@@ -17,7 +17,7 @@ Uses abilities when their action is pressed, and tracks cooldowns.
 Description
 -----------
 
-Put an :ref:`AbilityData<class_AbilityData>` in :ref:`slots<class_Abilities_property_slots>` under an action name, e.g. ``secondary``. Code and AI can call :ref:`use()<class_Abilities_method_use>` directly.
+Put an :ref:`AbilityData<class_AbilityData>` in :ref:`slots<class_Abilities_property_slots>` under an action name, e.g. ``secondary``. For a player, the action must be one :ref:`PlayerBrain<class_PlayerBrain>` passes on: one of its :ref:`PlayerBrain.ACTIONS<class_PlayerBrain_constant_ACTIONS>` or your own in :ref:`PlayerBrain.extra_actions<class_PlayerBrain_property_extra_actions>`. Code and AI can call :ref:`use()<class_Abilities_method_use>` directly.
 
 .. rst-class:: classref-reftable-group
 

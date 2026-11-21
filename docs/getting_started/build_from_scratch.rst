@@ -893,7 +893,8 @@ effects.
    * - ``Targeting``
      - ``Resource``
      - ``find(ctx) -> Array[Node]``. The base version returns ``[ctx.source]`` (the user).
-       Subclasses return what a ray, sphere or cone finds.
+       Subclasses return what a ray, sphere or cone finds; the reference build's
+       ``RadiusTargeting`` asks the physics engine for everything in a sphere.
    * - ``AbilityData``
      - ``Resource``
      - ``id``, ``display_name``, ``icon``, ``cooldown``, ``targeting``, ``effects``
@@ -932,7 +933,8 @@ These were added late in the reference build and are easier once everything else
 
 Get stages 1–3 running with plain ``print`` debugging first. When you're done,
 ``character_system/examples/`` and the :ref:`recipes <doc_recipes>` show finished statuses,
-items, zones and abilities to compare with yours.
+items, zones and abilities to compare with yours, and :ref:`doc_extending` adds a melee
+weapon, radius targeting, a hostility condition and example components on top.
 
 Checklist
 ---------

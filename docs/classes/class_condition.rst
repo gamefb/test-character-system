@@ -10,7 +10,7 @@ Condition
 
 **Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`HasTagCondition<class_HasTagCondition>`, :ref:`HealthBelowCondition<class_HealthBelowCondition>`, :ref:`StatCondition<class_StatCondition>`
+**Inherited By:** :ref:`HasTagCondition<class_HasTagCondition>`, :ref:`HealthBelowCondition<class_HealthBelowCondition>`, :ref:`IsHostileCondition<class_IsHostileCondition>`, :ref:`StatCondition<class_StatCondition>`
 
 A yes/no check on a node, used to gate effects and statuses.
 
@@ -32,7 +32,9 @@ Description
         var statuses := Component.of(node, Statuses) as Statuses
         return statuses != null and statuses.has_tag(&"fire")
 
-Set :ref:`subject<class_Condition_property_subject>` to check whoever caused it instead ("only rangers can apply this"), and :ref:`negate<class_Condition_property_negate>` to flip the result. The built-in ones are :ref:`HasTagCondition<class_HasTagCondition>`, :ref:`StatCondition<class_StatCondition>` and :ref:`HealthBelowCondition<class_HealthBelowCondition>`.
+Set :ref:`subject<class_Condition_property_subject>` to check whoever caused it instead ("only rangers can apply this"), and :ref:`negate<class_Condition_property_negate>` to flip the result. The built-in ones are :ref:`HasTagCondition<class_HasTagCondition>`, :ref:`StatCondition<class_StatCondition>`, :ref:`HealthBelowCondition<class_HealthBelowCondition>` and :ref:`IsHostileCondition<class_IsHostileCondition>`.
+
+A check that needs both sides, such as "the source is hostile to the target", overrides :ref:`check()<class_Condition_method_check>` instead and reads :ref:`EffectContext.source<class_EffectContext_property_source>` and :ref:`EffectContext.target<class_EffectContext_property_target>` itself. :ref:`IsHostileCondition<class_IsHostileCondition>` is a short example.
 
 .. rst-class:: classref-reftable-group
 

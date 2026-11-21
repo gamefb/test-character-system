@@ -49,17 +49,14 @@ Item components
    * - :ref:`Hitscan<class_Hitscan>`
      - What an instant shot hits and what happens to it
      - ``max_distance``, ``effects``
-   * - ``ProjectileLauncher``
-     - Spawns a projectile scene that carries the effects
-     - ``projectile``, ``speed``, ``effects``
-   * - ``MeleeSweep``
-     - What a swing hits, using a shape cast
-     - ``shape``, ``effects``
+   * - :ref:`MeleeSweep<class_MeleeSweep>`
+     - What a swing hits: everything inside a shape in front of the item
+     - ``shape``, ``offset``, ``effects``
    * - :ref:`GrantStatuses<class_GrantStatuses>`
      - Passives the wielder has while the item is equipped
      - ``statuses``
 
-The flow inside an item is a short signal chain: :ref:`Trigger<class_Trigger>` asks :ref:`Magazine<class_Magazine>` (if present) for a round, then emits ``fired``; every delivery component (:ref:`Hitscan<class_Hitscan>`, ``ProjectileLauncher``, ``MeleeSweep``) listens for ``fired`` and applies its ``effects`` to what it hits.
+The flow inside an item is a short signal chain: :ref:`Trigger<class_Trigger>` asks :ref:`Magazine<class_Magazine>` (if present) for a round, then emits ``fired``; every delivery component (:ref:`Hitscan<class_Hitscan>`, :ref:`MeleeSweep<class_MeleeSweep>`) listens for ``fired`` and applies its ``effects`` to what it hits. Each hit's context records the item's :ref:`ItemData<class_ItemData>` as ``origin``, so a kill feed can say "killed by Rifle".
 
 .. source-file:: ../../character_system/items/components/trigger.gd
 
@@ -82,7 +79,9 @@ A weapon's own wielder is never hit: :ref:`Hitscan<class_Hitscan>` collects the 
 
 .. source-file:: ../../character_system/items/components/hitscan.gd
 
-``ProjectileLauncher`` and ``MeleeSweep`` follow the :ref:`Hitscan<class_Hitscan>` pattern: require :ref:`Trigger<class_Trigger>`, listen to ``fired`` in ``_start()``, find targets, and build each context with ``Hurtbox.hit()``.
+.. source-file:: ../../character_system/items/components/melee_sweep.gd
+
+:ref:`MeleeSweep<class_MeleeSweep>` follows the :ref:`Hitscan<class_Hitscan>` pattern: require :ref:`Trigger<class_Trigger>`, listen to ``fired`` in ``_start()``, find targets, and build each context with ``Hurtbox.hit()``. It hits each character once per swing, through its most vulnerable part inside the shape. A projectile weapon would follow the same pattern; :ref:`doc_extending_item_component` covers writing your own.
 
 .. _doc_passives_from_equipment:
 
@@ -98,6 +97,35 @@ Passives from equipment
 Example items
 -------------
 
+These ship in ``character_system/examples/items/``, each an :ref:`ItemData<class_ItemData>` ``.tres`` with its scene in ``scenes/``.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Item
+     - Slot
+     - Components
+   * - Rifle (``rifle.tres``)
+     - ``weapon``
+     - :ref:`Trigger<class_Trigger>` (5 per second), :ref:`Magazine<class_Magazine>` (12 rounds,
+       rifle ammo), :ref:`Hitscan<class_Hitscan>` [10 physical damage; 5 more if the target is
+       wet]
+   * - Flare gun (``flare_gun.tres``)
+     - ``weapon``
+     - :ref:`Trigger<class_Trigger>` (2 per second), :ref:`Magazine<class_Magazine>` (2 rounds),
+       :ref:`Hitscan<class_Hitscan>` [2 fire damage, apply Burning]
+   * - Fireproof cloak (``fireproof_cloak.tres``)
+     - ``cloak``
+     - :ref:`GrantStatuses<class_GrantStatuses>` [Fireproof]
+   * - Ward amulet (``ward_amulet.tres``)
+     - ``neck``
+     - :ref:`GrantStatuses<class_GrantStatuses>` [Warded]
+   * - Rifle ammo (``rifle_ammo.tres``)
+     - none
+     - None: it's only carried, up to 60 per stack, and the rifle's Magazine reloads from it.
+
+More ideas, built from the same parts:
+
 .. list-table::
    :header-rows: 1
 
@@ -107,11 +135,8 @@ Example items
    * - Assault rifle
      - :ref:`Trigger<class_Trigger>` (automatic, 10 per second), :ref:`Magazine<class_Magazine>` (30, rifle ammo), :ref:`Hitscan<class_Hitscan>` [damage]
      - Full-auto, ammo-limited hitscan weapon
-   * - Revolver
-     - :ref:`Trigger<class_Trigger>` (2 per second), :ref:`Magazine<class_Magazine>` (6, pistol ammo), :ref:`Hitscan<class_Hitscan>` [damage]
-     - Semi-auto, same scripts with different numbers
    * - Flaming sword
-     - :ref:`Trigger<class_Trigger>` (1.5 per second), ``MeleeSweep`` [damage, apply Burning]
+     - :ref:`Trigger<class_Trigger>` (1.5 per second), :ref:`MeleeSweep<class_MeleeSweep>` [damage, apply Burning]
      - Melee weapon that sets targets on fire
    * - Storm rod
      - :ref:`Trigger<class_Trigger>`, :ref:`Hitscan<class_Hitscan>` [lightning damage, extra lightning damage if target has tag ``wet``]
@@ -120,8 +145,8 @@ Example items
      - :ref:`Trigger<class_Trigger>`, :ref:`Hitscan<class_Hitscan>` [heal]
      - Same delivery, friendly effect
    * - Ring of haste
-     - :ref:`GrantStatuses<class_GrantStatuses>` [Haste passive]
+     - :ref:`GrantStatuses<class_GrantStatuses>` [a Haste passive with duration 0]
      - No trigger at all, only a passive
    * - Cursed rifle
-     - Assault rifle + :ref:`GrantStatuses<class_GrantStatuses>` [Fragile passive]
+     - The rifle + :ref:`GrantStatuses<class_GrantStatuses>` [a Fragile passive]
      - A weapon and a passive drawback in one item

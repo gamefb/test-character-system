@@ -22,7 +22,7 @@ Every source applies statuses the same way: it builds an :ref:`EffectContext<cla
      - Ring of haste grants Haste while worn
    * - Equipment
      - Whatever it hits
-     - ``effects`` on :ref:`Hitscan<class_Hitscan>`, ``ProjectileLauncher``, ``MeleeSweep``
+     - ``effects`` on :ref:`Hitscan<class_Hitscan>` or :ref:`MeleeSweep<class_MeleeSweep>`
      - Flaming sword applies Burning
    * - Character
      - Another character or itself
@@ -54,12 +54,14 @@ Environment
 
 -  **"While inside" status** (deep water, a healing aura): set ``status_while_inside`` to a status with duration 0. Each zone a body stands in is one hold, so leaving one of two overlapping pools keeps it wet. The zone only drops holds for bodies that accepted the status, so a refused body never loses a hold that another source gave it.
 -  **One-shot hazard** (a fire patch): ``on_enter`` = :ref:`ApplyStatusEffect<class_ApplyStatusEffect>` with a timed status such as Burning.
--  **Surfaces created at runtime**, such as a puddle left by a water spell, are an :ref:`EffectZone<class_EffectZone>` scene spawned by a custom ``SpawnSceneEffect``. When the puddle is freed, everyone still standing in it loses its status. Statuses can therefore create environment that applies further statuses.
+-  **Surfaces created at runtime**, such as a puddle left by a water spell, are an :ref:`EffectZone<class_EffectZone>` scene spawned by a :ref:`SpawnSceneEffect<class_SpawnSceneEffect>`. When the puddle is freed, everyone still standing in it loses its status. Statuses can therefore create environment that applies further statuses.
 
 .. _doc_a_full_chain_end_to_end:
 
 A full chain, end to end
 ------------------------
+
+This chain uses two of the status ideas from :ref:`doc_example_statuses`, Flaming blade and Stoneskin, alongside the shipped Burning and Wet.
 
 1. The player equips a rifle with :ref:`Hitscan<class_Hitscan>` [damage 10] and a ring with :ref:`GrantStatuses<class_GrantStatuses>` [Flaming blade].
 2. The player fires at an enemy's head. :ref:`Trigger<class_Trigger>` emits ``fired``, and :ref:`Hitscan<class_Hitscan>` hits the enemy's head :ref:`Hurtbox<class_Hurtbox>`, which sets ``magnitude`` to 2.

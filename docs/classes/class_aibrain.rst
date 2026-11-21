@@ -17,7 +17,7 @@ Steers toward :ref:`target<class_AIBrain_property_target>` along the navigation 
 Description
 -----------
 
-Decision logic (a state machine or behavior tree) sets :ref:`target<class_AIBrain_property_target>` and calls :ref:`Brain.press()<class_Brain_method_press>` and :ref:`Brain.release()<class_Brain_method_release>` to attack, exactly like a player pressing a button.
+Decision logic (a state machine or behavior tree) sets :ref:`target<class_AIBrain_property_target>` and calls :ref:`Brain.press()<class_Brain_method_press>` and :ref:`Brain.release()<class_Brain_method_release>` to attack, exactly like a player pressing a button. Put it in its own component beside the brain; :ref:`AttackNearest<class_AttackNearest>` in ``examples/scripts/`` is a small one to start from.
 
 Finding a path is the expensive part of steering, so a new one is only asked for when the target has moved :ref:`repath_distance<class_AIBrain_property_repath_distance>` metres. Many characters can chase the same target without each one searching the navigation mesh every frame.
 
@@ -33,6 +33,8 @@ Properties
    | :ref:`NavigationAgent3D<class_NavigationAgent3D>` | :ref:`agent<class_AIBrain_property_agent>`                     |         |
    +---------------------------------------------------+----------------------------------------------------------------+---------+
    | :ref:`float<class_float>`                         | :ref:`repath_distance<class_AIBrain_property_repath_distance>` | ``1.0`` |
+   +---------------------------------------------------+----------------------------------------------------------------+---------+
+   | :ref:`float<class_float>`                         | :ref:`aim_height<class_AIBrain_property_aim_height>`           | ``1.0`` |
    +---------------------------------------------------+----------------------------------------------------------------+---------+
    | :ref:`Node3D<class_Node3D>`                       | :ref:`target<class_AIBrain_property_target>`                   |         |
    +---------------------------------------------------+----------------------------------------------------------------+---------+
@@ -69,6 +71,18 @@ Finds the paths. Leave it empty to use the first :ref:`NavigationAgent3D<class_N
 :ref:`float<class_float>` **repath_distance** = ``1.0`` :ref:`🔗<class_AIBrain_property_repath_distance>`
 
 How far, in metres, :ref:`target<class_AIBrain_property_target>` must move before a new path is found. Lower follows a fast target more closely and costs more. 0 finds a new path whenever it moves at all.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_AIBrain_property_aim_height:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **aim_height** = ``1.0`` :ref:`🔗<class_AIBrain_property_aim_height>`
+
+How high above the target's origin to aim, in metres. 1 aims at the chest of a character whose origin is at its feet; use 0 if the target's origin is its centre.
 
 .. rst-class:: classref-item-separator
 

@@ -33,5 +33,10 @@ Without the component the number has no purpose, so it has no value either: a mo
    * - ``jump_velocity``
      - :ref:`Movement<class_Movement>`
      - Jump Velocity (4.5)
+   * - ``air_jumps``
+     - :ref:`DoubleJump<class_DoubleJump>`
+     - Air Jumps (1)
+
+Your own components add more: any name a component returns from ``_stats()`` is a stat. :ref:`doc_extending_names` shows how.
 
 Damage buffs are not a stat. A status with a ``dealing_damage`` trigger and a :ref:`ModifyAmountEffect<class_ModifyAmountEffect>` changes each hit before it lands, which also allows conditions such as "+50% against wet targets".

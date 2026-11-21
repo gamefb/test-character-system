@@ -41,11 +41,11 @@ Methods
 .. table::
    :widths: auto
 
-   +----------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`EffectContext<class_EffectContext>`          | :ref:`hit<class_Hurtbox_method_hit>`\ (\ source\: :ref:`Node<class_Node>`, collider\: :ref:`Object<class_Object>`\ ) |static| |
-   +----------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Array<class_Array>`\[:ref:`RID<class_RID>`\] | :ref:`rids_of<class_Hurtbox_method_rids_of>`\ (\ character\: :ref:`Node<class_Node>`\ ) |static|                              |
-   +----------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------+
+   +----------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`EffectContext<class_EffectContext>`          | :ref:`hit<class_Hurtbox_method_hit>`\ (\ source\: :ref:`Node<class_Node>`, collider\: :ref:`Object<class_Object>`, origin\: :ref:`Resource<class_Resource>` = null\ ) |static| |
+   +----------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Array<class_Array>`\[:ref:`RID<class_RID>`\] | :ref:`rids_of<class_Hurtbox_method_rids_of>`\ (\ character\: :ref:`Node<class_Node>`\ ) |static|                                                                               |
+   +----------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -89,9 +89,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`EffectContext<class_EffectContext>` **hit**\ (\ source\: :ref:`Node<class_Node>`, collider\: :ref:`Object<class_Object>`\ ) |static| :ref:`🔗<class_Hurtbox_method_hit>`
+:ref:`EffectContext<class_EffectContext>` **hit**\ (\ source\: :ref:`Node<class_Node>`, collider\: :ref:`Object<class_Object>`, origin\: :ref:`Resource<class_Resource>` = null\ ) |static| :ref:`🔗<class_Hurtbox_method_hit>`
 
-Builds the :ref:`EffectContext<class_EffectContext>` for a hit on ``collider``, resolving a hurtbox to its character.
+Builds the :ref:`EffectContext<class_EffectContext>` for a hit on ``collider``, resolving a hurtbox to its character. ``origin`` is what dealt it, e.g. the weapon's :ref:`ItemData<class_ItemData>`, so a kill feed can name it.
 
 .. rst-class:: classref-item-separator
 

@@ -54,6 +54,8 @@ Methods
    +-----------------------------------------+--------------------------------------------------------------------------------------------------+
    | |void|                                  | :ref:`equip<class_Equipment_method_equip>`\ (\ item\: :ref:`ItemInstance<class_ItemInstance>`\ ) |
    +-----------------------------------------+--------------------------------------------------------------------------------------------------+
+   | :ref:`Node<class_Node>`                 | :ref:`node_in<class_Equipment_method_node_in>`\ (\ slot\: :ref:`StringName<class_StringName>`\ ) |
+   +-----------------------------------------+--------------------------------------------------------------------------------------------------+
    | :ref:`ItemInstance<class_ItemInstance>` | :ref:`unequip<class_Equipment_method_unequip>`\ (\ slot\: :ref:`StringName<class_StringName>`\ ) |
    +-----------------------------------------+--------------------------------------------------------------------------------------------------+
 
@@ -93,7 +95,7 @@ Property Descriptions
 
 - |void| **@sockets_setter**\ (\ value\: :ref:`Dictionary<class_Dictionary>`\[:ref:`StringName<class_StringName>`, :ref:`NodePath<class_NodePath>`\]\ )
 
-Where each slot's scene is attached, e.g. { &"weapon": ^"../Hand" }.
+Where each slot's scene is attached, e.g. { &"weapon": ^"../Hand" }. The key is the slot name an item's :ref:`ItemData.slot<class_ItemData_property_slot>` uses. Paths start from this node, so a Hand beside it is ``../Hand`` and a Hand under the camera is ``../Camera3D/Hand``.
 
 .. rst-class:: classref-item-separator
 
@@ -123,6 +125,22 @@ Method Descriptions
 |void| **equip**\ (\ item\: :ref:`ItemInstance<class_ItemInstance>`\ ) :ref:`🔗<class_Equipment_method_equip>`
 
 Equips ``item``, replacing whatever is in its slot. The replaced item stays carried.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Equipment_method_node_in:
+
+.. rst-class:: classref-method
+
+:ref:`Node<class_Node>` **node_in**\ (\ slot\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_Equipment_method_node_in>`
+
+The scene spawned for the item in ``slot``, or null if the slot is empty. Its item components are on it, e.g. for an ammo counter:
+
+::
+
+    var magazine := Component.of(gear.node_in(&"weapon"), Magazine) as Magazine
 
 .. rst-class:: classref-item-separator
 

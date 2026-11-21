@@ -19,7 +19,7 @@ Description
 
 A stat's value is (base + all adds) × all muls. The base comes from the component that owns the stat in :ref:`Component._stats()<class_Component_private_method__stats>`. Statuses apply theirs once per stack; see :ref:`StatusData.modifiers<class_StatusData_property_modifiers>`.
 
-The built-in stats are ``max_health``, ``move_speed``, ``jump_velocity`` and ``resist_<type>`` (e.g. ``resist_fire``, where 1 means immune). Your own components add more through :ref:`Component._stats()<class_Component_private_method__stats>`. Use a negative :ref:`add<class_StatModifier_property_add>` or a :ref:`mul<class_StatModifier_property_mul>` below 1 for penalties. A stat no component owns has nothing to change, so the modifier does nothing (the editor warns about the name).
+The built-in stats are ``max_health``, ``move_speed``, ``jump_velocity``, ``air_jumps`` and ``resist_<type>`` (e.g. ``resist_fire``, where 1 means immune). Your own components add more through :ref:`Component._stats()<class_Component_private_method__stats>`. Use a negative :ref:`add<class_StatModifier_property_add>` or a :ref:`mul<class_StatModifier_property_mul>` below 1 for penalties. A stat no component owns has nothing to change, so the modifier does nothing (the editor warns about the name).
 
 .. rst-class:: classref-reftable-group
 

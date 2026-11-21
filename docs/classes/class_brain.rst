@@ -33,6 +33,15 @@ Read its buttons the way Godot's input docs read the :ref:`Input<class_Input>` s
 
 A brain presses buttons with :ref:`press()<class_Brain_method_press>` and :ref:`release()<class_Brain_method_release>`. A press counts from the next frame, so every node sees it exactly once, wherever in the frame it was made.
 
+To drive a plain Brain yourself, set :ref:`move_dir<class_Brain_property_move_dir>` and :ref:`aim_point<class_Brain_property_aim_point>` and tap buttons from your own component, e.g. a turret that aims at the nearest enemy:
+
+::
+
+    var brain := find(Brain) as Brain
+    brain.aim_point = enemy.global_position
+    brain.press(&"primary")  # A tap: press and release in the same frame.
+    brain.release(&"primary")
+
 .. rst-class:: classref-reftable-group
 
 Properties

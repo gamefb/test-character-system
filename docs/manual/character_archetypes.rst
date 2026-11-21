@@ -69,8 +69,6 @@ The three character kinds share one scene layout and differ in two components an
      - Monster traits, e.g. fire immunity
      - Companion traits
 
-.. note::
+**One base scene, many characters.** Build one character scene that holds the shared parts: the body, its collision shape, the ComponentManager, Statuses, Health, Movement and Inventory. Make the player, enemies and allies as inherited scenes of it (Scene > New Inherited Scene), each adding its brain and its camera or navigation agent, and setting its Faction. A change to the base, such as a new component every character should have, then reaches them all. The :ref:`quick start <doc_quick_start>` builds a player and a target by hand, and the recipe "Make an enemy that attacks" builds an AI.
 
-   ``character_system/templates/`` is in the original project but not in this repository yet.
-
-``character_system/templates/`` ships these as ready-made scenes. ``character.tscn`` holds the shared components. ``player.tscn``, ``enemy.tscn`` and ``ally.tscn`` are inherited scenes of it (Scene > New Inherited Scene) that add a brain, a camera or a navigation agent, and a faction. Make your own characters as inherited scenes of these, so a change to the base reaches them all. ``hitscan_weapon.tscn`` and its ``.tres`` are a starting weapon. A stationary turret is a character without :ref:`Movement<class_Movement>` and with a plain :ref:`Brain<class_Brain>`. A destructible crate is a :ref:`ComponentManager<class_ComponentManager>` and a :ref:`Health<class_Health>` on a ``StaticBody3D``.
+A stationary turret is a character without :ref:`Movement<class_Movement>` and with a plain :ref:`Brain<class_Brain>`, driven by your own component. A destructible crate is a :ref:`ComponentManager<class_ComponentManager>` and a :ref:`Health<class_Health>` on a ``StaticBody3D``.
