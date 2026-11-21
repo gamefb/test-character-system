@@ -23,7 +23,8 @@ const ACTIONS: Array[StringName] = [
 	&"previous_weapon",
 ]
 
-## Movement is relative to this camera, and the character aims where it looks.
+## Movement is relative to this camera, and the character aims where it looks. Leave it empty
+## to use the first [Camera3D] under the character.
 @export var camera: Camera3D:
 	set(value):
 		camera = value
@@ -51,12 +52,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _warnings() -> PackedStringArray:
 	var out: PackedStringArray = super()
-	if not camera:
-		out.append("Set the Camera.")
+	if not camera and not find_node_of_type(&"Camera3D"):
+		out.append("Add a Camera3D to the character, or set the Camera.")
 	return out
 
 
 func _start() -> void:
+	if not camera:
+		camera = find_node_of_type(&"Camera3D")
 	var moves: Array[StringName] = [&"left", &"right", &"forward", &"back"]
 	var missing: Array = moves.filter(
 			func(a: StringName) -> bool: return not InputMap.has_action(a))

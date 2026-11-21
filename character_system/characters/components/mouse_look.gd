@@ -6,7 +6,8 @@ extends Component
 ##
 ## Captures the mouse when the character starts. Esc frees it; clicking captures it again.
 
-## Tilted up and down by the mouse. The host itself turns left and right.
+## Tilted up and down by the mouse. The host itself turns left and right. Leave it empty to use
+## the first [Camera3D] under the character.
 @export var camera: Camera3D:
 	set(value):
 		camera = value
@@ -34,9 +35,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _warnings() -> PackedStringArray:
-	return PackedStringArray() if camera else PackedStringArray(["Set the Camera."])
+	if camera or find_node_of_type(&"Camera3D"):
+		return PackedStringArray()
+	return PackedStringArray(["Add a Camera3D to the character, or set the Camera."])
 
 
 func _start() -> void:
+	if not camera:
+		camera = find_node_of_type(&"Camera3D")
 	if capture_on_start:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED

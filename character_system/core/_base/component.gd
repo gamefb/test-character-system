@@ -82,7 +82,7 @@ extends Node
 ##
 ## [b]Rules of thumb.[/b]
 ## [br]- Don't keep references to other components in variables; [method find] them when you
-## need them. They can be removed and added during play.
+## need them. They can be removed and added during play, and [method find] is cheap.
 ## [br]- Don't store stat values. Read [method stat] each time, or [method listen] to
 ## [signal ComponentManager.stat_changed]; a stored speed ignores every status.
 ## [br]- Connect with [method listen], not [code]connect()[/code], so connections are undone
@@ -109,6 +109,8 @@ var _connections: Array[Array] = []  # [Signal, Callable] pairs made with listen
 var _mode := PROCESS_MODE_INHERIT
 # Whether a "can't start" error was already shown.
 var _reported := false
+# What _requires() returned when the component started.
+var _required: Array[Script] = []
 
 
 ## Returns the [param type] component on [param node], or null. Safe on null or freed nodes.
@@ -174,7 +176,8 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 
 ## Returns the [param type] component on the same host, or null. Subclasses count. If the host
-## has several, the first is returned.
+## has several, the first is returned. The manager remembers the answer, so calling it every
+## frame is cheap.
 ##
 ## Types in [method _requires] are never null while the component runs, so in [method _start]
 ## and [code]_process()[/code] you can cast and use them directly:
@@ -183,6 +186,20 @@ func _get_configuration_warnings() -> PackedStringArray:
 ## [/codeblock]
 func find(type: Script) -> Component:
 	return _manager.find(type) if _manager else null
+
+
+## Returns the first node of the built-in class [param type] anywhere under the host, or null.
+## Use it to fill in an export that was left empty, the way [PlayerBrain] finds its camera:
+## [codeblock]
+## if not camera:
+## 	camera = find_node_of_type(&"Camera3D")
+## [/codeblock]
+## It searches the whole host, so call it once, e.g. in [method _start], not every frame.
+func find_node_of_type(type: StringName) -> Node:
+	if not host:
+		return null
+	var found: Array[Node] = host.find_children("*", type, true, false)
+	return found[0] if not found.is_empty() else null
 
 
 ## Current value of [param stat_name] on this host: the owner's base value with every
@@ -224,7 +241,11 @@ func update_stats() -> void:
 ## Components of the types in [method _requires] that are not on the host. Empty when the
 ## component can start. Handy for your own debug display.
 func missing() -> Array[Script]:
-	return _requires().filter(func(type: Script) -> bool: return not _has_sibling(type))
+	var out: Array[Script] = []
+	for type in _requires():
+		if not _has_sibling(type):
+			out.append(type)
+	return out
 
 
 #region Override these
@@ -301,6 +322,7 @@ func _warnings() -> PackedStringArray:
 ## Called by the [ComponentManager]. Starts the component.
 func _begin() -> void:
 	running = true
+	_required = _requires()
 	process_mode = _mode
 	_start()
 
@@ -317,6 +339,15 @@ func _halt() -> void:
 		if is_instance_valid(sig.get_object()) and sig.is_connected(pair[1]):
 			sig.disconnect(pair[1])
 	_connections.clear()
+
+
+# Called by the ComponentManager when other leaves: true if this component required other's
+# type when it started.
+func _required_type_of(other: Component) -> bool:
+	for type in _required:
+		if is_instance_of(other, type):
+			return true
+	return false
 
 
 func _has_sibling(type: Script) -> bool:

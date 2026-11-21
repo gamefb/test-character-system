@@ -109,6 +109,17 @@ func test_stops_and_restarts_with_its_requirement() -> void:
 	assert_eq(needy.pings, 2, "and made again on restart")
 
 
+func test_keeps_running_while_another_of_the_required_type_is_left() -> void:
+	var first := Needed.new()
+	var needy := Needy.new()
+	for node in [first, Needed.new(), needy]:
+		host.add_child(node)
+	add_child_autofree(host)
+	host.remove_child(first)
+	assert_true(needy.running)
+	first.free()
+
+
 func test_removing_a_component_stops_it() -> void:
 	var needy := Needy.new()
 	host.add_child(Needed.new())
@@ -163,6 +174,26 @@ func test_lookups_work_before_the_host_is_in_the_scene() -> void:
 	host.add_child(needed)
 	assert_eq(Component.of(host, Needed), needed)
 	host.free()
+
+
+func test_lookups_follow_components_that_come_and_go() -> void:
+	assert_null(Component.of(host, Needed), "none yet")
+	var needed := Needed.new()
+	host.add_child(needed)
+	assert_eq(Component.of(host, Needed), needed, "added outside the scene")
+	add_child_autofree(host)
+	host.remove_child(needed)
+	assert_null(Component.of(host, Needed), "removed during play")
+	needed.free()
+
+
+func test_new_component_reports_its_stats() -> void:
+	add_child_autofree(host)
+	var manager := ComponentManager.of(host)
+	watch_signals(manager)
+	host.add_child(Needed.new())
+	assert_signal_emitted_with_parameters(manager, "stat_changed", [&"power"])
+	assert_eq(manager.stat(&"power"), 10.0)
 
 
 class Needed extends Component:

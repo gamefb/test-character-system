@@ -33,8 +33,10 @@ var _nodes: Dictionary[StringName, Node] = {}
 
 
 func _on_event(event: StringName, _ctx: EffectContext) -> void:
+	if event != &"inventory_changed":
+		return
 	var bag := find(Inventory) as Inventory
-	if event == &"inventory_changed" and bag:
+	if bag:
 		for slot in equipped.keys():
 			if equipped[slot] not in bag.items:
 				unequip(slot)  # No longer carried.

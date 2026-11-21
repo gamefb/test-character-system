@@ -21,10 +21,11 @@ extends RefCounted
 ## 	return NameCheck.problems_in(effects)
 ## [/codeblock]
 ## It reads names written in the code and saved files, so a name built at runtime, such as
-## [code]notify(host, my_event, ctx)[/code] with a variable, isn't seen; a trigger for it is
-## reported even though it works. The project is read again at most every 3 seconds.
+## [code]notify(host, my_event)[/code] with a variable, isn't seen; a trigger for it is
+## reported even though it works. With the plugin enabled, the project is read again whenever
+## its files change; otherwise at most every 30 seconds.
 
-const _RESCAN_MS := 3000  # How long scan results are reused.
+const _RESCAN_MS := 30000  # How long scan results are reused if nothing says files changed.
 
 static var _scanned_at: int = -_RESCAN_MS
 static var _stats := PackedStringArray()

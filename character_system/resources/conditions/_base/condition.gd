@@ -35,7 +35,10 @@ enum Subject {
 
 ## True if every condition passes. An empty list always passes.
 static func all_pass(conditions: Array[Condition], ctx: EffectContext) -> bool:
-	return conditions.all(func(c: Condition) -> bool: return c.check(ctx))
+	for c in conditions:
+		if not c.check(ctx):
+			return false
+	return true
 
 
 ## Tests the node [member subject] picks and applies [member negate]. Override this
