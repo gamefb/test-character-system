@@ -8,15 +8,25 @@ extends Component
 ## [member item] before the scene is added, so both are ready in [method Component._start].
 ##
 ## Keep per-copy state, such as rounds loaded, in [member ItemInstance.state], not on the node:
-## the node is freed when the item is unequipped.
+## the node is freed when the item is unequipped. Anything you change on the wielder, such as a
+## stat modifier, must be undone in [method Component._stop], which runs on unequip.
 ##
+## A component that acts when the item is used listens to its [Trigger], as [Hitscan] and
+## [MeleeSweep] do:
 ## [codeblock]
-## class_name Scope
+## class_name ShotCounter
 ## extends ItemComponent
 ##
-## func _process(_delta: float) -> void:
-## 	item.state[&"zoomed"] = brain.is_action_pressed(&"secondary")
+## func _requires() -> Array[Script]:
+## 	return [Trigger]
+##
+## func _start() -> void:
+## 	listen((find(Trigger) as Trigger).fired, _on_fired)
+##
+## func _on_fired() -> void:
+## 	item.state[&"shots"] = item.state.get(&"shots", 0) + 1  # Kept between equips.
 ## [/codeblock]
+## [Scope] in [code]examples/scripts/[/code] is a complete one that changes its wielder.
 
 ## The character holding the item.
 var wielder: Node3D

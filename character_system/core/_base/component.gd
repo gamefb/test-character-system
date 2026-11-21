@@ -50,39 +50,39 @@ extends Node
 ## [b]Writing your own.[/b] Extend this class and override any of [method _requires],
 ## [method _stats], [method _start], [method _stop], [method _on_event] and
 ## [method _warnings]. Do setup in [method _start], not [code]_ready()[/code]: it runs once
-## everything is in place, and never in the editor.
+## everything is in place, and never in the editor. This outline shows where each part goes;
+## [Stamina] in [code]examples/scripts/[/code] is a complete one to copy.
 ##
 ## [codeblock]
 ## @tool  # Optional: shows this component's warnings in the editor.
-## class_name Stamina
+## class_name Shield
 ## extends Component
 ##
-## @export var max_stamina := 100.0
+## @export var max_shield := 50.0
 ##
 ## func _requires() -> Array[Script]:
-## 	return [Movement]  # Waits until there's a Movement beside it.
+## 	return [Health]  # Waits until there's a Health beside it.
 ##
 ## func _stats() -> Dictionary[StringName, float]:
-## 	return { &"max_stamina": max_stamina }  # Statuses can change it by name.
+## 	return { &"max_shield": max_shield }  # Statuses can change it by name.
 ##
 ## func _start() -> void:
 ## 	listen(manager.stat_changed, _on_stat_changed)  # Disconnected on stop.
 ##
-## func _process(delta: float) -> void:
-## 	if (find(Brain) as Brain).is_action_pressed(&"sprint"):
-## 		pass  # Runs only while the component runs.
+## func _process(_delta: float) -> void:
+## 	pass  # Runs only while the component runs, e.g. to recharge.
 ##
-## func _on_stat_changed(stat_name: StringName) -> void:
-## 	pass
+## func _on_stat_changed(_stat_name: StringName) -> void:
+## 	pass  # E.g. cut the shield down when max_shield drops.
 ##
 ## func _on_event(event: StringName, ctx: EffectContext) -> void:
-## 	if event == &"took_damage":
-## 		pass
+## 	if event == &"taking_damage":
+## 		ctx.amount *= 0.5  # A hit about to land: absorb half of it.
 ## [/codeblock]
 ##
 ## [b]Rules of thumb.[/b]
 ## [br]- Don't keep references to other components in variables; [method find] them when you
-## need them. They can be removed and added during play.
+## need them. They can be removed and added during play, and [method find] is cheap.
 ## [br]- Don't store stat values. Read [method stat] each time, or [method listen] to
 ## [signal ComponentManager.stat_changed]; a stored speed ignores every status.
 ## [br]- Connect with [method listen], not [code]connect()[/code], so connections are undone
@@ -109,6 +109,8 @@ var _connections: Array[Array] = []  # [Signal, Callable] pairs made with listen
 var _mode := PROCESS_MODE_INHERIT
 # Whether a "can't start" error was already shown.
 var _reported := false
+# What _requires() returned when the component started.
+var _required: Array[Script] = []
 
 
 ## Returns the [param type] component on [param node], or null. Safe on null or freed nodes.
@@ -174,7 +176,8 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 
 ## Returns the [param type] component on the same host, or null. Subclasses count. If the host
-## has several, the first is returned.
+## has several, the first is returned. The manager remembers the answer, so calling it every
+## frame is cheap.
 ##
 ## Types in [method _requires] are never null while the component runs, so in [method _start]
 ## and [code]_process()[/code] you can cast and use them directly:
@@ -183,6 +186,20 @@ func _get_configuration_warnings() -> PackedStringArray:
 ## [/codeblock]
 func find(type: Script) -> Component:
 	return _manager.find(type) if _manager else null
+
+
+## Returns the first node of the built-in class [param type] anywhere under the host, or null.
+## Use it to fill in an export that was left empty, the way [PlayerBrain] finds its camera:
+## [codeblock]
+## if not camera:
+## 	camera = find_node_of_type(&"Camera3D")
+## [/codeblock]
+## It searches the whole host, so call it once, e.g. in [method _start], not every frame.
+func find_node_of_type(type: StringName) -> Node:
+	if not host:
+		return null
+	var found: Array[Node] = host.find_children("*", type, true, false)
+	return found[0] if not found.is_empty() else null
 
 
 ## Current value of [param stat_name] on this host: the owner's base value with every
@@ -224,7 +241,11 @@ func update_stats() -> void:
 ## Components of the types in [method _requires] that are not on the host. Empty when the
 ## component can start. Handy for your own debug display.
 func missing() -> Array[Script]:
-	return _requires().filter(func(type: Script) -> bool: return not _has_sibling(type))
+	var out: Array[Script] = []
+	for type in _requires():
+		if not _has_sibling(type):
+			out.append(type)
+	return out
 
 
 #region Override these
@@ -301,6 +322,7 @@ func _warnings() -> PackedStringArray:
 ## Called by the [ComponentManager]. Starts the component.
 func _begin() -> void:
 	running = true
+	_required = _requires()
 	process_mode = _mode
 	_start()
 
@@ -317,6 +339,15 @@ func _halt() -> void:
 		if is_instance_valid(sig.get_object()) and sig.is_connected(pair[1]):
 			sig.disconnect(pair[1])
 	_connections.clear()
+
+
+# Called by the ComponentManager when other leaves: true if this component required other's
+# type when it started.
+func _required_type_of(other: Component) -> bool:
+	for type in _required:
+		if is_instance_of(other, type):
+			return true
+	return false
 
 
 func _has_sibling(type: Script) -> bool:

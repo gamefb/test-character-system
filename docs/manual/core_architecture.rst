@@ -25,6 +25,9 @@ A component that can't start shows a yellow warning in the editor and reports it
    * - Another component on the same host
      - ``find(Type)``
      - :ref:`Movement<class_Movement>` finds the :ref:`Brain<class_Brain>` each frame
+   * - A plain node under the host, such as a camera
+     - ``find_node_of_type(&"Camera3D")`` in ``_start()``
+     - :ref:`PlayerBrain<class_PlayerBrain>` finds its camera when Camera is left empty
    * - A component on another node
      - ``Component.of(node, Type)``
      - :ref:`DamageEffect<class_DamageEffect>` finds the target's :ref:`Health<class_Health>`
@@ -42,4 +45,4 @@ The manager is the hub. You add one per host and never change it; a new kind of 
 
 .. source-file:: ../../character_system/core/component_manager.gd
 
-Lookups search the host's children, so ``find()`` and ``Component.of()`` also work on a scene that hasn't been added to the level yet. Whether a component may start depends only on registered components, so one that is leaving no longer counts.
+Lookups search the host's children, so ``find()`` and ``Component.of()`` also work on a scene that hasn't been added to the level yet. The manager remembers each answer until a child is added, removed or moved, so a lookup every frame costs about as much as reading a variable. ``Component.of()`` finds the manager by its name first, so keep the default name, ``ComponentManager``; a renamed one still works, it's just found by searching. Whether a component may start depends only on registered components, so one that is leaving no longer counts.

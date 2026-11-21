@@ -7,8 +7,8 @@ extends Resource
 ## The event to react to. Built in: [code]dealing_damage[/code] and [code]taking_damage[/code]
 ## (before a hit lands), [code]dealt_damage[/code] and [code]took_damage[/code] (after), and
 ## [code]died[/code] when something dealt the killing blow. Send your own with
-## [method ComponentManager.notify] and an [EffectContext]: triggers ignore events sent
-## without one, such as [code]started[/code] and [code]inventory_changed[/code].
+## [method ComponentManager.notify]. Triggers ignore the events that carry no context,
+## [code]started[/code] and [code]inventory_changed[/code].
 @export var event: StringName
 ## Off: effects hit the holder. On: they hit the other side (the attacker or the victim).
 @export var affects_other := false

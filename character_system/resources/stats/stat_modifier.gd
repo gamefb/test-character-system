@@ -7,8 +7,9 @@ extends Resource
 ## [member StatusData.modifiers].
 ##
 ## The built-in stats are [code]max_health[/code], [code]move_speed[/code],
-## [code]jump_velocity[/code] and [code]resist_<type>[/code] (e.g. [code]resist_fire[/code],
-## where 1 means immune). Your own components add more through [method Component._stats].
+## [code]jump_velocity[/code], [code]air_jumps[/code] and [code]resist_<type>[/code] (e.g.
+## [code]resist_fire[/code], where 1 means immune). Your own components add more through
+## [method Component._stats].
 ## Use a negative [member add] or a [member mul] below 1 for penalties. A stat no component
 ## owns has nothing to change, so the modifier does nothing (the editor warns about the name).
 

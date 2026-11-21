@@ -40,7 +40,7 @@ Each component owns one concern and is optional. The table lists the standard se
      - none
    * - :ref:`MouseLook<class_MouseLook>`
      - Turning the player and its camera with the mouse; capturing the mouse
-     - none (set its Camera)
+     - none (uses the character's Camera3D)
      - none
      - none
    * - :ref:`Faction<class_Faction>`
@@ -93,13 +93,15 @@ A :ref:`Brain<class_Brain>` publishes intent and nothing else. Every other compo
 
 .. source-file:: ../../character_system/characters/brains/player_brain.gd
 
-Input actions are created in Project > Project Settings > Input Map.
+Input actions are created in Project > Project Settings > Input Map. Leave Camera empty and :ref:`PlayerBrain<class_PlayerBrain>` uses the first ``Camera3D`` under the character, as :ref:`MouseLook<class_MouseLook>` does.
 
 :ref:`PlayerBrain<class_PlayerBrain>` takes presses from input events in ``_unhandled_input()``, so a click the UI uses never reaches the character. It polls releases every frame with ``Input.is_action_pressed()``, so a button let go while the game was paused, over the UI or in another window doesn't stay held, and an action bound to two keys stays held until both are up. AI and tests press buttons with ``press()`` and ``release()``. A press made from code counts from the next frame, so every node sees it exactly once wherever in the frame it was made; presses from input events count straight away, as they do in :ref:`Input<class_Input>`.
 
 .. source-file:: ../../character_system/characters/brains/ai_brain.gd
 
 Because AI presses the same "buttons" as the player, with ``press()`` and ``release()``, every weapon and ability works for AI with no extra code.
+
+Leave Agent empty and :ref:`AIBrain<class_AIBrain>` uses the first ``NavigationAgent3D`` under the character. Finding a path is the expensive part of steering, so a new one is only asked for once the target has moved ``repath_distance`` metres (1 by default). In a test with 50 enemies chasing a running player, asking every physics frame cost about seven times as much frame time. Lower the distance for a target that moves fast and turns sharply.
 
 .. _doc_movement:
 
@@ -159,7 +161,7 @@ Items have two parts. :ref:`ItemData<class_ItemData>` is the shared definition (
 Abilities
 ---------
 
-An ability is data: who it targets and which effects it runs. :ref:`Effect<class_Effect>` and :ref:`EffectContext<class_EffectContext>` are defined under Effects, statuses and passives.
+An ability is data: who it targets and which effects it runs. :ref:`Effect<class_Effect>` and :ref:`EffectContext<class_EffectContext>` are explained in :ref:`doc_effects`.
 
 .. source-file:: ../../character_system/resources/abilities/targeting/_base/targeting.gd
 
@@ -169,86 +171,6 @@ An ability is data: who it targets and which effects it runs. :ref:`Effect<class
 
 Cooldowns run on game time. Each one is a :ref:`SceneTreeTimer<class_SceneTreeTimer>`, so it stops while the game is paused and follows ``Engine.time_scale``. ``cooldown_left()`` gives the seconds left, for an ability bar. A slot fires on ``is_action_just_pressed()``, so holding the button uses the ability once.
 
-Passive abilities are not handled here. A passive is a status with no duration, given by ``Statuses.innate``, an item or a zone.
+Left empty, an ability's ``targeting`` affects the user. :ref:`RadiusTargeting<class_RadiusTargeting>` reaches everything within a radius, for a shockwave or a healing aura, and :ref:`doc_extending_targeting` shows how to write your own.
 
-.. _doc_ability_status_or_component:
-
-Ability, status or component?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-New gameplay usually fits one of three places:
-
-- An **ability** is one action that happens once per press, then cools down.
-- A **status** changes numbers and reacts to events, for a while or as long as something holds
-  it.
-- A **component** is ongoing behaviour with its own memory, running every frame.
-
-To place a new idea, ask in this order:
-
-1. Does it happen once per press, then cool down? Make it an **ability**.
-2. Does it change a number, or react to hits or deaths, for a while or while equipped? Make it a
-   **status**, which an ability, item or zone can apply.
-3. Does it need memory between frames or presses, a held button, or a change to how the
-   character moves or acts? Make it a **component**.
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 40 40
-
-   * -
-     - Good at
-     - Limits
-   * - Ability
-     - One-off actions such as a heal, a fireball, a dash or applying a buff. Built in the
-       Inspector with no code when the effects exist. Granted or removed during play by
-       changing ``slots``; AI calls ``use()``.
-     - Fires only on a fresh press: nothing while held, on release, charged or channelled. A
-       cooldown is its only cost: no charges, mana, cast time or interruption. Effects are
-       instant, so anything lasting goes through a status. It remembers nothing between uses
-       but its cooldown. Conditions sit on the effects, so a failed one skips its effect but
-       still spends the cooldown.
-   * - Status
-     - Stat changes, reactions to events (shields, thorns, burning), immunities and passives.
-       Built in the Inspector. Timed, stacked, or held by items and zones.
-     - Can't read buttons or run every frame, except ticks at ``tick_interval``. Only changes
-       numbers some component already owns.
-   * - Component
-     - Anything that runs every frame, remembers state, reads held buttons, owns stats that
-       statuses can change, or needs other components.
-     - Needs GDScript and the start and stop lifecycle. Added to each character's scene, so
-       designers can't mix and match them as freely as resources. No built-in cooldowns or
-       costs.
-
-Some examples:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 20 50
-
-   * - Idea
-     - Where
-     - Why
-   * - Double jump
-     - Component
-     - Remembers jumps left, checks the floor every frame and shares the jump button with
-       :ref:`Movement<class_Movement>`. See :ref:`doc_double_jump`.
-   * - Learning to double jump, or boots that grant it
-     - Status
-     - Adds 1 to the ``air_jumps`` stat that :ref:`DoubleJump<class_DoubleJump>` owns.
-   * - Dash
-     - Ability
-     - Once per press: a :ref:`KnockbackEffect<class_KnockbackEffect>` on the user, then a
-       cooldown.
-   * - Sprint
-     - Ability
-     - Once per press: applies a speed status (``examples/abilities/sprint.tres`` applies
-       Haste).
-   * - Hover while holding jump
-     - Component
-     - Runs every frame while a button is held.
-
-When new behaviour needs code, prefer a new :ref:`Effect<class_Effect>` over a new component
-where you can: one effect works in abilities, statuses, weapons and zones at once.
-
-Most of the grey area comes from the ability limits above. A spell with charges, a mana cost or
-a charge-up can't be an ability yet, so today it would be a component of its own.
+Passive abilities are not handled here. A passive is a status with no duration, given by ``Statuses.innate``, an item or a zone. Not sure whether an idea should be an ability, a status or a component? See :ref:`doc_ability_status_or_component`.

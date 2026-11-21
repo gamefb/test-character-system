@@ -10,7 +10,7 @@ ItemComponent
 
 **Inherits:** :ref:`Component<class_Component>` **<** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`GrantStatuses<class_GrantStatuses>`, :ref:`Hitscan<class_Hitscan>`, :ref:`Magazine<class_Magazine>`, :ref:`Trigger<class_Trigger>`
+**Inherited By:** :ref:`GrantStatuses<class_GrantStatuses>`, :ref:`Hitscan<class_Hitscan>`, :ref:`Magazine<class_Magazine>`, :ref:`MeleeSweep<class_MeleeSweep>`, :ref:`Scope<class_Scope>`, :ref:`Trigger<class_Trigger>`
 
 Base class for components inside an item scene.
 
@@ -21,17 +21,25 @@ Description
 
 The item scene needs its own :ref:`ComponentManager<class_ComponentManager>`. :ref:`Equipment<class_Equipment>` sets :ref:`wielder<class_ItemComponent_property_wielder>` and :ref:`item<class_ItemComponent_property_item>` before the scene is added, so both are ready in :ref:`Component._start()<class_Component_private_method__start>`.
 
-Keep per-copy state, such as rounds loaded, in :ref:`ItemInstance.state<class_ItemInstance_property_state>`, not on the node: the node is freed when the item is unequipped.
+Keep per-copy state, such as rounds loaded, in :ref:`ItemInstance.state<class_ItemInstance_property_state>`, not on the node: the node is freed when the item is unequipped. Anything you change on the wielder, such as a stat modifier, must be undone in :ref:`Component._stop()<class_Component_private_method__stop>`, which runs on unequip.
 
-
+A component that acts when the item is used listens to its :ref:`Trigger<class_Trigger>`, as :ref:`Hitscan<class_Hitscan>` and :ref:`MeleeSweep<class_MeleeSweep>` do:
 
 ::
 
-    class_name Scope
+    class_name ShotCounter
     extends ItemComponent
 
-    func _process(_delta: float) -> void:
-        item.state[&"zoomed"] = brain.is_action_pressed(&"secondary")
+    func _requires() -> Array[Script]:
+        return [Trigger]
+
+    func _start() -> void:
+        listen((find(Trigger) as Trigger).fired, _on_fired)
+
+    func _on_fired() -> void:
+        item.state[&"shots"] = item.state.get(&"shots", 0) + 1  # Kept between equips.
+
+\ :ref:`Scope<class_Scope>` in ``examples/scripts/`` is a complete one that changes its wielder.
 
 .. rst-class:: classref-reftable-group
 

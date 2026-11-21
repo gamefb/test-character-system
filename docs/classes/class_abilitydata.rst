@@ -104,7 +104,7 @@ Seconds before it can be used again.
 
 :ref:`Targeting<class_Targeting>` **targeting** :ref:`🔗<class_AbilityData_property_targeting>`
 
-Picks who the effects apply to. Leave empty to affect the user.
+Picks who the effects apply to. Leave empty to affect the user; use a :ref:`RadiusTargeting<class_RadiusTargeting>` for everyone nearby, or your own :ref:`Targeting<class_Targeting>` for anything else.
 
 .. rst-class:: classref-item-separator
 

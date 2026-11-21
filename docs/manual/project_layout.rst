@@ -1,7 +1,7 @@
-.. _doc_project_layout_build_order_and_pitfalls:
+.. _doc_project_layout:
 
-Project layout, build order and pitfalls
-========================================
+Project layout and pitfalls
+===========================
 
 All scripts live in ``character_system/``, grouped by where they are used, and every base class sits in a ``_base/`` folder. Your own data and scenes stay outside it, so the system can be copied to another project as one folder. Each script file holds one ``class_name``.
 
@@ -13,8 +13,8 @@ All scripts live in ``character_system/``, grouped by where they are used, and e
    ├── character_system/
    │   ├── RECIPES.md                one-page answers to "how do I…"
    │   ├── icons/                    editor icons, one per node type
-   │   ├── templates/                ready-made scenes (not in this repository)
-   │   ├── examples/                 statuses, traits, items, zones and abilities to copy
+   │   ├── examples/                 statuses, traits, items, zones, abilities and scripts
+   │   │                             to copy
    │   ├── core/                     the framework
    │   │   ├── _base/component.gd
    │   │   ├── component_manager.gd  add one to every host
@@ -29,7 +29,7 @@ All scripts live in ``character_system/``, grouped by where they are used, and e
    │   │   │   └── ai_brain.gd
    │   │   └── hurtbox.gd
    │   ├── items/                    add to item scenes
-   │   │   └── components/           trigger, magazine, hitscan, grant_statuses
+   │   │   └── components/           trigger, magazine, hitscan, melee_sweep, grant_statuses
    │   │       └── _base/item_component.gd
    │   ├── world/                    add to levels
    │   │   └── effect_zone.gd
@@ -37,34 +37,22 @@ All scripts live in ``character_system/``, grouped by where they are used, and e
    │       ├── stats/                stat_modifier
    │       ├── items/                item_data, item_instance
    │       ├── statuses/             status_data, status_trigger
-   │       ├── abilities/            ability_data, targeting/_base/targeting.gd
+   │       ├── abilities/            ability_data, targeting/_base/targeting.gd,
+   │       │                         targeting/radius_targeting
    │       ├── effects/              _base/effect.gd, damage, heal, knockback,
-   │       │                         apply_status, remove_status, modify_amount
-   │       └── conditions/           _base/condition.gd, has_tag, health_below, stat
+   │       │                         apply_status, remove_status, modify_amount, spawn_scene
+   │       └── conditions/           _base/condition.gd, has_tag, health_below, stat,
+   │                                 is_hostile
    ├── data/                         your .tres files
    ├── scenes/                       your characters, items and levels
    ├── tests/                        test_*.gd, run with GUT
-   ├── test_level/                   optional arena (not in this repository)
    └── immunity_test/                scripted checks: immunities, zones, items
 
-**Examples and recipes.** ``examples/`` holds working resources to duplicate and change: statuses (Burning, Poisoned, Wet, Regenerating, Warded, Haste, Thorns, Fireproof), traits (Undead, Construct), items with their scenes (rifle, rifle ammo, flare gun, fireproof cloak, ward amulet), zones (fire patch, water pool, healing pad, ward circle, poison bog) and abilities (Second Wind, Sprint). ``RECIPES.md`` answers the common jobs on one page, from making a character, status, weapon or zone to reading buttons and writing your own effect, and points at the matching example.
+**Examples and recipes.** ``examples/`` holds working resources to duplicate and change: statuses (Burning, Poisoned, Wet, Regenerating, Warded, Haste, Thorns, Fireproof), traits (Undead, Construct), items with their scenes (rifle, rifle ammo, flare gun, fireproof cloak, ward amulet), zones (fire patch, water pool, healing pad, ward circle, poison bog) and abilities (Second Wind, Sprint). ``examples/scripts/`` holds scripts to copy: a :ref:`Stamina<class_Stamina>` component, a :ref:`Scope<class_Scope>` item component, :ref:`AttackNearest<class_AttackNearest>` AI decision logic and a :ref:`CharacterHud<class_CharacterHud>`, all explained in :ref:`doc_extending`. ``RECIPES.md`` answers the common jobs on one page, from making a character, status, weapon or zone to reading buttons and showing health on screen, and points at the matching example.
 
-**Editor icons.** Every node type has its own icon in ``icons/``, set by an ``@icon(...)`` line above its ``class_name``. Each is drawn on its base class's icon with a symbol for what it does: components are blue puzzle pieces (a heart for :ref:`Health<class_Health>`, an eye for :ref:`MouseLook<class_MouseLook>`), brains are pink brains (a person for :ref:`PlayerBrain<class_PlayerBrain>`, a chip for :ref:`AIBrain<class_AIBrain>`), and item components are the gold sword with a small sign in the corner (bullets for :ref:`Magazine<class_Magazine>`). :ref:`Hurtbox<class_Hurtbox>` and :ref:`EffectZone<class_EffectZone>` are ``Area3D`` nodes, so they use Godot's red for 3D nodes. A script without its own ``@icon`` shows its base class's icon, so your own components still read as components, and effects, conditions and targeting resources keep their base class's icon in the inspector. Symbols are cut out of the shape rather than drawn in white, so the editor background shows through on light and dark themes, and the SVGs are imported with Convert Colors With Editor Theme on.
+**Editor icons.** Every node type has its own icon file in ``icons/``, set by an ``@icon(...)`` line above its ``class_name``. Most are still the same plain square; only :ref:`DoubleJump<class_DoubleJump>` and :ref:`WeaponSwitch<class_WeaponSwitch>` have a symbol of their own. To give a node type its own icon, replace its SVG; the ``@icon`` line doesn't change. A script without its own ``@icon`` shows its base class's icon, so your own components look like components, and effects, conditions and targeting resources keep their base class's icon in the Inspector.
 
-.. _doc_build_order:
-
-Build order
------------
-
-Each step is playable and testable before the next begins.
-
-1. :ref:`Component<class_Component>`, :ref:`ComponentManager<class_ComponentManager>`, :ref:`StatModifier<class_StatModifier>`, :ref:`Health<class_Health>`, plus :ref:`Effect<class_Effect>`, :ref:`EffectContext<class_EffectContext>` and :ref:`DamageEffect<class_DamageEffect>`. Test: a script damages a dummy.
-2. :ref:`Brain<class_Brain>`, :ref:`PlayerBrain<class_PlayerBrain>`, :ref:`Movement<class_Movement>`, :ref:`MouseLook<class_MouseLook>`. Test: a controllable character.
-3. :ref:`ItemData<class_ItemData>`, :ref:`ItemInstance<class_ItemInstance>`, :ref:`Equipment<class_Equipment>`, :ref:`Trigger<class_Trigger>`, :ref:`Hitscan<class_Hitscan>`, :ref:`Hurtbox<class_Hurtbox>`. Test: the player shoots the dummy, with double damage to the head.
-4. :ref:`Statuses<class_Statuses>`, :ref:`StatusData<class_StatusData>`, :ref:`ApplyStatusEffect<class_ApplyStatusEffect>`, :ref:`RemoveStatusEffect<class_RemoveStatusEffect>`, :ref:`EffectZone<class_EffectZone>`. Test: Burning and Wet from zones and from a weapon.
-5. :ref:`AIBrain<class_AIBrain>`, :ref:`Faction<class_Faction>`. Test: a hostile and a friendly AI fight using the player's weapons.
-6. :ref:`Inventory<class_Inventory>`, :ref:`WeaponSwitch<class_WeaponSwitch>`, :ref:`Magazine<class_Magazine>`, :ref:`Abilities<class_Abilities>`, :ref:`GrantStatuses<class_GrantStatuses>`, :ref:`StatusTrigger<class_StatusTrigger>`, :ref:`Condition<class_Condition>`, :ref:`ModifyAmountEffect<class_ModifyAmountEffect>`, :ref:`KnockbackEffect<class_KnockbackEffect>`.
-7. :ref:`NameCheck<class_NameCheck>` and the Character System Warnings add-on, optional. Test: a mistyped stat name on a status shows a warning.
+To build the system yourself, one stage at a time, see :ref:`doc_build_from_scratch`.
 
 .. _doc_pitfalls:
 

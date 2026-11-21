@@ -27,7 +27,8 @@ var source: Node
 ## Who it happens to. Every effect must cope with a target that has no components, such as
 ## a wall.
 var target: Node
-## The ability, status or item it came from, e.g. to show "killed by Fireball".
+## The ability, status or item it came from, e.g. to show "killed by Fireball". Abilities set
+## their [AbilityData], statuses their [StatusData], and weapons their [ItemData].
 var origin: Resource
 ## Scales numeric effects: status stacks, headshot multipliers. 1 = normal strength.
 var magnitude: float = 1.0

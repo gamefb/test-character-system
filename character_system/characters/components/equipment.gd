@@ -21,7 +21,9 @@ extends Component
 ## Emitted when an item in [param slot] is equipped or unequipped.
 signal changed(slot: StringName)
 
-## Where each slot's scene is attached, e.g. { &"weapon": ^"../Hand" }.
+## Where each slot's scene is attached, e.g. { &"weapon": ^"../Hand" }. The key is the slot
+## name an item's [member ItemData.slot] uses. Paths start from this node, so a Hand beside it
+## is [code]../Hand[/code] and a Hand under the camera is [code]../Camera3D/Hand[/code].
 @export var sockets: Dictionary[StringName, NodePath] = {}:
 	set(value):
 		sockets = value
@@ -33,8 +35,10 @@ var _nodes: Dictionary[StringName, Node] = {}
 
 
 func _on_event(event: StringName, _ctx: EffectContext) -> void:
+	if event != &"inventory_changed":
+		return
 	var bag := find(Inventory) as Inventory
-	if event == &"inventory_changed" and bag:
+	if bag:
 		for slot in equipped.keys():
 			if equipped[slot] not in bag.items:
 				unequip(slot)  # No longer carried.
@@ -70,6 +74,15 @@ func equip(item: ItemInstance) -> void:
 	equipped[slot] = item
 	_nodes[slot] = node
 	changed.emit(slot)
+
+
+## The scene spawned for the item in [param slot], or null if the slot is empty. Its item
+## components are on it, e.g. for an ammo counter:
+## [codeblock]
+## var magazine := Component.of(gear.node_in(&"weapon"), Magazine) as Magazine
+## [/codeblock]
+func node_in(slot: StringName) -> Node:
+	return _nodes.get(slot)
 
 
 ## Removes the item in [param slot] and returns it, or null if the slot was empty.

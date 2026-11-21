@@ -52,7 +52,7 @@ Property Descriptions
 
 :ref:`StringName<class_StringName>` **event** :ref:`🔗<class_StatusTrigger_property_event>`
 
-The event to react to. Built in: ``dealing_damage`` and ``taking_damage`` (before a hit lands), ``dealt_damage`` and ``took_damage`` (after), and ``died`` when something dealt the killing blow. Send your own with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>` and an :ref:`EffectContext<class_EffectContext>`: triggers ignore events sent without one, such as ``started`` and ``inventory_changed``.
+The event to react to. Built in: ``dealing_damage`` and ``taking_damage`` (before a hit lands), ``dealt_damage`` and ``took_damage`` (after), and ``died`` when something dealt the killing blow. Send your own with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>`. Triggers ignore the events that carry no context, ``started`` and ``inventory_changed``.
 
 .. rst-class:: classref-item-separator
 

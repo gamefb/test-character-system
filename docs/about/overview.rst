@@ -49,3 +49,8 @@ Godot terms used in this document
      - An event a node announces, e.g. ``died``. Other nodes ``connect`` a function to it.
    * - :ref:`StringName<class_StringName>`
      - A fast, unique string written ``&"name"``. Used for stat, slot, tag and action names.
+
+Where to go next
+----------------
+
+Build the :ref:`quick start <doc_quick_start>` level to see the parts working together, then use the :ref:`recipes <doc_recipes>` for everyday jobs. When you need code of your own, :ref:`doc_extending` explains where new gameplay belongs and shows a complete example of each kind of script.

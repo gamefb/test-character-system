@@ -18,11 +18,12 @@ func add_action(action: StringName) -> void:
 		added.append(action)
 
 
-func make_player() -> PlayerBrain:
+func make_player(set_camera := true) -> PlayerBrain:
 	var host := Node3D.new()
 	var camera := Camera3D.new()
 	var brain := PlayerBrain.new()
-	brain.camera = camera
+	if set_camera:
+		brain.camera = camera
 	for node in [camera, ComponentManager.new(), brain]:
 		host.add_child(node)
 	add_child_autofree(host)
@@ -44,6 +45,26 @@ func test_weapon_actions_are_passed_on() -> void:
 	assert_true(brain.is_action_just_pressed(&"next_weapon"))
 	press(&"previous_weapon")
 	assert_true(brain.is_action_just_pressed(&"previous_weapon"))
+
+
+func test_extra_actions_are_passed_on() -> void:
+	for action in MOVES + PlayerBrain.ACTIONS + [&"sprint"]:
+		add_action(action)
+	var host := Node3D.new()
+	var brain := PlayerBrain.new()
+	brain.extra_actions = [&"sprint"]
+	for node in [Camera3D.new(), ComponentManager.new(), brain]:
+		host.add_child(node)
+	add_child_autofree(host)
+	press(&"sprint")
+	assert_true(brain.is_action_just_pressed(&"sprint"))
+
+
+func test_camera_left_empty_is_found() -> void:
+	for action in MOVES + PlayerBrain.ACTIONS:
+		add_action(action)
+	var brain: PlayerBrain = make_player(false)
+	assert_eq(brain.camera, brain.host.get_child(0))
 
 
 func test_missing_actions_are_skipped_without_errors() -> void:

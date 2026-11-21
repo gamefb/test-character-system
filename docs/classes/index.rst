@@ -56,6 +56,7 @@ Item components
     class_hitscan
     class_itemcomponent
     class_magazine
+    class_meleesweep
     class_trigger
 
 World
@@ -81,6 +82,7 @@ Effects
     class_knockbackeffect
     class_modifyamounteffect
     class_removestatuseffect
+    class_spawnsceneeffect
 
 Conditions
 ==========
@@ -92,6 +94,7 @@ Conditions
     class_condition
     class_hastagcondition
     class_healthbelowcondition
+    class_ishostilecondition
     class_statcondition
 
 Resources
@@ -104,7 +107,20 @@ Resources
     class_abilitydata
     class_itemdata
     class_iteminstance
+    class_radiustargeting
     class_statmodifier
     class_statusdata
     class_statustrigger
     class_targeting
+
+Examples
+========
+
+.. toctree::
+    :maxdepth: 1
+    :name: toc-class-ref-examples
+
+    class_attacknearest
+    class_characterhud
+    class_scope
+    class_stamina

@@ -12,7 +12,8 @@ extends Brain
 ## doesn't reach the character. Releases are polled every frame, so a button let go while the
 ## game was paused, over the UI or in another window doesn't stay held.
 
-## Input actions passed on to [method Brain.is_action_pressed]. Add your own here.
+## Input actions passed on to [method Brain.is_action_pressed]. Add your own to
+## [member extra_actions] instead of changing this list.
 const ACTIONS: Array[StringName] = [
 	&"primary",
 	&"secondary",
@@ -23,13 +24,17 @@ const ACTIONS: Array[StringName] = [
 	&"previous_weapon",
 ]
 
-## Movement is relative to this camera, and the character aims where it looks.
+## Movement is relative to this camera, and the character aims where it looks. Leave it empty
+## to use the first [Camera3D] under the character.
 @export var camera: Camera3D:
 	set(value):
 		camera = value
 		update_configuration_warnings()
+## Your own input actions to pass on as well, e.g. &"sprint" or &"ability_1". Add each one to
+## the Input Map too.
+@export var extra_actions: Array[StringName] = []
 
-var _actions: Array[StringName] = []  # The ACTIONS the Input Map has.
+var _actions: Array[StringName] = []  # The actions passed on that the Input Map has.
 
 
 func _process(_delta: float) -> void:
@@ -51,19 +56,23 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _warnings() -> PackedStringArray:
 	var out: PackedStringArray = super()
-	if not camera:
-		out.append("Set the Camera.")
+	if not camera and not find_node_of_type(&"Camera3D"):
+		out.append("Add a Camera3D to the character, or set the Camera.")
 	return out
 
 
 func _start() -> void:
+	if not camera:
+		camera = find_node_of_type(&"Camera3D")
 	var moves: Array[StringName] = [&"left", &"right", &"forward", &"back"]
 	var missing: Array = moves.filter(
 			func(a: StringName) -> bool: return not InputMap.has_action(a))
 	if not missing.is_empty():
 		push_error("PlayerBrain needs these input actions (Project Settings > Input Map): %s"
 				% ", ".join(missing))
-	_actions = ACTIONS.filter(InputMap.has_action)
-	var unused: Array = ACTIONS.filter(func(a: StringName) -> bool: return a not in _actions)
+	var wanted: Array[StringName] = ACTIONS.duplicate()
+	wanted.append_array(extra_actions)
+	_actions = wanted.filter(InputMap.has_action)
+	var unused: Array = wanted.filter(func(a: StringName) -> bool: return a not in _actions)
 	if not unused.is_empty():
 		push_warning("PlayerBrain: add these to the Input Map to use them: %s" % ", ".join(unused))

@@ -10,6 +10,8 @@ Targeting
 
 **Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
+**Inherited By:** :ref:`RadiusTargeting<class_RadiusTargeting>`
+
 Picks an ability's targets.
 
 .. rst-class:: classref-introduction-group
@@ -17,7 +19,26 @@ Picks an ability's targets.
 Description
 -----------
 
-This base version targets the user. Extend it and override :ref:`find()<class_Targeting_method_find>` to return what a ray, sphere or cone finds.
+This base version targets the user. :ref:`RadiusTargeting<class_RadiusTargeting>` picks everything within a radius. For anything else, extend this class and override :ref:`find()<class_Targeting_method_find>`, e.g. to hit what the user aims at:
+
+::
+
+    class_name AimedTargeting
+    extends Targeting
+
+    @export var reach := 20.0
+
+    func find(ctx: EffectContext) -> Array[Node]:
+        var user := ctx.source as Node3D
+        var brain := Component.of(user, Brain) as Brain
+        var to: Vector3 = user.global_position.move_toward(brain.aim_point, reach)
+        var query := PhysicsRayQueryParameters3D.create(user.global_position, to)
+        query.exclude = Hurtbox.rids_of(user)  # Not the user itself.
+        var hit := user.get_world_3d().direct_space_state.intersect_ray(query)
+        var targets: Array[Node] = []
+        if hit:
+            targets.append(Hurtbox.hit(user, hit.collider).target)
+        return targets
 
 .. rst-class:: classref-reftable-group
 

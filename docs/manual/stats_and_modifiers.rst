@@ -11,9 +11,9 @@ Without the component the number has no purpose, so it has no value either: a mo
 
 -  **Stats are open-ended.** A new component adds its own numbers by returning them from ``_stats()``; nothing else changes. :ref:`Health<class_Health>` turns each entry in its ``resistances`` into a ``resist_<type>`` stat, so ``resist_poison`` needs no code either.
 -  **Stacks are copies.** The same modifier resource can be added several times, once per status stack. ``remove_modifier`` removes one copy, so stacks unwind correctly.
--  **Totals are cached.** Movement reads ``move_speed`` every physics frame, so each total is worked out once and reused until a modifier for it changes or a component calls ``update_stats()`` after changing its own number.
+-  **Totals are cached.** Movement reads ``move_speed`` every physics frame, so each total is worked out once and reused until a modifier for it changes, the component that owns it is added or removed, or a component calls ``update_stats()`` after changing its own number.
 -  **Safe reads.** ``ComponentManager.stat_of(node, stat)`` reads a stat on any node, returning 0 for one with no manager, such as a wall. Inside a component, ``stat(name)`` reads its own host.
--  **Listening.** The manager emits ``stat_changed(stat_name)`` whenever a stat may have changed. :ref:`Health<class_Health>` uses it to keep health within a lowered maximum.
+-  **Listening.** The manager emits ``stat_changed(stat_name)`` whenever a stat may have changed, in the same cases. :ref:`Health<class_Health>` uses it to keep health within a lowered maximum.
 
 .. list-table::
    :header-rows: 1
@@ -33,5 +33,10 @@ Without the component the number has no purpose, so it has no value either: a mo
    * - ``jump_velocity``
      - :ref:`Movement<class_Movement>`
      - Jump Velocity (4.5)
+   * - ``air_jumps``
+     - :ref:`DoubleJump<class_DoubleJump>`
+     - Air Jumps (1)
+
+Your own components add more: any name a component returns from ``_stats()`` is a stat. :ref:`doc_extending_names` shows how.
 
 Damage buffs are not a stat. A status with a ``dealing_damage`` trigger and a :ref:`ModifyAmountEffect<class_ModifyAmountEffect>` changes each hit before it lands, which also allows conditions such as "+50% against wet targets".

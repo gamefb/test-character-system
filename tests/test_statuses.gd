@@ -147,6 +147,27 @@ func test_stacks_scale_ticks_and_modifiers() -> void:
 	assert_eq(health.current, 64.0, "one tick of 2 damage per stack")
 
 
+func test_only_processes_while_a_status_can_expire_or_tick() -> void:
+	statuses.add(make_status([&"undead"]))
+	assert_false(statuses.is_processing(), "passives need nothing per frame")
+	var burning: StatusData = make_status([&"fire"], 4.0)
+	statuses.add(burning)
+	assert_true(statuses.is_processing())
+	statuses.remove(burning)
+	assert_false(statuses.is_processing())
+
+
+func test_events_sent_without_a_context_reach_triggers() -> void:
+	var t := StatusTrigger.new()
+	t.event = &"level_up"
+	t.effects = [DamageEffect.new()]
+	var cursed: StatusData = make_status([&"curse"])
+	cursed.triggers = [t]
+	statuses.add(cursed)
+	ComponentManager.notify(character, &"level_up")
+	assert_eq(health.current, 90.0)
+
+
 func test_zone_drops_only_the_hold_it_added() -> void:
 	var water: StatusData = make_status([&"wet"])
 	var zone := EffectZone.new()

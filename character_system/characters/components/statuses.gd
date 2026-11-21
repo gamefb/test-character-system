@@ -10,6 +10,9 @@ extends Component
 ##
 ## [method remove] ends a status outright, e.g. for a cleanse.
 ##
+## It only runs every frame while a status has a [member StatusData.duration] or a
+## [member StatusData.tick_interval]. Characters with nothing but passives cost nothing per frame.
+##
 ## [codeblock]
 ## var statuses := Component.of(enemy, Statuses) as Statuses
 ## if not statuses.add(burning, player):
@@ -31,7 +34,10 @@ var active: Dictionary[StatusData, ActiveStatus] = {}
 
 
 static func _overlaps(a: Array[StringName], b: Array[StringName]) -> bool:
-	return a.any(func(tag: StringName) -> bool: return tag in b)
+	for tag in a:
+		if tag in b:
+			return true
+	return false
 
 
 func _process(delta: float) -> void:
@@ -57,6 +63,7 @@ func _warnings() -> PackedStringArray:
 func _start() -> void:
 	for data in innate:
 		add(data, host)
+	_update_processing()
 
 
 func _stop() -> void:
@@ -101,6 +108,7 @@ func add(data: StatusData, source: Node = null) -> bool:
 		s = ActiveStatus.new()
 		s.tick_in = data.tick_interval
 		active[data] = s
+		_update_processing()
 	if data.duration == 0.0:
 		s.holds += 1
 	if not is_new and data.stacking == StatusData.Stacking.IGNORE:
@@ -122,6 +130,7 @@ func remove(data: StatusData) -> void:
 		return
 	_set_stacks(data, s, 0)
 	active.erase(data)
+	_update_processing()
 	_run(data.on_remove, data, s)
 	changed.emit()
 
@@ -142,14 +151,28 @@ func drop_hold(data: StatusData) -> void:
 
 ## True if any active status has [param tag].
 func has_tag(tag: StringName) -> bool:
-	return active.keys().any(func(data: StatusData) -> bool: return tag in data.tags)
+	for data: StatusData in active:
+		if tag in data.tags:
+			return true
+	return false
 
 
 ## True if an active status or trait is immune to one of [param data]'s tags,
 ## e.g. Wet is immune to &"fire", so Burning can't be added.
 func is_immune_to(data: StatusData) -> bool:
-	return active.keys().any(
-			func(other: StatusData) -> bool: return _overlaps(data.tags, other.immune_to))
+	for other: StatusData in active:
+		if _overlaps(data.tags, other.immune_to):
+			return true
+	return false
+
+
+# Runs _process() only while a status can expire or tick; passives need nothing per frame.
+func _update_processing() -> void:
+	for data: StatusData in active:
+		if data.duration > 0.0 or data.tick_interval > 0.0:
+			set_process(true)
+			return
+	set_process(false)
 
 
 # Adds or removes stat modifiers so they match the stack count.

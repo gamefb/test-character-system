@@ -18,7 +18,11 @@ extends Resource
 ##
 ## Set [member subject] to check whoever caused it instead ("only rangers can apply this"),
 ## and [member negate] to flip the result. The built-in ones are [HasTagCondition],
-## [StatCondition] and [HealthBelowCondition].
+## [StatCondition], [HealthBelowCondition] and [IsHostileCondition].
+##
+## A check that needs both sides, such as "the source is hostile to the target", overrides
+## [method check] instead and reads [member EffectContext.source] and
+## [member EffectContext.target] itself. [IsHostileCondition] is a short example.
 
 enum Subject {
 	## Whoever receives the effect or status.
@@ -35,7 +39,10 @@ enum Subject {
 
 ## True if every condition passes. An empty list always passes.
 static func all_pass(conditions: Array[Condition], ctx: EffectContext) -> bool:
-	return conditions.all(func(c: Condition) -> bool: return c.check(ctx))
+	for c in conditions:
+		if not c.check(ctx):
+			return false
+	return true
 
 
 ## Tests the node [member subject] picks and applies [member negate]. Override this

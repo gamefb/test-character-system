@@ -10,7 +10,7 @@ Effect
 
 **Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`ApplyStatusEffect<class_ApplyStatusEffect>`, :ref:`DamageEffect<class_DamageEffect>`, :ref:`HealEffect<class_HealEffect>`, :ref:`KnockbackEffect<class_KnockbackEffect>`, :ref:`ModifyAmountEffect<class_ModifyAmountEffect>`, :ref:`RemoveStatusEffect<class_RemoveStatusEffect>`
+**Inherited By:** :ref:`ApplyStatusEffect<class_ApplyStatusEffect>`, :ref:`DamageEffect<class_DamageEffect>`, :ref:`HealEffect<class_HealEffect>`, :ref:`KnockbackEffect<class_KnockbackEffect>`, :ref:`ModifyAmountEffect<class_ModifyAmountEffect>`, :ref:`RemoveStatusEffect<class_RemoveStatusEffect>`, :ref:`SpawnSceneEffect<class_SpawnSceneEffect>`
 
 One instant change to a target: damage, healing, a status, and so on.
 

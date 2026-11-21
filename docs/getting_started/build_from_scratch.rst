@@ -139,21 +139,26 @@ scene. It is the hub: registry, stats and events.
    * - ``_cache``
      - var
      - ``Dictionary[StringName, float]`` of computed stats.
+   * - ``_found``
+     - var
+     - ``Dictionary[Script, Component]`` of ``find()`` answers.
    * - ``stat_changed(stat_name)``
      - signal
      - Emitted when a stat may have a new value.
    * - ``of(node)``
      - static
-     - Finds the manager among ``node``'s children.
-   * - ``notify(node, event, ctx)``
+     - Tries the child named ``ComponentManager``, then searches ``node``'s children.
+   * - ``notify(node, event, ctx = null)``
      - static
-     - ``of(node).send(...)``, safe when there is no manager.
+     - ``of(node).send(...)``, safe when there is no manager. Without ``ctx``, it makes one
+       with ``node`` as the target.
    * - ``stat_of(node, name)``
      - static
      - ``of(node).stat(name)``, or 0.
    * - ``find(type)``
      - func
-     - Scans ``host.get_children()``, so it works before the tree is built.
+     - Scans ``host.get_children()`` the first time, so it works before the tree is built,
+       and keeps the answer in ``_found`` until the host's children change.
    * - ``has_registered(type)``
      - func
      - True if a registered component is that type.
@@ -171,7 +176,8 @@ scene. It is the hub: registry, stats and events.
      - Clear the whole cache and emit for every stat name.
    * - ``register(c)`` / ``unregister(c)``
      - func
-     - Called by components themselves.
+     - Called by components themselves. Clear the cache entries of the stats ``c`` owns and
+       emit ``stat_changed`` for each.
    * - ``try_start(c)``
      - func
      - Starts ``c`` if the host is ready and nothing it requires is missing.
@@ -186,8 +192,9 @@ name (0 if none does):
 
     stat = (base + Σ add) × Π mul
 
-Lifecycle: on ``ENTER_TREE``, register any Component children. On ``READY``, wait for
-``host.ready``, then call ``_start_all()``.
+Lifecycle: on ``PARENTED``, connect ``host.child_order_changed`` to clear ``_found``, so a
+lookup is redone whenever a child is added, removed or moved. On ``ENTER_TREE``, register any
+Component children. On ``READY``, wait for ``host.ready``, then call ``_start_all()``.
 
 .. graphviz::
    :caption: Component lifecycle. Every registration retries the components still waiting.
@@ -243,6 +250,9 @@ everything else is plumbing.
    * - ``find(type)``
      - func
      - A sibling component of ``type``.
+   * - ``find_node_of_type(type)``
+     - func
+     - The first node of a built-in class under the host, e.g. a camera for an empty export.
    * - ``stat(name)``
      - func
      - Shortcut for ``manager.stat(name)``.
@@ -273,7 +283,8 @@ everything else is plumbing.
    * - ``_begin()`` / ``_halt()``
      - func
      - Called by the manager: flip ``running``, restore or disable ``process_mode``, call the
-       virtual, and on halt disconnect everything from ``listen()``.
+       virtual, and on halt disconnect everything from ``listen()``. ``_begin()`` also keeps
+       what ``_requires()`` returned, for ``unregister``.
 
 Watch out for
 ~~~~~~~~~~~~~
@@ -286,9 +297,12 @@ Watch out for
   without null checks.
 - **Copy a list before looping over it if the loop can change it.** An event can remove a
   component mid-loop.
-- **On unregister, stop anything that lost a requirement.** Any running component whose
-  ``missing()`` is no longer empty halts. ``try_start`` brings it back if the missing part
-  returns.
+- **On unregister, stop anything that lost a requirement.** Only the running components that
+  required the leaving one's type are checked, and any whose ``missing()`` is no longer empty
+  halts. ``try_start`` brings it back if the missing part returns.
+- **Remember lookups, and forget them when children change.** Components call ``find()`` every
+  frame. Scanning the children each time costs a list copy per call; a dictionary that's
+  cleared on ``child_order_changed`` costs one lookup.
 
 Test
 ~~~~
@@ -322,13 +336,15 @@ team. All extend ``Component``.
        ``is_action_just_pressed(action)``. It's the shared interface that Movement, Abilities
        and items read, the way your scripts read Godot's ``Input``.
    * - ``PlayerBrain``
-     - ``camera``, ``ACTIONS`` list
+     - ``camera`` (empty: the first ``Camera3D`` under the host), ``ACTIONS`` list
      - Fill ``move_dir`` and ``aim_point`` in ``_process``, and release any held action
        ``Input`` no longer has pressed; record presses from ``_unhandled_input``
    * - ``AIBrain``
-     - ``agent: NavigationAgent3D``, ``target``
-     - Steer ``move_dir`` toward the next path point in ``_physics_process``; decision logic
-       calls ``press()`` and ``release()``
+     - ``agent: NavigationAgent3D`` (empty: the first one under the host),
+       ``repath_distance``, ``target``
+     - Steer ``move_dir`` toward the next path point in ``_physics_process``, setting
+       ``agent.target_position`` only once the target has moved ``repath_distance``; decision
+       logic calls ``press()`` and ``release()``
    * - ``Movement``
      - ``move_speed``, ``jump_velocity``, ``push_damping``, ``_push``
      - ``_requires()`` returns ``[Brain]``; ``_stats()`` returns ``move_speed`` and
@@ -340,7 +356,8 @@ team. All extend ``Component``.
      - ``_start()`` adds the host to the group named ``team``, ``_stop()`` removes it;
        ``is_hostile(other)`` checks ``other``'s groups
    * - ``MouseLook``
-     - ``camera``, ``sensitivity``, ``capture_on_start``
+     - ``camera`` (empty: the first ``Camera3D`` under the host), ``sensitivity``,
+       ``capture_on_start``
      - Rotate the host and camera in ``_unhandled_input``
 
 How a brain remembers presses, modelled on Godot's ``Input``:
@@ -374,6 +391,9 @@ Watch out for
 - **Poll releases, don't wait for them.** A button let go while the game is paused, over the UI
   or in another window never sends a release event to ``_unhandled_input``. ``PlayerBrain``
   checks ``Input.is_action_pressed()`` every frame instead, so nothing stays held.
+- **Don't set** ``target_position`` **every frame.** Godot finds a whole new path each time it's
+  set, even to the same point. ``AIBrain`` only sets it once the target has moved
+  ``repath_distance`` metres.
 
 Test
 ~~~~
@@ -506,7 +526,8 @@ character.
        ``magnitude``.
    * - ``rids_of(character)``
      - static
-     - The body and hurtbox RIDs, so a character's own shots ignore them.
+     - The body and hurtbox RIDs, so a character's own shots ignore them. It searches the
+       whole character, so weapons call it once, on equip.
 
 Watch out for
 ~~~~~~~~~~~~~
@@ -623,7 +644,8 @@ class in the system.
        is how statuses change stats.
    * - ``_process(delta)``
      - func
-     - Counts down durations; runs ``on_tick`` every ``tick_interval``.
+     - Counts down durations; runs ``on_tick`` every ``tick_interval``. Only turned on (with
+       ``set_process``) while a status has a duration or a tick interval.
    * - ``_on_event(event, ctx)``
      - func
      - On ``died``, ends timed statuses. Then, if ``ctx`` isn't null, runs the effects of each
@@ -826,9 +848,9 @@ Brain.
        ``is_action_just_pressed(&"reload")``
    * - ``Hitscan``
      - ``max_distance``, ``collision_mask``, ``effects``
-     - ``_requires()`` returns ``[Trigger]``; on ``fired``, raycast toward ``brain.aim_point``
-       excluding ``Hurtbox.rids_of(wielder)``, build the context with ``Hurtbox.hit()``, then
-       ``Effect.apply_all``
+     - ``_requires()`` returns ``[Trigger]``; ``_start()`` keeps ``Hurtbox.rids_of(wielder)``;
+       on ``fired``, raycast toward ``brain.aim_point`` excluding those RIDs, build the context
+       with ``Hurtbox.hit()``, then ``Effect.apply_all``
    * - ``GrantStatuses``
      - ``statuses``, ``_granted``
      - ``_start()``: add each status, keeping only those accepted; ``_stop()``: drop the hold
@@ -871,7 +893,8 @@ effects.
    * - ``Targeting``
      - ``Resource``
      - ``find(ctx) -> Array[Node]``. The base version returns ``[ctx.source]`` (the user).
-       Subclasses return what a ray, sphere or cone finds.
+       Subclasses return what a ray, sphere or cone finds; the reference build's
+       ``RadiusTargeting`` asks the physics engine for everything in a sphere.
    * - ``AbilityData``
      - ``Resource``
      - ``id``, ``display_name``, ``icon``, ``cooldown``, ``targeting``, ``effects``
@@ -910,7 +933,8 @@ These were added late in the reference build and are easier once everything else
 
 Get stages 1–3 running with plain ``print`` debugging first. When you're done,
 ``character_system/examples/`` and the :ref:`recipes <doc_recipes>` show finished statuses,
-items, zones and abilities to compare with yours.
+items, zones and abilities to compare with yours, and :ref:`doc_extending` adds a melee
+weapon, radius targeting, a hostility condition and example components on top.
 
 Checklist
 ---------

@@ -104,7 +104,7 @@ How many fit in one inventory stack. Use 1 for items with their own state, such 
 
 :ref:`StringName<class_StringName>` **slot** :ref:`🔗<class_ItemData_property_slot>`
 
-:ref:`Equipment<class_Equipment>` slot, e.g. &"weapon". Leave empty if the item can't be equipped.
+:ref:`Equipment<class_Equipment>` slot, e.g. &"weapon". The character's :ref:`Equipment.sockets<class_Equipment_property_sockets>` needs an entry with the same name. Leave empty if the item can't be equipped, such as ammo.
 
 .. rst-class:: classref-item-separator
 
@@ -116,7 +116,7 @@ How many fit in one inventory stack. Use 1 for items with their own state, such 
 
 :ref:`PackedScene<class_PackedScene>` **scene** :ref:`🔗<class_ItemData_property_scene>`
 
-Spawned when equipped. Its :ref:`ItemComponent<class_ItemComponent>` children decide what the item does.
+Spawned when equipped. Its root is the model, with a :ref:`ComponentManager<class_ComponentManager>` and the :ref:`ItemComponent<class_ItemComponent>`\ s that decide what the item does as children.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

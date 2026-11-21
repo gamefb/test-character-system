@@ -107,7 +107,7 @@ Who it happens to. Every effect must cope with a target that has no components, 
 
 :ref:`Resource<class_Resource>` **origin** :ref:`🔗<class_EffectContext_property_origin>`
 
-The ability, status or item it came from, e.g. to show "killed by Fireball".
+The ability, status or item it came from, e.g. to show "killed by Fireball". Abilities set their :ref:`AbilityData<class_AbilityData>`, statuses their :ref:`StatusData<class_StatusData>`, and weapons their :ref:`ItemData<class_ItemData>`.
 
 .. rst-class:: classref-item-separator
 

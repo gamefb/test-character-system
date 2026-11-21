@@ -10,7 +10,8 @@ extends Node
 ## host is used.
 ##
 ## It does three jobs:
-## [br]- [b]Lookup.[/b] [method find] returns a component by type.
+## [br]- [b]Lookup.[/b] [method find] returns a component by type. It remembers the answer
+## until the host's children change, so it's cheap enough to call every frame.
 ## [br]- [b]Stats.[/b] Components declare numbers in [method Component._stats]; [method stat]
 ## returns them with every [StatModifier] applied, and [signal stat_changed] reports changes.
 ## [br]- [b]Events.[/b] [method send] passes an event to every running component's
@@ -21,13 +22,16 @@ extends Node
 ## walls, props and freed nodes.
 ## [codeblock]
 ## var speed := ComponentManager.stat_of(player, &"move_speed")
-## ComponentManager.notify(player, &"level_up", EffectContext.new(null, player))
+## ComponentManager.notify(player, &"level_up")
 ## ComponentManager.of(player).stat_changed.connect(_on_player_stat_changed)
 ## [/codeblock]
+## Keep this node's default name. [method of] looks for a child with that name first, and only
+## searches all the children when there isn't one.
 
 ## Emitted when [param stat_name]'s value may have changed: a modifier for it was added or
-## removed, or a component was added, removed or called [method Component.update_stats]. Read the
-## new value with [method stat]. Useful for UI, such as a health bar that follows max health.
+## removed, the component that owns it was added or removed, or a component called
+## [method Component.update_stats]. Read the new value with [method stat]. Useful for UI, such as
+## a health bar that follows max health.
 signal stat_changed(stat_name: StringName)
 
 ## True once the host is ready and its components have had the chance to start. At that moment
@@ -43,14 +47,20 @@ var _starting := false
 var _components: Array[Component] = []
 var _modifiers: Array[StatModifier] = []
 var _cache: Dictionary[StringName, float] = {}  # Stat values, cleared whenever anything changes.
+var _found: Dictionary[Script, Component] = {}  # find() answers, cleared when children change.
 
 
 ## Returns [param node]'s [ComponentManager] child, or null. Safe on null or freed nodes.
 static func of(node: Node) -> ComponentManager:
-	if is_instance_valid(node):
-		for child in node.get_children():
-			if child is ComponentManager:
-				return child
+	if not is_instance_valid(node):
+		return null
+	# The usual name is a quick lookup; searching the children is the fallback.
+	var named := node.get_node_or_null(^"ComponentManager") as ComponentManager
+	if named:
+		return named
+	for child in node.get_children():
+		if child is ComponentManager:
+			return child
 	return null
 
 
@@ -58,12 +68,12 @@ static func of(node: Node) -> ComponentManager:
 ##
 ## Use it for your own events, e.g. [code]&"jumped"[/code] or [code]&"level_up"[/code]. Every
 ## running component hears it in [method Component._on_event], and status triggers with that
-## [member StatusTrigger.event] fire. [param ctx] can be null, but then status triggers ignore
-## the event, so pass one if statuses should react to it.
-static func notify(node: Node, event: StringName, ctx: EffectContext) -> void:
+## [member StatusTrigger.event] fire. Leave out [param ctx] and a context with [param node] as
+## the target is made for you; pass your own to say who caused it.
+static func notify(node: Node, event: StringName, ctx: EffectContext = null) -> void:
 	var m: ComponentManager = of(node)
 	if m:
-		m.send(event, ctx)
+		m.send(event, ctx if ctx else EffectContext.new(null, node))
 
 
 ## Reads [param stat_name] from [param node], or 0 if it has no [ComponentManager].
@@ -72,7 +82,19 @@ static func stat_of(node: Node, stat_name: StringName) -> float:
 	return m.stat(stat_name) if m else 0.0
 
 
+func _init() -> void:
+	name = &"ComponentManager"  # So ComponentManager.new() gets the name of() looks for first.
+
+
 func _notification(what: int) -> void:
+	# find() remembers its answers until the host's children change, in the editor too.
+	if what == NOTIFICATION_PARENTED:
+		_found.clear()
+		host.child_order_changed.connect(_found_clear)
+	elif what == NOTIFICATION_UNPARENTED:
+		_found.clear()
+		if host.child_order_changed.is_connected(_found_clear):
+			host.child_order_changed.disconnect(_found_clear)
 	if Engine.is_editor_hint():
 		_editor_notification(what)
 		return
@@ -111,17 +133,25 @@ func _get_configuration_warnings() -> PackedStringArray:
 
 ## The first component on the host that is a [param type] (subclasses count), or null.
 ## Works before the host is added to the scene too, e.g. to set a spawned enemy's team.
+## The answer is remembered until a child is added, removed or moved, so calling it every frame
+## is cheap.
 func find(type: Script) -> Component:
-	for child in (host.get_children() if host else []):
-		if is_instance_of(child, type):
-			return child
-	return null
+	if not _found.has(type):
+		_found[type] = null
+		for child in (host.get_children() if host else []):
+			if is_instance_of(child, type):
+				_found[type] = child
+				break
+	return _found[type]
 
 
 ## True if a registered (in the scene) component is a [param type]. Used to decide
 ## whether a component has everything it requires.
 func has_registered(type: Script) -> bool:
-	return _components.any(func(c: Component) -> bool: return is_instance_of(c, type))
+	for c in _components:
+		if is_instance_of(c, type):
+			return true
+	return false
 
 
 ## Sends [param event] to the [method Component._on_event] of every running component.
@@ -206,7 +236,7 @@ func register(c: Component) -> void:
 		return
 	_components.append(c)
 	c._manager = self
-	refresh_stats()
+	_stats_changed_by(c)
 	if started or _starting:
 		for other in _components.duplicate():
 			# The newcomer, and anything that was waiting for it.
@@ -220,9 +250,9 @@ func unregister(c: Component) -> void:
 	c._halt()
 	_components.erase(c)
 	c._manager = null
-	refresh_stats()
+	_stats_changed_by(c)
 	for other in _components.duplicate():
-		if other.running and not other.missing().is_empty():
+		if other.running and other._required_type_of(c) and not other.missing().is_empty():
 			# It lost something it requires. It restarts if that comes back.
 			other._halt()
 
@@ -254,6 +284,17 @@ func _start_all() -> void:
 	_starting = false
 	started = true
 	send(&"started", null)
+
+
+# A component came or went, so only the stats it owns can have new totals.
+func _stats_changed_by(c: Component) -> void:
+	for stat_name in c._stats():
+		_cache.erase(stat_name)
+		stat_changed.emit(stat_name)
+
+
+func _found_clear() -> void:
+	_found.clear()
 
 
 func _editor_notification(what: int) -> void:

@@ -34,7 +34,7 @@ To check the resources your own component holds, return the results from its :re
     func _warnings() -> PackedStringArray:
         return NameCheck.problems_in(effects)
 
-It reads names written in the code and saved files, so a name built at runtime, such as ``notify(host, my_event, ctx)`` with a variable, isn't seen; a trigger for it is reported even though it works. The project is read again at most every 3 seconds.
+It reads names written in the code and saved files, so a name built at runtime, such as ``notify(host, my_event)`` with a variable, isn't seen; a trigger for it is reported even though it works. With the plugin enabled, the project is read again whenever its files change; otherwise at most every 30 seconds.
 
 .. rst-class:: classref-reftable-group
 

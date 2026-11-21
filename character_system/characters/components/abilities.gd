@@ -5,7 +5,9 @@ extends Component
 ## Uses abilities when their action is pressed, and tracks cooldowns.
 ##
 ## Put an [AbilityData] in [member slots] under an action name, e.g. [code]secondary[/code].
-## Code and AI can call [method use] directly.
+## For a player, the action must be one [PlayerBrain] passes on: one of its
+## [constant PlayerBrain.ACTIONS] or your own in [member PlayerBrain.extra_actions]. Code and AI
+## can call [method use] directly.
 
 ## Action name to ability, e.g. { &"secondary": fireball }. Change it at any time to grant
 ## abilities.

@@ -10,7 +10,7 @@ Component
 
 **Inherits:** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`Abilities<class_Abilities>`, :ref:`Brain<class_Brain>`, :ref:`DoubleJump<class_DoubleJump>`, :ref:`Equipment<class_Equipment>`, :ref:`Faction<class_Faction>`, :ref:`Health<class_Health>`, :ref:`Inventory<class_Inventory>`, :ref:`ItemComponent<class_ItemComponent>`, :ref:`MouseLook<class_MouseLook>`, :ref:`Movement<class_Movement>`, :ref:`Statuses<class_Statuses>`, :ref:`WeaponSwitch<class_WeaponSwitch>`
+**Inherited By:** :ref:`Abilities<class_Abilities>`, :ref:`AttackNearest<class_AttackNearest>`, :ref:`Brain<class_Brain>`, :ref:`DoubleJump<class_DoubleJump>`, :ref:`Equipment<class_Equipment>`, :ref:`Faction<class_Faction>`, :ref:`Health<class_Health>`, :ref:`Inventory<class_Inventory>`, :ref:`ItemComponent<class_ItemComponent>`, :ref:`MouseLook<class_MouseLook>`, :ref:`Movement<class_Movement>`, :ref:`Stamina<class_Stamina>`, :ref:`Statuses<class_Statuses>`, :ref:`WeaponSwitch<class_WeaponSwitch>`
 
 Base class for every component: a child node that adds one feature to its parent, the host.
 
@@ -53,41 +53,40 @@ If a component can't start, the editor shows a warning on it and the Output pane
     if health:
         health.change(-10.0)
 
-\ **Writing your own.** Extend this class and override any of :ref:`_requires()<class_Component_private_method__requires>`, :ref:`_stats()<class_Component_private_method__stats>`, :ref:`_start()<class_Component_private_method__start>`, :ref:`_stop()<class_Component_private_method__stop>`, :ref:`_on_event()<class_Component_private_method__on_event>` and :ref:`_warnings()<class_Component_private_method__warnings>`. Do setup in :ref:`_start()<class_Component_private_method__start>`, not ``_ready()``: it runs once everything is in place, and never in the editor.
+\ **Writing your own.** Extend this class and override any of :ref:`_requires()<class_Component_private_method__requires>`, :ref:`_stats()<class_Component_private_method__stats>`, :ref:`_start()<class_Component_private_method__start>`, :ref:`_stop()<class_Component_private_method__stop>`, :ref:`_on_event()<class_Component_private_method__on_event>` and :ref:`_warnings()<class_Component_private_method__warnings>`. Do setup in :ref:`_start()<class_Component_private_method__start>`, not ``_ready()``: it runs once everything is in place, and never in the editor. This outline shows where each part goes; :ref:`Stamina<class_Stamina>` in ``examples/scripts/`` is a complete one to copy.
 
 
 
 ::
 
     @tool  # Optional: shows this component's warnings in the editor.
-    class_name Stamina
+    class_name Shield
     extends Component
 
-    @export var max_stamina := 100.0
+    @export var max_shield := 50.0
 
     func _requires() -> Array[Script]:
-        return [Movement]  # Waits until there's a Movement beside it.
+        return [Health]  # Waits until there's a Health beside it.
 
     func _stats() -> Dictionary[StringName, float]:
-        return { &"max_stamina": max_stamina }  # Statuses can change it by name.
+        return { &"max_shield": max_shield }  # Statuses can change it by name.
 
     func _start() -> void:
         listen(manager.stat_changed, _on_stat_changed)  # Disconnected on stop.
 
-    func _process(delta: float) -> void:
-        if (find(Brain) as Brain).is_action_pressed(&"sprint"):
-            pass  # Runs only while the component runs.
+    func _process(_delta: float) -> void:
+        pass  # Runs only while the component runs, e.g. to recharge.
 
-    func _on_stat_changed(stat_name: StringName) -> void:
-        pass
+    func _on_stat_changed(_stat_name: StringName) -> void:
+        pass  # E.g. cut the shield down when max_shield drops.
 
     func _on_event(event: StringName, ctx: EffectContext) -> void:
-        if event == &"took_damage":
-            pass
+        if event == &"taking_damage":
+            ctx.amount *= 0.5  # A hit about to land: absorb half of it.
 
 \ **Rules of thumb.** 
 
-- Don't keep references to other components in variables; :ref:`find()<class_Component_method_find>` them when you need them. They can be removed and added during play. 
+- Don't keep references to other components in variables; :ref:`find()<class_Component_method_find>` them when you need them. They can be removed and added during play, and :ref:`find()<class_Component_method_find>` is cheap. 
 
 - Don't store stat values. Read :ref:`stat()<class_Component_method_stat>` each time, or :ref:`listen()<class_Component_method_listen>` to :ref:`ComponentManager.stat_changed<class_ComponentManager_signal_stat_changed>`; a stored speed ignores every status. 
 
@@ -125,6 +124,8 @@ Methods
    | :ref:`String<class_String>`                                                                           | :ref:`type_name<class_Component_method_type_name>`\ (\ type\: :ref:`Script<class_Script>`\ ) |static|                                                                      |
    +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`Component<class_Component>`                                                                     | :ref:`find<class_Component_method_find>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                         |
+   +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Node<class_Node>`                                                                               | :ref:`find_node_of_type<class_Component_method_find_node_of_type>`\ (\ type\: :ref:`StringName<class_StringName>`\ )                                                       |
    +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`float<class_float>`                                                                             | :ref:`stat<class_Component_method_stat>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                                                                            |
    +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -243,13 +244,32 @@ A readable name for a component type, for messages: its ``class_name``, or its f
 
 :ref:`Component<class_Component>` **find**\ (\ type\: :ref:`Script<class_Script>`\ ) :ref:`🔗<class_Component_method_find>`
 
-Returns the ``type`` component on the same host, or null. Subclasses count. If the host has several, the first is returned.
+Returns the ``type`` component on the same host, or null. Subclasses count. If the host has several, the first is returned. The manager remembers the answer, so calling it every frame is cheap.
 
 Types in :ref:`_requires()<class_Component_private_method__requires>` are never null while the component runs, so in :ref:`_start()<class_Component_private_method__start>` and ``_process()`` you can cast and use them directly:
 
 ::
 
     var brain := find(Brain) as Brain
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Component_method_find_node_of_type:
+
+.. rst-class:: classref-method
+
+:ref:`Node<class_Node>` **find_node_of_type**\ (\ type\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_Component_method_find_node_of_type>`
+
+Returns the first node of the built-in class ``type`` anywhere under the host, or null. Use it to fill in an export that was left empty, the way :ref:`PlayerBrain<class_PlayerBrain>` finds its camera:
+
+::
+
+    if not camera:
+        camera = find_node_of_type(&"Camera3D")
+
+It searches the whole host, so call it once, e.g. in :ref:`_start()<class_Component_private_method__start>`, not every frame.
 
 .. rst-class:: classref-item-separator
 
