@@ -31,6 +31,7 @@ Character components
     class_aibrain
     class_abilities
     class_brain
+    class_doublejump
     class_equipment
     class_faction
     class_health

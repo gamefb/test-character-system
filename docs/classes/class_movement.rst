@@ -43,9 +43,11 @@ Methods
 .. table::
    :widths: auto
 
-   +--------+-----------------------------------------------------------------------------------------+
-   | |void| | :ref:`push<class_Movement_method_push>`\ (\ velocity\: :ref:`Vector3<class_Vector3>`\ ) |
-   +--------+-----------------------------------------------------------------------------------------+
+   +-------------------------+-----------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>` | :ref:`jumped_this_frame<class_Movement_method_jumped_this_frame>`\ (\ )                 |
+   +-------------------------+-----------------------------------------------------------------------------------------+
+   | |void|                  | :ref:`push<class_Movement_method_push>`\ (\ velocity\: :ref:`Vector3<class_Vector3>`\ ) |
+   +-------------------------+-----------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -104,6 +106,18 @@ How quickly pushes fade out. Higher = shorter slides.
 
 Method Descriptions
 -------------------
+
+.. _class_Movement_method_jumped_this_frame:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **jumped_this_frame**\ (\ ) :ref:`🔗<class_Movement_method_jumped_this_frame>`
+
+True during the physics frame the character jumped from the floor. :ref:`DoubleJump<class_DoubleJump>` uses it so the press that starts a jump doesn't also use up an air jump.
+
+.. rst-class:: classref-item-separator
+
+----
 
 .. _class_Movement_method_push:
 

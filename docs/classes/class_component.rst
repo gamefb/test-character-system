@@ -10,7 +10,7 @@ Component
 
 **Inherits:** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`Abilities<class_Abilities>`, :ref:`Brain<class_Brain>`, :ref:`Equipment<class_Equipment>`, :ref:`Faction<class_Faction>`, :ref:`Health<class_Health>`, :ref:`Inventory<class_Inventory>`, :ref:`ItemComponent<class_ItemComponent>`, :ref:`MouseLook<class_MouseLook>`, :ref:`Movement<class_Movement>`, :ref:`Statuses<class_Statuses>`, :ref:`WeaponSwitch<class_WeaponSwitch>`
+**Inherited By:** :ref:`Abilities<class_Abilities>`, :ref:`Brain<class_Brain>`, :ref:`DoubleJump<class_DoubleJump>`, :ref:`Equipment<class_Equipment>`, :ref:`Faction<class_Faction>`, :ref:`Health<class_Health>`, :ref:`Inventory<class_Inventory>`, :ref:`ItemComponent<class_ItemComponent>`, :ref:`MouseLook<class_MouseLook>`, :ref:`Movement<class_Movement>`, :ref:`Statuses<class_Statuses>`, :ref:`WeaponSwitch<class_WeaponSwitch>`
 
 Base class for every component: a child node that adds one feature to its parent, the host.
 

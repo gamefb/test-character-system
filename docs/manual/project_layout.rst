@@ -21,8 +21,8 @@ All scripts live in ``character_system/``, grouped by where they are used, and e
    │   │   ├── effect_context.gd
    │   │   └── name_check.gd         finds mistyped stat, event and tag names
    │   ├── characters/               add to character scenes
-   │   │   ├── components/           statuses, health, movement, mouse_look, faction,
-   │   │   │                         inventory, abilities, equipment, weapon_switch
+   │   │   ├── components/           statuses, health, movement, double_jump, mouse_look,
+   │   │   │                         faction, inventory, abilities, equipment, weapon_switch
    │   │   ├── brains/
    │   │   │   ├── _base/brain.gd
    │   │   │   ├── player_brain.gd

@@ -33,6 +33,11 @@ Each component owns one concern and is optional. The table lists the standard se
      - :ref:`Brain<class_Brain>`
      - none
      - none
+   * - :ref:`DoubleJump<class_DoubleJump>`
+     - Jumps in the air, ``air_jumps``
+     - Brain, Movement
+     - none
+     - none
    * - :ref:`MouseLook<class_MouseLook>`
      - Turning the player and its camera with the mouse; capturing the mouse
      - none (set its Camera)
@@ -104,6 +109,17 @@ Movement
 .. source-file:: ../../character_system/characters/components/movement.gd
 
 Speed is read through ``stat()`` every frame, so a slow status or a speed ring takes effect immediately. ``push()`` is how effects shove a character: :ref:`KnockbackEffect<class_KnockbackEffect>` uses it, and a dash ability could too. A flying or swimming character swaps this component for another that reads the same :ref:`Brain<class_Brain>`.
+
+.. _doc_double_jump:
+
+Double jump
+-----------
+
+.. source-file:: ../../character_system/characters/components/double_jump.gd
+
+A double jump is its own component, so a character only has one if you add it. Pressing ``jump`` in the air jumps as high as a jump from the floor, and the air jumps come back on landing. How many there are is the ``air_jumps`` stat, so it works like any other number in the system: a status adding 1 makes a triple jump, boots can grant the jump through a status, and a rooted status can multiply it by 0. To give the jump only through an item, add the component with :ref:`air_jumps<class_DoubleJump_property_air_jumps>` at 0 and let the item's status add to it.
+
+The press that starts a jump from the floor must not also use up an air jump. :ref:`Movement<class_Movement>` and :ref:`DoubleJump<class_DoubleJump>` both read the same press in the same physics frame, in either order, so :ref:`Movement<class_Movement>` records the frame it jumped and :ref:`DoubleJump<class_DoubleJump>` checks :ref:`jumped_this_frame()<class_Movement_method_jumped_this_frame>` before using an air jump.
 
 .. _doc_mouse_look:
 

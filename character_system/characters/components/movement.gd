@@ -22,6 +22,8 @@ extends Component
 @export var push_damping: float = 6.0
 
 var _push := Vector3.ZERO
+# Physics frame of the last jump from the floor.
+var _jumped_on: int = -1
 
 
 func _physics_process(delta: float) -> void:
@@ -31,6 +33,7 @@ func _physics_process(delta: float) -> void:
 	body.velocity = Vector3(walk.x, body.velocity.y, walk.z) + body.get_gravity() * delta
 	if brain.is_action_just_pressed(&"jump") and body.is_on_floor():
 		body.velocity.y = stat(&"jump_velocity")
+		_jumped_on = Engine.get_physics_frames()
 	body.move_and_slide()
 	_push *= maxf(1.0 - push_damping * delta, 0.0)
 
@@ -47,6 +50,12 @@ func _warnings() -> PackedStringArray:
 	if host is CharacterBody3D:
 		return PackedStringArray()
 	return PackedStringArray(["Movement only works on a CharacterBody3D."])
+
+
+## True during the physics frame the character jumped from the floor. [DoubleJump] uses it so
+## the press that starts a jump doesn't also use up an air jump.
+func jumped_this_frame() -> bool:
+	return _jumped_on == Engine.get_physics_frames()
 
 
 ## Shoves the character by [param velocity]. The sideways part fades out over time.

@@ -9,7 +9,7 @@ For any class, press **F1** in Godot and search its name for the full reference.
 1. New scene with a **CharacterBody3D** root, a **CollisionShape3D** (capsule) and a mesh.
 2. Add a **ComponentManager**, then the components you want, in any order: `Statuses`,
    `Health`, a brain (`PlayerBrain` or `AIBrain`), `Movement`, `Faction`, `Inventory`,
-   `Equipment`, `WeaponSwitch`, `Abilities`.
+   `Equipment`, `WeaponSwitch`, `Abilities`, `DoubleJump`.
 3. Fix any yellow warning triangles in the Scene dock. They name what's missing.
 
 A component without what it needs waits instead of crashing, and starts once it's added.
@@ -95,6 +95,14 @@ CollisionShape3D.
 New Resource > **AbilityData**: `cooldown` and `effects`. Leave `targeting` empty to affect
 the user. On the character, add it to **Abilities > Slots** under an action, e.g.
 `secondary`. See `abilities/second_wind.tres`.
+
+## Add a double jump
+
+Add a **DoubleJump** beside `Movement`. Pressing jump in the air jumps again; landing refills
+it. `Air Jumps` sets how many (2 for a triple jump).
+
+To grant it with an item or a status instead, set `Air Jumps` to 0 and give the status a
+`StatModifier` on `air_jumps` with add 1. A rooted status can take it away with mul 0.
 
 ## React to a button
 

@@ -27,6 +27,9 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
    * - ``test_inventory.gd``
      - 12
      - Weapon switching (drawing, wrapping around, holstering, dropping, each weapon's own rounds) and the carrying rule between Inventory and Equipment
+   * - ``test_double_jump.gd``
+     - 3
+     - One floor jump plus one air jump, in either node order; the air jump comes back on landing; statuses change ``air_jumps``
    * - ``test_combat_parts.gd``
      - 5
      - Hitscan hits the target and not its wielder; cooldowns block reuse and wait while paused; teams are groups
@@ -92,7 +95,7 @@ A second folder, ``immunity_test/``, is a scripted scene that runs 43 checks on 
 Verification status
 -------------------
 
-All 70 tests and all 43 scene checks pass on both supported versions, last run on November 20: Godot 4.8 beta 3 with GUT 9.7.1 and Jolt physics, and Godot 4.4.1 with GUT 9.4.0. Every script in this document was rebuilt into a project and run headless on both.
+All 73 tests and all 43 scene checks pass on both supported versions, last run on November 21: Godot 4.8 beta 3 with GUT 9.7.1 and Jolt physics, and Godot 4.4.1 with GUT 9.4.0. Every script in this document was rebuilt into a project and run headless on both.
 
 .. list-table::
    :header-rows: 1
@@ -100,9 +103,9 @@ All 70 tests and all 43 scene checks pass on both supported versions, last run o
    * - Check
      - Godot 4.8 beta 3
      - Godot 4.4.1
-   * - GUT tests (8 files above, test_statuses.gd included)
-     - 70 of 70, 228 asserts
-     - 70 of 70, 224 asserts
+   * - GUT tests (9 files above, test_statuses.gd included)
+     - 73 of 73, 248 asserts
+     - 73 of 73, 244 asserts
    * - ``immunity_test`` scene
      - 43 of 43
      - 43 of 43
@@ -110,7 +113,7 @@ All 70 tests and all 43 scene checks pass on both supported versions, last run o
      - All compile
      - All compile
 
-Breaking the system on purpose makes the tests fail. Each part of the input design fails its own test when undone: counting a press from code in the current frame, skipping the release check, forgetting a press when it's released, and dropping the extra physics frame. Earlier, with the 38-check version of the scene, ignoring ``immune_to`` failed 6 checks, ignoring ``removes_tags`` 1, ignoring ``react_to_statuses`` 1, and items that never drop their holds 3.
+Breaking the system on purpose makes the tests fail. Each part of the input design fails its own test when undone: counting a press from code in the current frame, skipping the release check, forgetting a press when it's released, and dropping the extra physics frame. Earlier, with the 38-check version of the scene, ignoring ``immune_to`` failed 6 checks, ignoring ``removes_tags`` 1, ignoring ``react_to_statuses`` 1, and items that never drop their holds 3. Without the ``jumped_this_frame()`` check, DoubleJump spends its air jump on the floor jump and its tests fail.
 
 The scripts follow the GDScript style guide: a script that checks its main rules (code order, naming, static typing, line length, comments, one statement per line) reports nothing, and every link in the generated class reference resolves.
 
