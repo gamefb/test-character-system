@@ -26,9 +26,8 @@ static func rids_of(character: Node) -> Array[RID]:
 	var rids: Array[RID] = []
 	if character is CollisionObject3D:
 		rids.append(character.get_rid())
-	for node in character.find_children("*", "Area3D", true, false):
-		if node is Hurtbox:
-			rids.append(node.get_rid())
+	for node in character.find_children("*", "Hurtbox", true, false):
+		rids.append(node.get_rid())
 	return rids
 
 
