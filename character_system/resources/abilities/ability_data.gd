@@ -12,7 +12,8 @@ extends Resource
 @export var icon: Texture2D
 ## Seconds before it can be used again.
 @export var cooldown: float = 1.0
-## Picks who the effects apply to. Leave empty to affect the user.
+## Picks who the effects apply to. Leave empty to affect the user; use a [RadiusTargeting]
+## for everyone nearby, or your own [Targeting] for anything else.
 @export var targeting: Targeting
 ## Run in order on each node [member targeting] returns.
 @export var effects: Array[Effect] = []

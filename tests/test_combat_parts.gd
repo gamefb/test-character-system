@@ -44,6 +44,21 @@ func test_hitscan_hits_the_target_and_not_its_wielder() -> void:
 	assert_eq((Component.of(shooter, Health) as Health).current, 100.0, "its own body is skipped")
 
 
+func test_hits_say_which_item_dealt_them() -> void:
+	var shooter: CharacterBody3D = make_character()
+	var target: CharacterBody3D = make_character(Vector3(0, 0, 6))
+	var health := Component.of(target, Health) as Health
+	health.max_health = 10.0  # One shot kills.
+	var rifle: ItemData = load(EX + "items/rifle.tres")
+	(Component.of(shooter, Equipment) as Equipment).equip(ItemInstance.new(rifle))
+	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP
+	watch_signals(health)
+	await get_tree().physics_frame
+	await pull_trigger(shooter)
+	var ctx: EffectContext = get_signal_parameters(health, "died")[0]
+	assert_eq(ctx.origin, rifle, "for a kill feed: killed by Rifle")
+
+
 func test_cooldown_blocks_reuse() -> void:
 	var who: CharacterBody3D = make_character(Vector3.ZERO, [Abilities.new()])
 	var abilities := Component.of(who, Abilities) as Abilities

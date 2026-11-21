@@ -12,7 +12,9 @@ extends Resource
 @export var icon: Texture2D
 ## How many fit in one inventory stack. Use 1 for items with their own state, such as weapons.
 @export var max_stack: int = 1
-## [Equipment] slot, e.g. &"weapon". Leave empty if the item can't be equipped.
+## [Equipment] slot, e.g. &"weapon". The character's [member Equipment.sockets] needs an entry
+## with the same name. Leave empty if the item can't be equipped, such as ammo.
 @export var slot: StringName
-## Spawned when equipped. Its [ItemComponent] children decide what the item does.
+## Spawned when equipped. Its root is the model, with a [ComponentManager] and the
+## [ItemComponent]s that decide what the item does as children.
 @export var scene: PackedScene

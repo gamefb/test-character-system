@@ -20,6 +20,15 @@ extends Component
 ## [/codeblock]
 ## A brain presses buttons with [method press] and [method release]. A press counts from the
 ## next frame, so every node sees it exactly once, wherever in the frame it was made.
+##
+## To drive a plain Brain yourself, set [member move_dir] and [member aim_point] and tap buttons
+## from your own component, e.g. a turret that aims at the nearest enemy:
+## [codeblock]
+## var brain := find(Brain) as Brain
+## brain.aim_point = enemy.global_position
+## brain.press(&"primary")  # A tap: press and release in the same frame.
+## brain.release(&"primary")
+## [/codeblock]
 
 ## Desired movement in world space. Length 0 to 1.
 var move_dir := Vector3.ZERO

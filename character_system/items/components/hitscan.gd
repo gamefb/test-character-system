@@ -41,4 +41,4 @@ func _fire() -> void:
 	query.collide_with_areas = true  # So hurtboxes can be hit.
 	var hit: Dictionary = muzzle.get_world_3d().direct_space_state.intersect_ray(query)
 	if hit:
-		Effect.apply_all(effects, Hurtbox.hit(wielder, hit.collider))
+		Effect.apply_all(effects, Hurtbox.hit(wielder, hit.collider, item.data if item else null))

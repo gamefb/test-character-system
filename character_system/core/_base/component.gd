@@ -50,34 +50,34 @@ extends Node
 ## [b]Writing your own.[/b] Extend this class and override any of [method _requires],
 ## [method _stats], [method _start], [method _stop], [method _on_event] and
 ## [method _warnings]. Do setup in [method _start], not [code]_ready()[/code]: it runs once
-## everything is in place, and never in the editor.
+## everything is in place, and never in the editor. This outline shows where each part goes;
+## [Stamina] in [code]examples/scripts/[/code] is a complete one to copy.
 ##
 ## [codeblock]
 ## @tool  # Optional: shows this component's warnings in the editor.
-## class_name Stamina
+## class_name Shield
 ## extends Component
 ##
-## @export var max_stamina := 100.0
+## @export var max_shield := 50.0
 ##
 ## func _requires() -> Array[Script]:
-## 	return [Movement]  # Waits until there's a Movement beside it.
+## 	return [Health]  # Waits until there's a Health beside it.
 ##
 ## func _stats() -> Dictionary[StringName, float]:
-## 	return { &"max_stamina": max_stamina }  # Statuses can change it by name.
+## 	return { &"max_shield": max_shield }  # Statuses can change it by name.
 ##
 ## func _start() -> void:
 ## 	listen(manager.stat_changed, _on_stat_changed)  # Disconnected on stop.
 ##
-## func _process(delta: float) -> void:
-## 	if (find(Brain) as Brain).is_action_pressed(&"sprint"):
-## 		pass  # Runs only while the component runs.
+## func _process(_delta: float) -> void:
+## 	pass  # Runs only while the component runs, e.g. to recharge.
 ##
-## func _on_stat_changed(stat_name: StringName) -> void:
-## 	pass
+## func _on_stat_changed(_stat_name: StringName) -> void:
+## 	pass  # E.g. cut the shield down when max_shield drops.
 ##
 ## func _on_event(event: StringName, ctx: EffectContext) -> void:
-## 	if event == &"took_damage":
-## 		pass
+## 	if event == &"taking_damage":
+## 		ctx.amount *= 0.5  # A hit about to land: absorb half of it.
 ## [/codeblock]
 ##
 ## [b]Rules of thumb.[/b]

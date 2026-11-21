@@ -47,6 +47,19 @@ func test_weapon_actions_are_passed_on() -> void:
 	assert_true(brain.is_action_just_pressed(&"previous_weapon"))
 
 
+func test_extra_actions_are_passed_on() -> void:
+	for action in MOVES + PlayerBrain.ACTIONS + [&"sprint"]:
+		add_action(action)
+	var host := Node3D.new()
+	var brain := PlayerBrain.new()
+	brain.extra_actions = [&"sprint"]
+	for node in [Camera3D.new(), ComponentManager.new(), brain]:
+		host.add_child(node)
+	add_child_autofree(host)
+	press(&"sprint")
+	assert_true(brain.is_action_just_pressed(&"sprint"))
+
+
 func test_camera_left_empty_is_found() -> void:
 	for action in MOVES + PlayerBrain.ACTIONS:
 		add_action(action)

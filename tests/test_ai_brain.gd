@@ -29,3 +29,4 @@ func test_new_path_only_when_the_target_moves_enough() -> void:
 	target.position = Vector3(8, 0, 0)
 	await physics_frames()
 	assert_eq(agent.target_position, Vector3(8, 0, 0))
+	assert_eq(brain.aim_point, Vector3(8, 1, 0), "aims at the chest, aim_height above the feet")
