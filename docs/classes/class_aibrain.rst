@@ -19,6 +19,8 @@ Description
 
 Decision logic (a state machine or behavior tree) sets :ref:`target<class_AIBrain_property_target>` and calls :ref:`Brain.press()<class_Brain_method_press>` and :ref:`Brain.release()<class_Brain_method_release>` to attack, exactly like a player pressing a button.
 
+Finding a path is the expensive part of steering, so a new one is only asked for when the target has moved :ref:`repath_distance<class_AIBrain_property_repath_distance>` metres. Many characters can chase the same target without each one searching the navigation mesh every frame.
+
 .. rst-class:: classref-reftable-group
 
 Properties
@@ -27,11 +29,13 @@ Properties
 .. table::
    :widths: auto
 
-   +---------------------------------------------------+----------------------------------------------+
-   | :ref:`NavigationAgent3D<class_NavigationAgent3D>` | :ref:`agent<class_AIBrain_property_agent>`   |
-   +---------------------------------------------------+----------------------------------------------+
-   | :ref:`Node3D<class_Node3D>`                       | :ref:`target<class_AIBrain_property_target>` |
-   +---------------------------------------------------+----------------------------------------------+
+   +---------------------------------------------------+----------------------------------------------------------------+---------+
+   | :ref:`NavigationAgent3D<class_NavigationAgent3D>` | :ref:`agent<class_AIBrain_property_agent>`                     |         |
+   +---------------------------------------------------+----------------------------------------------------------------+---------+
+   | :ref:`float<class_float>`                         | :ref:`repath_distance<class_AIBrain_property_repath_distance>` | ``1.0`` |
+   +---------------------------------------------------+----------------------------------------------------------------+---------+
+   | :ref:`Node3D<class_Node3D>`                       | :ref:`target<class_AIBrain_property_target>`                   |         |
+   +---------------------------------------------------+----------------------------------------------------------------+---------+
 
 .. rst-class:: classref-section-separator
 
@@ -52,7 +56,19 @@ Property Descriptions
 
 - |void| **@agent_setter**\ (\ value\: :ref:`NavigationAgent3D<class_NavigationAgent3D>`\ )
 
-If the character has a path but stands still, set this agent's Path Height Offset to how far the baked navigation mesh sits above the floor (0.5 m for a default bake).
+Finds the paths. Leave it empty to use the first :ref:`NavigationAgent3D<class_NavigationAgent3D>` under the character. If the character has a path but stands still, set the agent's Path Height Offset to how far the baked navigation mesh sits above the floor (0.5 m for a default bake).
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_AIBrain_property_repath_distance:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **repath_distance** = ``1.0`` :ref:`🔗<class_AIBrain_property_repath_distance>`
+
+How far, in metres, :ref:`target<class_AIBrain_property_target>` must move before a new path is found. Lower follows a fast target more closely and costs more. 0 finds a new path whenever it moves at all.
 
 .. rst-class:: classref-item-separator
 

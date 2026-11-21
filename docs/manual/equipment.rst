@@ -76,6 +76,8 @@ A :ref:`Hurtbox<class_Hurtbox>` is an optional ``Area3D`` on a character, such a
 
 Shots are physics rays, so collision layers decide what they can hit. ``Hitscan.collision_mask`` lists the layers a weapon hits, every layer by default; untick layers in the inspector to make, for example, a rifle that ignores a turrets layer. The ray also hits areas, which is how hurtboxes get hit. :ref:`EffectZone<class_EffectZone>` therefore sets its own layer to 0, so shots and AI sight lines pass through fire patches and pools. A zone still detects bodies, because detection uses its mask, not its layer.
 
+A weapon's own wielder is never hit: :ref:`Hitscan<class_Hitscan>` collects the wielder's body and hurtboxes once, when the weapon is equipped, and every shot passes through them.
+
 .. source-file:: ../../character_system/characters/hurtbox.gd
 
 .. source-file:: ../../character_system/items/components/hitscan.gd

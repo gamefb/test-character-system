@@ -10,7 +10,9 @@ For any class, press **F1** in Godot and search its name for the full reference.
 2. Add a **ComponentManager**, then the components you want, in any order: `Statuses`,
    `Health`, a brain (`PlayerBrain` or `AIBrain`), `Movement`, `Faction`, `Inventory`,
    `Equipment`, `WeaponSwitch`, `Abilities`, `DoubleJump`.
-3. Fix any yellow warning triangles in the Scene dock. They name what's missing.
+3. A player needs a **Camera3D** and an AI a **NavigationAgent3D** somewhere under the
+   character. The brain finds it by itself.
+4. Fix any yellow warning triangles in the Scene dock. They name what's missing.
 
 A component without what it needs waits instead of crashing, and starts once it's added.
 
@@ -135,7 +137,9 @@ carry a context (`ctx`):
 | `inventory_changed` | Something was added to or removed from the Inventory | No |
 
 In your own component, override `_on_event(event, ctx)`. Send your own with
-`ComponentManager.notify(node, &"my_event", ctx)`; pass a context if statuses should react.
+`ComponentManager.notify(node, &"my_event")`, and status triggers react to it too. To say who
+caused it, pass a context as well:
+`ComponentManager.notify(node, &"my_event", EffectContext.new(who, node))`.
 
 ## Write your own effect, condition or component
 

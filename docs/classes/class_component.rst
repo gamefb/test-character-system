@@ -87,7 +87,7 @@ If a component can't start, the editor shows a warning on it and the Output pane
 
 \ **Rules of thumb.** 
 
-- Don't keep references to other components in variables; :ref:`find()<class_Component_method_find>` them when you need them. They can be removed and added during play. 
+- Don't keep references to other components in variables; :ref:`find()<class_Component_method_find>` them when you need them. They can be removed and added during play, and :ref:`find()<class_Component_method_find>` is cheap. 
 
 - Don't store stat values. Read :ref:`stat()<class_Component_method_stat>` each time, or :ref:`listen()<class_Component_method_listen>` to :ref:`ComponentManager.stat_changed<class_ComponentManager_signal_stat_changed>`; a stored speed ignores every status. 
 
@@ -125,6 +125,8 @@ Methods
    | :ref:`String<class_String>`                                                                           | :ref:`type_name<class_Component_method_type_name>`\ (\ type\: :ref:`Script<class_Script>`\ ) |static|                                                                      |
    +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`Component<class_Component>`                                                                     | :ref:`find<class_Component_method_find>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                         |
+   +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Node<class_Node>`                                                                               | :ref:`find_node_of_type<class_Component_method_find_node_of_type>`\ (\ type\: :ref:`StringName<class_StringName>`\ )                                                       |
    +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`float<class_float>`                                                                             | :ref:`stat<class_Component_method_stat>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                                                                            |
    +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -243,13 +245,32 @@ A readable name for a component type, for messages: its ``class_name``, or its f
 
 :ref:`Component<class_Component>` **find**\ (\ type\: :ref:`Script<class_Script>`\ ) :ref:`🔗<class_Component_method_find>`
 
-Returns the ``type`` component on the same host, or null. Subclasses count. If the host has several, the first is returned.
+Returns the ``type`` component on the same host, or null. Subclasses count. If the host has several, the first is returned. The manager remembers the answer, so calling it every frame is cheap.
 
 Types in :ref:`_requires()<class_Component_private_method__requires>` are never null while the component runs, so in :ref:`_start()<class_Component_private_method__start>` and ``_process()`` you can cast and use them directly:
 
 ::
 
     var brain := find(Brain) as Brain
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Component_method_find_node_of_type:
+
+.. rst-class:: classref-method
+
+:ref:`Node<class_Node>` **find_node_of_type**\ (\ type\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_Component_method_find_node_of_type>`
+
+Returns the first node of the built-in class ``type`` anywhere under the host, or null. Use it to fill in an export that was left empty, the way :ref:`PlayerBrain<class_PlayerBrain>` finds its camera:
+
+::
+
+    if not camera:
+        camera = find_node_of_type(&"Camera3D")
+
+It searches the whole host, so call it once, e.g. in :ref:`_start()<class_Component_private_method__start>`, not every frame.
 
 .. rst-class:: classref-item-separator
 

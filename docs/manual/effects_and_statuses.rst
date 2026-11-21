@@ -140,6 +140,7 @@ The rules this component enforces:
 -  **Credit is kept.** Damage from a status tick carries the original applier as ``source``, so kill credit and the applier's ``dealing_damage`` triggers still work.
 -  **Death ends timed statuses only.** :ref:`Statuses<class_Statuses>` hears the ``died`` event and removes timed statuses. Burning stops on a corpse, but racial and equipment passives stay, so a revived character keeps them.
 -  **Removing the component removes its statuses.** ``_stop()`` takes every status off, so no stat modifier is left behind on the manager.
+-  **Passives cost nothing per frame.** ``_process()`` only runs while a status has a ``duration`` or a ``tick_interval``, so a crowd whose only statuses are traits and item passives adds no per-frame work.
 
 .. _doc_passives:
 
@@ -194,7 +195,7 @@ A trait gained during play, such as a curse that turns a character undead, does 
 Events
 ------
 
-An event reaches every running component on a host through ``_on_event()``. Statuses passes it on to triggers; your own components can react too. The four damage events are built in, :ref:`Health<class_Health>` sends ``died``, the manager sends ``started``, and :ref:`Inventory<class_Inventory>` sends ``inventory_changed``. Status triggers only react to events that carry a context, so ``started`` and ``inventory_changed`` reach components but never triggers, and ``died`` reaches triggers only when something dealt the killing blow. Any system can add more with one line, such as ``ComponentManager.notify(host, &"jumped", EffectContext.new(host, host))``.
+An event reaches every running component on a host through ``_on_event()``. Statuses passes it on to triggers; your own components can react too. The four damage events are built in, :ref:`Health<class_Health>` sends ``died``, the manager sends ``started``, and :ref:`Inventory<class_Inventory>` sends ``inventory_changed``. Status triggers only react to events that carry a context, so ``started`` and ``inventory_changed`` reach components but never triggers, and ``died`` reaches triggers only when something dealt the killing blow. Any system can add more with one line, such as ``ComponentManager.notify(host, &"jumped")``. ``notify()`` gives the event a context with the host as the target, so triggers react to it; pass your own :ref:`EffectContext<class_EffectContext>` as a third argument to say who caused it.
 
 .. list-table::
    :header-rows: 1

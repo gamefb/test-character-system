@@ -16,20 +16,23 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - Tests
      - What it checks
    * - ``test_core.gd``
-     - 11
-     - Components start in any order and once a requirement arrives, only process and get input while running, keep their own process mode, and stop and restart with a requirement; stats combine and update; events reach running components only; lookups work before the host is in the scene
+     - 14
+     - Components start in any order and once a requirement arrives, only process and get input while running, keep their own process mode, and stop and restart with a requirement (but keep running while another of its type is left); stats combine and update, and a new component reports its stats; events reach running components only; lookups work before the host is in the scene and follow components that come and go
    * - ``test_input.gd``
      - 9
      - Presses and releases, a release while paused or never seen, a press the UI used, two keys on one action, an AI press seen once by every node, automatic fire held and tapped
    * - ``test_player_brain.gd``
-     - 2
-     - Weapon actions are passed on; missing Input Map actions are skipped without errors
+     - 3
+     - Weapon actions are passed on; a Camera left empty is found; missing Input Map actions are skipped without errors
    * - ``test_inventory.gd``
      - 12
      - Weapon switching (drawing, wrapping around, holstering, dropping, each weapon's own rounds) and the carrying rule between Inventory and Equipment
    * - ``test_double_jump.gd``
      - 3
      - One floor jump plus one air jump, in either node order; the air jump comes back on landing; statuses change ``air_jumps``
+   * - ``test_ai_brain.gd``
+     - 1
+     - The agent is found by itself, and a new path is only asked for once the target has moved ``repath_distance``
    * - ``test_combat_parts.gd``
      - 5
      - Hitscan hits the target and not its wielder; cooldowns block reuse and wait while paused; teams are groups
@@ -95,7 +98,7 @@ A second folder, ``immunity_test/``, is a scripted scene that runs 43 checks on 
 Verification status
 -------------------
 
-All 73 tests and all 43 scene checks pass on both supported versions, last run on November 21: Godot 4.8 beta 3 with GUT 9.7.1 and Jolt physics, and Godot 4.4.1 with GUT 9.4.0. Every script in this document was rebuilt into a project and run headless on both.
+All 80 tests and all 43 scene checks pass on both supported versions, last run on November 21: Godot 4.8 beta 3 with GUT 9.7.1 and Jolt physics, and Godot 4.4.1 with GUT 9.4.0. Every script in this document was rebuilt into a project and run headless on both.
 
 .. list-table::
    :header-rows: 1
@@ -103,9 +106,9 @@ All 73 tests and all 43 scene checks pass on both supported versions, last run o
    * - Check
      - Godot 4.8 beta 3
      - Godot 4.4.1
-   * - GUT tests (9 files above, test_statuses.gd included)
-     - 73 of 73, 248 asserts
-     - 73 of 73, 244 asserts
+   * - GUT tests (10 files above, test_statuses.gd included)
+     - 80 of 80, 263 asserts
+     - 80 of 80, 259 asserts
    * - ``immunity_test`` scene
      - 43 of 43
      - 43 of 43

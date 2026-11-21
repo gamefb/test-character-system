@@ -9,4 +9,4 @@ The warnings show in two places. :ref:`Statuses<class_Statuses>`, :ref:`GrantSta
 
 .. source-file:: ../../character_system/core/name_check.gd
 
-It only sees names written in code and saved files. A name built at runtime, such as an event sent with a variable, isn't seen, so a trigger for it is reported even though it works. Resources saved in their own file are checked when you open them. The project is read again at most every 3 seconds, and the add-on also re-reads it whenever a resource is saved.
+It only sees names written in code and saved files. A name built at runtime, such as an event sent with a variable, isn't seen, so a trigger for it is reported even though it works. Resources saved in their own file are checked when you open them. With the add-on enabled, the project is read again whenever its files change or a resource is saved, so a large project isn't re-read while nothing changes. Without the add-on, it's read again at most every 30 seconds.

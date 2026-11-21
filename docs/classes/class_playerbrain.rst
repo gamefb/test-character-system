@@ -69,7 +69,7 @@ Property Descriptions
 
 - |void| **@camera_setter**\ (\ value\: :ref:`Camera3D<class_Camera3D>`\ )
 
-Movement is relative to this camera, and the character aims where it looks.
+Movement is relative to this camera, and the character aims where it looks. Leave it empty to use the first :ref:`Camera3D<class_Camera3D>` under the character.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

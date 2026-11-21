@@ -103,7 +103,7 @@ Builds the :ref:`EffectContext<class_EffectContext>` for a hit on ``collider``, 
 
 :ref:`Array<class_Array>`\[:ref:`RID<class_RID>`\] **rids_of**\ (\ character\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_Hurtbox_method_rids_of>`
 
-RIDs of a character's body and hurtboxes, so its own shots can ignore them.
+RIDs of a character's body and hurtboxes, so its own shots can ignore them. It searches the whole character, so call it once (e.g. when a weapon is equipped), not on every shot.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

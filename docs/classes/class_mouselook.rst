@@ -54,7 +54,7 @@ Property Descriptions
 
 - |void| **@camera_setter**\ (\ value\: :ref:`Camera3D<class_Camera3D>`\ )
 
-Tilted up and down by the mouse. The host itself turns left and right.
+Tilted up and down by the mouse. The host itself turns left and right. Leave it empty to use the first :ref:`Camera3D<class_Camera3D>` under the character.
 
 .. rst-class:: classref-item-separator
 

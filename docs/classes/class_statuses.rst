@@ -21,6 +21,8 @@ Give statuses with :ref:`add()<class_Statuses_method_add>`, or through effects (
 
 \ :ref:`remove()<class_Statuses_method_remove>` ends a status outright, e.g. for a cleanse.
 
+It only runs every frame while a status has a :ref:`StatusData.duration<class_StatusData_property_duration>` or a :ref:`StatusData.tick_interval<class_StatusData_property_tick_interval>`. Characters with nothing but passives cost nothing per frame.
+
 
 
 ::

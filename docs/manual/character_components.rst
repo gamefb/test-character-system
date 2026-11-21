@@ -40,7 +40,7 @@ Each component owns one concern and is optional. The table lists the standard se
      - none
    * - :ref:`MouseLook<class_MouseLook>`
      - Turning the player and its camera with the mouse; capturing the mouse
-     - none (set its Camera)
+     - none (uses the character's Camera3D)
      - none
      - none
    * - :ref:`Faction<class_Faction>`
@@ -93,13 +93,15 @@ A :ref:`Brain<class_Brain>` publishes intent and nothing else. Every other compo
 
 .. source-file:: ../../character_system/characters/brains/player_brain.gd
 
-Input actions are created in Project > Project Settings > Input Map.
+Input actions are created in Project > Project Settings > Input Map. Leave Camera empty and :ref:`PlayerBrain<class_PlayerBrain>` uses the first ``Camera3D`` under the character, as :ref:`MouseLook<class_MouseLook>` does.
 
 :ref:`PlayerBrain<class_PlayerBrain>` takes presses from input events in ``_unhandled_input()``, so a click the UI uses never reaches the character. It polls releases every frame with ``Input.is_action_pressed()``, so a button let go while the game was paused, over the UI or in another window doesn't stay held, and an action bound to two keys stays held until both are up. AI and tests press buttons with ``press()`` and ``release()``. A press made from code counts from the next frame, so every node sees it exactly once wherever in the frame it was made; presses from input events count straight away, as they do in :ref:`Input<class_Input>`.
 
 .. source-file:: ../../character_system/characters/brains/ai_brain.gd
 
 Because AI presses the same "buttons" as the player, with ``press()`` and ``release()``, every weapon and ability works for AI with no extra code.
+
+Leave Agent empty and :ref:`AIBrain<class_AIBrain>` uses the first ``NavigationAgent3D`` under the character. Finding a path is the expensive part of steering, so a new one is only asked for once the target has moved ``repath_distance`` metres (1 by default). In a test with 50 enemies chasing a running player, asking every physics frame cost about seven times as much frame time. Lower the distance for a target that moves fast and turns sharply.
 
 .. _doc_movement:
 
