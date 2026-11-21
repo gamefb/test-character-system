@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_4a51q"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_htyb6"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_6klof"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_x0v8i"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_4g1nh"]
+
+[resource]
+script = ExtResource("4_x0v8i")
+id = &"construct"
+display_name = "Construct"
+description = "Trait: immune to fire and poison. Put it in Statuses > Innate."
+tags = Array[StringName]([&"construct"])
+immune_to = Array[StringName]([&"fire", &"poison"])
+apply_conditions = Array[ExtResource("1_4a51q")]([])
+duration = 0.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_htyb6")]([])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_6klof")]([])
+on_tick = Array[ExtResource("3_6klof")]([])
+on_remove = Array[ExtResource("3_6klof")]([])
+triggers = Array[ExtResource("5_4g1nh")]([])

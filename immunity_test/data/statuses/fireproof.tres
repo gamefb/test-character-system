@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_ugoe1"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_malc1"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_hp5vs"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_mafyc"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_d2h3j"]
+
+[resource]
+script = ExtResource("4_mafyc")
+id = &"fireproof"
+display_name = "Fireproof"
+description = "Can't burn."
+tags = Array[StringName]([&"fireproof"])
+immune_to = Array[StringName]([&"fire"])
+apply_conditions = Array[ExtResource("1_ugoe1")]([])
+duration = 0.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_malc1")]([])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_hp5vs")]([])
+on_tick = Array[ExtResource("3_hp5vs")]([])
+on_remove = Array[ExtResource("3_hp5vs")]([])
+triggers = Array[ExtResource("5_d2h3j")]([])

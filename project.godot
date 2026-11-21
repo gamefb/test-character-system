@@ -1,0 +1,12 @@
+config_version=5
+
+[application]
+config/name="test-character-system"
+config/features=PackedStringArray("4.4")
+
+[physics]
+3d/physics_engine="Jolt Physics"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/character_system_warnings/plugin.cfg")

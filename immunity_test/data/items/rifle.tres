@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://immunity_test/scenes/items/rifle.tscn" id="1_5kiru"]
+[ext_resource type="Script" path="res://character_system/resources/items/item_data.gd" id="2_vbj8q"]
+
+[resource]
+script = ExtResource("2_vbj8q")
+id = &"rifle"
+display_name = "Rifle"
+max_stack = 1
+slot = &"weapon"
+scene = ExtResource("1_5kiru")

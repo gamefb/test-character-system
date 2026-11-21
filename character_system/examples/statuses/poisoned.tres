@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_nd3fg"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_2sq3u"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_4bc0b"]
+[ext_resource type="Script" path="res://character_system/resources/effects/damage_effect.gd" id="4_t2prm"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="5_nvn4t"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="6_7vu35"]
+
+[sub_resource type="Resource" id="Resource_csar4"]
+script = ExtResource("4_t2prm")
+amount = 2.0
+type = &"poison"
+conditions = Array[ExtResource("1_nd3fg")]([])
+
+[resource]
+script = ExtResource("5_nvn4t")
+id = &"poisoned"
+display_name = "Poisoned"
+description = "2 poison damage a second for 6 seconds. Stacks up to 3 times."
+tags = Array[StringName]([&"poison"])
+immune_to = Array[StringName]([])
+apply_conditions = Array[ExtResource("1_nd3fg")]([])
+duration = 6.0
+stacking = 1
+max_stacks = 3
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_2sq3u")]([])
+tick_interval = 1.0
+on_apply = Array[ExtResource("3_4bc0b")]([])
+on_tick = Array[ExtResource("3_4bc0b")]([SubResource("Resource_csar4")])
+on_remove = Array[ExtResource("3_4bc0b")]([])
+triggers = Array[ExtResource("6_7vu35")]([])

@@ -1,0 +1,649 @@
+[gd_scene load_steps=63 format=3]
+
+[ext_resource type="Script" path="res://immunity_test/scripts/immunity_test.gd" id="1_ao2wf"]
+[ext_resource type="Script" path="res://immunity_test/scripts/nameplate.gd" id="2_rg5bo"]
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="3_53kh5"]
+[ext_resource type="Script" path="res://character_system/characters/components/statuses.gd" id="4_ke4w3"]
+[ext_resource type="Script" path="res://character_system/characters/components/health.gd" id="5_0gagl"]
+[ext_resource type="Script" path="res://immunity_test/scripts/walker_brain.gd" id="6_5r2hm"]
+[ext_resource type="Script" path="res://character_system/characters/components/movement.gd" id="7_lffln"]
+[ext_resource type="Script" path="res://character_system/characters/components/inventory.gd" id="8_dyyyg"]
+[ext_resource type="Script" path="res://character_system/characters/components/equipment.gd" id="9_rsaxf"]
+[ext_resource type="Script" path="res://character_system/characters/components/weapon_switch.gd" id="10_edhvn"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="11_sccwp"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/undead.tres" id="12_pdyfo"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/construct.tres" id="13_b0fpu"]
+[ext_resource type="PackedScene" path="res://immunity_test/scenes/zones/fire_patch.tscn" id="14_rfj7u"]
+[ext_resource type="Script" path="res://character_system/world/effect_zone.gd" id="15_xlhdq"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="16_j7g5h"]
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="17_s2yj1"]
+[ext_resource type="Script" path="res://character_system/resources/effects/apply_status_effect.gd" id="18_h52a1"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/burning.tres" id="19_n20mg"]
+[ext_resource type="PackedScene" path="res://immunity_test/scenes/zones/healing_pad.tscn" id="20_fuskk"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/regenerating.tres" id="21_0vk3c"]
+[ext_resource type="PackedScene" path="res://immunity_test/scenes/zones/poison_bog.tscn" id="22_5qsak"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/poisoned.tres" id="23_h8ohv"]
+[ext_resource type="PackedScene" path="res://immunity_test/scenes/zones/ward_circle.tscn" id="24_pa62d"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/warded.tres" id="25_vfvrx"]
+[ext_resource type="PackedScene" path="res://immunity_test/scenes/zones/water_pool.tscn" id="26_02dks"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/soaked.tres" id="27_fkvja"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/dripping.tres" id="28_j3hv8"]
+[ext_resource type="PackedScene" path="res://immunity_test/scenes/item_pickup.tscn" id="29_txlg3"]
+[ext_resource type="Script" path="res://immunity_test/scripts/item_pickup.gd" id="30_lf17o"]
+[ext_resource type="Resource" path="res://immunity_test/data/items/rifle.tres" id="31_igack"]
+[ext_resource type="Resource" path="res://immunity_test/data/items/rifle_ammo.tres" id="32_ga4q4"]
+[ext_resource type="Resource" path="res://immunity_test/data/items/flare_gun.tres" id="33_m5im5"]
+[ext_resource type="Resource" path="res://immunity_test/data/items/fireproof_cloak.tres" id="34_jtbwv"]
+[ext_resource type="Resource" path="res://immunity_test/data/items/ward_amulet.tres" id="35_j1lgh"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_f2uwj"]
+size = Vector3(48, 1, 36)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kximr"]
+albedo_color = Color(0.5, 0.5, 0.52, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bkfs4"]
+material = SubResource("StandardMaterial3D_kximr")
+size = Vector3(48, 1, 36)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_66mya"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tym51"]
+albedo_color = Color(0.85, 0.85, 0.9, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_kij0q"]
+material = SubResource("StandardMaterial3D_tym51")
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_o2p10"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tp2ht"]
+albedo_color = Color(0.55, 0.7, 0.55, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_tiytg"]
+material = SubResource("StandardMaterial3D_tp2ht")
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6o8hi"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mng0q"]
+albedo_color = Color(0.6, 0.5, 0.4, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_y56bv"]
+material = SubResource("StandardMaterial3D_mng0q")
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ogive"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0uecv"]
+albedo_color = Color(0.4, 0.75, 0.9, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_nyptr"]
+material = SubResource("StandardMaterial3D_0uecv")
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_5ft6q"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xf3qp"]
+albedo_color = Color(0.95, 0.9, 0.6, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_oniio"]
+material = SubResource("StandardMaterial3D_xf3qp")
+radius = 0.4
+height = 1.8
+
+[sub_resource type="Resource" id="Resource_0brkc"]
+script = ExtResource("18_h52a1")
+status = ExtResource("19_n20mg")
+conditions = Array[ExtResource("17_s2yj1")]([])
+
+[sub_resource type="Resource" id="Resource_dtexm"]
+script = ExtResource("18_h52a1")
+status = ExtResource("23_h8ohv")
+conditions = Array[ExtResource("17_s2yj1")]([])
+
+[sub_resource type="Resource" id="Resource_tb8d5"]
+script = ExtResource("18_h52a1")
+status = ExtResource("28_j3hv8")
+conditions = Array[ExtResource("17_s2yj1")]([])
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u1ryo"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f12po"]
+albedo_color = Color(0.7, 0.6, 0.5, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_o5j0u"]
+material = SubResource("StandardMaterial3D_f12po")
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dl8ya"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3cfx0"]
+albedo_color = Color(0.7, 0.6, 0.5, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_f3uc6"]
+material = SubResource("StandardMaterial3D_3cfx0")
+radius = 0.4
+height = 1.8
+
+[node name="ImmunityTest" type="Node3D"]
+script = ExtResource("1_ao2wf")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, 0.409576, -0.286788, 0, 0.573576, 0.819152, 0.5, -0.709406, 0.496732, 0, 0, 0)
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.573576, 0.819152, 0, -0.819152, 0.573576, 0, 30, 21)
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="Shape" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_f2uwj")
+
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+mesh = SubResource("BoxMesh_bkfs4")
+
+[node name="Knight" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -10)
+
+[node name="Shape" type="CollisionShape3D" parent="Knight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_66mya")
+
+[node name="Mesh" type="MeshInstance3D" parent="Knight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_kij0q")
+
+[node name="Nameplate" type="Label3D" parent="Knight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
+billboard = 1
+text = "Knight"
+font_size = 36
+script = ExtResource("2_rg5bo")
+
+[node name="Hand" type="Node3D" parent="Knight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.3, -0.4)
+
+[node name="ComponentManager" type="Node" parent="Knight"]
+script = ExtResource("3_53kh5")
+
+[node name="Statuses" type="Node" parent="Knight"]
+script = ExtResource("4_ke4w3")
+
+[node name="Health" type="Node" parent="Knight"]
+script = ExtResource("5_0gagl")
+
+[node name="WalkerBrain" type="Node" parent="Knight"]
+script = ExtResource("6_5r2hm")
+
+[node name="Movement" type="Node" parent="Knight"]
+script = ExtResource("7_lffln")
+
+[node name="Inventory" type="Node" parent="Knight"]
+script = ExtResource("8_dyyyg")
+
+[node name="Equipment" type="Node" parent="Knight"]
+script = ExtResource("9_rsaxf")
+sockets = Dictionary[StringName, NodePath]({
+&"cloak": NodePath("../Hand"),
+&"neck": NodePath("../Hand"),
+&"weapon": NodePath("../Hand")
+})
+
+[node name="WeaponSwitch" type="Node" parent="Knight"]
+script = ExtResource("10_edhvn")
+
+[node name="KnightTrack" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -16, 0.05, -8.4)
+text = "Knight: pickups, cloak vs fire, two weapons"
+font_size = 40
+
+[node name="Ghoul" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -5)
+
+[node name="Shape" type="CollisionShape3D" parent="Ghoul"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_o2p10")
+
+[node name="Mesh" type="MeshInstance3D" parent="Ghoul"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_tiytg")
+
+[node name="Nameplate" type="Label3D" parent="Ghoul"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
+billboard = 1
+text = "Ghoul"
+font_size = 36
+script = ExtResource("2_rg5bo")
+
+[node name="Hand" type="Node3D" parent="Ghoul"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.3, -0.4)
+
+[node name="ComponentManager" type="Node" parent="Ghoul"]
+script = ExtResource("3_53kh5")
+
+[node name="Statuses" type="Node" parent="Ghoul"]
+script = ExtResource("4_ke4w3")
+innate = Array[ExtResource("11_sccwp")]([ExtResource("12_pdyfo")])
+
+[node name="Health" type="Node" parent="Ghoul"]
+script = ExtResource("5_0gagl")
+
+[node name="WalkerBrain" type="Node" parent="Ghoul"]
+script = ExtResource("6_5r2hm")
+
+[node name="Movement" type="Node" parent="Ghoul"]
+script = ExtResource("7_lffln")
+
+[node name="Inventory" type="Node" parent="Ghoul"]
+script = ExtResource("8_dyyyg")
+
+[node name="Equipment" type="Node" parent="Ghoul"]
+script = ExtResource("9_rsaxf")
+sockets = Dictionary[StringName, NodePath]({
+&"cloak": NodePath("../Hand"),
+&"neck": NodePath("../Hand"),
+&"weapon": NodePath("../Hand")
+})
+
+[node name="GhoulTrack" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -16, 0.05, -3.4)
+text = "Ghoul: Undead: immune to poison"
+font_size = 40
+
+[node name="Golem" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, 0)
+
+[node name="Shape" type="CollisionShape3D" parent="Golem"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_6o8hi")
+
+[node name="Mesh" type="MeshInstance3D" parent="Golem"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_y56bv")
+
+[node name="Nameplate" type="Label3D" parent="Golem"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
+billboard = 1
+text = "Golem"
+font_size = 36
+script = ExtResource("2_rg5bo")
+
+[node name="Hand" type="Node3D" parent="Golem"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.3, -0.4)
+
+[node name="ComponentManager" type="Node" parent="Golem"]
+script = ExtResource("3_53kh5")
+
+[node name="Statuses" type="Node" parent="Golem"]
+script = ExtResource("4_ke4w3")
+innate = Array[ExtResource("11_sccwp")]([ExtResource("13_b0fpu")])
+
+[node name="Health" type="Node" parent="Golem"]
+script = ExtResource("5_0gagl")
+
+[node name="WalkerBrain" type="Node" parent="Golem"]
+script = ExtResource("6_5r2hm")
+
+[node name="Movement" type="Node" parent="Golem"]
+script = ExtResource("7_lffln")
+
+[node name="Inventory" type="Node" parent="Golem"]
+script = ExtResource("8_dyyyg")
+
+[node name="Equipment" type="Node" parent="Golem"]
+script = ExtResource("9_rsaxf")
+sockets = Dictionary[StringName, NodePath]({
+&"cloak": NodePath("../Hand"),
+&"neck": NodePath("../Hand"),
+&"weapon": NodePath("../Hand")
+})
+
+[node name="GolemTrack" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -16, 0.05, 1.6)
+text = "Golem: Construct: immune to fire, poison"
+font_size = 40
+
+[node name="Diver" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, 5)
+
+[node name="Shape" type="CollisionShape3D" parent="Diver"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_ogive")
+
+[node name="Mesh" type="MeshInstance3D" parent="Diver"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_nyptr")
+
+[node name="Nameplate" type="Label3D" parent="Diver"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
+billboard = 1
+text = "Diver"
+font_size = 36
+script = ExtResource("2_rg5bo")
+
+[node name="Hand" type="Node3D" parent="Diver"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.3, -0.4)
+
+[node name="ComponentManager" type="Node" parent="Diver"]
+script = ExtResource("3_53kh5")
+
+[node name="Statuses" type="Node" parent="Diver"]
+script = ExtResource("4_ke4w3")
+
+[node name="Health" type="Node" parent="Diver"]
+script = ExtResource("5_0gagl")
+
+[node name="WalkerBrain" type="Node" parent="Diver"]
+script = ExtResource("6_5r2hm")
+
+[node name="Movement" type="Node" parent="Diver"]
+script = ExtResource("7_lffln")
+
+[node name="Inventory" type="Node" parent="Diver"]
+script = ExtResource("8_dyyyg")
+
+[node name="Equipment" type="Node" parent="Diver"]
+script = ExtResource("9_rsaxf")
+sockets = Dictionary[StringName, NodePath]({
+&"cloak": NodePath("../Hand"),
+&"neck": NodePath("../Hand"),
+&"weapon": NodePath("../Hand")
+})
+
+[node name="DiverTrack" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -16, 0.05, 6.6)
+text = "Diver: water vs fire"
+font_size = 40
+
+[node name="Cleric" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, 10)
+
+[node name="Shape" type="CollisionShape3D" parent="Cleric"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_5ft6q")
+
+[node name="Mesh" type="MeshInstance3D" parent="Cleric"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_oniio")
+
+[node name="Nameplate" type="Label3D" parent="Cleric"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
+billboard = 1
+text = "Cleric"
+font_size = 36
+script = ExtResource("2_rg5bo")
+
+[node name="Hand" type="Node3D" parent="Cleric"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.3, -0.4)
+
+[node name="ComponentManager" type="Node" parent="Cleric"]
+script = ExtResource("3_53kh5")
+
+[node name="Statuses" type="Node" parent="Cleric"]
+script = ExtResource("4_ke4w3")
+
+[node name="Health" type="Node" parent="Cleric"]
+script = ExtResource("5_0gagl")
+
+[node name="WalkerBrain" type="Node" parent="Cleric"]
+script = ExtResource("6_5r2hm")
+
+[node name="Movement" type="Node" parent="Cleric"]
+script = ExtResource("7_lffln")
+
+[node name="Inventory" type="Node" parent="Cleric"]
+script = ExtResource("8_dyyyg")
+
+[node name="Equipment" type="Node" parent="Cleric"]
+script = ExtResource("9_rsaxf")
+sockets = Dictionary[StringName, NodePath]({
+&"cloak": NodePath("../Hand"),
+&"neck": NodePath("../Hand"),
+&"weapon": NodePath("../Hand")
+})
+
+[node name="ClericTrack" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -16, 0.05, 11.6)
+text = "Cleric: ward amulet and circle"
+font_size = 40
+
+[node name="KnightFirePatchm6" type="Area3D" parent="." instance=ExtResource("14_rfj7u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -10)
+script = ExtResource("15_xlhdq")
+on_enter = Array[ExtResource("16_j7g5h")]([SubResource("Resource_0brkc")])
+
+[node name="KnightHealingPad0" type="Area3D" parent="." instance=ExtResource("20_fuskk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -10)
+script = ExtResource("15_xlhdq")
+status_while_inside = ExtResource("21_0vk3c")
+
+[node name="GhoulPoisonBogm8" type="Area3D" parent="." instance=ExtResource("22_5qsak")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -5)
+script = ExtResource("15_xlhdq")
+on_enter = Array[ExtResource("16_j7g5h")]([SubResource("Resource_dtexm")])
+
+[node name="GhoulFirePatch0" type="Area3D" parent="." instance=ExtResource("14_rfj7u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+script = ExtResource("15_xlhdq")
+on_enter = Array[ExtResource("16_j7g5h")]([SubResource("Resource_0brkc")])
+
+[node name="GhoulHealingPad8" type="Area3D" parent="." instance=ExtResource("20_fuskk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, -5)
+script = ExtResource("15_xlhdq")
+status_while_inside = ExtResource("21_0vk3c")
+
+[node name="GolemFirePatchm8" type="Area3D" parent="." instance=ExtResource("14_rfj7u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+script = ExtResource("15_xlhdq")
+on_enter = Array[ExtResource("16_j7g5h")]([SubResource("Resource_0brkc")])
+
+[node name="GolemPoisonBog0" type="Area3D" parent="." instance=ExtResource("22_5qsak")]
+script = ExtResource("15_xlhdq")
+on_enter = Array[ExtResource("16_j7g5h")]([SubResource("Resource_dtexm")])
+
+[node name="GolemWardCircle8" type="Area3D" parent="." instance=ExtResource("24_pa62d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+script = ExtResource("15_xlhdq")
+status_while_inside = ExtResource("25_vfvrx")
+
+[node name="DiverWaterPoolm10" type="Area3D" parent="." instance=ExtResource("26_02dks")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 5)
+script = ExtResource("15_xlhdq")
+status_while_inside = ExtResource("27_fkvja")
+on_exit = Array[ExtResource("16_j7g5h")]([SubResource("Resource_tb8d5")])
+
+[node name="DiverFirePatchm5" type="Area3D" parent="." instance=ExtResource("14_rfj7u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
+script = ExtResource("15_xlhdq")
+on_enter = Array[ExtResource("16_j7g5h")]([SubResource("Resource_0brkc")])
+
+[node name="DiverFirePatch3" type="Area3D" parent="." instance=ExtResource("14_rfj7u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 5)
+script = ExtResource("15_xlhdq")
+on_enter = Array[ExtResource("16_j7g5h")]([SubResource("Resource_0brkc")])
+
+[node name="DiverWaterPool10" type="Area3D" parent="." instance=ExtResource("26_02dks")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 5)
+script = ExtResource("15_xlhdq")
+status_while_inside = ExtResource("27_fkvja")
+on_exit = Array[ExtResource("16_j7g5h")]([SubResource("Resource_tb8d5")])
+
+[node name="ClericFirePatchm8" type="Area3D" parent="." instance=ExtResource("14_rfj7u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 10)
+script = ExtResource("15_xlhdq")
+on_enter = Array[ExtResource("16_j7g5h")]([SubResource("Resource_0brkc")])
+
+[node name="ClericFirePatch2" type="Area3D" parent="." instance=ExtResource("14_rfj7u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 10)
+script = ExtResource("15_xlhdq")
+on_enter = Array[ExtResource("16_j7g5h")]([SubResource("Resource_0brkc")])
+
+[node name="ClericWardCircle9" type="Area3D" parent="." instance=ExtResource("24_pa62d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 10)
+script = ExtResource("15_xlhdq")
+status_while_inside = ExtResource("25_vfvrx")
+
+[node name="ClericPoisonBog15" type="Area3D" parent="." instance=ExtResource("22_5qsak")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 10)
+script = ExtResource("15_xlhdq")
+on_enter = Array[ExtResource("16_j7g5h")]([SubResource("Resource_dtexm")])
+
+[node name="KnightRiflePickup" type="Area3D" parent="." instance=ExtResource("29_txlg3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0, -10)
+script = ExtResource("30_lf17o")
+item = ExtResource("31_igack")
+
+[node name="Label" type="Label3D" parent="KnightRiflePickup"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+billboard = 1
+text = "Rifle x1"
+
+[node name="KnightAmmo1Pickup" type="Area3D" parent="." instance=ExtResource("29_txlg3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -10)
+script = ExtResource("30_lf17o")
+item = ExtResource("32_ga4q4")
+count = 15
+
+[node name="Label" type="Label3D" parent="KnightAmmo1Pickup"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+billboard = 1
+text = "Rifle ammo x15"
+
+[node name="KnightAmmo2Pickup" type="Area3D" parent="." instance=ExtResource("29_txlg3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -10)
+script = ExtResource("30_lf17o")
+item = ExtResource("32_ga4q4")
+count = 15
+
+[node name="Label" type="Label3D" parent="KnightAmmo2Pickup"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+billboard = 1
+text = "Rifle ammo x15"
+
+[node name="KnightFlareGunPickup" type="Area3D" parent="." instance=ExtResource("29_txlg3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, -10)
+script = ExtResource("30_lf17o")
+item = ExtResource("33_m5im5")
+
+[node name="Label" type="Label3D" parent="KnightFlareGunPickup"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+billboard = 1
+text = "Flare gun x1"
+
+[node name="KnightCloakPickup" type="Area3D" parent="." instance=ExtResource("29_txlg3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0, -10)
+script = ExtResource("30_lf17o")
+item = ExtResource("34_jtbwv")
+
+[node name="Label" type="Label3D" parent="KnightCloakPickup"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+billboard = 1
+text = "Fireproof cloak x1"
+
+[node name="ClericAmuletPickup" type="Area3D" parent="." instance=ExtResource("29_txlg3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0, 10)
+script = ExtResource("30_lf17o")
+item = ExtResource("35_j1lgh")
+
+[node name="Label" type="Label3D" parent="ClericAmuletPickup"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+billboard = 1
+text = "Ward amulet x1"
+
+[node name="DryDummy" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 0, -14)
+
+[node name="Shape" type="CollisionShape3D" parent="DryDummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_u1ryo")
+
+[node name="Mesh" type="MeshInstance3D" parent="DryDummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_o5j0u")
+
+[node name="Nameplate" type="Label3D" parent="DryDummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
+billboard = 1
+text = "DryDummy"
+font_size = 36
+script = ExtResource("2_rg5bo")
+
+[node name="Hand" type="Node3D" parent="DryDummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.3, -0.4)
+
+[node name="ComponentManager" type="Node" parent="DryDummy"]
+script = ExtResource("3_53kh5")
+
+[node name="Statuses" type="Node" parent="DryDummy"]
+script = ExtResource("4_ke4w3")
+
+[node name="Health" type="Node" parent="DryDummy"]
+script = ExtResource("5_0gagl")
+
+[node name="WetDummy" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -14)
+
+[node name="Shape" type="CollisionShape3D" parent="WetDummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_dl8ya")
+
+[node name="Mesh" type="MeshInstance3D" parent="WetDummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_f3uc6")
+
+[node name="Nameplate" type="Label3D" parent="WetDummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, 0)
+billboard = 1
+text = "WetDummy"
+font_size = 36
+script = ExtResource("2_rg5bo")
+
+[node name="Hand" type="Node3D" parent="WetDummy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.3, -0.4)
+
+[node name="ComponentManager" type="Node" parent="WetDummy"]
+script = ExtResource("3_53kh5")
+
+[node name="Statuses" type="Node" parent="WetDummy"]
+script = ExtResource("4_ke4w3")
+
+[node name="Health" type="Node" parent="WetDummy"]
+script = ExtResource("5_0gagl")
+
+[node name="DummyWaterPool" type="Area3D" parent="." instance=ExtResource("26_02dks")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -14)
+script = ExtResource("15_xlhdq")
+status_while_inside = ExtResource("27_fkvja")
+on_exit = Array[ExtResource("16_j7g5h")]([SubResource("Resource_tb8d5")])
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Results" type="Label" parent="HUD"]
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 12.0
+offset_bottom = 12.0
+theme_override_font_sizes/font_size = 13
+text = "Running..."

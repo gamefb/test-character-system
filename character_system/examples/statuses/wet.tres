@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_5kkhx"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_hkvyg"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_lu7tv"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_7xrpn"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_xbg6m"]
+
+[sub_resource type="Resource" id="Resource_6pfm6"]
+script = ExtResource("2_hkvyg")
+stat = &"move_speed"
+add = 0.0
+mul = 0.6
+
+[resource]
+script = ExtResource("4_7xrpn")
+id = &"wet"
+display_name = "Wet"
+description = "Standing in water: 40% slower, can't burn, and puts fire out."
+tags = Array[StringName]([&"wet"])
+immune_to = Array[StringName]([&"fire"])
+apply_conditions = Array[ExtResource("1_5kkhx")]([])
+duration = 0.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([&"fire"])
+modifiers = Array[ExtResource("2_hkvyg")]([SubResource("Resource_6pfm6")])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_lu7tv")]([])
+on_tick = Array[ExtResource("3_lu7tv")]([])
+on_remove = Array[ExtResource("3_lu7tv")]([])
+triggers = Array[ExtResource("5_xbg6m")]([])

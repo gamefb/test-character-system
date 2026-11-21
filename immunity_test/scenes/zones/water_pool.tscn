@@ -1,0 +1,42 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://character_system/world/effect_zone.gd" id="1_lku1b"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/soaked.tres" id="2_v3c6q"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_hcfgq"]
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="4_hsaif"]
+[ext_resource type="Script" path="res://character_system/resources/effects/apply_status_effect.gd" id="5_f6n68"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/dripping.tres" id="6_7l473"]
+
+[sub_resource type="Resource" id="Resource_tb8d5"]
+script = ExtResource("5_f6n68")
+status = ExtResource("6_7l473")
+conditions = Array[ExtResource("4_hsaif")]([])
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uldco"]
+size = Vector3(3, 2, 3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rbg1d"]
+albedo_color = Color(0.2, 0.45, 0.95, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0fcq4"]
+material = SubResource("StandardMaterial3D_rbg1d")
+size = Vector3(3, 0.04, 3)
+
+[node name="WaterPool" type="Area3D"]
+script = ExtResource("1_lku1b")
+status_while_inside = ExtResource("2_v3c6q")
+on_exit = Array[ExtResource("3_hcfgq")]([SubResource("Resource_tb8d5")])
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_uldco")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("BoxMesh_0fcq4")
+
+[node name="Label" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+billboard = 1
+text = "Water pool"
+font_size = 40

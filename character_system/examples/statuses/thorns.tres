@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_byeif"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_epmv5"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_astw6"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_egjmc"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_e11hd"]
+[ext_resource type="Script" path="res://character_system/resources/effects/damage_effect.gd" id="6_cqedp"]
+
+[sub_resource type="Resource" id="Resource_i51ee"]
+script = ExtResource("6_cqedp")
+amount = 3.0
+type = &"physical"
+conditions = Array[ExtResource("1_byeif")]([])
+
+[sub_resource type="Resource" id="Resource_nnet4"]
+script = ExtResource("5_e11hd")
+event = &"took_damage"
+affects_other = true
+react_to_statuses = false
+effects = Array[ExtResource("3_astw6")]([SubResource("Resource_i51ee")])
+
+[resource]
+script = ExtResource("4_egjmc")
+id = &"thorns"
+display_name = "Thorns"
+description = "Whoever hits you takes 3 physical damage."
+tags = Array[StringName]([&"thorns"])
+immune_to = Array[StringName]([])
+apply_conditions = Array[ExtResource("1_byeif")]([])
+duration = 0.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_epmv5")]([])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_astw6")]([])
+on_tick = Array[ExtResource("3_astw6")]([])
+on_remove = Array[ExtResource("3_astw6")]([])
+triggers = Array[ExtResource("5_e11hd")]([SubResource("Resource_nnet4")])

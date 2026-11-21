@@ -1,0 +1,34 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://character_system/world/effect_zone.gd" id="1_ps0bk"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="2_v0gu1"]
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="3_rt1c7"]
+[ext_resource type="Script" path="res://character_system/resources/effects/apply_status_effect.gd" id="4_nacnt"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/poisoned.tres" id="5_av623"]
+
+[sub_resource type="Resource" id="Resource_5wdiw"]
+script = ExtResource("4_nacnt")
+status = ExtResource("5_av623")
+conditions = Array[ExtResource("3_rt1c7")]([])
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wa3nh"]
+size = Vector3(3, 2, 3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_286l0"]
+albedo_color = Color(0.45, 0.6, 0.15, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3o68o"]
+material = SubResource("StandardMaterial3D_286l0")
+size = Vector3(3, 0.04, 3)
+
+[node name="PoisonBog" type="Area3D"]
+script = ExtResource("1_ps0bk")
+on_enter = Array[ExtResource("2_v0gu1")]([SubResource("Resource_5wdiw")])
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_wa3nh")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("BoxMesh_3o68o")

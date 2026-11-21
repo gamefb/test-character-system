@@ -1,0 +1,32 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://character_system/world/effect_zone.gd" id="1_0shf8"]
+[ext_resource type="Resource" path="res://immunity_test/data/statuses/regenerating.tres" id="2_v5h18"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yhk30"]
+size = Vector3(3, 2, 3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_axb84"]
+albedo_color = Color(0.3, 0.85, 0.35, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3w1wj"]
+material = SubResource("StandardMaterial3D_axb84")
+size = Vector3(3, 0.04, 3)
+
+[node name="HealingPad" type="Area3D"]
+script = ExtResource("1_0shf8")
+status_while_inside = ExtResource("2_v5h18")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_yhk30")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("BoxMesh_3w1wj")
+
+[node name="Label" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+billboard = 1
+text = "Healing pad"
+font_size = 40

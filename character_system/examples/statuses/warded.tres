@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_mn7u5"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_j5qtx"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_aj6ak"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_5wsvd"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_v7ngn"]
+[ext_resource type="Script" path="res://character_system/resources/effects/modify_amount_effect.gd" id="6_31pl3"]
+
+[sub_resource type="Resource" id="Resource_ucepw"]
+script = ExtResource("6_31pl3")
+add = 0.0
+mul = 0.5
+conditions = Array[ExtResource("1_mn7u5")]([])
+
+[sub_resource type="Resource" id="Resource_7hhhw"]
+script = ExtResource("5_v7ngn")
+event = &"taking_damage"
+affects_other = false
+react_to_statuses = true
+effects = Array[ExtResource("3_aj6ak")]([SubResource("Resource_ucepw")])
+
+[resource]
+script = ExtResource("4_5wsvd")
+id = &"warded"
+display_name = "Warded"
+description = "Takes half damage, including burn and poison ticks."
+tags = Array[StringName]([&"ward"])
+immune_to = Array[StringName]([])
+apply_conditions = Array[ExtResource("1_mn7u5")]([])
+duration = 0.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_j5qtx")]([])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_aj6ak")]([])
+on_tick = Array[ExtResource("3_aj6ak")]([])
+on_remove = Array[ExtResource("3_aj6ak")]([])
+triggers = Array[ExtResource("5_v7ngn")]([SubResource("Resource_7hhhw")])

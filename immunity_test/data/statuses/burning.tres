@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_hw0qv"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_y0oxf"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_rsik3"]
+[ext_resource type="Script" path="res://character_system/resources/effects/damage_effect.gd" id="4_exqsh"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="5_orf5g"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="6_5y1bo"]
+
+[sub_resource type="Resource" id="Resource_hro8d"]
+script = ExtResource("4_exqsh")
+amount = 4.0
+type = &"fire"
+conditions = Array[ExtResource("1_hw0qv")]([])
+
+[resource]
+script = ExtResource("5_orf5g")
+id = &"burning"
+display_name = "Burning"
+description = "4 fire damage a second for 4 seconds."
+tags = Array[StringName]([&"fire"])
+immune_to = Array[StringName]([])
+apply_conditions = Array[ExtResource("1_hw0qv")]([])
+duration = 4.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_y0oxf")]([])
+tick_interval = 1.0
+on_apply = Array[ExtResource("3_rsik3")]([])
+on_tick = Array[ExtResource("3_rsik3")]([SubResource("Resource_hro8d")])
+on_remove = Array[ExtResource("3_rsik3")]([])
+triggers = Array[ExtResource("6_5y1bo")]([])

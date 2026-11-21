@@ -1,0 +1,55 @@
+/* Small additions to the Godot docs theme (custom.css). */
+
+/* Long code listings from the project's files. */
+.literal-block-wrapper .code-block-caption {
+    text-align: left;
+    font-family: var(--code-font, monospace);
+    font-size: 0.85em;
+}
+
+/* Diagrams scale down on narrow screens. */
+.graphviz svg, .graphviz object, .graphviz img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Folded code listings (the source-file directive). */
+details.source-file {
+    margin: 0 0 24px;
+    border: 1px solid var(--code-border-color, #d0d0d0);
+    border-radius: 4px;
+    background-color: var(--code-background-color, #f8f8f8);
+}
+details.source-file > summary {
+    cursor: pointer;
+    padding: 8px 12px;
+    user-select: none;
+}
+details.source-file > summary code.literal {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--body-color);
+    font-weight: 700;
+}
+details.source-file .source-file-lines {
+    opacity: 0.6;
+    font-size: 0.9em;
+    margin-left: 6px;
+}
+details.source-file[open] > summary {
+    border-bottom: 1px solid var(--code-border-color, #d0d0d0);
+}
+details.source-file div[class^="highlight"] {
+    margin: 0;
+    border: none;
+}
+
+/* Diagrams sit on a light card in both themes. */
+div.graphviz {
+    background-color: #ffffff;
+    border-radius: 6px;
+    padding: 12px;
+    display: inline-block;
+    max-width: 100%;
+}

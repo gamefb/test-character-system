@@ -1,0 +1,13 @@
+{% extends "!layout.html" -%}
+{# Based on the Godot docs layout: https://github.com/godotengine/godot-docs/blob/master/_templates/layout.html #}
+
+{% block extrahead -%}
+<meta name="doc_version" content="{{ version }}" />
+<meta name="doc_is_latest" content="False" />
+<meta name="doc_pagename" content="{{ pagename }}" />
+{% endblock -%}
+
+{% block linktags -%}
+  <meta name="theme-color" content="#3d8fcc" />
+  {{ super() }}
+{% endblock -%}

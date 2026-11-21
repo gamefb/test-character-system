@@ -1,0 +1,25 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_n7fna"]
+[ext_resource type="Script" path="res://character_system/items/components/grant_statuses.gd" id="2_q5br6"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="3_eorpv"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/fireproof.tres" id="4_o386a"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_amhss"]
+albedo_color = Color(0.8, 0.3, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0dhgv"]
+material = SubResource("StandardMaterial3D_amhss")
+size = Vector3(0.2, 0.2, 0.2)
+
+[node name="FireproofCloak" type="Node3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_0dhgv")
+
+[node name="ComponentManager" type="Node" parent="."]
+script = ExtResource("1_n7fna")
+
+[node name="GrantStatuses" type="Node" parent="."]
+script = ExtResource("2_q5br6")
+statuses = Array[ExtResource("3_eorpv")]([ExtResource("4_o386a")])

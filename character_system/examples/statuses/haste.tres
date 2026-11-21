@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_pusod"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_f8ptm"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_416ko"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_w4x37"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_bwfyj"]
+
+[sub_resource type="Resource" id="Resource_rwbtn"]
+script = ExtResource("2_f8ptm")
+stat = &"move_speed"
+add = 0.0
+mul = 1.5
+
+[resource]
+script = ExtResource("4_w4x37")
+id = &"haste"
+display_name = "Haste"
+description = "50% faster for 8 seconds."
+tags = Array[StringName]([&"haste"])
+immune_to = Array[StringName]([])
+apply_conditions = Array[ExtResource("1_pusod")]([])
+duration = 8.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_f8ptm")]([SubResource("Resource_rwbtn")])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_416ko")]([])
+on_tick = Array[ExtResource("3_416ko")]([])
+on_remove = Array[ExtResource("3_416ko")]([])
+triggers = Array[ExtResource("5_bwfyj")]([])

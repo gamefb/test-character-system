@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://character_system/examples/items/scenes/fireproof_cloak.tscn" id="1_75iko"]
+[ext_resource type="Script" path="res://character_system/resources/items/item_data.gd" id="2_ptb0e"]
+
+[resource]
+script = ExtResource("2_ptb0e")
+id = &"fireproof_cloak"
+display_name = "Fireproof cloak"
+max_stack = 1
+slot = &"cloak"
+scene = ExtResource("1_75iko")

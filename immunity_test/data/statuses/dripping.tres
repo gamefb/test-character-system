@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_uljtn"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_wl2mx"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_gfwxy"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_ywd1d"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_tdhj8"]
+
+[resource]
+script = ExtResource("4_ywd1d")
+id = &"dripping"
+display_name = "Dripping"
+description = "Just left water: can't burn for 3 seconds."
+tags = Array[StringName]([&"wet"])
+immune_to = Array[StringName]([&"fire"])
+apply_conditions = Array[ExtResource("1_uljtn")]([])
+duration = 3.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_wl2mx")]([])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_gfwxy")]([])
+on_tick = Array[ExtResource("3_gfwxy")]([])
+on_remove = Array[ExtResource("3_gfwxy")]([])
+triggers = Array[ExtResource("5_tdhj8")]([])
