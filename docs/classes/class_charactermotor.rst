@@ -37,7 +37,9 @@ The motor is the only node that calls :ref:`CharacterBody3D.move_and_slide()<cla
 
 3. The body moves, and the mode may hand over to another, e.g. walking to the air once the floor is gone. If it doesn't, any other mode may take over, e.g. a wall slide once the character falls against a wall. 
 
-Modes and moves read the :ref:`brain<class_CharacterMotor_property_brain>`, and use :ref:`consume_action()<class_CharacterMotor_method_consume_action>` for presses, so only one of them acts on each press. To change which key does what, edit the Input Map.
+Modes and moves read the :ref:`brain<class_CharacterMotor_property_brain>`, and use :ref:`consume_action()<class_CharacterMotor_method_consume_action>` for presses, so only one of them acts on each press. To change which key does what, edit the Input Map. 
+
+A mode or move whose :ref:`MotorNode.blocked_by_tags<class_MotorNode_property_blocked_by_tags>` match a status can't take over or start. The motor also tells the character's components and statuses when a mode takes over or hands over, e.g. ``walk_mode_entered`` on landing and ``air_mode_entered`` on take-off, and when a move starts or finishes, e.g. ``dash_move_started``. The first mode it starts in sends no event.
 
 .. rst-class:: classref-reftable-group
 

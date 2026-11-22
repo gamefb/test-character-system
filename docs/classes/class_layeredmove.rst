@@ -19,7 +19,7 @@ Extra movement for a while, on top of the current :ref:`MovementMode<class_Movem
 Description
 -----------
 
-Each physics frame, after the mode, the motor asks every idle move :ref:`_can_start()<class_LayeredMove_private_method__can_start>`, usually by using up a press with :ref:`CharacterMotor.consume_action()<class_CharacterMotor_method_consume_action>`. While :ref:`active<class_LayeredMove_property_active>`, its :ref:`MotorNode._physics_update()<class_MotorNode_private_method__physics_update>` changes ``body.velocity``. Set :ref:`active<class_LayeredMove_property_active>` to false when it's done.
+Each physics frame, after the mode, the motor asks every idle move :ref:`_can_start()<class_LayeredMove_private_method__can_start>`, usually by using up a press with :ref:`CharacterMotor.consume_action()<class_CharacterMotor_method_consume_action>`. It doesn't ask while the move is on :ref:`cooldown<class_LayeredMove_property_cooldown>` or blocked by a status, so the press is left for something else. While :ref:`active<class_LayeredMove_property_active>`, its :ref:`MotorNode._physics_update()<class_MotorNode_private_method__physics_update>` changes ``body.velocity``. Set :ref:`active<class_LayeredMove_property_active>` to false when it's done.
 
 ::
 
@@ -40,9 +40,11 @@ Properties
 .. table::
    :widths: auto
 
-   +-------------------------+--------------------------------------------------+-----------+
-   | :ref:`bool<class_bool>` | :ref:`active<class_LayeredMove_property_active>` | ``false`` |
-   +-------------------------+--------------------------------------------------+-----------+
+   +---------------------------+------------------------------------------------------+-----------+
+   | :ref:`float<class_float>` | :ref:`cooldown<class_LayeredMove_property_cooldown>` | ``0.0``   |
+   +---------------------------+------------------------------------------------------+-----------+
+   | :ref:`bool<class_bool>`   | :ref:`active<class_LayeredMove_property_active>`     | ``false`` |
+   +---------------------------+------------------------------------------------------+-----------+
 
 .. rst-class:: classref-reftable-group
 
@@ -52,9 +54,11 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------+--------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`_can_start<class_LayeredMove_private_method__can_start>`\ (\ ) |virtual| |
-   +-------------------------+--------------------------------------------------------------------------------+
+   +---------------------------+--------------------------------------------------------------------------------+
+   | :ref:`float<class_float>` | :ref:`cooldown_left<class_LayeredMove_method_cooldown_left>`\ (\ )             |
+   +---------------------------+--------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`   | :ref:`_can_start<class_LayeredMove_private_method__can_start>`\ (\ ) |virtual| |
+   +---------------------------+--------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -94,6 +98,18 @@ Emitted when the move ends.
 Property Descriptions
 ---------------------
 
+.. _class_LayeredMove_property_cooldown:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **cooldown** = ``0.0`` :ref:`🔗<class_LayeredMove_property_cooldown>`
+
+Time from the start of one run until the next may start, in game time like an ability's cooldown. 0 for none.
+
+.. rst-class:: classref-item-separator
+
+----
+
 .. _class_LayeredMove_property_active:
 
 .. rst-class:: classref-property
@@ -104,7 +120,7 @@ Property Descriptions
 
 - |void| **@active_setter**\ (\ value\: :ref:`bool<class_bool>`\ )
 
-True while the move runs. Set it from code to start or end the move, e.g. from a jump pad.
+True while the move runs. Set it from code to start or end the move, e.g. from a jump pad. It won't start while :ref:`cooldown_left()<class_LayeredMove_method_cooldown_left>` is above 0.
 
 .. rst-class:: classref-section-separator
 
@@ -114,6 +130,18 @@ True while the move runs. Set it from code to start or end the move, e.g. from a
 
 Method Descriptions
 -------------------
+
+.. _class_LayeredMove_method_cooldown_left:
+
+.. rst-class:: classref-method
+
+:ref:`float<class_float>` **cooldown_left**\ (\ ) :ref:`🔗<class_LayeredMove_method_cooldown_left>`
+
+Seconds until the move may start again, e.g. for a HUD. 0 when it's ready.
+
+.. rst-class:: classref-item-separator
+
+----
 
 .. _class_LayeredMove_private_method__can_start:
 

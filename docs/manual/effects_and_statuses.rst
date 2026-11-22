@@ -104,7 +104,7 @@ Status data
 Events
 ------
 
-An event reaches every running component on a host through ``_on_event()``. Statuses passes it on to triggers; your own components can react too. The four damage events are built in, :ref:`Health<class_Health>` sends ``died``, the manager sends ``started``, and :ref:`Inventory<class_Inventory>` sends ``inventory_changed``. Status triggers only react to events that carry a context, so ``started`` and ``inventory_changed`` reach components but never triggers, and ``died`` reaches triggers only when something dealt the killing blow. Any system can add more with one line, such as ``ComponentManager.notify(host, &"jumped")``. ``notify()`` gives the event a context with the host as the target, so triggers react to it; pass your own :ref:`EffectContext<class_EffectContext>` as a third argument to say who caused it.
+An event reaches every running component on a host through ``_on_event()``. Statuses passes it on to triggers; your own components can react too. The four damage events are built in, :ref:`Health<class_Health>` sends ``died``, the manager sends ``started``, :ref:`Inventory<class_Inventory>` sends ``inventory_changed``, and the :ref:`CharacterMotor<class_CharacterMotor>` sends one each time a movement mode or move starts or ends. Status triggers only react to events that carry a context, so ``started`` and ``inventory_changed`` reach components but never triggers, and ``died`` reaches triggers only when something dealt the killing blow. Any system can add more with one line, such as ``ComponentManager.notify(host, &"jumped")``. ``notify()`` gives the event a context with the host as the target, so triggers react to it; pass your own :ref:`EffectContext<class_EffectContext>` as a third argument to say who caused it.
 
 .. list-table::
    :header-rows: 1
@@ -141,6 +141,14 @@ An event reaches every running component on a host through ``_on_event()``. Stat
      - Every component on the host; no context
      - Something was added to or removed from the Inventory
      - Equipment unequipping a dropped item, WeaponSwitch drawing a weapon
+   * - ``<mode>_entered``, ``<mode>_exited``
+     - The moving character
+     - A movement mode takes over or hands over, e.g. ``walk_mode_entered`` on landing
+     - Landing shockwaves, effects on take-off. See :ref:`doc_movement_statuses_events_cooldowns`
+   * - ``<move>_started``, ``<move>_finished``
+     - The moving character
+     - A layered move starts or ends, e.g. ``dash_move_started``
+     - Dashes that cost health or leave a trail of fire
 
 .. _doc_example_statuses:
 
@@ -181,6 +189,11 @@ These ship in ``character_system/examples/`` as ``.tres`` files with no code. Du
      - ``statuses/haste.tres``
      - ``tags`` = haste. ``duration`` = 8. ``modifiers`` = ``move_speed`` × 1.5. The Sprint
        ability applies it.
+   * - Rooted
+     - ``statuses/rooted.tres``
+     - ``tags`` = rooted. ``duration`` = 3. ``modifiers`` = ``move_speed`` × 0 and
+       ``jump_velocity`` × 0. Moves and modes with ``rooted`` in their Blocked By Tags stop
+       too.
    * - Thorns (passive)
      - ``statuses/thorns.tres``
      - ``tags`` = thorns. ``duration`` = 0. ``triggers`` = on ``took_damage``, affect other,
