@@ -2,52 +2,47 @@
 @icon("res://character_system/icons/air_mode.svg")
 class_name AirMode
 extends MovementMode
-## In the air: fall, steer, and jump again while air jumps are left.
+## In the air: fall, steer, and jump again while air jumps are left. Hands back to
+## [member walk_mode] on landing.
 ##
-## Air jumps refill each time the character takes off, so a double jump is just
-## [member air_jumps] = 1 here. Statuses change it through the air_jumps stat, e.g. boots that
-## add 1. It hands back to [member walk_mode] on landing.
+## Air jumps refill on every take-off, so a double jump is [member air_jumps] = 1. Statuses
+## change it through the air_jumps stat, e.g. boots that add 1.
 
-## Jumps allowed in the air before landing. 1 is a double jump, 0 none.
-@export var air_jumps: int = 1:
+## Jumps allowed in the air before landing: 1 is a double jump, 0 none.
+@export_range(0, 5, 1, "or_greater") var air_jumps := 1:
 	set(value):
 		air_jumps = value
 		update_stats()
-## How quickly steering changes sideways speed in the air, in metres per second per second.
-## Lower keeps more of the speed it took off with.
-@export var air_acceleration: float = 20.0
-## The mode to switch to on landing.
-@export var walk_mode: StringName = &"walk"
-
-var _jumps_left: int = 0
-
-
-func _init() -> void:
-	mode_name = &"air"
-
+## How quickly steering changes speed in the air. Lower keeps more of the take-off speed.
+@export_range(0.0, 100.0, 0.1, "or_greater", "suffix:m/s²") var air_acceleration := 20.0
+## The [Brain] action that jumps.
+@export var jump_action := &"jump"
+## The mode to switch to on landing. Left empty, it's the [WalkMode].
+@export var walk_mode: MovementMode
 
 ## Air jumps left before landing, e.g. for a HUD.
-func jumps_left() -> int:
-	return _jumps_left
-
-
-func _enter() -> void:
-	_jumps_left = int(stat(&"air_jumps"))
-
-
-func _tick(delta: float) -> void:
-	var wish: Vector3 = motor.input.direction * stat(&"move_speed")
-	var sideways := Vector3(body.velocity.x, 0.0, body.velocity.z)
-	sideways = sideways.move_toward(Vector3(wish.x, 0.0, wish.z), air_acceleration * delta)
-	body.velocity = Vector3(sideways.x, body.velocity.y, sideways.z) + body.get_gravity() * delta
-	if _jumps_left > 0 and motor.input.consume(&"jump"):
-		_jumps_left -= 1
-		body.velocity.y = stat(&"jump_velocity")
-
-
-func _next_mode() -> StringName:
-	return walk_mode if body.is_on_floor() else &""
+var jumps_left := 0
 
 
 func _stats() -> Dictionary[StringName, float]:
 	return { &"air_jumps": air_jumps }
+
+
+func _enter() -> void:
+	jumps_left = int(stat(&"air_jumps"))
+
+
+func _physics_update(delta: float) -> void:
+	var target := motor.brain.move_dir * stat(&"move_speed")
+	body.velocity.x = move_toward(body.velocity.x, target.x, air_acceleration * delta)
+	body.velocity.z = move_toward(body.velocity.z, target.z, air_acceleration * delta)
+	body.velocity += body.get_gravity() * delta
+	if jumps_left > 0 and motor.consume_action(jump_action):
+		jumps_left -= 1
+		body.velocity.y = stat(&"jump_velocity")
+
+
+func _get_next_mode() -> MovementMode:
+	if not body.is_on_floor():
+		return null
+	return walk_mode if walk_mode else find(WalkMode) as MovementMode

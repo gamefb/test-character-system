@@ -3,54 +3,36 @@
 class_name LayeredMove
 extends Component
 ## Extra movement for a while, on top of the current [MovementMode]: a dash, a jump pad, a
-## grapple pull.
+## grapple pull. Several can run at once.
 ##
-## Each frame the [CharacterMotor] runs the mode first, then asks every idle move whether it
-## [method _wants_to_start], usually by using up a request the mode left. Once started, its
-## [method _tick] runs every frame, after the mode's, so it can add to the velocity or replace
-## it, until it calls [method finish]. Several can run at once.
-##
-## Like modes, use these hooks rather than [method Component._start] and
-## [method Component._stop]; if you do override those, call [code]super()[/code].
+## Each physics frame, after the mode, the [CharacterMotor] asks every idle move
+## [method _can_start], usually by using up a press with [method CharacterMotor.consume_action].
+## While [member active], its [method _physics_update] changes [code]body.velocity[/code]. Set
+## [member active] to false when it's done.
+## [br][br]If you override [method Component._start] or [method Component._stop], call
+## [code]super()[/code].
 
-## Moves with a higher priority are asked first, so they win a request two moves want.
-@export var priority: int = 0
+## Emitted when the move starts, e.g. to play a sound.
+signal started
+## Emitted when the move ends.
+signal finished
 
-## True while the move is running.
-var active := false
-
-## The motor running this move. Set when it starts.
+## True while the move runs. Set it from code to start or end the move, e.g. from a jump pad.
+var active := false:
+	set(value):
+		if value == active or (value and not running):
+			return
+		active = value
+		if active:
+			_enter()
+			started.emit()
+		else:
+			_exit()
+			finished.emit()
+## The motor running this move. Set when the move starts.
 var motor: CharacterMotor
-## The body being moved. Set when it starts.
+## The body being moved. Set when the move starts.
 var body: CharacterBody3D
-
-
-## Ends the move. Call it from [method _tick] when it's done.
-func finish() -> void:
-	if active:
-		active = false
-		_deactivate()
-
-
-## Asked every frame while idle: return true to start, e.g.
-## [code]return motor.input.consume(&"dash")[/code].
-func _wants_to_start() -> bool:
-	return false
-
-
-## Called when the move starts.
-func _activate() -> void:
-	pass
-
-
-## Called when the move ends, from [method finish] or because the move was removed.
-func _deactivate() -> void:
-	pass
-
-
-## Changes [code]body.velocity[/code] each frame while active, after the mode has set it.
-func _tick(_delta: float) -> void:
-	pass
 
 
 func _requires() -> Array[Script]:
@@ -64,5 +46,26 @@ func _start() -> void:
 
 
 func _stop() -> void:
-	finish()
+	active = false
 	motor.remove_move(self)
+
+
+## Asked every physics frame while idle. Return true to start, e.g.
+## [code]return motor.consume_action(&"dash")[/code].
+func _can_start() -> bool:
+	return false
+
+
+## Called when the move starts.
+func _enter() -> void:
+	pass
+
+
+## Called when the move ends, or when it's removed while running.
+func _exit() -> void:
+	pass
+
+
+## Called every physics frame while [member active], after the mode, before the body moves.
+func _physics_update(_delta: float) -> void:
+	pass

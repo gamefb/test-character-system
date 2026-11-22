@@ -71,16 +71,16 @@ func check_jumps(modes_first: bool) -> void:
 	var motor := motor_of(body)
 	var air := Component.of(body, AirMode) as AirMode
 	await land(body)
-	assert_eq(motor.mode.mode_name, &"walk", "Starts walking")
+	assert_is(motor.mode, WalkMode, "Starts walking")
 
 	await tap(body, &"jump")
-	assert_eq(motor.mode.mode_name, &"air", "The first press jumps from the floor")
-	assert_eq(air.jumps_left(), 1, "and doesn't use the air jump")
+	assert_is(motor.mode, AirMode, "The first press jumps from the floor")
+	assert_eq(air.jumps_left, 1, "and doesn't use the air jump")
 
 	await physics_frames(10)
 	var before: float = body.velocity.y
 	await tap(body, &"jump")
-	assert_eq(air.jumps_left(), 0, "The second press uses the air jump")
+	assert_eq(air.jumps_left, 0, "The second press uses the air jump")
 	assert_gt(body.velocity.y, before, "and goes up again")
 
 	await physics_frames(10)
@@ -89,9 +89,9 @@ func check_jumps(modes_first: bool) -> void:
 	assert_lt(body.velocity.y, before, "A third press does nothing")
 
 	await land(body)
-	assert_eq(motor.mode.mode_name, &"walk", "Landing goes back to walking")
+	assert_is(motor.mode, WalkMode, "Landing goes back to walking")
 	await tap(body, &"jump")
-	assert_eq(air.jumps_left(), 1, "and the next take-off refills the air jump")
+	assert_eq(air.jumps_left, 1, "and the next take-off refills the air jump")
 
 
 func test_double_jump_motor_first() -> void:
@@ -122,7 +122,7 @@ func test_walks_at_move_speed_and_stats_change_it() -> void:
 	boots.add = 1.0
 	ComponentManager.of(body).add_modifier(boots)
 	await tap(body, &"jump")
-	assert_eq((Component.of(body, AirMode) as AirMode).jumps_left(), 2, "and the air jumps")
+	assert_eq((Component.of(body, AirMode) as AirMode).jumps_left, 2, "and the air jumps")
 
 
 func test_dash() -> void:
@@ -161,15 +161,15 @@ func test_dash() -> void:
 	brain.release(&"dash")
 
 
-func test_requests_can_be_remapped() -> void:
+func test_actions_can_be_changed() -> void:
 	var body := make_character()
 	var motor := motor_of(body)
-	motor.requests[&"jump"] = &"hop"
+	(Component.of(body, WalkMode) as WalkMode).jump_action = &"hop"
 	await land(body)
 	await tap(body, &"jump")
-	assert_eq(motor.mode.mode_name, &"walk", "The old action no longer jumps")
+	assert_is(motor.mode, WalkMode, "The old action no longer jumps")
 	await tap(body, &"hop")
-	assert_eq(motor.mode.mode_name, &"air", "The new one does")
+	assert_is(motor.mode, AirMode, "The new one does")
 
 
 func test_knockback_pushes_motor_characters() -> void:
@@ -181,7 +181,7 @@ func test_knockback_pushes_motor_characters() -> void:
 	KnockbackEffect.new().apply(EffectContext.new(source, body))
 	await physics_frames(2)
 	assert_lt(body.velocity.z, -4.0, "Pushed away from the source")
-	assert_eq(motor_of(body).mode.mode_name, &"air", "and lifted off the floor")
+	assert_is(motor_of(body).mode, AirMode, "and lifted off the floor")
 	await physics_frames(60)
 	assert_almost_eq(body.velocity.z, 0.0, 0.1, "The push fades")
 
@@ -195,7 +195,8 @@ func test_modes_can_be_removed_and_added() -> void:
 	assert_eq(motor.mode, air, "In the air")
 
 	body.remove_child(air)
-	assert_eq(motor.mode.mode_name, &"walk", "Removing the current mode falls back to start_mode")
+	await physics_frames(1)
+	assert_is(motor.mode, WalkMode, "Removing the current mode goes back to the start mode")
 	await land(body)
 	await tap(body, &"jump")
 	await physics_frames(10)
@@ -215,14 +216,14 @@ func test_modes_can_be_removed_and_added() -> void:
 class Glide extends LayeredMove:
 	var fall_speed := 1.0
 
-	func _wants_to_start() -> bool:
-		return motor.mode.mode_name == &"air" and motor.input.is_held(&"jump") \
+	func _can_start() -> bool:
+		return motor.mode is AirMode and motor.brain.is_action_pressed(&"jump") \
 				and body.velocity.y < 0.0
 
-	func _tick(_delta: float) -> void:
+	func _physics_update(_delta: float) -> void:
 		body.velocity.y = maxf(body.velocity.y, -fall_speed)
-		if not motor.input.is_held(&"jump") or motor.mode.mode_name != &"air":
-			finish()
+		if not motor.brain.is_action_pressed(&"jump") or not motor.mode is AirMode:
+			active = false
 
 
 func test_new_moves_need_no_changes_elsewhere() -> void:
@@ -238,10 +239,34 @@ func test_new_moves_need_no_changes_elsewhere() -> void:
 	assert_lt(body.velocity.y, -1.0, "Falling normally with jump released")
 	brain.press(&"jump")
 	await physics_frames(3)
-	assert_eq(air.jumps_left(), 0, "The press still double jumps")
+	assert_eq(air.jumps_left, 0, "The press still double jumps")
 	await physics_frames(40)
 	assert_true(glide.active, "then holding it glides on the way down")
 	assert_almost_eq(body.velocity.y, -glide.fall_speed, 0.01, "at the glide speed")
 	brain.release(&"jump")
 	await physics_frames(2)
 	assert_false(glide.active, "Letting go stops gliding")
+
+
+func test_signals_and_switching_from_code() -> void:
+	var body := make_character(false, true)
+	var motor := motor_of(body)
+	var walk := Component.of(body, WalkMode) as WalkMode
+	var air := Component.of(body, AirMode) as AirMode
+	var dash := Component.of(body, DashMove) as DashMove
+	await land(body)
+	watch_signals(motor)
+	watch_signals(dash)
+	await tap(body, &"jump")
+	assert_signal_emitted_with_parameters(motor, "mode_changed", [walk, air])
+
+	await land(body)
+	dash.active = true
+	assert_signal_emitted(dash, "started", "A move can be started from code")
+	await physics_frames(20)
+	assert_signal_emitted(dash, "finished", "and says when it's done")
+
+	motor.mode = air
+	assert_eq(motor.mode, air, "Modes can be switched from code")
+	await physics_frames(2)
+	assert_eq(motor.mode, walk, "and hand back as usual")
