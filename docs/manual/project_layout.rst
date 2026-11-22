@@ -21,8 +21,10 @@ All scripts live in ``character_system/``, grouped by where they are used, and e
    │   │   ├── effect_context.gd
    │   │   └── name_check.gd         finds mistyped stat, event and tag names
    │   ├── characters/               add to character scenes
-   │   │   ├── components/           statuses, health, movement, double_jump, mouse_look,
-   │   │   │                         faction, inventory, abilities, equipment, weapon_switch
+   │   │   ├── components/           statuses, health, mouse_look, faction, inventory,
+   │   │   │                         abilities, equipment, weapon_switch
+   │   │   ├── motor/                character_motor, walk_mode, air_mode, dash_move
+   │   │   │   └── _base/            motor_node, movement_mode, layered_move
    │   │   ├── brains/
    │   │   │   ├── _base/brain.gd
    │   │   │   ├── player_brain.gd
@@ -50,7 +52,7 @@ All scripts live in ``character_system/``, grouped by where they are used, and e
 
 **Examples and recipes.** ``examples/`` holds working resources to duplicate and change: statuses (Burning, Poisoned, Wet, Regenerating, Warded, Haste, Thorns, Fireproof), traits (Undead, Construct), items with their scenes (rifle, rifle ammo, flare gun, fireproof cloak, ward amulet), zones (fire patch, water pool, healing pad, ward circle, poison bog) and abilities (Second Wind, Sprint). ``examples/scripts/`` holds scripts to copy: a :ref:`Stamina<class_Stamina>` component, a :ref:`Scope<class_Scope>` item component, :ref:`AttackNearest<class_AttackNearest>` AI decision logic and a :ref:`CharacterHud<class_CharacterHud>`, all explained in :ref:`doc_extending`. ``RECIPES.md`` answers the common jobs on one page, from making a character, status, weapon or zone to reading buttons and showing health on screen, and points at the matching example.
 
-**Editor icons.** Every node type has its own icon file in ``icons/``, set by an ``@icon(...)`` line above its ``class_name``. Most are still the same plain square; only :ref:`DoubleJump<class_DoubleJump>` and :ref:`WeaponSwitch<class_WeaponSwitch>` have a symbol of their own. To give a node type its own icon, replace its SVG; the ``@icon`` line doesn't change. A script without its own ``@icon`` shows its base class's icon, so your own components look like components, and effects, conditions and targeting resources keep their base class's icon in the Inspector.
+**Editor icons.** Every node type has its own icon file in ``icons/``, set by an ``@icon(...)`` line above its ``class_name``. Most are still the same plain square; the motor, its modes and moves, and :ref:`WeaponSwitch<class_WeaponSwitch>` have a symbol of their own. To give a node type its own icon, replace its SVG; the ``@icon`` line doesn't change. A script without its own ``@icon`` shows its base class's icon, so your own components look like components, and effects, conditions and targeting resources keep their base class's icon in the Inspector.
 
 To build the system yourself, one stage at a time, see :ref:`doc_build_from_scratch`.
 

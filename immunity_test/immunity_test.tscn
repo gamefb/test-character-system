@@ -1,4 +1,4 @@
-[gd_scene load_steps=63 format=3]
+[gd_scene load_steps=65 format=3]
 
 [ext_resource type="Script" path="res://immunity_test/scripts/immunity_test.gd" id="1_ao2wf"]
 [ext_resource type="Script" path="res://immunity_test/scripts/nameplate.gd" id="2_rg5bo"]
@@ -6,7 +6,9 @@
 [ext_resource type="Script" path="res://character_system/characters/components/statuses.gd" id="4_ke4w3"]
 [ext_resource type="Script" path="res://character_system/characters/components/health.gd" id="5_0gagl"]
 [ext_resource type="Script" path="res://immunity_test/scripts/walker_brain.gd" id="6_5r2hm"]
-[ext_resource type="Script" path="res://character_system/characters/components/movement.gd" id="7_lffln"]
+[ext_resource type="Script" path="res://character_system/characters/motor/character_motor.gd" id="7_lffln"]
+[ext_resource type="Script" path="res://character_system/characters/motor/walk_mode.gd" id="7_walkm"]
+[ext_resource type="Script" path="res://character_system/characters/motor/air_mode.gd" id="7_airmd"]
 [ext_resource type="Script" path="res://character_system/characters/components/inventory.gd" id="8_dyyyg"]
 [ext_resource type="Script" path="res://character_system/characters/components/equipment.gd" id="9_rsaxf"]
 [ext_resource type="Script" path="res://character_system/characters/components/weapon_switch.gd" id="10_edhvn"]
@@ -197,8 +199,14 @@ script = ExtResource("5_0gagl")
 [node name="WalkerBrain" type="Node" parent="Knight"]
 script = ExtResource("6_5r2hm")
 
-[node name="Movement" type="Node" parent="Knight"]
+[node name="CharacterMotor" type="Node" parent="Knight"]
 script = ExtResource("7_lffln")
+
+[node name="WalkMode" type="Node" parent="Knight/CharacterMotor"]
+script = ExtResource("7_walkm")
+
+[node name="AirMode" type="Node" parent="Knight/CharacterMotor"]
+script = ExtResource("7_airmd")
 
 [node name="Inventory" type="Node" parent="Knight"]
 script = ExtResource("8_dyyyg")
@@ -253,8 +261,14 @@ script = ExtResource("5_0gagl")
 [node name="WalkerBrain" type="Node" parent="Ghoul"]
 script = ExtResource("6_5r2hm")
 
-[node name="Movement" type="Node" parent="Ghoul"]
+[node name="CharacterMotor" type="Node" parent="Ghoul"]
 script = ExtResource("7_lffln")
+
+[node name="WalkMode" type="Node" parent="Ghoul/CharacterMotor"]
+script = ExtResource("7_walkm")
+
+[node name="AirMode" type="Node" parent="Ghoul/CharacterMotor"]
+script = ExtResource("7_airmd")
 
 [node name="Inventory" type="Node" parent="Ghoul"]
 script = ExtResource("8_dyyyg")
@@ -306,8 +320,14 @@ script = ExtResource("5_0gagl")
 [node name="WalkerBrain" type="Node" parent="Golem"]
 script = ExtResource("6_5r2hm")
 
-[node name="Movement" type="Node" parent="Golem"]
+[node name="CharacterMotor" type="Node" parent="Golem"]
 script = ExtResource("7_lffln")
+
+[node name="WalkMode" type="Node" parent="Golem/CharacterMotor"]
+script = ExtResource("7_walkm")
+
+[node name="AirMode" type="Node" parent="Golem/CharacterMotor"]
+script = ExtResource("7_airmd")
 
 [node name="Inventory" type="Node" parent="Golem"]
 script = ExtResource("8_dyyyg")
@@ -358,8 +378,14 @@ script = ExtResource("5_0gagl")
 [node name="WalkerBrain" type="Node" parent="Diver"]
 script = ExtResource("6_5r2hm")
 
-[node name="Movement" type="Node" parent="Diver"]
+[node name="CharacterMotor" type="Node" parent="Diver"]
 script = ExtResource("7_lffln")
+
+[node name="WalkMode" type="Node" parent="Diver/CharacterMotor"]
+script = ExtResource("7_walkm")
+
+[node name="AirMode" type="Node" parent="Diver/CharacterMotor"]
+script = ExtResource("7_airmd")
 
 [node name="Inventory" type="Node" parent="Diver"]
 script = ExtResource("8_dyyyg")
@@ -410,8 +436,14 @@ script = ExtResource("5_0gagl")
 [node name="WalkerBrain" type="Node" parent="Cleric"]
 script = ExtResource("6_5r2hm")
 
-[node name="Movement" type="Node" parent="Cleric"]
+[node name="CharacterMotor" type="Node" parent="Cleric"]
 script = ExtResource("7_lffln")
+
+[node name="WalkMode" type="Node" parent="Cleric/CharacterMotor"]
+script = ExtResource("7_walkm")
+
+[node name="AirMode" type="Node" parent="Cleric/CharacterMotor"]
+script = ExtResource("7_airmd")
 
 [node name="Inventory" type="Node" parent="Cleric"]
 script = ExtResource("8_dyyyg")

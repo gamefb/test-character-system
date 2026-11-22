@@ -61,7 +61,7 @@ func make_player() -> CharacterBody3D:
 	inventory.items = [ItemInstance.new(load(EX + "items/rifle.tres")), ammo]
 	var parts: Array[Node] = [
 		ComponentManager.new(), Health.new(), Statuses.new(), PlayerBrain.new(),
-		Movement.new(), MouseLook.new(), inventory, equipment, WeaponSwitch.new(),
+		walker(), MouseLook.new(), inventory, equipment, WeaponSwitch.new(),
 	]
 	for node in parts:
 		player.add_child(node)
@@ -104,3 +104,11 @@ func test_quick_start_level_plays_as_described() -> void:
 	for i in 3:
 		await get_tree().physics_frame
 	assert_true((Component.of(player, Statuses) as Statuses).has_tag(&"fire"), "Burning")
+
+
+## A CharacterMotor that walks and jumps, as in the docs.
+func walker() -> CharacterMotor:
+	var motor := CharacterMotor.new()
+	motor.add_child(WalkMode.new())
+	motor.add_child(AirMode.new())
+	return motor

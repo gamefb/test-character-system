@@ -16,7 +16,7 @@ The three character kinds share one scene layout and differ in two components an
    ├── Statuses
    ├── Health
    ├── Brain            <- PlayerBrain or AIBrain
-   ├── Movement
+   ├── CharacterMotor   <- with WalkMode and AirMode under it
    ├── Faction
    ├── Abilities
    ├── Inventory
@@ -44,7 +44,7 @@ The three character kinds share one scene layout and differ in two components an
      - ``enemy``
      - ``player``, ``ally``
      - ``enemy``
-   * - :ref:`ComponentManager<class_ComponentManager>`, :ref:`Statuses<class_Statuses>`, :ref:`Health<class_Health>`, :ref:`Movement<class_Movement>`
+   * - :ref:`ComponentManager<class_ComponentManager>`, :ref:`Statuses<class_Statuses>`, :ref:`Health<class_Health>`, :ref:`CharacterMotor<class_CharacterMotor>`
      - Yes
      - Yes
      - Yes
@@ -69,6 +69,6 @@ The three character kinds share one scene layout and differ in two components an
      - Monster traits, e.g. fire immunity
      - Companion traits
 
-**One base scene, many characters.** Build one character scene that holds the shared parts: the body, its collision shape, the ComponentManager, Statuses, Health, Movement and Inventory. Make the player, enemies and allies as inherited scenes of it (Scene > New Inherited Scene), each adding its brain and its camera or navigation agent, and setting its Faction. A change to the base, such as a new component every character should have, then reaches them all. The :ref:`quick start <doc_quick_start>` builds a player and a target by hand, and the recipe "Make an enemy that attacks" builds an AI.
+**One base scene, many characters.** Build one character scene that holds the shared parts: the body, its collision shape, the ComponentManager, Statuses, Health, CharacterMotor with its modes, and Inventory. Make the player, enemies and allies as inherited scenes of it (Scene > New Inherited Scene), each adding its brain and its camera or navigation agent, and setting its Faction. A change to the base, such as a new component every character should have, then reaches them all. The :ref:`quick start <doc_quick_start>` builds a player and a target by hand, and the recipe "Make an enemy that attacks" builds an AI.
 
-A stationary turret is a character without :ref:`Movement<class_Movement>` and with a plain :ref:`Brain<class_Brain>`, driven by your own component. A destructible crate is a :ref:`ComponentManager<class_ComponentManager>` and a :ref:`Health<class_Health>` on a ``StaticBody3D``.
+A stationary turret is a character without a :ref:`CharacterMotor<class_CharacterMotor>` and with a plain :ref:`Brain<class_Brain>`, driven by your own component. A destructible crate is a :ref:`ComponentManager<class_ComponentManager>` and a :ref:`Health<class_Health>` on a ``StaticBody3D``.

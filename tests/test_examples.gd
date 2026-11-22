@@ -20,7 +20,7 @@ func make_character() -> CharacterBody3D:
 		Statuses.new(),
 		Health.new(),
 		Brain.new(),
-		Movement.new(),
+		walker(),
 		Abilities.new(),
 		Inventory.new(),
 		gear,
@@ -135,3 +135,11 @@ func test_items_equip_and_grant_their_passives() -> void:
 	gear.equip(ItemInstance.new(ex("items/ward_amulet.tres")))
 	assert_true(statuses(who).has_tag(&"fireproof"))
 	assert_true(statuses(who).has_tag(&"ward"))
+
+
+## A CharacterMotor that walks and jumps, as in the docs.
+func walker() -> CharacterMotor:
+	var motor := CharacterMotor.new()
+	motor.add_child(WalkMode.new())
+	motor.add_child(AirMode.new())
+	return motor

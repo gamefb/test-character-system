@@ -7,7 +7,7 @@ extends MovementMode
 
 ## The [Brain] action that jumps.
 @export var jump_action := &"jump"
-## The mode to switch to off the floor. Left empty, it's the [AirMode].
+## The mode to switch to off the floor. Left empty, it's the [AirMode] beside this one.
 @export var air_mode: MovementMode
 
 
@@ -23,4 +23,4 @@ func _physics_update(delta: float) -> void:
 func _get_next_mode() -> MovementMode:
 	if body.is_on_floor():
 		return null
-	return air_mode if air_mode else find(AirMode) as MovementMode
+	return air_mode if air_mode else motor.get_mode(AirMode)

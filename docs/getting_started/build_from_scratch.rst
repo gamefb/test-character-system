@@ -333,7 +333,7 @@ team. All extend ``Component``.
    * - ``Brain``
      - ``move_dir``, ``aim_point``, ``_held``, ``_pressed_on``
      - ``press(action)``, ``release(action)``, ``is_action_pressed(action)``,
-       ``is_action_just_pressed(action)``. It's the shared interface that Movement, Abilities
+       ``is_action_just_pressed(action)``. It's the shared interface that the motor, Abilities
        and items read, the way your scripts read Godot's ``Input``.
    * - ``PlayerBrain``
      - ``camera`` (empty: the first ``Camera3D`` under the host), ``ACTIONS`` list
@@ -345,12 +345,28 @@ team. All extend ``Component``.
      - Steer ``move_dir`` toward the next path point in ``_physics_process``, setting
        ``agent.target_position`` only once the target has moved ``repath_distance``; decision
        logic calls ``press()`` and ``release()``
-   * - ``Movement``
-     - ``move_speed``, ``jump_velocity``, ``push_damping``, ``_push``
-     - ``_requires()`` returns ``[Brain]``; ``_stats()`` returns ``move_speed`` and
-       ``jump_velocity``; ``push(velocity)``; ``_physics_process`` sets velocity from
-       ``brain.move_dir × stat("move_speed")`` plus ``_push``, jumps on
-       ``brain.is_action_just_pressed(&"jump")``, then calls ``move_and_slide()``
+   * - ``CharacterMotor``
+     - ``move_speed``, ``jump_velocity``, ``start_mode``, ``push_friction``, ``mode``,
+       ``brain``, ``body``, ``_modes``, ``_moves``, ``_consumed``, ``_push``; signal
+       ``mode_changed(old_mode, new_mode)``
+     - ``_requires()`` returns ``[Brain]``; ``_stats()`` returns ``move_speed``,
+       ``jump_velocity`` and its children's stats; ``consume_action(action)``,
+       ``get_mode(type)``, ``push(velocity)``; ``_physics_process`` runs the mode's
+       ``_physics_update()``, then each active move's, calls ``move_and_slide()``, then
+       switches to the mode's ``_get_next_mode()`` or to another mode whose ``_can_enter()``
+       is true
+   * - ``MotorNode``, ``MovementMode``, ``LayeredMove``
+     - ``motor`` and ``body``, set when entering the tree; a move's ``active`` and signals
+       ``started``, ``finished``
+     - Empty hooks ``_stats()``, ``_enter()``, ``_exit()`` and ``_physics_update(delta)``;
+       ``stat()``; a mode's ``_can_enter()`` and ``_get_next_mode()``; a move's
+       ``_can_start()``
+   * - ``WalkMode``, ``AirMode``
+     - ``jump_action``; ``air_mode`` or ``walk_mode`` (empty: the other one); AirMode's
+       ``air_jumps``, ``air_acceleration`` and ``jumps_left``
+     - Set velocity as Godot's CharacterBody3D template does; jump on
+       ``motor.consume_action(jump_action)``; hand over when the floor is gone or reached.
+       AirMode owns ``air_jumps`` and refills ``jumps_left`` in ``_enter()``
    * - ``Faction``
      - ``team``, ``hostile_to``
      - ``_start()`` adds the host to the group named ``team``, ``_stop()`` removes it;
@@ -381,8 +397,14 @@ Watch out for
   raising the maximum doesn't heal, and lowering it clamps ``current``.
 - **Health listens to** ``manager.stat_changed`` with ``listen()``, so the connection is undone
   when Health stops.
-- **Brains are swappable.** Movement only knows ``Brain``, so the same body works for a player
-  or an AI. That's why it requires the base class, not ``PlayerBrain``.
+- **Brains are swappable.** The motor only knows ``Brain``, so the same body works for a
+  player or an AI. That's why it requires the base class, not ``PlayerBrain``.
+- **One mode at a time, one use per press.** Only the current mode runs, and
+  ``consume_action()`` remembers which presses were used this frame, so the press that jumps
+  from the floor can't also spend an air jump, whatever order the nodes are in.
+- **Modes and moves are plain nodes.** They live under the motor, which lists them again
+  whenever its children change (``NOTIFICATION_CHILD_ORDER_CHANGED``), so they can be added and
+  removed during play.
 - **A press from code counts from the next frame.** ``press()`` can be called at any point in a
   frame, even after some nodes already ran their ``_process``. Counting it from the next frame
   means every node sees it as just pressed exactly once. Presses from input events arrive
@@ -498,8 +520,8 @@ Other effects
 ~~~~~~~~~~~~~
 
 - ``HealEffect(amount)``: ``health.change(amount × magnitude)``.
-- ``KnockbackEffect(strength, lift)``: calls ``Movement.push`` on the target, away from the
-  source.
+- ``KnockbackEffect(strength, lift)``: calls ``CharacterMotor.push`` on the target, away from
+  the source.
 
 Hurtbox
 ~~~~~~~

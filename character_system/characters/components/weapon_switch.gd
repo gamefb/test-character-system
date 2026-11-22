@@ -46,7 +46,7 @@ func _on_event(event: StringName, _ctx: EffectContext) -> void:
 ## The weapons carried, in the order they were picked up.
 func weapons() -> Array[ItemInstance]:
 	return (find(Inventory) as Inventory).items.filter(
-		func(item: ItemInstance) -> bool: return item.data.slot == slot)
+			func(item: ItemInstance) -> bool: return item.data.slot == slot)
 
 
 ## The weapon being held, or null.

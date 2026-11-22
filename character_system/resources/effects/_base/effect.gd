@@ -15,9 +15,9 @@ extends Resource
 ## @export var strength := 5.0
 ##
 ## func _execute(ctx: EffectContext) -> void:
-## 	var movement := Component.of(ctx.target, Movement) as Movement
-## 	if movement:  # Walls and props have no Movement.
-## 		movement.push(Vector3.UP * strength * ctx.magnitude)
+## 	var motor := Component.of(ctx.target, CharacterMotor) as CharacterMotor
+## 	if motor:  # Walls and props have no motor.
+## 		motor.push(Vector3.UP * strength * ctx.magnitude)
 ## [/codeblock]
 ##
 ## [b]Where effects run.[/b] The same effect resource works in all of these:

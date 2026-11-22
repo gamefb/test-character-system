@@ -16,11 +16,8 @@ func _execute(ctx: EffectContext) -> void:
 	var away: Vector3 = from.global_position.direction_to(target.global_position)
 	away = away.slide(Vector3.UP).normalized()
 	var push: Vector3 = away * strength * ctx.magnitude + Vector3.UP * lift
-	var movement := Component.of(target, Movement) as Movement
 	var motor := Component.of(target, CharacterMotor) as CharacterMotor
-	if movement:
-		movement.push(push)
-	elif motor:
+	if motor:
 		motor.push(push)
 	elif target is RigidBody3D:
 		target.apply_central_impulse(push * target.mass)

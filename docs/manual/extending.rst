@@ -19,6 +19,8 @@ New gameplay usually fits one of these places:
   statuses, weapons and zones all run effects, so a new one works in all four.
 - A **component** is ongoing behaviour with its own memory, running every frame. On an item,
   it's an **item component**.
+- A **movement mode** or **layered move** is a new way for the character to move, under its
+  :ref:`CharacterMotor<class_CharacterMotor>`.
 
 To place a new idea, ask in this order:
 
@@ -27,8 +29,10 @@ To place a new idea, ask in this order:
    **status**, which an ability, item or zone can apply.
 3. Is the missing piece one instant change, such as "spawn a puddle"? Write an **effect** and
    use it in an ability or status.
-4. Does it need memory between frames or presses, a held button, or a change to how the
-   character moves or acts? Make it a **component**.
+4. Does it change how the character moves, such as climbing, gliding or wall jumps? Make it a
+   **movement mode** or **layered move**.
+5. Does it need memory between frames or presses, a held button, or a change to how the
+   character acts? Make it a **component**.
 
 .. list-table::
    :header-rows: 1
@@ -60,6 +64,11 @@ To place a new idea, ask in this order:
      - Needs GDScript and the start and stop lifecycle. Added to each character's scene, so
        designers can't mix and match them as freely as resources. No built-in cooldowns or
        costs.
+   * - Mode or move
+     - New ways to move that work alongside the others: a press used by one feature never
+       triggers another, and new ones need no changes to the existing ones.
+     - Needs GDScript. Only changes the character's velocity: anything else, such as an
+       animation, listens to the motor's signals.
 
 Some examples:
 
@@ -71,16 +80,23 @@ Some examples:
      - Where
      - Why
    * - Double jump
-     - Component
-     - Remembers jumps left, checks the floor every frame and shares the jump button with
-       :ref:`Movement<class_Movement>`. See :ref:`doc_double_jump`.
+     - Setting
+     - :ref:`AirMode<class_AirMode>` already does it: ``air_jumps`` is 1. See
+       :ref:`doc_movement_walk_and_air`.
    * - Learning to double jump, or boots that grant it
      - Status
-     - Adds 1 to the ``air_jumps`` stat that :ref:`DoubleJump<class_DoubleJump>` owns.
-   * - Dash
+     - Adds 1 to the ``air_jumps`` stat that :ref:`AirMode<class_AirMode>` owns.
+   * - Dash that controls the character for its whole length
+     - Layered move
+     - :ref:`DashMove<class_DashMove>`. See :ref:`doc_movement_dash`.
+   * - Quick shove forward
      - Ability
      - Once per press: a :ref:`KnockbackEffect<class_KnockbackEffect>` on the user, then a
        cooldown.
+   * - Wall slide, swimming, climbing
+     - Movement mode
+     - A different way of moving that takes over from walking or falling. See
+       :ref:`doc_extending_movement`.
    * - Sprint for a few seconds
      - Ability
      - Once per press: applies a speed status (``examples/abilities/sprint.tres`` applies
@@ -91,9 +107,10 @@ Some examples:
    * - A water spell that leaves a puddle
      - Ability + effect
      - Once per press, and the puddle is one instant change: :ref:`SpawnSceneEffect<class_SpawnSceneEffect>`.
-   * - Hover while holding jump
-     - Component
-     - Runs every frame while a button is held.
+   * - Glide while holding jump
+     - Layered move
+     - Changes the fall on top of the air mode while a button is held. See
+       :ref:`doc_extending_movement`.
 
 When new behaviour needs code, prefer a new :ref:`Effect<class_Effect>` over a new component where you can: one effect works in abilities, statuses, weapons and zones at once. Most of the grey area comes from the ability limits above. A spell with charges, a mana cost or a charge-up can't be an ability yet, so today it would be a component of its own.
 
@@ -138,8 +155,8 @@ A component
 
 Each part does one job:
 
-- ``_requires()`` returns ``[Brain, Movement]``, so the component waits, with a warning, until
-  both are beside it. Sprinting means nothing without movement.
+- ``_requires()`` returns ``[Brain, CharacterMotor]``, so the component waits, with a warning,
+  until both are beside it. Sprinting means nothing without movement.
 - ``_stats()`` owns ``max_stamina``, so a status can raise it with a
   :ref:`StatModifier<class_StatModifier>` and ``stat(&"max_stamina")`` returns the result. The
   setter calls ``update_stats()``, so a change in the Inspector during play counts at once.
@@ -150,7 +167,53 @@ Each part does one job:
   the component mid-sprint leaves nothing behind.
 - The ``changed`` signal is for a stamina bar.
 
-To use it, add it to a character beside Movement, add a ``sprint`` action to the Input Map, and add ``sprint`` to the :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions.
+To use it, add it to a character beside the CharacterMotor, add a ``sprint`` action to the Input Map, and add ``sprint`` to the :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions.
+
+.. _doc_extending_movement:
+
+A movement mode or move
+-----------------------
+
+New ways to move go under the character's :ref:`CharacterMotor<class_CharacterMotor>` (see :ref:`doc_movement`). Pick the kind by asking whether it replaces how the character moves or adds to it:
+
+- A **movement mode** replaces it: swimming, climbing, sliding down a wall. Extend
+  :ref:`MovementMode<class_MovementMode>`.
+- A **layered move** adds to whatever mode is in charge, for a while: a dash, a glide, a
+  grapple pull. Extend :ref:`LayeredMove<class_LayeredMove>`.
+
+:ref:`WallSlideMode<class_WallSlideMode>` slides slowly down a wall while the character falls against it, and jumps off it:
+
+.. source-file:: ../../character_system/examples/scripts/wall_slide_mode.gd
+
+- ``_can_enter()`` lets it take over by itself once the character falls against a wall. The
+  motor asks every mode that isn't in charge, so WalkMode and AirMode don't need to know this
+  one exists.
+- ``_physics_update()`` sets ``body.velocity`` like the CharacterBody3D template does, using the
+  ``move_speed`` and ``jump_velocity`` stats, so statuses that change them work here too. It
+  never calls ``move_and_slide()``: the motor does.
+- ``motor.consume_action()`` uses up the jump press, so nothing else jumps on it.
+- ``_get_next_mode()`` hands back to walking or falling once the wall is gone.
+
+:ref:`GlideMove<class_GlideMove>` slows the fall while jump is held:
+
+.. source-file:: ../../character_system/examples/scripts/glide_move.gd
+
+- ``_can_start()`` is asked every frame while it's idle. It reads the held button with
+  ``is_action_pressed()``, which doesn't use anything up, so AirMode still gets the press for its
+  double jump.
+- It runs after the mode each frame, so it only has to cap the fall speed AirMode just set.
+- It sets ``active`` to false to end itself.
+
+Modes and moves are plain nodes, not components:
+
+- **Add them as children of the motor.** Anywhere else, they show a warning.
+- **Use** ``_enter()`` **and** ``_exit()`` **for setup and cleanup**, not ``_ready()``: they run
+  when a mode takes over or hands over, or when a move starts or ends.
+- **Own numbers statuses should change** in ``_stats()``, as components do, and read them with
+  ``stat()``. Call ``update_stats()`` when you change one yourself.
+- **Read the brain through** ``motor.brain``, and the body through ``body``.
+
+To use either example, add it as a child of a character's CharacterMotor. Both are covered by ``tests/test_extending.gd``.
 
 .. _doc_extending_item_component:
 

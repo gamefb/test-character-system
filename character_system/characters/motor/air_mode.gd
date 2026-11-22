@@ -17,7 +17,7 @@ extends MovementMode
 @export_range(0.0, 100.0, 0.1, "or_greater", "suffix:m/s²") var air_acceleration := 20.0
 ## The [Brain] action that jumps.
 @export var jump_action := &"jump"
-## The mode to switch to on landing. Left empty, it's the [WalkMode].
+## The mode to switch to on landing. Left empty, it's the [WalkMode] beside this one.
 @export var walk_mode: MovementMode
 
 ## Air jumps left before landing, e.g. for a HUD.
@@ -45,4 +45,4 @@ func _physics_update(delta: float) -> void:
 func _get_next_mode() -> MovementMode:
 	if not body.is_on_floor():
 		return null
-	return walk_mode if walk_mode else find(WalkMode) as MovementMode
+	return walk_mode if walk_mode else motor.get_mode(WalkMode)

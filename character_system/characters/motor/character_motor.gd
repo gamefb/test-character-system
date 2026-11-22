@@ -4,13 +4,24 @@ class_name CharacterMotor
 extends Component
 ## Moves a [CharacterBody3D] with one [MovementMode] at a time, plus any [LayeredMove]s.
 ##
-## Add it to a character that has a [Brain], then add modes and moves beside it, such as a
-## [WalkMode], an [AirMode] and a [DashMove]. The motor is the only node that calls
-## [method CharacterBody3D.move_and_slide]. Each physics frame:
+## Add it to a character that has a [Brain], with modes and moves as its children:
+## [codeblock lang=text]
+## Player (CharacterBody3D)
+##  ├─ ComponentManager
+##  ├─ PlayerBrain
+##  └─ CharacterMotor
+##      ├─ WalkMode
+##      ├─ AirMode
+##      └─ DashMove
+## [/codeblock]
+## The motor is the only node that calls [method CharacterBody3D.move_and_slide]. Each physics
+## frame:
 ## [br]1. The current [member mode] sets the body's velocity, e.g. walking.
-## [br]2. Each [LayeredMove] may start, then changes the velocity while it runs, e.g. a dash.
+## [br]2. Each [LayeredMove], in scene order, may start, then changes the velocity while it
+## runs, e.g. a dash.
 ## [br]3. The body moves, and the mode may hand over to another, e.g. walking to the air once
-## the floor is gone.
+## the floor is gone. If it doesn't, any other mode may take over, e.g. a wall slide once the
+## character falls against a wall.
 ## [br][br]Modes and moves read the [member brain], and use [method consume_action] for
 ## presses, so only one of them acts on each press. To change which key does what, edit the
 ## Input Map.
@@ -35,11 +46,11 @@ signal mode_changed(old_mode: MovementMode, new_mode: MovementMode)
 @export_range(0.0, 100.0, 0.1, "or_greater", "suffix:m/s²") var push_friction := 20.0
 
 ## The mode in charge. Set it to switch modes from code, e.g. [code]motor.mode = climb[/code]
-## when a ladder is grabbed; a mode that isn't running is ignored. Check it with [code]is[/code],
-## e.g. [code]if motor.mode is AirMode:[/code]
+## when a ladder is grabbed; a mode that isn't a child of this motor is ignored. Check it with
+## [code]is[/code], e.g. [code]if motor.mode is AirMode:[/code]
 var mode: MovementMode:
 	set(value):
-		if value == mode or (value and not value.running):
+		if value == mode or (value and value.get_parent() != self):
 			return
 		var old_mode := mode
 		if old_mode:
@@ -50,8 +61,10 @@ var mode: MovementMode:
 		mode_changed.emit(old_mode, value)
 ## The [Brain] giving orders. Read [member Brain.move_dir] and held actions from it.
 var brain: Brain
+## The character being moved.
+var body: CharacterBody3D
 
-var _body: CharacterBody3D
+var _modes: Array[MovementMode] = []
 var _moves: Array[LayeredMove] = []
 var _consumed: Dictionary[StringName, bool] = {}  # Presses already used this frame.
 var _push := Vector3.ZERO  # Sideways knockback, kept in the body's velocity between frames.
@@ -60,10 +73,10 @@ var _push := Vector3.ZERO  # Sideways knockback, kept in the body's velocity bet
 func _physics_process(delta: float) -> void:
 	_consumed.clear()
 	if not mode:
-		mode = start_mode if start_mode else find(WalkMode) as MovementMode
+		mode = start_mode if start_mode else get_mode(WalkMode)
 		if not mode:
 			return
-	_body.velocity -= _push  # Modes work from the character's own velocity.
+	body.velocity -= _push  # Modes work from the character's own velocity.
 	mode._physics_update(delta)
 	for move in _moves:
 		if not move.active and move._can_start():
@@ -71,11 +84,30 @@ func _physics_process(delta: float) -> void:
 		if move.active:
 			move._physics_update(delta)
 	_push = _push.move_toward(Vector3.ZERO, push_friction * delta)
-	_body.velocity += _push
-	_body.move_and_slide()
+	body.velocity += _push
+	body.move_and_slide()
 	var next := mode._get_next_mode()
+	if not next:
+		for other in _modes:
+			if other != mode and other._can_enter():
+				next = other
+				break
 	if next:
 		mode = next
+
+
+func _notification(what: int) -> void:
+	if what != NOTIFICATION_CHILD_ORDER_CHANGED:
+		return
+	for move in _moves:
+		if move.get_parent() != self:
+			move.active = false
+	_modes.assign(get_children().filter(func(node: Node) -> bool: return node is MovementMode))
+	_moves.assign(get_children().filter(func(node: Node) -> bool: return node is LayeredMove))
+	if mode and mode.get_parent() != self:
+		mode = null
+	update_stats()
+	update_configuration_warnings()
 
 
 func _requires() -> Array[Script]:
@@ -83,25 +115,33 @@ func _requires() -> Array[Script]:
 
 
 func _stats() -> Dictionary[StringName, float]:
-	return { &"move_speed": move_speed, &"jump_velocity": jump_velocity }
+	var stats: Dictionary[StringName, float] = {
+		&"move_speed": move_speed,
+		&"jump_velocity": jump_velocity,
+	}
+	for node in get_children():
+		if node is MotorNode:
+			stats.merge(node._stats())
+	return stats
 
 
 func _start() -> void:
 	brain = find(Brain) as Brain
-	_body = host as CharacterBody3D
+	body = host as CharacterBody3D
 
 
 func _stop() -> void:
 	mode = null
-	_moves.clear()
+	for move in _moves:
+		move.active = false
 
 
 func _warnings() -> PackedStringArray:
 	var warnings := PackedStringArray()
 	if not host is CharacterBody3D:
 		warnings.append("CharacterMotor only works on a CharacterBody3D.")
-	if not start_mode and not host.get_children().any(func(c: Node) -> bool: return c is WalkMode):
-		warnings.append("Add a WalkMode, or set Start Mode.")
+	if not start_mode and not get_mode(WalkMode):
+		warnings.append("Add a WalkMode as a child, or set Start Mode.")
 	return warnings
 
 
@@ -114,19 +154,18 @@ func consume_action(action: StringName) -> bool:
 	return true
 
 
+## The first child mode that is a [param type], or null, e.g.
+## [code]motor.get_mode(AirMode)[/code].
+func get_mode(type: Script) -> MovementMode:
+	for node in get_children():
+		if is_instance_of(node, type):
+			return node as MovementMode
+	return null
+
+
 ## Shoves the character, e.g. from a [KnockbackEffect]. The sideways part wears off over time.
 func push(velocity: Vector3) -> void:
 	if not running:
 		return
-	_body.velocity += velocity
+	body.velocity += velocity
 	_push += Vector3(velocity.x, 0.0, velocity.z)
-
-
-## Called by a [LayeredMove] when it starts. You don't need to call it yourself.
-func add_move(move: LayeredMove) -> void:
-	_moves.append(move)
-
-
-## Called by a [LayeredMove] when it stops.
-func remove_move(move: LayeredMove) -> void:
-	_moves.erase(move)
