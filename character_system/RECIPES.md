@@ -56,7 +56,8 @@ to **PlayerBrain > Extra Actions**. `Speed`, `Duration` and `Cooldown` are in th
 Gliding, wall slides, swimming and climbing go under the `CharacterMotor` as a movement mode
 (a new way of moving that takes over) or a layered move (extra movement on top, for a while).
 Copy `examples/scripts/wall_slide_mode.gd` or `examples/scripts/glide_move.gd`, and add your
-copy as a child of the motor. The Extending page explains both.
+copy as a child of the motor. "Write your own movement mode or move" below explains how to
+write one from scratch.
 
 ### Add your own input action
 
@@ -263,6 +264,66 @@ func _execute(ctx: EffectContext) -> void:
 	if health and ctx.cause:  # The target may have no Health.
 		health.change(maxf(ctx.cause.amount, 0.0) * share * ctx.magnitude, ctx)
 ```
+
+### Write your own movement mode or move
+
+Both go under the `CharacterMotor`, as children. Pick by asking whether it replaces how the
+character moves or adds to it:
+
+- **Movement mode:** replaces it, such as flying, swimming or climbing. Only one mode is in
+  charge at a time. Extend `MovementMode`.
+- **Layered move:** adds to whatever mode is in charge, for a while, such as a dash, a glide
+  or a jump pad. Several can run at once. Extend `LayeredMove`.
+
+The parts to override:
+
+| Override | Mode or move | What it's for |
+| --- | --- | --- |
+| `_physics_update(delta)` | Both | Set `body.velocity`. Runs every physics frame while it's in charge or active. Never call `move_and_slide()`: the motor does, once everything has run. |
+| `_can_enter() -> bool` | Mode | Return true to take over from the mode in charge, e.g. once in water. The other modes don't need to know about yours. |
+| `_get_next_mode() -> MovementMode` | Mode | Return the mode to hand over to, or null to stay. |
+| `_can_start() -> bool` | Move | Return true to start, e.g. `return motor.consume_action(&"dash")`. |
+| `_enter()`, `_exit()` | Both | Setup and cleanup when it takes over or starts, and when it hands over or ends. Use these, not `_ready()`. |
+| `_stats()` | Both | Numbers statuses may change, as in a component. Read them with `stat()`. |
+
+Inside, `body` is the character, `motor.brain` gives `move_dir` and held buttons, and
+`motor.consume_action(&"jump")` uses up a press so nothing else acts on it. A move sets
+`active = false` to end itself.
+
+A complete mode, to fly while a button toggles it:
+
+```gdscript
+# With a class_name, it appears in the Add Child Node dialog.
+class_name FlyMode
+extends MovementMode
+
+## Flying speed, in metres per second.
+@export var fly_speed: float = 8.0
+
+
+# Asked while another mode is in charge: pressing fly takes over.
+func _can_enter() -> bool:
+	return motor.consume_action(&"fly")
+
+
+# Move where the brain points, and rise while jump is held. No gravity.
+func _physics_update(_delta: float) -> void:
+	body.velocity = motor.brain.move_dir * fly_speed
+	if motor.brain.is_action_pressed(&"jump"):
+		body.velocity.y = fly_speed
+
+
+# Pressing fly again lands: hand back to walking, or to falling if in the air.
+func _get_next_mode() -> MovementMode:
+	if not motor.consume_action(&"fly"):
+		return null
+	return motor.get_mode(WalkMode) if body.is_on_floor() else motor.get_mode(AirMode)
+```
+
+Add it as a child of the `CharacterMotor`, beside the WalkMode and AirMode, and add a `fly`
+action to the Input Map and to **PlayerBrain > Extra Actions**. Nothing else changes: the
+walk and air modes keep working, and the motor hands over to `FlyMode` when it asks. For a
+layered move, see `examples/scripts/glide_move.gd`.
 
 ## Show it on screen
 
