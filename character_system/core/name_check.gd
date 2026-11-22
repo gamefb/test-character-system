@@ -5,10 +5,13 @@ extends RefCounted
 ##
 ## Stats, events and tags are typed as text, so [code]move_sped[/code] or
 ## [code]took_damgae[/code] would otherwise do nothing without any error. This checks:
-## [br]- stat names in [StatModifier] and [StatCondition] against the stats components
-## declare in [method Component._stats] ([code]resist_<type>[/code] is always allowed),
+## [br]- stat names in [StatModifier] and [StatCondition] against the stats components and
+## movement modes and moves declare in [code]_stats()[/code] ([code]resist_<type>[/code] is
+## always allowed),
 ## [br]- [member StatusTrigger.event] against the events scripts send with
-## [method ComponentManager.notify] or [method ComponentManager.send],
+## [method ComponentManager.notify] or [method ComponentManager.send], and the ones the
+## [CharacterMotor] sends for each mode and move with a [code]class_name[/code], such as
+## [code]walk_mode_entered[/code],
 ## [br]- tags in [member StatusData.immune_to], [member StatusData.removes_tags] and
 ## [HasTagCondition] against the tags your saved statuses have.
 ## [br]The editor shows the results above the Inspector (enable the Character System Warnings
@@ -173,6 +176,8 @@ static func _scan() -> void:
 			for line in tag_line.search_all(text):
 				for m in name.search_all(line.get_string(1)):
 					tags[m.get_string(1)] = true
+	for event in _motor_events():
+		events[event] = true
 	_events = PackedStringArray(events.keys())
 	_tags = PackedStringArray(tags.keys())
 
@@ -188,9 +193,9 @@ static func _component_stats() -> PackedStringArray:
 	var found := {}
 	for cls in path_of:
 		var c = cls
-		while base_of.has(c) and c != &"Component":
+		while base_of.has(c) and c != &"Component" and c != &"MotorNode":
 			c = base_of[c]
-		if c != &"Component":
+		if c != &"Component" and c != &"MotorNode":
 			continue
 		var source: String = FileAccess.get_file_as_string(path_of[cls])
 		var start: int = source.find("\nfunc _stats(")
@@ -200,6 +205,24 @@ static func _component_stats() -> PackedStringArray:
 		for m in key.search_all(source.substr(start, end - start if end != -1 else -1)):
 			found[m.get_string(1)] = true
 	return PackedStringArray(found.keys())
+
+
+# The events the motor sends for every movement mode and layered move, e.g. walk_mode_entered.
+static func _motor_events() -> PackedStringArray:
+	var base_of := {}
+	for c in ProjectSettings.get_global_class_list():
+		base_of[c["class"]] = c["base"]
+	var out := PackedStringArray()
+	for cls in base_of:
+		var c = cls
+		while base_of.has(c) and c != &"MovementMode" and c != &"LayeredMove":
+			c = base_of[c]
+		var prefix := String(cls).to_snake_case()
+		if c == &"MovementMode":
+			out.append_array([prefix + "_entered", prefix + "_exited"])
+		elif c == &"LayeredMove":
+			out.append_array([prefix + "_started", prefix + "_finished"])
+	return out
 
 
 # Scripts, resources and scenes in the project, skipping addons and Godot's cache.

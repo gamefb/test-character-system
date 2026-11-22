@@ -70,8 +70,8 @@ All 105 tests and all 43 scene checks pass on both supported versions, last run 
      - Godot 4.8 beta 3
      - Godot 4.4.1
    * - GUT tests (12 files above, test_statuses.gd included)
-     - 105 of 105, 359 asserts
-     - 105 of 105, 355 asserts
+     - 105 of 105, 365 asserts
+     - 105 of 105, 361 asserts
    * - ``immunity_test`` scene
      - 43 of 43
      - 43 of 43

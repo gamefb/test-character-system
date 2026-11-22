@@ -21,7 +21,7 @@ func trigger(event: StringName) -> StatusTrigger:
 
 
 func test_finds_names_in_the_project() -> void:
-	for stat in [&"max_health", &"move_speed", &"jump_velocity"]:
+	for stat in [&"max_health", &"move_speed", &"jump_velocity", &"air_jumps"]:
 		assert_has(NameCheck.known_stats(), String(stat))
 	var events: Array[StringName] = [
 		&"started",
@@ -31,6 +31,11 @@ func test_finds_names_in_the_project() -> void:
 		&"dealing_damage",
 		&"dealt_damage",
 		&"inventory_changed",
+		&"walk_mode_entered",
+		&"air_mode_exited",
+		&"wall_slide_mode_entered",
+		&"dash_move_started",
+		&"glide_move_finished",
 	]
 	for event in events:
 		assert_has(NameCheck.known_events(), String(event))
