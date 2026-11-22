@@ -93,6 +93,13 @@ Some examples:
      - Ability
      - Once per press: a :ref:`KnockbackEffect<class_KnockbackEffect>` on the user, then a
        cooldown.
+   * - Being rooted or stunned stops dashing and climbing
+     - Status
+     - Give the status a tag, and add the tag to each mode's or move's Blocked By Tags. See
+       :ref:`doc_movement_statuses_events_cooldowns`.
+   * - Shockwave on landing
+     - Status
+     - A trigger on ``walk_mode_entered``, the event the motor sends on landing.
    * - Wall slide, swimming, climbing
      - Movement mode
      - A different way of moving that takes over from walking or falling. See

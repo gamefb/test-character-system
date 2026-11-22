@@ -10,7 +10,7 @@ DashMove
 
 **Inherits:** :ref:`LayeredMove<class_LayeredMove>` **<** :ref:`MotorNode<class_MotorNode>` **<** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-On :ref:`action<class_DashMove_property_action>`, shoots the character the way it's moving, or forward if it's standing still. While it runs it replaces the velocity, so there's no gravity and no steering.
+On :ref:`action<class_DashMove_property_action>`, shoots the character the way it's moving, or forward if it's standing still. While it runs it replaces the velocity, so there's no gravity and no steering. Its :ref:`LayeredMove.cooldown<class_LayeredMove_property_cooldown>` starts at 0.6 seconds.
 
 .. rst-class:: classref-reftable-group
 
@@ -26,8 +26,6 @@ Properties
    | :ref:`float<class_float>`           | :ref:`speed<class_DashMove_property_speed>`       | ``15.0``    |
    +-------------------------------------+---------------------------------------------------+-------------+
    | :ref:`float<class_float>`           | :ref:`duration<class_DashMove_property_duration>` | ``0.2``     |
-   +-------------------------------------+---------------------------------------------------+-------------+
-   | :ref:`float<class_float>`           | :ref:`cooldown<class_DashMove_property_cooldown>` | ``0.6``     |
    +-------------------------------------+---------------------------------------------------+-------------+
 
 .. rst-class:: classref-section-separator
@@ -70,18 +68,6 @@ Speed during the dash.
 :ref:`float<class_float>` **duration** = ``0.2`` :ref:`🔗<class_DashMove_property_duration>`
 
 How long a dash lasts.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_DashMove_property_cooldown:
-
-.. rst-class:: classref-property
-
-:ref:`float<class_float>` **cooldown** = ``0.6`` :ref:`🔗<class_DashMove_property_cooldown>`
-
-Time from the start of one dash until the next one is allowed.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

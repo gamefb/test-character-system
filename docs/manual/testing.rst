@@ -28,8 +28,8 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - 12
      - Weapon switching (drawing, wrapping around, holstering, dropping, each weapon's own rounds) and the carrying rule between Inventory and Equipment
    * - ``test_motor.gd``
-     - 11
-     - One floor jump plus one air jump, in either node order, and none with ``air_jumps`` at 0; the air jump comes back on take-off; walking at ``move_speed`` and statuses changing it; a dash on the floor and in the air, with its cooldown; a press used once; changing an action; knockback; modes removed and added during play; signals and switching modes from code; a mode outside a motor warns
+     - 14
+     - Statuses stopping a dash and a mode through Blocked By Tags; the motor's events for jumps, landings and dashes, and a status trigger reacting to landing; a move's cooldown leaving its press for the next move; one floor jump plus one air jump, in either node order, and none with ``air_jumps`` at 0; the air jump comes back on take-off; walking at ``move_speed`` and statuses changing it; a dash on the floor and in the air, with its cooldown; a press used once; changing an action; knockback; modes removed and added during play; signals and switching modes from code; a mode outside a motor warns
    * - ``test_ai_brain.gd``
      - 1
      - The agent is found by itself, a new path is only asked for once the target has moved ``repath_distance``, and it aims ``aim_height`` above the target
@@ -61,7 +61,7 @@ The ``immunity_test/`` folder holds a scripted scene that runs 43 checks on immu
 Verification status
 -------------------
 
-All 102 tests and all 43 scene checks pass on both supported versions, last run on November 22: Godot 4.8 beta 3 with GUT 9.7.1 and Jolt physics, and Godot 4.4.1 with GUT 9.4.0. Every script in this document was rebuilt into a project and run headless on both.
+All 105 tests and all 43 scene checks pass on both supported versions, last run on November 22: Godot 4.8 beta 3 with GUT 9.7.1 and Jolt physics, and Godot 4.4.1 with GUT 9.4.0. Every script in this document was rebuilt into a project and run headless on both.
 
 .. list-table::
    :header-rows: 1
@@ -70,8 +70,8 @@ All 102 tests and all 43 scene checks pass on both supported versions, last run 
      - Godot 4.8 beta 3
      - Godot 4.4.1
    * - GUT tests (12 files above, test_statuses.gd included)
-     - 102 of 102, 336 asserts
-     - 102 of 102, 332 asserts
+     - 105 of 105, 359 asserts
+     - 105 of 105, 355 asserts
    * - ``immunity_test`` scene
      - 43 of 43
      - 43 of 43
