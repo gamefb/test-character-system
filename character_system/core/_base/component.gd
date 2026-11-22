@@ -17,7 +17,7 @@ extends Node
 ##     ComponentManager
 ##     Health
 ##     PlayerBrain
-##     Movement
+##     CharacterMotor
 ## [/codeblock]
 ##
 ## [b]What happens, in order.[/b]

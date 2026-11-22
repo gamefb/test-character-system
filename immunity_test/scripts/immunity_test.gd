@@ -131,7 +131,7 @@ func bag_count(who: Node, data: ItemData) -> int:
 
 func stacks_of(who: Node, data: ItemData) -> int:
 	return bag(who).items.filter(
-		func(item: ItemInstance) -> bool: return item.data == data).size()
+			func(item: ItemInstance) -> bool: return item.data == data).size()
 
 
 func equipped(who: Node, slot: StringName) -> ItemData:

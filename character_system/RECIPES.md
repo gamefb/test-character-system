@@ -11,18 +11,21 @@ system? The Quick start page of the documentation builds a whole level, step by 
 
 1. New scene with a **CharacterBody3D** root, a **CollisionShape3D** (capsule) and a mesh.
 2. Add a **ComponentManager**, then the components you want, in any order: `Statuses`,
-   `Health`, a brain (`PlayerBrain` or `AIBrain`), `Movement`, `Faction`, `Inventory`,
-   `Equipment`, `WeaponSwitch`, `Abilities`, `DoubleJump`.
-3. A player needs a **Camera3D** and an AI a **NavigationAgent3D** somewhere under the
+   `Health`, a brain (`PlayerBrain` or `AIBrain`), `CharacterMotor`, `Faction`, `Inventory`,
+   `Equipment`, `WeaponSwitch`, `Abilities`.
+3. Add a **WalkMode** and an **AirMode** as children of the `CharacterMotor`, so the character
+   can walk, jump and fall.
+4. A player needs a **Camera3D** and an AI a **NavigationAgent3D** somewhere under the
    character. The brain finds it by itself.
-4. Fix any yellow warning triangles in the Scene dock. They name what's missing.
+5. Fix any yellow warning triangles in the Scene dock. They name what's missing.
 
 A component without what it needs waits instead of crashing, and starts once it's added.
 
 ### Make an enemy that attacks
 
 1. Make a character with an **AIBrain** as its brain and a **NavigationAgent3D**, a
-   **Movement**, a **Faction** and the example **AttackNearest**
+   **CharacterMotor** (with a WalkMode and an AirMode under it), a **Faction** and the example
+   **AttackNearest**
    (`examples/scripts/attack_nearest.gd`) beside it.
 2. Set its **Faction > Team** to `enemy` and **Hostile To** to `player`. Give the player a
    Faction with the team `player`.
@@ -35,13 +38,25 @@ A component without what it needs waits instead of crashing, and starts once it'
 
 AttackNearest picks the nearest `player` every half second and fires while it's within 15 m.
 
-### Add a double jump
+### Change the double jump
 
-Add a **DoubleJump** beside `Movement`. Pressing jump in the air jumps again; landing refills
-it. `Air Jumps` sets how many (2 for a triple jump).
+The **AirMode** under the `CharacterMotor` already double jumps: pressing jump in the air jumps
+again, and taking off refills it. `Air Jumps` sets how many (2 for a triple jump, 0 for none).
 
 To grant it with an item or a status instead, set `Air Jumps` to 0 and give the status a
 `StatModifier` on `air_jumps` with add 1. A rooted status can take it away with mul 0.
+
+### Add a dash
+
+Add a **DashMove** as a child of the `CharacterMotor`, and a `dash` action to the Input Map and
+to **PlayerBrain > Extra Actions**. `Speed`, `Duration` and `Cooldown` are in the Inspector.
+
+### Add a new way to move
+
+Gliding, wall slides, swimming and climbing go under the `CharacterMotor` as a movement mode
+(a new way of moving that takes over) or a layered move (extra movement on top, for a while).
+Copy `examples/scripts/wall_slide_mode.gd` or `examples/scripts/glide_move.gd`, and add your
+copy as a child of the motor. The Extending page explains both.
 
 ### Add your own input action
 
@@ -179,7 +194,7 @@ Read the character's brain the way Godot's input docs read `Input`, in `_process
 ```gdscript
 func _physics_process(_delta: float) -> void:
 	var brain := find(Brain) as Brain
-	if brain.is_action_just_pressed(&"jump"):  # Once per press.
+	if brain.is_action_just_pressed(&"interact"):  # Once per press.
 		pass
 	if brain.is_action_pressed(&"primary"):  # Every frame it's held.
 		pass

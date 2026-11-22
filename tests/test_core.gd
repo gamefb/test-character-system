@@ -2,6 +2,8 @@ extends GutTest
 ## The core: components start once what they need is there, stop when it leaves, only
 ## process while running, and share stats and events through the ComponentManager.
 
+var host: Node3D
+
 
 func before_each() -> void:
 	host = Node3D.new()
@@ -233,6 +235,3 @@ class Needy extends Component:
 
 	func _on_event(event: StringName, _ctx: EffectContext) -> void:
 		heard.append(event)
-
-
-var host: Node3D

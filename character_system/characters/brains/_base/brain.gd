@@ -6,7 +6,7 @@ extends Component
 ##
 ## [PlayerBrain] fills it in from input and [AIBrain] from navigation. A plain [Brain] can be
 ## driven by your own script, such as a turret's targeting logic. Other components, such as
-## [Movement], [Trigger] and [WeaponSwitch], read intent from here and never ask where it came
+## [CharacterMotor], [Trigger] and [WeaponSwitch], read intent from here and never ask where it came
 ## from. Use one brain per character.
 ##
 ## Read its buttons the way Godot's input docs read the [Input] singleton, polling in

@@ -1,6 +1,7 @@
 extends GutTest
 ## The pieces the Extending page builds on: radius targeting, the hostility condition, scene
-## spawning and melee swings, and the example Stamina, Scope, AttackNearest and HUD scripts.
+## spawning and melee swings, and the example Stamina, Scope, AttackNearest, HUD, GlideMove and
+## WallSlideMode scripts.
 
 const EX := "res://character_system/examples/"
 const HUD := preload("res://character_system/examples/scripts/character_hud.gd")
@@ -129,7 +130,7 @@ func test_melee_sweep_hits_what_is_in_front() -> void:
 
 func test_stamina_speeds_up_while_held_and_cleans_up() -> void:
 	var stamina := Stamina.new()
-	var runner: CharacterBody3D = make_character(Vector3.ZERO, [Brain.new(), Movement.new(), stamina])
+	var runner: CharacterBody3D = make_character(Vector3.ZERO, [Brain.new(), walker(), stamina])
 	var manager := ComponentManager.of(runner)
 	var brain := Component.of(runner, Brain) as Brain
 	brain.press(&"sprint")
@@ -148,7 +149,7 @@ func test_stamina_speeds_up_while_held_and_cleans_up() -> void:
 
 
 func test_scope_slows_the_wielder_only_while_aiming() -> void:
-	var shooter: CharacterBody3D = make_character(Vector3.ZERO, [Brain.new(), Movement.new()])
+	var shooter: CharacterBody3D = make_character(Vector3.ZERO, [Brain.new(), walker()])
 	var manager := ComponentManager.of(shooter)
 	var gear := Component.of(shooter, Equipment) as Equipment
 	gear.equip(ItemInstance.new(item([Scope.new()])))
@@ -221,3 +222,72 @@ class PressProbe extends Component:
 	func _process(_delta: float) -> void:
 		if (find(Brain) as Brain).is_action_just_pressed(&"primary"):
 			presses += 1
+
+
+
+## A standing character with a motor holding WalkMode, AirMode and [param extra], on a floor
+## with a wall 1 m to its right.
+func make_mover(extra: Array[MotorNode]) -> CharacterBody3D:
+	for spec in [[Vector3(0.0, -0.5, 0.0), Vector3(40.0, 1.0, 40.0)],
+			[Vector3(2.0, 5.0, 0.0), Vector3(1.0, 10.0, 10.0)]]:
+		var solid := StaticBody3D.new()
+		var shape := CollisionShape3D.new()
+		shape.shape = BoxShape3D.new()
+		(shape.shape as BoxShape3D).size = spec[1]
+		solid.add_child(shape)
+		solid.position = spec[0]
+		add_child_autofree(solid)
+	var motor := walker()
+	for node in extra:
+		motor.add_child(node)
+	var body := make_character(Vector3(0.0, 0.05, 0.0), [Brain.new(), motor])
+	for i in 10:
+		await get_tree().physics_frame
+	return body
+
+
+func test_glide_move_slows_the_fall_while_held() -> void:
+	var glide := GlideMove.new()
+	var body: CharacterBody3D = await make_mover([glide])
+	var brain := Component.of(body, Brain) as Brain
+	var air := (Component.of(body, CharacterMotor) as CharacterMotor).get_mode(AirMode) as AirMode
+	await tap(body, &"jump")
+	for i in 40:
+		await get_tree().physics_frame
+	assert_lt(body.velocity.y, -1.0, "Falling normally with jump released")
+	brain.press(&"jump")
+	for i in 3:
+		await get_tree().physics_frame
+	assert_eq(air.jumps_left, 0, "The press still double jumps")
+	for i in 40:
+		await get_tree().physics_frame
+	assert_true(glide.active, "then holding it glides on the way down")
+	assert_almost_eq(body.velocity.y, -glide.fall_speed, 0.01, "at the glide speed")
+	brain.release(&"jump")
+	for i in 2:
+		await get_tree().physics_frame
+	assert_false(glide.active, "Letting go stops gliding")
+
+
+func test_wall_slide_mode_takes_over_by_itself() -> void:
+	var slide := WallSlideMode.new()
+	var body: CharacterBody3D = await make_mover([slide])
+	var motor := Component.of(body, CharacterMotor) as CharacterMotor
+	var brain := Component.of(body, Brain) as Brain
+	brain.move_dir = Vector3.RIGHT
+	await tap(body, &"jump")
+	for i in 40:
+		await get_tree().physics_frame
+	assert_eq(motor.mode, slide, "Falling against the wall slides")
+	assert_gt(body.velocity.y, -slide.slide_speed - 0.01, "slowly")
+	await tap(body, &"jump")
+	assert_lt(body.velocity.x, -3.0, "Jumping pushes off the wall")
+	assert_is(motor.mode, AirMode, "into the air")
+
+
+## A CharacterMotor that walks and jumps, as in the docs.
+func walker() -> CharacterMotor:
+	var motor := CharacterMotor.new()
+	motor.add_child(WalkMode.new())
+	motor.add_child(AirMode.new())
+	return motor

@@ -19,7 +19,7 @@ A character's intent: where to move, where to aim, and which buttons are pressed
 Description
 -----------
 
-:ref:`PlayerBrain<class_PlayerBrain>` fills it in from input and :ref:`AIBrain<class_AIBrain>` from navigation. A plain **Brain** can be driven by your own script, such as a turret's targeting logic. Other components, such as :ref:`Movement<class_Movement>`, :ref:`Trigger<class_Trigger>` and :ref:`WeaponSwitch<class_WeaponSwitch>`, read intent from here and never ask where it came from. Use one brain per character.
+:ref:`PlayerBrain<class_PlayerBrain>` fills it in from input and :ref:`AIBrain<class_AIBrain>` from navigation. A plain **Brain** can be driven by your own script, such as a turret's targeting logic. Other components, such as :ref:`CharacterMotor<class_CharacterMotor>`, :ref:`Trigger<class_Trigger>` and :ref:`WeaponSwitch<class_WeaponSwitch>`, read intent from here and never ask where it came from. Use one brain per character.
 
 Read its buttons the way Godot's input docs read the :ref:`Input<class_Input>` singleton, polling in ``_process()`` or ``_physics_process()``:
 

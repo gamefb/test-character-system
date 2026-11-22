@@ -228,7 +228,7 @@ Sends ``event`` to the :ref:`Component._on_event()<class_Component_private_metho
 
 Current value of a stat: (base + all adds) \* all muls. The base comes from the component that lists it in :ref:`Component._stats()<class_Component_private_method__stats>`. With no such component, nothing reads it anyway.
 
-For example, with :ref:`Movement.move_speed<class_Movement_property_move_speed>` 5 and modifiers ``add 1``, ``mul 1.5`` and ``mul 0.5``, ``move_speed`` is (5 + 1) × 1.5 × 0.5 = 4.5. Results are cached until something changes, so read it whenever you need it instead of keeping a copy.
+For example, with :ref:`CharacterMotor.move_speed<class_CharacterMotor_property_move_speed>` 5 and modifiers ``add 1``, ``mul 1.5`` and ``mul 0.5``, ``move_speed`` is (5 + 1) × 1.5 × 0.5 = 4.5. Results are cached until something changes, so read it whenever you need it instead of keeping a copy.
 
 .. rst-class:: classref-item-separator
 

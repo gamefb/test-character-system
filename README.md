@@ -13,7 +13,7 @@ New to it? Start with the Quick start page, which builds a small level in about 
 | --- | --- |
 | `character_system/` | The system: core, components, items, resources and examples. Start with `RECIPES.md`. |
 | `addons/character_system_warnings/` | Editor plugin that warns about mistyped stat, event and tag names. |
-| `tests/` | GUT unit tests (92 tests). |
+| `tests/` | GUT unit tests (102 tests). |
 | `immunity_test/` | A scripted scene that runs 43 checks on immunities, zones and items. |
 | `docs/` | The documentation site (Sphinx). |
 

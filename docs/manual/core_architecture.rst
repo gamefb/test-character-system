@@ -24,7 +24,7 @@ A component that can't start shows a yellow warning in the editor and reports it
      - Example
    * - Another component on the same host
      - ``find(Type)``
-     - :ref:`Movement<class_Movement>` finds the :ref:`Brain<class_Brain>` each frame
+     - :ref:`CharacterMotor<class_CharacterMotor>` finds the :ref:`Brain<class_Brain>` in ``_start()``
    * - A plain node under the host, such as a camera
      - ``find_node_of_type(&"Camera3D")`` in ``_start()``
      - :ref:`PlayerBrain<class_PlayerBrain>` finds its camera when Camera is left empty
@@ -39,7 +39,7 @@ A component that can't start shows a yellow warning in the editor and reports it
      - :ref:`Statuses<class_Statuses>` clears timed statuses on ``died``
    * - A number statuses can change
      - ``_stats()`` to own it, ``stat()`` to read it
-     - :ref:`Movement<class_Movement>` owns and reads ``move_speed``
+     - :ref:`CharacterMotor<class_CharacterMotor>` owns ``move_speed``, and :ref:`WalkMode<class_WalkMode>` reads it
 
 The manager is the hub. You add one per host and never change it; a new kind of component needs nothing from it.
 

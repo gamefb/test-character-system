@@ -32,7 +32,7 @@ Resistance is clamped to 0 to 1 and the final amount is never negative, so stack
 
 .. source-file:: ../../character_system/resources/effects/knockback_effect.gd
 
-:ref:`KnockbackEffect<class_KnockbackEffect>` shows the rule that every effect handles a target without the component it needs: a character is shoved through ``Movement.push()``, a physics prop gets an impulse, and a wall is left alone.
+:ref:`KnockbackEffect<class_KnockbackEffect>` shows the rule that every effect handles a target without the component it needs: a character is shoved through ``CharacterMotor.push()``, a physics prop gets an impulse, and a wall is left alone.
 
 .. source-file:: ../../character_system/resources/effects/spawn_scene_effect.gd
 

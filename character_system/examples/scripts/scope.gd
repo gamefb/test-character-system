@@ -22,6 +22,11 @@ var _camera: Camera3D
 var _normal_fov: float = 75.0
 
 
+func _process(_delta: float) -> void:
+	var wielder_brain: Brain = brain
+	_set_aiming(wielder_brain != null and wielder_brain.is_action_pressed(action))
+
+
 func _start() -> void:
 	_slow.stat = &"move_speed"
 	var player := brain as PlayerBrain
@@ -30,11 +35,6 @@ func _start() -> void:
 
 func _stop() -> void:
 	_set_aiming(false)
-
-
-func _process(_delta: float) -> void:
-	var wielder_brain: Brain = brain
-	_set_aiming(wielder_brain != null and wielder_brain.is_action_pressed(action))
 
 
 func _set_aiming(on: bool) -> void:

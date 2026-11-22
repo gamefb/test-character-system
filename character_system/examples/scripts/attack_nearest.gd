@@ -18,10 +18,6 @@ extends Component
 var _think_in: float = 0.0
 
 
-func _requires() -> Array[Script]:
-	return [AIBrain, Faction]
-
-
 func _process(delta: float) -> void:
 	_think_in -= delta
 	if _think_in > 0.0:
@@ -36,6 +32,10 @@ func _process(delta: float) -> void:
 		# A tap: the weapon sees one press, like a click.
 		brain.press(action)
 		brain.release(action)
+
+
+func _requires() -> Array[Script]:
+	return [AIBrain, Faction]
 
 
 # The closest node in a group this character is hostile to, or null.

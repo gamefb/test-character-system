@@ -52,6 +52,7 @@ change these pages themselves, see :ref:`About this documentation <doc_this_docu
    manual/stats_and_modifiers
    manual/effects_and_statuses
    manual/character_components
+   manual/movement
    manual/equipment
    manual/character_archetypes
    manual/application_sources

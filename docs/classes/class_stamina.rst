@@ -17,7 +17,7 @@ An example component to copy: sprint while an action is held, using up stamina t
 Description
 -----------
 
-It uses each part of a component once: :ref:`Component._requires()<class_Component_private_method__requires>` waits for a :ref:`Brain<class_Brain>` and :ref:`Movement<class_Movement>`, :ref:`Component._stats()<class_Component_private_method__stats>` gives statuses a ``max_stamina`` stat to change, ``_process()`` reads a held button, a :ref:`StatModifier<class_StatModifier>` raises ``move_speed`` while sprinting, and :ref:`Component._stop()<class_Component_private_method__stop>` takes it off again. Add the action to the Input Map and to :ref:`PlayerBrain.extra_actions<class_PlayerBrain_property_extra_actions>`.
+It uses each part of a component once: :ref:`Component._requires()<class_Component_private_method__requires>` waits for a :ref:`Brain<class_Brain>` and a :ref:`CharacterMotor<class_CharacterMotor>`, :ref:`Component._stats()<class_Component_private_method__stats>` gives statuses a ``max_stamina`` stat to change, ``_process()`` reads a held button, a :ref:`StatModifier<class_StatModifier>` raises ``move_speed`` while sprinting, and :ref:`Component._stop()<class_Component_private_method__stop>` takes it off again. Add the action to the Input Map and to :ref:`PlayerBrain.extra_actions<class_PlayerBrain_property_extra_actions>`.
 
 .. rst-class:: classref-reftable-group
 

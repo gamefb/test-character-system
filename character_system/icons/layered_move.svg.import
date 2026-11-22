@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dqdk2ha38w43d"
-path="res://.godot/imported/double_jump.svg-fe60a0a4befb91676bcaff45e750bc5c.ctex"
+uid="uid://d36o5pd7elh4w"
+path="res://.godot/imported/layered_move.svg-16ff1ecc763bb25dae02a7c22bc30137.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://character_system/icons/double_jump.svg"
-dest_files=["res://.godot/imported/double_jump.svg-fe60a0a4befb91676bcaff45e750bc5c.ctex"]
+source_file="res://character_system/icons/layered_move.svg"
+dest_files=["res://.godot/imported/layered_move.svg-16ff1ecc763bb25dae02a7c22bc30137.ctex"]
 
 [params]
 

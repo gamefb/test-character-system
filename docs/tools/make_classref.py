@@ -36,6 +36,9 @@ VIRTUALS = {
     "Component": {"_requires", "_stats", "_start", "_stop", "_on_event", "_warnings"},
     "Condition": {"_test"},
     "Effect": {"_execute"},
+    "MotorNode": {"_stats", "_enter", "_exit", "_physics_update"},
+    "MovementMode": {"_can_enter", "_get_next_mode"},
+    "LayeredMove": {"_can_start"},
 }
 # Documented private methods that are internal plumbing. Left out of the reference.
 HIDDEN = {
@@ -44,6 +47,7 @@ HIDDEN = {
 # Sections of the index, by the folder the script is in. The first match wins.
 GROUPS = [
     ("Core", "character_system/core/"),
+    ("Movement", "character_system/characters/motor/"),
     ("Character components", "character_system/characters/"),
     ("Item components", "character_system/items/"),
     ("World", "character_system/world/"),

@@ -53,8 +53,10 @@ static func problems_in(list: Array) -> PackedStringArray:
 
 ## True for the kinds of resource this checks, directly or inside them.
 static func handles(object: Object) -> bool:
-	return object is StatusData or object is StatusTrigger or object is StatModifier \
-		or object is Condition or object is Effect or object is AbilityData
+	return (
+			object is StatusData or object is StatusTrigger or object is StatModifier
+			or object is Condition or object is Effect or object is AbilityData
+	)
 
 
 ## Stat names declared by components, e.g. move_speed.

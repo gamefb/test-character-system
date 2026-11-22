@@ -22,6 +22,21 @@ Core
     class_effectcontext
     class_namecheck
 
+Movement
+========
+
+.. toctree::
+    :maxdepth: 1
+    :name: toc-class-ref-movement
+
+    class_airmode
+    class_charactermotor
+    class_dashmove
+    class_layeredmove
+    class_motornode
+    class_movementmode
+    class_walkmode
+
 Character components
 ====================
 
@@ -32,14 +47,12 @@ Character components
     class_aibrain
     class_abilities
     class_brain
-    class_doublejump
     class_equipment
     class_faction
     class_health
     class_hurtbox
     class_inventory
     class_mouselook
-    class_movement
     class_playerbrain
     class_statuses.activestatus
     class_statuses
@@ -122,5 +135,7 @@ Examples
 
     class_attacknearest
     class_characterhud
+    class_glidemove
     class_scope
     class_stamina
+    class_wallslidemode

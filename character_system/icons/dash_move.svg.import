@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bb3tvoxge08cg"
-path="res://.godot/imported/movement.svg-a386614ba38a3a2d70b02aefe3d4138f.ctex"
+uid="uid://dtue0m8kj723b"
+path="res://.godot/imported/dash_move.svg-c4a159da3964228c961b1df0504519d7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://character_system/icons/movement.svg"
-dest_files=["res://.godot/imported/movement.svg-a386614ba38a3a2d70b02aefe3d4138f.ctex"]
+source_file="res://character_system/icons/dash_move.svg"
+dest_files=["res://.godot/imported/dash_move.svg-c4a159da3964228c961b1df0504519d7.ctex"]
 
 [params]
 
