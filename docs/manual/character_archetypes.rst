@@ -71,4 +71,11 @@ The three character kinds share one scene layout and differ in two components an
 
 **One base scene, many characters.** Build one character scene that holds the shared parts: the body, its collision shape, the ComponentManager, Statuses, Health, CharacterMotor with its modes, and Inventory. Make the player, enemies and allies as inherited scenes of it (Scene > New Inherited Scene), each adding its brain and its camera or navigation agent, and setting its Faction. A change to the base, such as a new component every character should have, then reaches them all. The :ref:`quick start <doc_quick_start>` builds a player and a target by hand, and the recipe "Make an enemy that attacks" builds an AI.
 
+**Different ways of moving.** The modes and moves under each character's CharacterMotor decide how it moves, so the inherited scenes can differ there too:
+
+- A heavy enemy that can't double jump: set its AirMode's **Air Jumps** to 0.
+- A nimble one: add a :ref:`DashMove<class_DashMove>` or a :ref:`WallSlideMode<class_WallSlideMode>` under its motor.
+- A flying enemy: add your own flying mode (the recipe "Write your own movement mode or move" has one) and set the motor's **Start Mode** to it.
+- An AI uses the same modes and moves as a player. :ref:`AIBrain<class_AIBrain>` fills ``move_dir`` from its path, and your decision logic jumps or dashes with ``brain.press(&"jump")`` and ``brain.release(&"jump")``, as :ref:`AttackNearest<class_AttackNearest>` does for firing.
+
 A stationary turret is a character without a :ref:`CharacterMotor<class_CharacterMotor>` and with a plain :ref:`Brain<class_Brain>`, driven by your own component. A destructible crate is a :ref:`ComponentManager<class_ComponentManager>` and a :ref:`Health<class_Health>` on a ``StaticBody3D``.

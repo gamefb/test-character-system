@@ -350,3 +350,11 @@ these:
   was turned away, by an immunity or a failed `apply_conditions`.
 - **A component does nothing?** Check the Output panel for "can't start: it needs …".
 - `ComponentManager.stat_of(node, &"move_speed")` prints any stat's current value.
+- **Which way is it moving?** In the Remote tab, click the **CharacterMotor**: its `mode` is
+  the mode in charge. To log every handover, connect to `CharacterMotor.mode_changed`, which
+  gives the old and new mode.
+- **A mode or move does nothing?** It must be a child of the CharacterMotor; anywhere else it
+  shows a warning triangle. A move that never starts usually has an action the brain never
+  presses: the action must be in the Input Map *and* in **PlayerBrain > Extra Actions**.
+  PlayerBrain warns in the Output panel when an Extra Action is missing from the Input Map,
+  but not the other way round.
