@@ -19,9 +19,9 @@ Description
 
 Stats, events and tags are typed as text, so ``move_sped`` or ``took_damgae`` would otherwise do nothing without any error. This checks: 
 
-- stat names in :ref:`StatModifier<class_StatModifier>` and :ref:`StatCondition<class_StatCondition>` against the stats components declare in :ref:`Component._stats()<class_Component_private_method__stats>` (\ ``resist_<type>`` is always allowed), 
+- stat names in :ref:`StatModifier<class_StatModifier>` and :ref:`StatCondition<class_StatCondition>` against the stats components and movement modes and moves declare in ``_stats()`` (\ ``resist_<type>`` is always allowed), 
 
-- :ref:`StatusTrigger.event<class_StatusTrigger_property_event>` against the events scripts send with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>` or :ref:`ComponentManager.send()<class_ComponentManager_method_send>`, 
+- :ref:`StatusTrigger.event<class_StatusTrigger_property_event>` against the events scripts send with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>` or :ref:`ComponentManager.send()<class_ComponentManager_method_send>`, and the ones the :ref:`CharacterMotor<class_CharacterMotor>` sends for each mode and move with a ``class_name``, such as ``walk_mode_entered``, 
 
 - tags in :ref:`StatusData.immune_to<class_StatusData_property_immune_to>`, :ref:`StatusData.removes_tags<class_StatusData_property_removes_tags>` and :ref:`HasTagCondition<class_HasTagCondition>` against the tags your saved statuses have. 
 

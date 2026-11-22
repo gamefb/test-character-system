@@ -37,7 +37,7 @@ Every physics frame, the motor:
 Three rules keep features from getting in each other's way:
 
 - **Only the current mode runs.** WalkMode and AirMode both jump, but never in the same frame, so their code doesn't need to know about each other.
-- **A press is used once.** Modes and moves read held buttons and ``move_dir`` from ``motor.brain``, but presses that only one of them should act on go through ``motor.consume_action(&"jump")``. It's true for the first caller in the frame of the press and false after that. So the press that jumps from the floor can't also use up an air jump, and a dash and a jump bound to the same button can't both happen.
+- **A press is used once.** Modes and moves read held buttons and ``move_dir`` from ``motor.brain``, but presses that only one of them should act on go through ``motor.consume_action(&"jump")``. It's true for the first caller in the frame of the press and false after that. So the press that jumps from the floor can't also use up an air jump, and a dash and a jump bound to the same button can't both happen. :ref:`Abilities<class_Abilities>` read presses straight from the brain instead, so don't put an ability on an action a mode or move uses: both would fire.
 - **Velocity is set, then the body moves once.** Every mode and move changes ``body.velocity`` and none calls ``move_and_slide()``, so what a dash does on top of walking is just a line of code, not a race between two nodes.
 
 .. _doc_movement_walk_and_air:
