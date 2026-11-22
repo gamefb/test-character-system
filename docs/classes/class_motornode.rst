@@ -19,7 +19,9 @@ Base for the nodes under a :ref:`CharacterMotor<class_CharacterMotor>`: :ref:`Mo
 Description
 -----------
 
-It gives them :ref:`motor<class_MotorNode_property_motor>`, :ref:`body<class_MotorNode_property_body>` and :ref:`stat()<class_MotorNode_method_stat>`, and the hooks the motor calls. Like a component, it can own stats with :ref:`_stats()<class_MotorNode_private_method__stats>`, and statuses can change them.
+It gives them :ref:`motor<class_MotorNode_property_motor>`, :ref:`body<class_MotorNode_property_body>` and :ref:`stat()<class_MotorNode_method_stat>`, and the hooks the motor calls. Like a component, it can own stats with :ref:`_stats()<class_MotorNode_private_method__stats>`, and statuses can change them. 
+
+Statuses can also stop it, through :ref:`blocked_by_tags<class_MotorNode_property_blocked_by_tags>`, and the motor sends an event when it takes over or starts and when it hands over or ends, named after its class: e.g. ``walk_mode_entered`` or ``dash_move_started``. Status triggers and components react to these like any other event.
 
 .. rst-class:: classref-reftable-group
 
@@ -29,11 +31,15 @@ Properties
 .. table::
    :widths: auto
 
-   +-----------------------------------------------+----------------------------------------------+
-   | :ref:`CharacterMotor<class_CharacterMotor>`   | :ref:`motor<class_MotorNode_property_motor>` |
-   +-----------------------------------------------+----------------------------------------------+
-   | :ref:`CharacterBody3D<class_CharacterBody3D>` | :ref:`body<class_MotorNode_property_body>`   |
-   +-----------------------------------------------+----------------------------------------------+
+   +------------------------------------------------------------------+------------------------------------------------------------------+--------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`blocked_by_tags<class_MotorNode_property_blocked_by_tags>` | ``[]`` |
+   +------------------------------------------------------------------+------------------------------------------------------------------+--------+
+   | :ref:`CharacterMotor<class_CharacterMotor>`                      | :ref:`motor<class_MotorNode_property_motor>`                     |        |
+   +------------------------------------------------------------------+------------------------------------------------------------------+--------+
+   | :ref:`CharacterBody3D<class_CharacterBody3D>`                    | :ref:`body<class_MotorNode_property_body>`                       |        |
+   +------------------------------------------------------------------+------------------------------------------------------------------+--------+
+   | :ref:`String<class_String>`                                      | :ref:`event_prefix<class_MotorNode_property_event_prefix>`       |        |
+   +------------------------------------------------------------------+------------------------------------------------------------------+--------+
 
 .. rst-class:: classref-reftable-group
 
@@ -43,6 +49,8 @@ Methods
 .. table::
    :widths: auto
 
+   +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                                                                               | :ref:`is_blocked<class_MotorNode_method_is_blocked>`\ (\ )                                                                 |
    +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
    | :ref:`float<class_float>`                                                                             | :ref:`stat<class_MotorNode_method_stat>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                            |
    +-------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
@@ -66,6 +74,18 @@ Methods
 Property Descriptions
 ---------------------
 
+.. _class_MotorNode_property_blocked_by_tags:
+
+.. rst-class:: classref-property
+
+:ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] **blocked_by_tags** = ``[]`` :ref:`🔗<class_MotorNode_property_blocked_by_tags>`
+
+While the character has a status with one of these tags, this can't take over (a mode) or start (a move), e.g. ``rooted`` on a dash. A mode in charge hands back to the motor's start mode, and a running move ends.
+
+.. rst-class:: classref-item-separator
+
+----
+
 .. _class_MotorNode_property_motor:
 
 .. rst-class:: classref-property
@@ -86,6 +106,18 @@ The motor this node is under. Set when it enters the tree.
 
 The character being moved. Set when it enters the tree.
 
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_MotorNode_property_event_prefix:
+
+.. rst-class:: classref-property
+
+:ref:`String<class_String>` **event_prefix** :ref:`🔗<class_MotorNode_property_event_prefix>`
+
+The start of the events the motor sends for this node: its class name in snake_case, e.g. ``walk_mode`` for ``walk_mode_entered``.
+
 .. rst-class:: classref-section-separator
 
 ----
@@ -94,6 +126,18 @@ The character being moved. Set when it enters the tree.
 
 Method Descriptions
 -------------------
+
+.. _class_MotorNode_method_is_blocked:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **is_blocked**\ (\ ) :ref:`🔗<class_MotorNode_method_is_blocked>`
+
+True while a status on the character has one of :ref:`blocked_by_tags<class_MotorNode_property_blocked_by_tags>`.
+
+.. rst-class:: classref-item-separator
+
+----
 
 .. _class_MotorNode_method_stat:
 

@@ -281,6 +281,8 @@ func test_wall_slide_mode_takes_over_by_itself() -> void:
 	assert_eq(motor.mode, slide, "Falling against the wall slides")
 	assert_gt(body.velocity.y, -slide.slide_speed - 0.01, "slowly")
 	await tap(body, &"jump")
+	for i in 2:
+		await get_tree().physics_frame  # Movement runs on physics frames, tap() on drawn ones.
 	assert_lt(body.velocity.x, -3.0, "Jumping pushes off the wall")
 	assert_is(motor.mode, AirMode, "into the air")
 

@@ -62,7 +62,7 @@ Dashing
 
 .. source-file:: ../../character_system/characters/motor/dash_move.gd
 
-DashMove replaces the velocity while it runs, so it works the same on the floor and in the air, ignores gravity, and can't be steered. Afterwards the mode takes over again: walking stops at once, while the air keeps some of the speed. Add a ``dash`` action to the Input Map and to the :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions, as for any action of your own.
+DashMove replaces the velocity while it runs, so it works the same on the floor and in the air, ignores gravity, and can't be steered. Its cooldown is the Cooldown every layered move has (see :ref:`doc_movement_statuses_events_cooldowns`). Afterwards the mode takes over again: walking stops at once, while the air keeps some of the speed. Add a ``dash`` action to the Input Map and to the :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions, as for any action of your own.
 
 A dash can also be an :ref:`ability<doc_abilities>` with a :ref:`KnockbackEffect<class_KnockbackEffect>` on the user. That's a one-off shove with a cooldown, built in the Inspector. DashMove is for a dash that controls the character for its whole length.
 
@@ -79,6 +79,40 @@ Using the motor from your own code
 - **Change keys** in the Input Map, as in any Godot game. To make a mode or move use another action, set its ``jump_action`` or ``action`` in the Inspector.
 
 To add a new way of moving, see :ref:`doc_extending_movement`.
+
+.. _doc_movement_statuses_events_cooldowns:
+
+Statuses, events and cooldowns
+------------------------------
+
+Every mode and move gets these from its base class, so one you write yourself has them too.
+
+**Statuses that stop movement.** A status changes how fast the character moves through stats: Wet multiplies ``move_speed``, which every built-in mode reads. To stop a mode or move outright, give it **Blocked By Tags** in the Inspector. While the character has a status with one of those tags:
+
+- a move can't start, and one already running ends;
+- a mode can't take over, and if it's in charge it hands back to the motor's start mode.
+
+The example :ref:`Rooted<doc_example_statuses>` status has the tag ``rooted`` and multiplies ``move_speed`` and ``jump_velocity`` by 0. Add ``rooted`` to a DashMove's Blocked By Tags, and rooting stops dashing too. Use the same tag on every mode and move a status should stop, such as ``stunned`` on a dash, a wall slide and a glide. Don't block the start mode: it's where a blocked mode goes back to.
+
+**Events.** The motor sends an :ref:`event<doc_events>` to the character's components and statuses each time a mode takes over or hands over, and each time a move starts or finishes. The name is the class name in snake_case, then what happened:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Event
+     - When
+   * - ``walk_mode_entered``
+     - Landing
+   * - ``air_mode_entered``
+     - Jumping, or walking off a ledge
+   * - ``walk_mode_exited``, ``air_mode_exited``
+     - The mode hands over
+   * - ``dash_move_started``, ``dash_move_finished``
+     - A dash starts and ends
+
+Your own modes and moves send theirs the same way, e.g. ``wall_slide_mode_entered``. The mode the motor starts in sends nothing, so a character doesn't "land" when it spawns. A status trigger on ``walk_mode_entered`` makes a landing shockwave; one on ``dash_move_started`` can make dashing cost health. In code, ``mode_changed`` and a move's ``started`` and ``finished`` signals say the same.
+
+**Cooldowns.** Every layered move has a **Cooldown**: the time from the start of one run until the next may start, in game time, so it stops while the game is paused, as an ability's cooldown does. While it counts down the move isn't asked to start, so its press is left for something else, and ``cooldown_left()`` tells a HUD how long is left. DashMove's is 0.6 seconds.
 
 .. _doc_movement_base_classes:
 

@@ -50,6 +50,8 @@ To grant it with an item or a status instead, set `Air Jumps` to 0 and give the 
 
 Add a **DashMove** as a child of the `CharacterMotor`, and a `dash` action to the Input Map and
 to **PlayerBrain > Extra Actions**. `Speed`, `Duration` and `Cooldown` are in the Inspector.
+To stop it while rooted or stunned, add those tags to its **Blocked By Tags**: see "Stop
+movement with a status".
 
 ### Add a new way to move
 
@@ -107,6 +109,15 @@ A StatusTrigger with a **ModifyAmountEffect** changes a hit before it lands:
 - **A bonus against some targets:** the damage buff, with **Affects Other** on and a condition
   on the ModifyAmountEffect, such as a HasTagCondition (`wet`). Affects Other makes the
   condition look at the victim instead of the attacker.
+
+### Stop movement with a status
+
+Slowing goes through stats: a StatModifier on `move_speed`, `jump_velocity` or `air_jumps`, as
+in `statuses/wet.tres`. To stop a mode or move outright, give the status a tag, e.g. `stunned`,
+and add that tag to the **Blocked By Tags** of each mode and move under the `CharacterMotor`
+it should stop. A blocked move ends at once; a blocked mode hands back to the start mode
+(WalkMode). `statuses/rooted.tres` does both for the tag `rooted`: it zeroes speed and jumps,
+and stops anything with `rooted` in its Blocked By Tags.
 
 ### Make a zone
 
@@ -216,6 +227,9 @@ carry a context (`ctx`):
 | `dealt_damage`, `took_damage` | After a hit lands | Yes |
 | `died` | Health reached 0 | When something dealt the killing blow |
 | `inventory_changed` | Something was added to or removed from the Inventory | No |
+| `walk_mode_entered`, `air_mode_entered` | Landing, and jumping or walking off a ledge | Yes |
+| `<mode>_exited` | A movement mode hands over, e.g. `walk_mode_exited` | Yes |
+| `dash_move_started`, `dash_move_finished` | A dash starts and ends; any layered move sends `<move>_started` and `<move>_finished` | Yes |
 
 In your own component, override `_on_event(event, ctx)`. Send your own with
 `ComponentManager.notify(node, &"my_event")`, and status triggers react to it too. To say who
@@ -285,10 +299,13 @@ The parts to override:
 | `_can_start() -> bool` | Move | Return true to start, e.g. `return motor.consume_action(&"dash")`. |
 | `_enter()`, `_exit()` | Both | Setup and cleanup when it takes over or starts, and when it hands over or ends. Use these, not `_ready()`. |
 | `_stats()` | Both | Numbers statuses may change, as in a component. Read them with `stat()`. |
+| `cooldown` (Inspector) | Move | Time from one start to the next. While it counts down, `_can_start()` isn't asked, so the press is left for something else. |
+| `blocked_by_tags` (Inspector) | Both | Status tags that stop it, e.g. `stunned`. See "Stop movement with a status". |
 
 Inside, `body` is the character, `motor.brain` gives `move_dir` and held buttons, and
 `motor.consume_action(&"jump")` uses up a press so nothing else acts on it. A move sets
-`active = false` to end itself.
+`active = false` to end itself. The motor sends events for yours too, named after the class,
+e.g. `fly_mode_entered`, so status triggers can react to it.
 
 A complete mode, to fly while a button toggles it:
 
@@ -340,6 +357,8 @@ these:
 | Status bar | `Statuses.changed`, then `Statuses.active`: each StatusData's `display_name` and `icon`, and its `stacks` and `time_left` |
 | Ammo | `Component.of(gear.node_in(&"weapon"), Magazine)`, then its `rounds` and `capacity` |
 | Cooldown | `Abilities.cooldown_left(ability)` |
+| Dash cooldown | `cooldown_left()` on the DashMove, or any layered move |
+| Air jumps left | `jumps_left` on the AirMode |
 | Stamina | the example Stamina's `changed(current, maximum)` |
 
 ## Find out what's going on

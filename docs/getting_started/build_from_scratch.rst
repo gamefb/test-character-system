@@ -356,11 +356,12 @@ team. All extend ``Component``.
        switches to the mode's ``_get_next_mode()`` or to another mode whose ``_can_enter()``
        is true
    * - ``MotorNode``, ``MovementMode``, ``LayeredMove``
-     - ``motor`` and ``body``, set when entering the tree; a move's ``active`` and signals
-       ``started``, ``finished``
+     - ``blocked_by_tags``; ``motor``, ``body`` and ``event_prefix``, set when entering the
+       tree; a move's ``cooldown``, ``active`` and signals ``started``, ``finished``
      - Empty hooks ``_stats()``, ``_enter()``, ``_exit()`` and ``_physics_update(delta)``;
-       ``stat()``; a mode's ``_can_enter()`` and ``_get_next_mode()``; a move's
-       ``_can_start()``
+       ``stat()``, ``is_blocked()``; a mode's ``_can_enter()`` and ``_get_next_mode()``; a
+       move's ``_can_start()`` and ``cooldown_left()``. Setting ``active`` starts the
+       cooldown timer and sends ``<event_prefix>_started`` or ``_finished``
    * - ``WalkMode``, ``AirMode``
      - ``jump_action``; ``air_mode`` or ``walk_mode`` (empty: the other one); AirMode's
        ``air_jumps``, ``air_acceleration`` and ``jumps_left``
@@ -402,6 +403,9 @@ Watch out for
 - **One mode at a time, one use per press.** Only the current mode runs, and
   ``consume_action()`` remembers which presses were used this frame, so the press that jumps
   from the floor can't also spend an air jump, whatever order the nodes are in.
+- **Statuses and events go through the motor.** It skips blocked modes and moves, and sends
+  ``<event_prefix>_entered`` and ``_exited`` when the mode changes, except for the first mode,
+  so features written later get both without code of their own.
 - **Modes and moves are plain nodes.** They live under the motor, which lists them again
   whenever its children change (``NOTIFICATION_CHILD_ORDER_CHANGED``), so they can be added and
   removed during play.

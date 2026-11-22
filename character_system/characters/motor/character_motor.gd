@@ -25,6 +25,11 @@ extends Component
 ## [br][br]Modes and moves read the [member brain], and use [method consume_action] for
 ## presses, so only one of them acts on each press. To change which key does what, edit the
 ## Input Map.
+## [br][br]A mode or move whose [member MotorNode.blocked_by_tags] match a status can't take
+## over or start. The motor also tells the character's components and statuses when a mode
+## takes over or hands over, e.g. [code]walk_mode_entered[/code] on landing and
+## [code]air_mode_entered[/code] on take-off, and when a move starts or finishes, e.g.
+## [code]dash_move_started[/code]. The first mode it starts in sends no event.
 
 ## Emitted when [member mode] changes, e.g. to play a landing animation.
 signal mode_changed(old_mode: MovementMode, new_mode: MovementMode)
@@ -59,6 +64,10 @@ var mode: MovementMode:
 		if value:
 			value._enter()
 		mode_changed.emit(old_mode, value)
+		if running and old_mode:
+			ComponentManager.notify(host, old_mode.event_prefix + "_exited")
+			if value:
+				ComponentManager.notify(host, value.event_prefix + "_entered")
 ## The [Brain] giving orders. Read [member Brain.move_dir] and held actions from it.
 var brain: Brain
 ## The character being moved.
@@ -72,14 +81,16 @@ var _push := Vector3.ZERO  # Sideways knockback, kept in the body's velocity bet
 
 func _physics_process(delta: float) -> void:
 	_consumed.clear()
-	if not mode:
+	if not mode or mode.is_blocked():
 		mode = start_mode if start_mode else get_mode(WalkMode)
 		if not mode:
 			return
 	body.velocity -= _push  # Modes work from the character's own velocity.
 	mode._physics_update(delta)
 	for move in _moves:
-		if not move.active and move._can_start():
+		if move.active and move.is_blocked():
+			move.active = false
+		elif not move.active and _may_start(move) and move._can_start():
 			move.active = true
 		if move.active:
 			move._physics_update(delta)
@@ -87,9 +98,11 @@ func _physics_process(delta: float) -> void:
 	body.velocity += _push
 	body.move_and_slide()
 	var next := mode._get_next_mode()
+	if next and next.is_blocked():
+		next = null
 	if not next:
 		for other in _modes:
-			if other != mode and other._can_enter():
+			if other != mode and not other.is_blocked() and other._can_enter():
 				next = other
 				break
 	if next:
@@ -169,3 +182,7 @@ func push(velocity: Vector3) -> void:
 		return
 	body.velocity += velocity
 	_push += Vector3(velocity.x, 0.0, velocity.z)
+
+
+func _may_start(move: LayeredMove) -> bool:
+	return move.cooldown_left() <= 0.0 and not move.is_blocked()
