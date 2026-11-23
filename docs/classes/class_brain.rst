@@ -97,6 +97,10 @@ Property Descriptions
 
 :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] **blocked_by_tags** = ``[...]`` :ref:`🔗<class_Brain_property_blocked_by_tags>`
 
+.. rst-class:: classref-property-setget
+
+- |void| **@blocked_by_tags_setter**\ (\ value\: :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]\ )
+
 While the character has a status with one of these tags, it can't act at all.
 
 .. rst-class:: classref-item-separator
@@ -108,6 +112,10 @@ While the character has a status with one of these tags, it can't act at all.
 .. rst-class:: classref-property
 
 :ref:`bool<class_bool>` **acts_while_dead** = ``false`` :ref:`🔗<class_Brain_property_acts_while_dead>`
+
+.. rst-class:: classref-property-setget
+
+- |void| **@acts_while_dead_setter**\ (\ value\: :ref:`bool<class_bool>`\ )
 
 Off: a dead character can't act until :ref:`Health.revive()<class_Health_method_revive>`. On: death doesn't stop the brain, e.g. for a ghost or a turret without :ref:`Health<class_Health>`.
 

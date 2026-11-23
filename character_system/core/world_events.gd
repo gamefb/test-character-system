@@ -22,6 +22,10 @@ extends RefCounted
 # The listeners are kept on the scene tree's root, so they're freed with the game.
 const _META := &"_character_system_world_events"
 
+# How many listeners there are, so an event nobody listens for costs one comparison. Only the
+# count is static: the listeners themselves must not be (see _listeners).
+static var _count: int = 0
+
 
 ## Calls [param method] each time [param event] is sent to any host. The method takes the host
 ## and the event's [EffectContext], which is null for events sent without one:
@@ -36,6 +40,7 @@ static func on(event: StringName, method: Callable) -> void:
 		if entry[0] == method:
 			return
 	list.append([method, owner_of(method)])
+	_count += 1
 
 
 ## Stops [param method] hearing [param event].
@@ -45,6 +50,7 @@ static func off(event: StringName, method: Callable) -> void:
 	for i in list.size():
 		if list[i][0] == method:
 			list.remove_at(i)
+			_count -= 1
 			break
 	if list.is_empty():
 		listeners.erase(event)
@@ -53,6 +59,8 @@ static func off(event: StringName, method: Callable) -> void:
 ## Passes an event on to its listeners. [method ComponentManager.send] calls this; you don't
 ## need to.
 static func emit(host: Node, event: StringName, ctx: EffectContext) -> void:
+	if _count <= 0:
+		return
 	var listeners: Dictionary = _listeners()
 	if not listeners.has(event):
 		return

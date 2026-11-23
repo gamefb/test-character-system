@@ -37,6 +37,11 @@ extends Node
 ## a health bar that follows max health.
 signal stat_changed(stat_name: StringName)
 
+const _NO_LISTENERS: Array = []
+
+# Script instance id -> whether that script or one it extends overrides _on_event().
+static var _overriding: Dictionary[int, bool] = {}
+
 ## True once the host is ready and its components have had the chance to start. At that moment
 ## every running component also hears the [code]started[/code] event.
 var started := false
@@ -48,6 +53,7 @@ var host: Node:
 # True while the components first start, before [member started].
 var _starting := false
 var _components: Array[Component] = []
+var _hearing: Array[Component] = []  # The components that override _on_event(), in order.
 var _modifiers: Array[StatModifier] = []
 var _modifier_sources: Array[Object] = []  # What added each modifier, in the same order.
 var _cache: Dictionary[StringName, float] = {}  # Stat values, cleared whenever anything changes.
@@ -61,13 +67,16 @@ var _subscribers: Dictionary[StringName, Array] = {}
 ## Returns [param node]'s [ComponentManager] child, or null. Safe on null or freed nodes:
 ## [param node] has no type so that a node freed a moment ago can be passed straight in.
 static func of(node: Variant) -> ComponentManager:
-	if not is_instance_valid(node) or not node is Node:
+	if not is_instance_valid(node):
+		return null
+	var valid := node as Node  # Typed from here on, which is quicker to call.
+	if not valid:
 		return null
 	# The usual name is a quick lookup; searching the children is the fallback.
-	var named := node.get_node_or_null(^"ComponentManager") as ComponentManager
+	var named := valid.get_node_or_null(^"ComponentManager") as ComponentManager
 	if named:
 		return named
-	for child in node.get_children():
+	for child in valid.get_children():
 		if child is ComponentManager:
 			return child
 	return null
@@ -185,14 +194,18 @@ func has_registered(type: Script) -> bool:
 ## [br]3. Methods subscribed with priority 0 or below, highest first.
 ## [br]4. [WorldEvents] listeners, which hear the events of every host.
 func send(event: StringName, ctx: EffectContext) -> void:
-	var listeners: Array = _subscribers.get(event, []).duplicate()
+	var listeners: Array = _subscribers.get(event, _NO_LISTENERS)
+	if not listeners.is_empty():
+		listeners = listeners.duplicate()  # A listener may unsubscribe while it's called.
 	var next: int = 0
 	while next < listeners.size() and listeners[next][0] > 0:
 		_call_subscriber(event, listeners[next], ctx)
 		next += 1
-	for c in _components.duplicate():
-		if c.running:
-			c._on_event(event, ctx)
+	# Only the components that override _on_event(), which is few: most use on().
+	if not _hearing.is_empty():
+		for c in _hearing.duplicate():
+			if c.running:
+				c._on_event(event, ctx)
 	while next < listeners.size():
 		_call_subscriber(event, listeners[next], ctx)
 		next += 1
@@ -367,6 +380,8 @@ func register(c: Component) -> void:
 	if c in _components:
 		return
 	_components.append(c)
+	if _hears_every_event(c):
+		_hearing.append(c)
 	c._manager = self
 	_stats_changed_by(c)
 	if started or _starting:
@@ -381,6 +396,7 @@ func unregister(c: Component) -> void:
 		return
 	c._halt()
 	_components.erase(c)
+	_hearing.erase(c)
 	c._manager = null
 	_stats_changed_by(c)
 	for other in _components.duplicate():
@@ -424,6 +440,23 @@ func _stats_changed_by(c: Component) -> void:
 		_cache.erase(stat_name)
 		_bases.erase(stat_name)
 		stat_changed.emit(stat_name)
+
+
+# True if c's script overrides _on_event(), so send() must call it for every event.
+func _hears_every_event(c: Component) -> bool:
+	var script: Script = c.get_script()
+	var id: int = script.get_instance_id()
+	if not _overriding.has(id):
+		var overrides := false
+		var base: Script = script
+		while base and base != Component and not overrides:
+			for method in base.get_script_method_list():
+				if method.name == "_on_event":
+					overrides = true
+					break
+			base = base.get_base_script()
+		_overriding[id] = overrides
+	return _overriding[id]
 
 
 func _found_clear() -> void:

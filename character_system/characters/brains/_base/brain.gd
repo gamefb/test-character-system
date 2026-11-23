@@ -39,10 +39,16 @@ extends Component
 ## (disarmed) or [member AbilityData.blocked_by_tags] (silenced).
 
 ## While the character has a status with one of these tags, it can't act at all.
-@export var blocked_by_tags: Array[StringName] = [&"stunned"]
+@export var blocked_by_tags: Array[StringName] = [&"stunned"]:
+	set(value):
+		blocked_by_tags = value
+		_forget_blocked()
 ## Off: a dead character can't act until [method Health.revive]. On: death doesn't stop the
 ## brain, e.g. for a ghost or a turret without [Health].
-@export var acts_while_dead := false
+@export var acts_while_dead := false:
+	set(value):
+		acts_while_dead = value
+		_forget_blocked()
 
 ## Desired movement in world space. Length 0 to 1. Zero while [method is_blocked].
 var move_dir: Vector3:
@@ -54,6 +60,14 @@ var move_dir: Vector3:
 var aim_point := Vector3.ZERO
 
 var _move_dir := Vector3.ZERO
+# is_blocked() is asked many times a frame, so its answer is kept until the frame ends or the
+# character's health or statuses change.
+var _blocked := false
+var _blocked_on_frame: int = -1
+var _blocked_on_tick: int = -1
+# Not typed: either may have been freed since.
+var _watched_health
+var _watched_statuses
 
 # Action -> (physics frame, process frame) on which it counts as just pressed. Pressed actions
 # are in _held; a tap may already be released while still just pressed.
@@ -83,14 +97,34 @@ func release(action: StringName) -> void:
 ## [member blocked_by_tags]. Presses made meanwhile are lost; a button still held when it ends
 ## counts as held again.
 func is_blocked() -> bool:
-	if not acts_while_dead:
-		var health := find(Health) as Health
-		if health and health.is_dead():
-			return true
-	if blocked_by_tags.is_empty():
-		return false
+	var frame: int = Engine.get_process_frames()
+	var tick: int = Engine.get_physics_frames()
+	if frame != _blocked_on_frame or tick != _blocked_on_tick:
+		_blocked_on_frame = frame
+		_blocked_on_tick = tick
+		_blocked = _work_out_blocked()
+	return _blocked
+
+
+func _work_out_blocked() -> bool:
+	var health := find(Health) as Health
+	if health and health != _watched_health:
+		_watched_health = health
+		health.changed.connect(_forget_blocked.unbind(2))
 	var statuses := find(Statuses) as Statuses
-	return statuses != null and blocked_by_tags.any(statuses.has_tag)
+	if statuses and statuses != _watched_statuses:
+		_watched_statuses = statuses
+		statuses.changed.connect(_forget_blocked)
+	if not acts_while_dead and health and health.is_dead():
+		return true
+	if blocked_by_tags.is_empty() or not statuses or statuses.active.is_empty():
+		return false
+	return blocked_by_tags.any(statuses.has_tag)
+
+
+# Health or statuses changed: work the answer out again when it's next asked for.
+func _forget_blocked() -> void:
+	_blocked_on_frame = -1
 
 
 ## True while [param action] is held down, like [method Input.is_action_pressed].

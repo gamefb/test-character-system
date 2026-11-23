@@ -76,6 +76,8 @@ func _stop() -> void:
 
 
 func _on_event(event: StringName, ctx: EffectContext) -> void:
+	if active.is_empty():
+		return  # Every event on the host passes through here, so leave early.
 	if event == &"died":
 		for data: StatusData in active.keys():
 			if data.duration > 0.0:

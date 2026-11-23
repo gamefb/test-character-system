@@ -20,6 +20,11 @@ extends Effect
 ## [br][br]Steps 2 and 3 don't depend on the order statuses were applied in. A target that is
 ## already dead is left alone: no damage and no events.
 
+const _NO_NAMES: Array = []
+
+# Damage type -> its [bonus, resist] stat names, so they aren't built again for every hit.
+static var _stat_names: Dictionary[StringName, Array] = {}
+
 ## Damage before scaling, magnitude and resistance.
 @export var amount: float = 10.0
 ## Added to [member amount] each time it runs, e.g. a [StatAmount] for 2 per point of the
@@ -38,18 +43,21 @@ func _execute(ctx: EffectContext) -> void:
 	if not health or health.is_dead():
 		return
 	# This effect's tags only last while it runs; the hit's own tags (a hurtbox's) stay.
-	var hit_tags: Array[StringName] = ctx.tags
-	ctx.tags = hit_tags.duplicate()
+	var own_tags: int = ctx.tags.size()
 	for tag in tags:
 		if tag not in ctx.tags:
 			ctx.tags.append(tag)
 	ctx.damage_type = type
 	ctx.reset_amount(Amount.total(amount, scaling, ctx) * ctx.magnitude)
-	ctx.percent = ComponentManager.stat_of(ctx.source, StringName("bonus_" + type))
+	var names: Array = _stat_names.get(type, _NO_NAMES)
+	if names.is_empty():
+		names = [StringName("bonus_" + type), StringName("resist_" + type)]
+		_stat_names[type] = names
+	ctx.percent = ComponentManager.stat_of(ctx.source, names[0])
 	# Before: both sides add to ctx.add, ctx.percent and ctx.mul (armour, crits, damage buffs).
 	ComponentManager.notify(ctx.source, &"dealing_damage", ctx)
 	ComponentManager.notify(ctx.target, &"taking_damage", ctx)
-	var resist: float = minf(ComponentManager.stat_of(ctx.target, StringName("resist_" + type)), 1.0)
+	var resist: float = minf(ComponentManager.stat_of(ctx.target, names[1]), 1.0)
 	ctx.reset_amount(ctx.resolve() * (1.0 - resist))
 	# The number is final: shields soak up what they can.
 	ComponentManager.notify(ctx.target, &"absorbing_damage", ctx)
@@ -58,4 +66,4 @@ func _execute(ctx: EffectContext) -> void:
 	# After: statuses may react (thorns, life steal, on-hit procs).
 	ComponentManager.notify(ctx.source, &"dealt_damage", ctx)
 	ComponentManager.notify(ctx.target, &"took_damage", ctx)
-	ctx.tags = hit_tags
+	ctx.tags.resize(own_tags)
