@@ -185,7 +185,7 @@ All 214 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 an
    * - Test level, ``--self-test``
      - 18 of 18
    * - ``core/`` on its own, with ``kit/`` and ``examples/`` deleted
-     - All 35 scripts load
+     - All 20 scripts load
    * - Code examples in ``RECIPES.md``
      - All compile
 

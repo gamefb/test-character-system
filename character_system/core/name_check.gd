@@ -65,8 +65,9 @@ static func problems_in(list: Array) -> PackedStringArray:
 static func handles(object: Object) -> bool:
 	return (
 			object is StatusData or object is StatusTrigger or object is StatModifier
-			or object is Condition or object is Effect or object is AbilityData
-			or object is Amount or object is ItemData
+			or object is Condition or object is Effect or object is Amount
+			# An ability or an item, known by what it holds: core has neither class.
+			or (object is Resource and (&"costs" in object or &"use_effects" in object))
 	)
 
 
@@ -119,10 +120,11 @@ static func _check(object: Object, out: PackedStringArray, is_root: bool) -> voi
 	if object is Effect and &"pool" in object:
 		_check_name(object.get(&"pool"), _pools, "pool",
 				"No Pool in a saved scene is called '%s'.", out)
-	if object is AbilityData:
+	if object is Resource and &"costs" in object:
 		for pool_name in object.get(&"costs"):
 			_check_name(pool_name, _pools, "pool",
 					"Costs: no Pool in a saved scene is called '%s'.", out)
+	if object is Resource and &"blocked_by_tags" in object:
 		for tag in object.get(&"blocked_by_tags"):
 			_check_name(tag, _tags, "tag", "Blocked By Tags: no status has the tag '%s'.", out)
 	if object is RemoveStatusEffect and object.get(&"tag"):

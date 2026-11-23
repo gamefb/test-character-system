@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://character_system/kit/items/grants.gd" id="2_2m5os"]
 [ext_resource type="Script" path="res://character_system/core/stats/stat_modifier.gd" id="3_d8la7"]
 [ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="4_o14i4"]
-[ext_resource type="Script" path="res://character_system/core/abilities/ability_data.gd" id="5_uqqte"]
+[ext_resource type="Script" path="res://character_system/kit/abilities/ability_data.gd" id="5_uqqte"]
 [ext_resource type="Resource" path="res://character_system/examples/abilities/fireball.tres" id="6_whje6"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rh4h2"]

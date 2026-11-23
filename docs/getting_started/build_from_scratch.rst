@@ -491,15 +491,15 @@ stats of its own, and knows its team. All extend ``Component``.
 
 How a brain remembers presses, modelled on Godot's ``Input``:
 
-.. literalinclude:: ../../character_system/core/characters/brain.gd
+.. literalinclude:: ../../character_system/kit/brains/brain.gd
    :language: gdscript
-   :caption: character_system/core/characters/brain.gd (variables)
+   :caption: character_system/kit/brains/brain.gd (variables)
    :start-at: var _pressed_on
    :end-at: var _held
 
-.. literalinclude:: ../../character_system/core/characters/brain.gd
+.. literalinclude:: ../../character_system/kit/brains/brain.gd
    :language: gdscript
-   :caption: character_system/core/characters/brain.gd (functions)
+   :caption: character_system/kit/brains/brain.gd (functions)
    :start-at: func press(
 
 Watch out for

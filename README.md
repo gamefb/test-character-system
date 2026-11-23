@@ -15,8 +15,8 @@ minutes.
 
 | Folder | What it is |
 | --- | --- |
-| `character_system/core/` | The system itself. It loads on its own: copy this and build your game's parts on it. |
-| `character_system/kit/` | Ready-made parts built on the core: brains, movement modes, weapons, projectiles, zones and more. Keep what you use. |
+| `character_system/core/` | The rules everything shares, in 20 scripts: components, stats, events, effects, health and statuses. It loads on its own. |
+| `character_system/kit/` | The features built on the core: brains, movement, pools, abilities, items, weapons, projectiles and zones. Keep what you use. |
 | `character_system/examples/` | Statuses, items, abilities and scripts to copy. Start with `character_system/RECIPES.md`. |
 | `addons/character_system_warnings/` | Editor plugin that warns about mistyped stat, event and tag names. |
 | `tests/` | GUT unit tests (214 tests), and `benchmark.gd`. |

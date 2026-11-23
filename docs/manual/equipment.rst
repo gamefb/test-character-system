@@ -5,14 +5,14 @@ Equipment system
 
 An equippable item is a scene whose root is the model and whose children are its own :ref:`ComponentManager<class_ComponentManager>` and item components; the item does whatever its components do. Item components use the same :ref:`Component<class_Component>` base as characters, plus references to who holds the item and which copy it is.
 
-.. source-file:: ../../character_system/core/items/item_component.gd
+.. source-file:: ../../character_system/kit/items/item_component.gd
 
 .. _doc_equipping:
 
 Equipping
 ---------
 
-.. source-file:: ../../character_system/core/items/equipment.gd
+.. source-file:: ../../character_system/kit/items/equipment.gd
 
 Equip is "instantiate and attach": the item's components start once the scene is in the tree, with ``wielder`` and ``item`` already set. Unequip is "free": they stop, and connections made with ``listen()`` are undone. The scene is thrown away, but the :ref:`ItemInstance<class_ItemInstance>` and its state survive, so a rifle remembers its rounds when equipped again.
 
@@ -83,7 +83,7 @@ Shots are physics rays, so collision layers decide what they can hit. ``Hitscan.
 
 A weapon's own wielder is never hit: :ref:`Hitscan<class_Hitscan>` collects the wielder's body and hurtboxes once, when the weapon is equipped, and every shot passes through them.
 
-.. source-file:: ../../character_system/core/characters/hurtbox.gd
+.. source-file:: ../../character_system/kit/characters/hurtbox.gd
 
 .. source-file:: ../../character_system/kit/items/hitscan.gd
 

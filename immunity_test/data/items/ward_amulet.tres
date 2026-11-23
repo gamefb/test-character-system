@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
 
 [ext_resource type="PackedScene" path="res://immunity_test/scenes/items/ward_amulet.tscn" id="1_gnbyc"]
-[ext_resource type="Script" path="res://character_system/core/items/item_data.gd" id="2_ml8er"]
+[ext_resource type="Script" path="res://character_system/kit/items/item_data.gd" id="2_ml8er"]
 
 [resource]
 script = ExtResource("2_ml8er")

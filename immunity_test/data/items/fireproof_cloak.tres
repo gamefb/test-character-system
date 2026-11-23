@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
 
 [ext_resource type="PackedScene" path="res://immunity_test/scenes/items/fireproof_cloak.tscn" id="1_40wc8"]
-[ext_resource type="Script" path="res://character_system/core/items/item_data.gd" id="2_w0tyi"]
+[ext_resource type="Script" path="res://character_system/kit/items/item_data.gd" id="2_w0tyi"]
 
 [resource]
 script = ExtResource("2_w0tyi")
