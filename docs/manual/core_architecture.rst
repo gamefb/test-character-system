@@ -11,7 +11,7 @@ How a component lives:
 
 1. **Enters the tree:** it registers with the host's :ref:`ComponentManager<class_ComponentManager>`, and the numbers its ``_stats()`` returns become readable.
 2. **Starts:** ``_start()`` runs once the host is ready and every type in ``_requires()`` is present. A component added mid-game starts straight away.
-3. **Stops:** ``_stop()`` runs when it leaves, or when something it requires leaves. Connections made with ``listen()`` are undone.
+3. **Stops:** ``_stop()`` runs when it leaves, or when something it requires leaves. Connections made with ``listen()`` and events asked for with ``on()`` are undone.
 4. **Restarts:** if what it required comes back, ``_start()`` runs again.
 
 A component that can't start shows a yellow warning in the editor and reports it once in the Output panel; the rest of the character keeps working. Nothing runs in the editor: built-in components are ``@tool`` so they can show warnings, and the base class turns their processing off there and never calls ``_start()``. It does its work in ``_notification()``, which Godot calls for every script in the inheritance chain, so a component may still override ``_ready()`` without calling ``super()``.
@@ -35,14 +35,31 @@ A component that can't start shows a yellow warning in the editor and reports it
      - ``listen(signal, method)`` in ``_start()``
      - :ref:`Health<class_Health>` listens to ``ComponentManager.stat_changed``
    * - Something that happened to the host
+     - ``on(event, method)`` in ``_start()``
+     - :ref:`Equipment<class_Equipment>` unequips what was dropped on ``inventory_changed``
+   * - Something that happened to another host
+     - ``on(event, method, 0, node)`` in ``_start()``
+     - An item component hearing its wielder's ``killed``
+   * - Every event on the host
      - ``_on_event(event, ctx)``
-     - :ref:`Statuses<class_Statuses>` clears timed statuses on ``died``
+     - :ref:`Statuses<class_Statuses>` passing events on to status triggers
+   * - Something that happened to anyone
+     - ``WorldEvents.on(event, method)``
+     - Experience for every enemy that dies
+   * - Several components of one type
+     - ``find_all(Type)``
+     - A character's :ref:`Pool<class_Pool>`\ s; one is found by name with ``Pool.named()``
    * - A number statuses can change
      - ``_stats()`` to own it, ``stat()`` to read it
      - :ref:`CharacterMotor<class_CharacterMotor>` owns ``move_speed``, and :ref:`WalkMode<class_WalkMode>` reads it
+   * - A number of your game's own, with no script
+     - An :ref:`Attributes<class_Attributes>` component
+     - ``strength``, ``level``, ``crit_chance``
 
 The manager is the hub. You add one per host and never change it; a new kind of component needs nothing from it.
 
 .. source-file:: ../../character_system/core/component_manager.gd
+
+The manager's third job is events. ``send()`` passes an event to the methods subscribed to it and to every running component, in a fixed order by priority, and then to :ref:`WorldEvents<class_WorldEvents>`, which hears every host. :ref:`doc_events` lists the events and the ways to hear them.
 
 Lookups search the host's children, so ``find()`` and ``Component.of()`` also work on a scene that hasn't been added to the level yet. The manager remembers each answer until a child is added, removed or moved, so a lookup every frame costs about as much as reading a variable. ``Component.of()`` finds the manager by its name first, so keep the default name, ``ComponentManager``; a renamed one still works, it's just found by searching. Whether a component may start depends only on registered components, so one that is leaving no longer counts.

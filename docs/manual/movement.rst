@@ -92,7 +92,9 @@ Every mode and move gets these from its base class, so one you write yourself ha
 - a move can't start, and one already running ends;
 - a mode can't take over, and if it's in charge it hands back to the motor's start mode.
 
-The example :ref:`Rooted<doc_example_statuses>` status has the tag ``rooted`` and multiplies ``move_speed`` and ``jump_velocity`` by 0. Add ``rooted`` to a DashMove's Blocked By Tags, and rooting stops dashing too. Use the same tag on every mode and move a status should stop, such as ``stunned`` on a dash, a wall slide and a glide. Don't block the start mode: it's where a blocked mode goes back to.
+The example :ref:`Rooted<doc_example_statuses>` status has the tag ``rooted`` and multiplies ``move_speed`` and ``jump_velocity`` by 0. Add ``rooted`` to a DashMove's Blocked By Tags, and rooting stops dashing too. Use the same tag on every mode and move a status should stop. Don't block the start mode: it's where a blocked mode goes back to.
+
+A stun needs none of this to stop walking, jumping or starting a dash: a status tagged ``stunned`` makes the :ref:`Brain<class_Brain>` report no intent, and every mode and move reads the brain. Add ``stunned`` to a move's Blocked By Tags only to cut short one that is already under way, such as a dash in mid-air.
 
 **Events.** The motor sends an :ref:`event<doc_events>` to the character's components and statuses each time a mode takes over or hands over, and each time a move starts or finishes. The name is the class name in snake_case, then what happened:
 

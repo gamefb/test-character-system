@@ -23,9 +23,9 @@ It does three jobs:
 
 - **Lookup.** :ref:`find()<class_ComponentManager_method_find>` returns a component by type. It remembers the answer until the host's children change, so it's cheap enough to call every frame. 
 
-- **Stats.** Components declare numbers in :ref:`Component._stats()<class_Component_private_method__stats>`; :ref:`stat()<class_ComponentManager_method_stat>` returns them with every :ref:`StatModifier<class_StatModifier>` applied, and :ref:`stat_changed<class_ComponentManager_signal_stat_changed>` reports changes. 
+- **Stats.** Components declare numbers in :ref:`Component._stats()<class_Component_private_method__stats>`; :ref:`stat()<class_ComponentManager_method_stat>` returns them with every :ref:`StatModifier<class_StatModifier>` applied, and :ref:`stat_changed<class_ComponentManager_signal_stat_changed>` reports changes. :ref:`modifiers_of()<class_ComponentManager_method_modifiers_of>` lists what is changing a stat, for a character sheet. 
 
-- **Events.** :ref:`send()<class_ComponentManager_method_send>` passes an event to every running component's :ref:`Component._on_event()<class_Component_private_method__on_event>`.
+- **Events.** :ref:`send()<class_ComponentManager_method_send>` passes an event to everything that asked for it with :ref:`subscribe()<class_ComponentManager_method_subscribe>` (or :ref:`Component.on()<class_Component_method_on>`) and to every running component's :ref:`Component._on_event()<class_Component_private_method__on_event>`. :ref:`WorldEvents<class_WorldEvents>` hears the events of every host at once.
 
 From other code, use the static helpers :ref:`of()<class_ComponentManager_method_of>`, :ref:`notify()<class_ComponentManager_method_notify>` and :ref:`stat_of()<class_ComponentManager_method_stat_of>`. They take any node and do nothing (or return 0) if it has no manager, so they're safe on walls, props and freed nodes.
 
@@ -34,6 +34,7 @@ From other code, use the static helpers :ref:`of()<class_ComponentManager_method
     var speed := ComponentManager.stat_of(player, &"move_speed")
     ComponentManager.notify(player, &"level_up")
     ComponentManager.of(player).stat_changed.connect(_on_player_stat_changed)
+    ComponentManager.of(player).subscribe(&"took_damage", _on_player_hurt)
 
 Keep this node's default name. :ref:`of()<class_ComponentManager_method_of>` looks for a child with that name first, and only searches all the children when there isn't one.
 
@@ -59,33 +60,43 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`ComponentManager<class_ComponentManager>` | :ref:`of<class_ComponentManager_method_of>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static|                                                                                                              |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                          | :ref:`notify<class_ComponentManager_method_notify>`\ (\ node\: :ref:`Node<class_Node>`, event\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |static| |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`float<class_float>`                       | :ref:`stat_of<class_ComponentManager_method_stat_of>`\ (\ node\: :ref:`Node<class_Node>`, stat_name\: :ref:`StringName<class_StringName>`\ ) |static|                                                   |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Component<class_Component>`               | :ref:`find<class_ComponentManager_method_find>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                                               |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`                         | :ref:`has_registered<class_ComponentManager_method_has_registered>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                           |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                          | :ref:`send<class_ComponentManager_method_send>`\ (\ event\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>`\ )                                                     |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`float<class_float>`                       | :ref:`stat<class_ComponentManager_method_stat>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                                                                                                  |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                          | :ref:`add_modifier<class_ComponentManager_method_add_modifier>`\ (\ m\: :ref:`StatModifier<class_StatModifier>`\ )                                                                                      |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                          | :ref:`remove_modifier<class_ComponentManager_method_remove_modifier>`\ (\ m\: :ref:`StatModifier<class_StatModifier>`\ )                                                                                |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                          | :ref:`refresh_stats<class_ComponentManager_method_refresh_stats>`\ (\ )                                                                                                                                 |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                          | :ref:`register<class_ComponentManager_method_register>`\ (\ c\: :ref:`Component<class_Component>`\ )                                                                                                    |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                          | :ref:`unregister<class_ComponentManager_method_unregister>`\ (\ c\: :ref:`Component<class_Component>`\ )                                                                                                |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                          | :ref:`try_start<class_ComponentManager_method_try_start>`\ (\ c\: :ref:`Component<class_Component>`\ )                                                                                                  |
-   +-------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`ComponentManager<class_ComponentManager>`                  | :ref:`of<class_ComponentManager_method_of>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                                                                                                              |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`notify<class_ComponentManager_method_notify>`\ (\ node\: :ref:`Variant<class_Variant>`, event\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |static| |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`float<class_float>`                                        | :ref:`stat_of<class_ComponentManager_method_stat_of>`\ (\ node\: :ref:`Variant<class_Variant>`, stat_name\: :ref:`StringName<class_StringName>`\ ) |static|                                                   |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Component<class_Component>`                                | :ref:`find<class_ComponentManager_method_find>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                                                     |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Array<class_Array>`\[:ref:`Component<class_Component>`\]   | :ref:`find_all<class_ComponentManager_method_find_all>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                                             |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                                          | :ref:`has_registered<class_ComponentManager_method_has_registered>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                                 |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`send<class_ComponentManager_method_send>`\ (\ event\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>`\ )                                                           |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`subscribe<class_ComponentManager_method_subscribe>`\ (\ event\: :ref:`StringName<class_StringName>`, method\: :ref:`Callable<class_Callable>`, priority\: :ref:`int<class_int>` = 0\ )                  |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`unsubscribe<class_ComponentManager_method_unsubscribe>`\ (\ event\: :ref:`StringName<class_StringName>`, method\: :ref:`Callable<class_Callable>`\ )                                                    |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`float<class_float>`                                        | :ref:`stat<class_ComponentManager_method_stat>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                                                                                                        |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`float<class_float>`                                        | :ref:`base_of<class_ComponentManager_method_base_of>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                                                                                                  |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Array<class_Array>`\[:ref:`Dictionary<class_Dictionary>`\] | :ref:`modifiers_of<class_ComponentManager_method_modifiers_of>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                                                                                        |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`add_modifier<class_ComponentManager_method_add_modifier>`\ (\ m\: :ref:`StatModifier<class_StatModifier>`, source\: :ref:`Object<class_Object>` = null\ )                                               |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`remove_modifier<class_ComponentManager_method_remove_modifier>`\ (\ m\: :ref:`StatModifier<class_StatModifier>`\ )                                                                                      |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`refresh_stats<class_ComponentManager_method_refresh_stats>`\ (\ )                                                                                                                                       |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`register<class_ComponentManager_method_register>`\ (\ c\: :ref:`Component<class_Component>`\ )                                                                                                          |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`unregister<class_ComponentManager_method_unregister>`\ (\ c\: :ref:`Component<class_Component>`\ )                                                                                                      |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`try_start<class_ComponentManager_method_try_start>`\ (\ c\: :ref:`Component<class_Component>`\ )                                                                                                        |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -150,9 +161,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`ComponentManager<class_ComponentManager>` **of**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_ComponentManager_method_of>`
+:ref:`ComponentManager<class_ComponentManager>` **of**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_ComponentManager_method_of>`
 
-Returns ``node``'s **ComponentManager** child, or null. Safe on null or freed nodes.
+Returns ``node``'s **ComponentManager** child, or null. Safe on null or freed nodes: ``node`` has no type so that a node freed a moment ago can be passed straight in.
 
 .. rst-class:: classref-item-separator
 
@@ -162,7 +173,7 @@ Returns ``node``'s **ComponentManager** child, or null. Safe on null or freed no
 
 .. rst-class:: classref-method
 
-|void| **notify**\ (\ node\: :ref:`Node<class_Node>`, event\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |static| :ref:`🔗<class_ComponentManager_method_notify>`
+|void| **notify**\ (\ node\: :ref:`Variant<class_Variant>`, event\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |static| :ref:`🔗<class_ComponentManager_method_notify>`
 
 Sends ``event`` to ``node``'s components, if it has a **ComponentManager**.
 
@@ -176,7 +187,7 @@ Use it for your own events, e.g. ``&"jumped"`` or ``&"level_up"``. Every running
 
 .. rst-class:: classref-method
 
-:ref:`float<class_float>` **stat_of**\ (\ node\: :ref:`Node<class_Node>`, stat_name\: :ref:`StringName<class_StringName>`\ ) |static| :ref:`🔗<class_ComponentManager_method_stat_of>`
+:ref:`float<class_float>` **stat_of**\ (\ node\: :ref:`Variant<class_Variant>`, stat_name\: :ref:`StringName<class_StringName>`\ ) |static| :ref:`🔗<class_ComponentManager_method_stat_of>`
 
 Reads ``stat_name`` from ``node``, or 0 if it has no **ComponentManager**.
 
@@ -191,6 +202,18 @@ Reads ``stat_name`` from ``node``, or 0 if it has no **ComponentManager**.
 :ref:`Component<class_Component>` **find**\ (\ type\: :ref:`Script<class_Script>`\ ) :ref:`🔗<class_ComponentManager_method_find>`
 
 The first component on the host that is a ``type`` (subclasses count), or null. Works before the host is added to the scene too, e.g. to set a spawned enemy's team. The answer is remembered until a child is added, removed or moved, so calling it every frame is cheap.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ComponentManager_method_find_all:
+
+.. rst-class:: classref-method
+
+:ref:`Array<class_Array>`\[:ref:`Component<class_Component>`\] **find_all**\ (\ type\: :ref:`Script<class_Script>`\ ) :ref:`🔗<class_ComponentManager_method_find_all>`
+
+Every component on the host that is a ``type`` (subclasses count), in scene order, e.g. all of a character's :ref:`Pool<class_Pool>`\ s. Unlike :ref:`find()<class_ComponentManager_method_find>`, the answer isn't remembered, so don't call it every frame.
 
 .. rst-class:: classref-item-separator
 
@@ -214,7 +237,53 @@ True if a registered (in the scene) component is a ``type``. Used to decide whet
 
 |void| **send**\ (\ event\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>`\ ) :ref:`🔗<class_ComponentManager_method_send>`
 
-Sends ``event`` to the :ref:`Component._on_event()<class_Component_private_method__on_event>` of every running component. Components that are stopped, or not yet started, miss it. From outside the host, use :ref:`notify()<class_ComponentManager_method_notify>`, which also copes with a null node.
+Sends ``event`` to everything listening on this host. Components that are stopped, or not yet started, miss it. From outside the host, use :ref:`notify()<class_ComponentManager_method_notify>`, which also copes with a null node.
+
+Listeners hear it in this order: 
+
+1. Methods subscribed with a priority above 0, highest first. 
+
+2. Every running component's :ref:`Component._on_event()<class_Component_private_method__on_event>`, in scene order. :ref:`Statuses<class_Statuses>` runs its status triggers here. 
+
+3. Methods subscribed with priority 0 or below, highest first. 
+
+4. :ref:`WorldEvents<class_WorldEvents>` listeners, which hear the events of every host.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ComponentManager_method_subscribe:
+
+.. rst-class:: classref-method
+
+|void| **subscribe**\ (\ event\: :ref:`StringName<class_StringName>`, method\: :ref:`Callable<class_Callable>`, priority\: :ref:`int<class_int>` = 0\ ) :ref:`🔗<class_ComponentManager_method_subscribe>`
+
+Calls ``method`` with the event's :ref:`EffectContext<class_EffectContext>` each time ``event`` is sent to this host, until :ref:`unsubscribe()<class_ComponentManager_method_unsubscribe>`. Use it from code that isn't a component, such as a HUD; components use :ref:`Component.on()<class_Component_method_on>`, which unsubscribes by itself.
+
+A higher ``priority`` hears the event earlier; see :ref:`send()<class_ComponentManager_method_send>` for the order. The method takes one argument, which is null for events sent without a context:
+
+::
+
+    func _ready() -> void:
+        ComponentManager.of(player).subscribe(&"took_damage", _flash_red)
+
+    func _flash_red(ctx: EffectContext) -> void:
+        flash.modulate.a = clampf(ctx.amount / 20.0, 0.2, 1.0)
+
+A method whose object has been freed is dropped the next time the event is sent, and so is a lambda that uses the object it was written in. A lambda that doesn't use its own object is never dropped: remove it with :ref:`unsubscribe()<class_ComponentManager_method_unsubscribe>`.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ComponentManager_method_unsubscribe:
+
+.. rst-class:: classref-method
+
+|void| **unsubscribe**\ (\ event\: :ref:`StringName<class_StringName>`, method\: :ref:`Callable<class_Callable>`\ ) :ref:`🔗<class_ComponentManager_method_unsubscribe>`
+
+Undoes one :ref:`subscribe()<class_ComponentManager_method_subscribe>` of ``method`` to ``event``.
 
 .. rst-class:: classref-item-separator
 
@@ -226,9 +295,48 @@ Sends ``event`` to the :ref:`Component._on_event()<class_Component_private_metho
 
 :ref:`float<class_float>` **stat**\ (\ stat_name\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_ComponentManager_method_stat>`
 
-Current value of a stat: (base + all adds) \* all muls. The base comes from the component that lists it in :ref:`Component._stats()<class_Component_private_method__stats>`. With no such component, nothing reads it anyway.
+Current value of a stat: (base + all adds) × (1 + all percents) × all muls. The base comes from the component that lists it in :ref:`Component._stats()<class_Component_private_method__stats>`, or is 0 if none does.
 
-For example, with :ref:`CharacterMotor.move_speed<class_CharacterMotor_property_move_speed>` 5 and modifiers ``add 1``, ``mul 1.5`` and ``mul 0.5``, ``move_speed`` is (5 + 1) × 1.5 × 0.5 = 4.5. Results are cached until something changes, so read it whenever you need it instead of keeping a copy.
+For example, with :ref:`CharacterMotor.move_speed<class_CharacterMotor_property_move_speed>` 5 and modifiers ``add 1``, ``percent 0.5`` and ``mul 0.5``, ``move_speed`` is (5 + 1) × 1.5 × 0.5 = 4.5. Results are cached until something changes, so read it whenever you need it instead of keeping a copy. A stat with a conditional modifier (see :ref:`StatModifier.conditions<class_StatModifier_property_conditions>`) is worked out on every read instead.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ComponentManager_method_base_of:
+
+.. rst-class:: classref-method
+
+:ref:`float<class_float>` **base_of**\ (\ stat_name\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_ComponentManager_method_base_of>`
+
+A stat's value before any :ref:`StatModifier<class_StatModifier>`: what the component that owns it returns from :ref:`Component._stats()<class_Component_private_method__stats>`, or 0 if no component owns it.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ComponentManager_method_modifiers_of:
+
+.. rst-class:: classref-method
+
+:ref:`Array<class_Array>`\[:ref:`Dictionary<class_Dictionary>`\] **modifiers_of**\ (\ stat_name\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_ComponentManager_method_modifiers_of>`
+
+Everything changing ``stat_name`` right now, in the order it was added, for a character sheet or a tooltip that explains a number. Each entry is a Dictionary with: 
+
+- ``modifier``: the :ref:`StatModifier<class_StatModifier>`. 
+
+- ``source``: what added it, e.g. the :ref:`StatusData<class_StatusData>`, or null if it wasn't said. 
+
+- ``active``: false while the modifier's conditions don't pass.
+
+::
+
+    var lines := ["Base %s" % manager.base_of(&"move_speed")]
+    for entry in manager.modifiers_of(&"move_speed"):
+        var m: StatModifier = entry.modifier
+        var status := entry.source as StatusData
+        lines.append("%s: +%s, +%d%%, x%s"
+                % [status.display_name if status else "?", m.add, m.percent * 100.0, m.mul])
 
 .. rst-class:: classref-item-separator
 
@@ -238,11 +346,11 @@ For example, with :ref:`CharacterMotor.move_speed<class_CharacterMotor_property_
 
 .. rst-class:: classref-method
 
-|void| **add_modifier**\ (\ m\: :ref:`StatModifier<class_StatModifier>`\ ) :ref:`🔗<class_ComponentManager_method_add_modifier>`
+|void| **add_modifier**\ (\ m\: :ref:`StatModifier<class_StatModifier>`, source\: :ref:`Object<class_Object>` = null\ ) :ref:`🔗<class_ComponentManager_method_add_modifier>`
 
 Applies ``m`` until :ref:`remove_modifier()<class_ComponentManager_method_remove_modifier>` takes it off. :ref:`Statuses<class_Statuses>` does this for status modifiers; call it yourself for a one-off change.
 
-Keep the same object to remove it later. Most changes are better as a status (a :ref:`StatusData<class_StatusData>` with :ref:`StatusData.modifiers<class_StatusData_property_modifiers>`), which can end by itself and appear on a status bar; use this for changes your own code controls, such as aiming down sights.
+Keep the same object to remove it later. Most changes are better as a status (a :ref:`StatusData<class_StatusData>` with :ref:`StatusData.modifiers<class_StatusData_property_modifiers>`), which can end by itself and appear on a status bar; use this for changes your own code controls, such as aiming down sights. ``source`` is whatever is behind it (a status, an item), for :ref:`modifiers_of()<class_ComponentManager_method_modifiers_of>`.
 
 ::
 

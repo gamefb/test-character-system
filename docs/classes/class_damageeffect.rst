@@ -17,7 +17,21 @@ Deals damage, scaled by magnitude and reduced by the target's resistance to its 
 Description
 -----------
 
-Before the hit lands, the source hears ``dealing_damage`` and the target ``taking_damage``, so their statuses can change :ref:`EffectContext.amount<class_EffectContext_property_amount>`. After it lands they hear ``dealt_damage`` and ``took_damage``.
+The number starts as :ref:`amount<class_DamageEffect_property_amount>` plus everything in :ref:`scaling<class_DamageEffect_property_scaling>`, times :ref:`EffectContext.magnitude<class_EffectContext_property_magnitude>`. Then, in a fixed order: 
+
+1. The source's ``bonus_<type>`` stat is added as a percentage, e.g. ``bonus_fire`` 0.2 for 20% more fire damage. 
+
+2. The source hears ``dealing_damage`` and the target ``taking_damage``. Their statuses and components change :ref:`EffectContext.add<class_EffectContext_property_add>`, :ref:`EffectContext.percent<class_EffectContext_property_percent>` and :ref:`EffectContext.mul<class_EffectContext_property_mul>`. 
+
+3. The totals are applied: (amount + add) × (1 + percent) × mul. 
+
+4. The target's ``resist_<type>`` stat takes its share: 0.5 halves it, 1 is immune, and a negative value is a weakness (-0.5 is 50% more). 
+
+5. The target hears ``absorbing_damage`` with the final number in :ref:`EffectContext.amount<class_EffectContext_property_amount>`. Shields lower it by what they soak up. 
+
+6. :ref:`Health<class_Health>` loses what's left, and the source hears ``dealt_damage`` and the target ``took_damage``. A killing blow also sends ``died`` to the target and ``killed`` to the source. 
+
+Steps 2 and 3 don't depend on the order statuses were applied in. A target that is already dead is left alone: no damage and no events.
 
 .. rst-class:: classref-reftable-group
 
@@ -27,11 +41,15 @@ Properties
 .. table::
    :widths: auto
 
-   +-------------------------------------+---------------------------------------------------+-----------------+
-   | :ref:`float<class_float>`           | :ref:`amount<class_DamageEffect_property_amount>` | ``10.0``        |
-   +-------------------------------------+---------------------------------------------------+-----------------+
-   | :ref:`StringName<class_StringName>` | :ref:`type<class_DamageEffect_property_type>`     | ``&"physical"`` |
-   +-------------------------------------+---------------------------------------------------+-----------------+
+   +------------------------------------------------------------------+-----------------------------------------------------+-----------------+
+   | :ref:`float<class_float>`                                        | :ref:`amount<class_DamageEffect_property_amount>`   | ``10.0``        |
+   +------------------------------------------------------------------+-----------------------------------------------------+-----------------+
+   | :ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\]         | :ref:`scaling<class_DamageEffect_property_scaling>` | ``[]``          |
+   +------------------------------------------------------------------+-----------------------------------------------------+-----------------+
+   | :ref:`StringName<class_StringName>`                              | :ref:`type<class_DamageEffect_property_type>`       | ``&"physical"`` |
+   +------------------------------------------------------------------+-----------------------------------------------------+-----------------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`tags<class_DamageEffect_property_tags>`       | ``[]``          |
+   +------------------------------------------------------------------+-----------------------------------------------------+-----------------+
 
 .. rst-class:: classref-section-separator
 
@@ -48,7 +66,19 @@ Property Descriptions
 
 :ref:`float<class_float>` **amount** = ``10.0`` :ref:`🔗<class_DamageEffect_property_amount>`
 
-Damage before magnitude and resistance.
+Damage before scaling, magnitude and resistance.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_DamageEffect_property_scaling:
+
+.. rst-class:: classref-property
+
+:ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] **scaling** = ``[]`` :ref:`🔗<class_DamageEffect_property_scaling>`
+
+Added to :ref:`amount<class_DamageEffect_property_amount>` each time it runs, e.g. a :ref:`StatAmount<class_StatAmount>` for 2 per point of the user's strength, or a :ref:`HealthAmount<class_HealthAmount>` for 5% of the target's health.
 
 .. rst-class:: classref-item-separator
 
@@ -60,7 +90,19 @@ Damage before magnitude and resistance.
 
 :ref:`StringName<class_StringName>` **type** = ``&"physical"`` :ref:`🔗<class_DamageEffect_property_type>`
 
-Matched against the target's resist\_<type> stat, e.g. resist_fire.
+Matched against the source's bonus\_<type> stat and the target's resist\_<type> stat, e.g. bonus_fire and resist_fire. :ref:`DamageTypeCondition<class_DamageTypeCondition>` tests it.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_DamageEffect_property_tags:
+
+.. rst-class:: classref-property
+
+:ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] **tags** = ``[]`` :ref:`🔗<class_DamageEffect_property_tags>`
+
+Labels for this hit, e.g. &"melee" or &"explosion", beside any the :ref:`Hurtbox<class_Hurtbox>` added. :ref:`HitTagCondition<class_HitTagCondition>` tests them, so a status can react to melee hits only.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

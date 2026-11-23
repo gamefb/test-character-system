@@ -22,12 +22,24 @@ Every source applies statuses the same way: it builds an :ref:`EffectContext<cla
      - Ring of haste grants Haste while worn
    * - Equipment
      - Whatever it hits
-     - ``effects`` on :ref:`Hitscan<class_Hitscan>` or :ref:`MeleeSweep<class_MeleeSweep>`
+     - ``effects`` on :ref:`Hitscan<class_Hitscan>`, :ref:`MeleeSweep<class_MeleeSweep>` or :ref:`Launcher<class_Launcher>`
      - Flaming sword applies Burning
+   * - Projectile
+     - What it hits, and everything near the impact
+     - ``effects`` and ``blast_effects`` on the :ref:`Projectile<class_Projectile>`
+     - A fireball burns its target and scorches everyone around it
    * - Character
      - Another character or itself
-     - ``AbilityData.effects`` through :ref:`Abilities<class_Abilities>`
+     - ``AbilityData.effects`` and ``user_effects`` through :ref:`Abilities<class_Abilities>`
      - Player casts Slow on an AI. A friendly AI casts Haste on the player.
+   * - Character
+     - Itself, for the length of a cast
+     - ``AbilityData.status_while_casting``
+     - A mage is slowed while casting
+   * - Consumable
+     - Whoever uses it
+     - ``ItemData.use_effects`` through ``Inventory.use()``
+     - An elixir grants Haste
    * - Status
      - Its holder
      - ``on_apply``, ``on_tick``, ``on_remove``
@@ -65,7 +77,7 @@ This chain uses two of the status ideas from :ref:`doc_example_statuses`, Flamin
 
 1. The player equips a rifle with :ref:`Hitscan<class_Hitscan>` [damage 10] and a ring with :ref:`GrantStatuses<class_GrantStatuses>` [Flaming blade].
 2. The player fires at an enemy's head. :ref:`Trigger<class_Trigger>` emits ``fired``, and :ref:`Hitscan<class_Hitscan>` hits the enemy's head :ref:`Hurtbox<class_Hurtbox>`, which sets ``magnitude`` to 2.
-3. :ref:`DamageEffect<class_DamageEffect>` works out 20 damage and sends ``taking_damage``. The enemy's Stoneskin lowers it to 17.
+3. :ref:`DamageEffect<class_DamageEffect>` works out 20 damage and sends ``taking_damage``. The enemy's Stoneskin adds -3 to the hit's totals, and the hit lands for 17.
 4. The enemy's :ref:`Health<class_Health>` drops by 17, and the player's :ref:`Statuses<class_Statuses>` receives ``dealt_damage``.
 5. Flaming blade's trigger runs :ref:`ApplyStatusEffect<class_ApplyStatusEffect>` on the enemy, which gains Burning.
 6. Burning ticks fire damage with the player as source. Stoneskin reacts to the ticks too, because its trigger has ``react_to_statuses`` on. The ticks set off nothing else, so the chain ends.

@@ -10,7 +10,7 @@ RemoveStatusEffect
 
 **Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-Takes a status away from the target.
+Takes a status away from the target: one status, or every status with a tag.
 
 .. rst-class:: classref-reftable-group
 
@@ -22,6 +22,8 @@ Properties
 
    +-------------------------------------+-------------------------------------------------------------------------+-----------+
    | :ref:`StatusData<class_StatusData>` | :ref:`status<class_RemoveStatusEffect_property_status>`                 |           |
+   +-------------------------------------+-------------------------------------------------------------------------+-----------+
+   | :ref:`StringName<class_StringName>` | :ref:`tag<class_RemoveStatusEffect_property_tag>`                       |           |
    +-------------------------------------+-------------------------------------------------------------------------+-----------+
    | :ref:`bool<class_bool>`             | :ref:`drop_hold_only<class_RemoveStatusEffect_property_drop_hold_only>` | ``false`` |
    +-------------------------------------+-------------------------------------------------------------------------+-----------+
@@ -41,7 +43,19 @@ Property Descriptions
 
 :ref:`StatusData<class_StatusData>` **status** :ref:`🔗<class_RemoveStatusEffect_property_status>`
 
-The status to take away.
+The status to take away. Leave empty to go by :ref:`tag<class_RemoveStatusEffect_property_tag>` alone.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_RemoveStatusEffect_property_tag:
+
+.. rst-class:: classref-property
+
+:ref:`StringName<class_StringName>` **tag** :ref:`🔗<class_RemoveStatusEffect_property_tag>`
+
+Every status with this tag is taken away too, e.g. &"poison" for an antidote that cures every kind of poison.
 
 .. rst-class:: classref-item-separator
 
@@ -53,7 +67,7 @@ The status to take away.
 
 :ref:`bool<class_bool>` **drop_hold_only** = ``false`` :ref:`🔗<class_RemoveStatusEffect_property_drop_hold_only>`
 
-On: only drop one hold, for a permanent source you manage yourself. Off: remove it completely (use for cleanses). Zones use status_while_inside instead.
+On: only drop one hold of :ref:`status<class_RemoveStatusEffect_property_status>`, for a permanent source you manage yourself. Off: remove it completely (use for cleanses). Zones use status_while_inside instead.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

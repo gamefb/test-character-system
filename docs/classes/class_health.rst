@@ -19,7 +19,9 @@ Description
 
 The maximum is the ``max_health`` stat, so statuses and items can raise or lower it. Raising it doesn't heal; lowering it only cuts health above the new maximum. A character starts at full health, innate passives included, whatever the node order.
 
-\ :ref:`DamageEffect<class_DamageEffect>` and :ref:`HealEffect<class_HealEffect>` call :ref:`change()<class_Health_method_change>` for you. Every component on the character hears ``died`` as an event.
+\ :ref:`DamageEffect<class_DamageEffect>` and :ref:`HealEffect<class_HealEffect>` call :ref:`change()<class_Health_method_change>` for you. Every component on the character hears ``died`` as an event, and whoever dealt the killing blow hears ``killed``, so "heal on kill" is a status trigger and experience for kills is one :ref:`WorldEvents<class_WorldEvents>` listener. 
+
+For a shield that soaks up damage before health, add a :ref:`Pool<class_Pool>` with :ref:`Pool.absorbs_damage<class_Pool_property_absorbs_damage>` on.
 
 .. rst-class:: classref-reftable-group
 
@@ -119,7 +121,7 @@ Health before statuses and items. They change it through the max_health stat.
 
 - |void| **@resistances_setter**\ (\ value\: :ref:`Dictionary<class_Dictionary>`\[:ref:`StringName<class_StringName>`, :ref:`float<class_float>`\]\ )
 
-Fraction of each damage type that is ignored, e.g. { &"fire": 0.5 }. 1 = immune. Statuses change these through stats named resist\_<type>, e.g. resist_fire.
+Fraction of each damage type that is ignored, e.g. { &"fire": 0.5 }. 1 = immune, and a negative number is a weakness: -0.5 takes 50% more. Statuses change these through stats named resist\_<type>, e.g. resist_fire.
 
 .. rst-class:: classref-item-separator
 
@@ -188,7 +190,7 @@ Adds ``amount`` to health. Use a negative amount for damage. Ignored once dead.
 
 |void| **revive**\ (\ amount\: :ref:`float<class_float>` = -1.0\ ) :ref:`🔗<class_Health_method_revive>`
 
-Brings the character back with ``amount`` health, or full health if left out.
+Brings the character back with ``amount`` health, or full health if left out. Every component hears ``revived``.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

@@ -60,6 +60,10 @@ Methods
    +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
    | |void|                  | :ref:`drop_hold<class_Statuses_method_drop_hold>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                              |
    +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`int<class_int>`   | :ref:`remove_tagged<class_Statuses_method_remove_tagged>`\ (\ tag\: :ref:`StringName<class_StringName>`\ )                       |
+   +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`int<class_int>`   | :ref:`stacks_of<class_Statuses_method_stacks_of>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                              |
+   +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`bool<class_bool>` | :ref:`has_tag<class_Statuses_method_has_tag>`\ (\ tag\: :ref:`StringName<class_StringName>`\ )                                   |
    +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`bool<class_bool>` | :ref:`is_immune_to<class_Statuses_method_is_immune_to>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                        |
@@ -163,6 +167,30 @@ Removes a status completely, whatever is keeping it active.
 |void| **drop_hold**\ (\ data\: :ref:`StatusData<class_StatusData>`\ ) :ref:`🔗<class_Statuses_method_drop_hold>`
 
 Drops one permanent source, such as an unequipped item. The status ends when no sources remain.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Statuses_method_remove_tagged:
+
+.. rst-class:: classref-method
+
+:ref:`int<class_int>` **remove_tagged**\ (\ tag\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_Statuses_method_remove_tagged>`
+
+Removes every status with ``tag``, e.g. &"poison" for an antidote. Returns how many were removed.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Statuses_method_stacks_of:
+
+.. rst-class:: classref-method
+
+:ref:`int<class_int>` **stacks_of**\ (\ data\: :ref:`StatusData<class_StatusData>`\ ) :ref:`🔗<class_Statuses_method_stacks_of>`
+
+How many stacks of ``data`` are active, or 0.
 
 .. rst-class:: classref-item-separator
 

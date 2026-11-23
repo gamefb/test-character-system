@@ -17,7 +17,7 @@ Who did what to whom, and how strongly: passed to every effect, condition and ev
 Description
 -----------
 
-:ref:`source<class_EffectContext_property_source>` caused it (null for the environment), :ref:`target<class_EffectContext_property_target>` receives it, and :ref:`origin<class_EffectContext_property_origin>` is the ability, status or item behind it. Damage carries the hit's :ref:`amount<class_EffectContext_property_amount>`, which status triggers can change before it lands.
+:ref:`source<class_EffectContext_property_source>` caused it (null for the environment), :ref:`target<class_EffectContext_property_target>` receives it, and :ref:`origin<class_EffectContext_property_origin>` is the ability, status or item behind it. Damage and healing carry the number being worked out in :ref:`amount<class_EffectContext_property_amount>`, which statuses and components change through :ref:`add<class_EffectContext_property_add>`, :ref:`percent<class_EffectContext_property_percent>` and :ref:`mul<class_EffectContext_property_mul>` before it lands.
 
 Weapons, abilities, statuses and zones build these for you. Build one yourself to run effects from your own code, such as a trap or a cutscene:
 
@@ -30,7 +30,18 @@ Weapons, abilities, statuses and zones build these for you. Build one yourself t
 
 Use a new context for each target. Effects write to it (:ref:`amount<class_EffectContext_property_amount>`) and events pass it on, so it's only meant for one target at a time.
 
-\ :ref:`source<class_EffectContext_property_source>` may have been freed by the time a status ticks. :ref:`Component.of()<class_Component_method_of>` and the :ref:`ComponentManager<class_ComponentManager>` helpers cope with that; check ``is_instance_valid(ctx.source)`` before using it directly.
+\ **Changing a hit before it lands.** In ``dealing_damage`` and ``taking_damage``, change the three totals, never :ref:`amount<class_EffectContext_property_amount>` itself:
+
+::
+
+    func _on_taking_damage(ctx: EffectContext) -> void:
+        ctx.add -= 3.0      # Armour: 3 less.
+        ctx.percent += 0.2  # Marked: 20% more. Several of these add up.
+        ctx.mul *= 0.5      # Shield: half of everything.
+
+The hit then lands for (amount + add) × (1 + percent) × mul, the same formula stats use, so the result doesn't depend on which status was applied first. See :ref:`resolve()<class_EffectContext_method_resolve>`.
+
+\ :ref:`source<class_EffectContext_property_source>` may have been freed by the time a status ticks. A context built then has a null source, and :ref:`Component.of()<class_Component_method_of>` and the :ref:`ComponentManager<class_ComponentManager>` helpers accept freed nodes; check ``is_instance_valid(ctx.source)`` before using it directly.
 
 .. rst-class:: classref-reftable-group
 
@@ -40,21 +51,37 @@ Properties
 .. table::
    :widths: auto
 
-   +-------------------------------------------+--------------------------------------------------------------+-----------+
-   | :ref:`Node<class_Node>`                   | :ref:`source<class_EffectContext_property_source>`           |           |
-   +-------------------------------------------+--------------------------------------------------------------+-----------+
-   | :ref:`Node<class_Node>`                   | :ref:`target<class_EffectContext_property_target>`           |           |
-   +-------------------------------------------+--------------------------------------------------------------+-----------+
-   | :ref:`Resource<class_Resource>`           | :ref:`origin<class_EffectContext_property_origin>`           |           |
-   +-------------------------------------------+--------------------------------------------------------------+-----------+
-   | :ref:`float<class_float>`                 | :ref:`magnitude<class_EffectContext_property_magnitude>`     | ``1.0``   |
-   +-------------------------------------------+--------------------------------------------------------------+-----------+
-   | :ref:`float<class_float>`                 | :ref:`amount<class_EffectContext_property_amount>`           | ``0.0``   |
-   +-------------------------------------------+--------------------------------------------------------------+-----------+
-   | :ref:`bool<class_bool>`                   | :ref:`from_status<class_EffectContext_property_from_status>` | ``false`` |
-   +-------------------------------------------+--------------------------------------------------------------+-----------+
-   | :ref:`EffectContext<class_EffectContext>` | :ref:`cause<class_EffectContext_property_cause>`             |           |
-   +-------------------------------------------+--------------------------------------------------------------+-----------+
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`Node<class_Node>`                                          | :ref:`source<class_EffectContext_property_source>`           |                            |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`Node<class_Node>`                                          | :ref:`target<class_EffectContext_property_target>`           |                            |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`Resource<class_Resource>`                                  | :ref:`origin<class_EffectContext_property_origin>`           |                            |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`float<class_float>`                                        | :ref:`magnitude<class_EffectContext_property_magnitude>`     | ``1.0``                    |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`float<class_float>`                                        | :ref:`amount<class_EffectContext_property_amount>`           | ``0.0``                    |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`float<class_float>`                                        | :ref:`add<class_EffectContext_property_add>`                 | ``0.0``                    |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`float<class_float>`                                        | :ref:`percent<class_EffectContext_property_percent>`         | ``0.0``                    |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`float<class_float>`                                        | :ref:`mul<class_EffectContext_property_mul>`                 | ``1.0``                    |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`StringName<class_StringName>`                              | :ref:`damage_type<class_EffectContext_property_damage_type>` |                            |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`tags<class_EffectContext_property_tags>`               | ``[]``                     |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`Vector3<class_Vector3>`                                    | :ref:`position<class_EffectContext_property_position>`       | ``Vector3(inf, inf, inf)`` |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`Vector3<class_Vector3>`                                    | :ref:`normal<class_EffectContext_property_normal>`           | ``Vector3(0, 0, 0)``       |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`bool<class_bool>`                                          | :ref:`from_status<class_EffectContext_property_from_status>` | ``false``                  |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`EffectContext<class_EffectContext>`                        | :ref:`cause<class_EffectContext_property_cause>`             |                            |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`int<class_int>`                                            | :ref:`depth<class_EffectContext_property_depth>`             | ``0``                      |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
 
 .. rst-class:: classref-reftable-group
 
@@ -64,9 +91,36 @@ Methods
 .. table::
    :widths: auto
 
-   +--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void| | :ref:`_init<class_EffectContext_private_method__init>`\ (\ p_source\: :ref:`Node<class_Node>` = null, p_target\: :ref:`Node<class_Node>` = null, p_origin\: :ref:`Resource<class_Resource>` = null\ ) |
-   +--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                    | :ref:`_init<class_EffectContext_private_method__init>`\ (\ p_source\: :ref:`Variant<class_Variant>` = null, p_target\: :ref:`Variant<class_Variant>` = null, p_origin\: :ref:`Resource<class_Resource>` = null\ ) |
+   +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`EffectContext<class_EffectContext>` | :ref:`hit<class_EffectContext_method_hit>`\ (\ )                                                                                                                                                                  |
+   +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                   | :ref:`has_tag<class_EffectContext_method_has_tag>`\ (\ tag\: :ref:`StringName<class_StringName>`\ )                                                                                                               |
+   +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`float<class_float>`                 | :ref:`resolve<class_EffectContext_method_resolve>`\ (\ )                                                                                                                                                          |
+   +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Vector3<class_Vector3>`             | :ref:`hit_position<class_EffectContext_method_hit_position>`\ (\ )                                                                                                                                                |
+   +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                    | :ref:`reset_amount<class_EffectContext_method_reset_amount>`\ (\ value\: :ref:`float<class_float>`\ )                                                                                                             |
+   +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+.. rst-class:: classref-section-separator
+
+----
+
+.. rst-class:: classref-descriptions-group
+
+Constants
+---------
+
+.. _class_EffectContext_constant_MAX_DEPTH:
+
+.. rst-class:: classref-constant
+
+**MAX_DEPTH** = ``8`` :ref:`🔗<class_EffectContext_constant_MAX_DEPTH>`
+
+How many status triggers may set each other off in a row before the chain is cut. It only matters for triggers with :ref:`StatusTrigger.react_to_statuses<class_StatusTrigger_property_react_to_statuses>` on, which could otherwise loop forever.
 
 .. rst-class:: classref-section-separator
 
@@ -131,7 +185,91 @@ Scales numeric effects: status stacks, headshot multipliers. 1 = normal strength
 
 :ref:`float<class_float>` **amount** = ``0.0`` :ref:`🔗<class_EffectContext_property_amount>`
 
-The damage about to land. Statuses can change it before it does. :ref:`HealEffect<class_HealEffect>` doesn't use it.
+The damage or healing being worked out. Before it lands this is the effect's own number; afterwards it's what actually landed, e.g. for damage numbers.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_property_add:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **add** = ``0.0`` :ref:`🔗<class_EffectContext_property_add>`
+
+Flat change to :ref:`amount<class_EffectContext_property_amount>`, set by statuses and components before it lands. Negative for armour.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_property_percent:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **percent** = ``0.0`` :ref:`🔗<class_EffectContext_property_percent>`
+
+Percentage change to :ref:`amount<class_EffectContext_property_amount>`: 0.2 is 20% more, -0.2 is 20% less. Several add up before they're applied, so two +50% bonuses make +100%.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_property_mul:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **mul** = ``1.0`` :ref:`🔗<class_EffectContext_property_mul>`
+
+Multiplies the total, e.g. 0.5 for a shield that halves everything, 2 for a critical hit.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_property_damage_type:
+
+.. rst-class:: classref-property
+
+:ref:`StringName<class_StringName>` **damage_type** :ref:`🔗<class_EffectContext_property_damage_type>`
+
+The kind of damage, e.g. &"fire". Set by :ref:`DamageEffect<class_DamageEffect>`; empty for anything else. :ref:`DamageTypeCondition<class_DamageTypeCondition>` tests it.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_property_tags:
+
+.. rst-class:: classref-property
+
+:ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] **tags** = ``[]`` :ref:`🔗<class_EffectContext_property_tags>`
+
+Labels on this hit, e.g. &"head" from a :ref:`Hurtbox<class_Hurtbox>`, &"melee" from a :ref:`DamageEffect<class_DamageEffect>` or &"crit" from a :ref:`ModifyAmountEffect<class_ModifyAmountEffect>`. :ref:`HitTagCondition<class_HitTagCondition>` tests them; your damage numbers can colour by them.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_property_position:
+
+.. rst-class:: classref-property
+
+:ref:`Vector3<class_Vector3>` **position** = ``Vector3(inf, inf, inf)`` :ref:`🔗<class_EffectContext_property_position>`
+
+Where the hit landed, in world space. :ref:`Vector3.INF<class_Vector3_constant_INF>` when nothing recorded it, e.g. for a status tick. Use :ref:`hit_position()<class_EffectContext_method_hit_position>` to always get a point.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_property_normal:
+
+.. rst-class:: classref-property
+
+:ref:`Vector3<class_Vector3>` **normal** = ``Vector3(0, 0, 0)`` :ref:`🔗<class_EffectContext_property_normal>`
+
+The surface direction at :ref:`position<class_EffectContext_property_position>`, for decals and sparks. Zero if unknown.
 
 .. rst-class:: classref-item-separator
 
@@ -155,7 +293,19 @@ True if a status caused this. Most status triggers ignore these, which prevents 
 
 :ref:`EffectContext<class_EffectContext>` **cause** :ref:`🔗<class_EffectContext_property_cause>`
 
-For effects run by a status trigger: the context of the event that set it off, such as the hit for &"taking_damage". :ref:`ModifyAmountEffect<class_ModifyAmountEffect>` changes its :ref:`amount<class_EffectContext_property_amount>`.
+For effects run by a status trigger: the context of the event that set it off, such as the hit for &"taking_damage". :ref:`ModifyAmountEffect<class_ModifyAmountEffect>` changes its totals.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_property_depth:
+
+.. rst-class:: classref-property
+
+:ref:`int<class_int>` **depth** = ``0`` :ref:`🔗<class_EffectContext_property_depth>`
+
+How many status triggers led to this one. See :ref:`MAX_DEPTH<class_EffectContext_constant_MAX_DEPTH>`.
 
 .. rst-class:: classref-section-separator
 
@@ -170,9 +320,74 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-|void| **_init**\ (\ p_source\: :ref:`Node<class_Node>` = null, p_target\: :ref:`Node<class_Node>` = null, p_origin\: :ref:`Resource<class_Resource>` = null\ ) :ref:`🔗<class_EffectContext_private_method__init>`
+|void| **_init**\ (\ p_source\: :ref:`Variant<class_Variant>` = null, p_target\: :ref:`Variant<class_Variant>` = null, p_origin\: :ref:`Resource<class_Resource>` = null\ ) :ref:`🔗<class_EffectContext_private_method__init>`
 
-``p_source`` caused it, ``p_target`` receives it, and ``p_origin`` is the ability, status or item behind it.
+``p_source`` caused it, ``p_target`` receives it, and ``p_origin`` is the ability, status or item behind it. A node that has already been freed counts as null, so a status whose applier is gone can still build its context.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_method_hit:
+
+.. rst-class:: classref-method
+
+:ref:`EffectContext<class_EffectContext>` **hit**\ (\ ) :ref:`🔗<class_EffectContext_method_hit>`
+
+The hit this is about: :ref:`cause<class_EffectContext_property_cause>` inside a status trigger, otherwise this context. Conditions and amounts use it so the same resource works in both places:
+
+::
+
+    func check(ctx: EffectContext) -> bool:
+        return ctx.hit().damage_type == &"fire"
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_method_has_tag:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **has_tag**\ (\ tag\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_EffectContext_method_has_tag>`
+
+True if this hit has ``tag``.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_method_resolve:
+
+.. rst-class:: classref-method
+
+:ref:`float<class_float>` **resolve**\ (\ ) :ref:`🔗<class_EffectContext_method_resolve>`
+
+:ref:`amount<class_EffectContext_property_amount>` with :ref:`add<class_EffectContext_property_add>`, :ref:`percent<class_EffectContext_property_percent>` and :ref:`mul<class_EffectContext_property_mul>` applied: (amount + add) × (1 + percent) × mul, never below 0. :ref:`DamageEffect<class_DamageEffect>` and :ref:`HealEffect<class_HealEffect>` call it once every listener has had its say.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_method_hit_position:
+
+.. rst-class:: classref-method
+
+:ref:`Vector3<class_Vector3>` **hit_position**\ (\ ) :ref:`🔗<class_EffectContext_method_hit_position>`
+
+Where the hit landed: :ref:`position<class_EffectContext_property_position>` if it was recorded, otherwise where the target is. Zero if neither is known.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_method_reset_amount:
+
+.. rst-class:: classref-method
+
+|void| **reset_amount**\ (\ value\: :ref:`float<class_float>`\ ) :ref:`🔗<class_EffectContext_method_reset_amount>`
+
+Clears the running totals before a new number is worked out. Effects call this.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

@@ -17,7 +17,9 @@ Fires an instant ray on each :ref:`Trigger<class_Trigger>` shot and applies :ref
 Description
 -----------
 
-The ray goes from the item toward the wielder's :ref:`Brain.aim_point<class_Brain_property_aim_point>`. A hit on a :ref:`Hurtbox<class_Hurtbox>` scales the effects by its multiplier.
+The ray goes from the item toward the wielder's :ref:`Brain.aim_point<class_Brain_property_aim_point>`. A hit on a :ref:`Hurtbox<class_Hurtbox>` scales the effects by its multiplier and adds its tags. The hit point is recorded in :ref:`EffectContext.position<class_EffectContext_property_position>`, so a :ref:`SpawnSceneEffect<class_SpawnSceneEffect>` can put sparks there. 
+
+For a shotgun, raise :ref:`pellets<class_Hitscan_property_pellets>` and :ref:`spread<class_Hitscan_property_spread>`: every pellet is its own ray and applies the effects by itself.
 
 .. rst-class:: classref-reftable-group
 
@@ -31,6 +33,10 @@ Properties
    | :ref:`float<class_float>`                                | :ref:`max_distance<class_Hitscan_property_max_distance>`     | ``100.0``      |
    +----------------------------------------------------------+--------------------------------------------------------------+----------------+
    | :ref:`int<class_int>`                                    | :ref:`collision_mask<class_Hitscan_property_collision_mask>` | ``4294967295`` |
+   +----------------------------------------------------------+--------------------------------------------------------------+----------------+
+   | :ref:`int<class_int>`                                    | :ref:`pellets<class_Hitscan_property_pellets>`               | ``1``          |
+   +----------------------------------------------------------+--------------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`                                | :ref:`spread<class_Hitscan_property_spread>`                 | ``0.0``        |
    +----------------------------------------------------------+--------------------------------------------------------------+----------------+
    | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] | :ref:`effects<class_Hitscan_property_effects>`               | ``[]``         |
    +----------------------------------------------------------+--------------------------------------------------------------+----------------+
@@ -63,6 +69,30 @@ How far the ray reaches, in metres.
 :ref:`int<class_int>` **collision_mask** = ``4294967295`` :ref:`🔗<class_Hitscan_property_collision_mask>`
 
 Physics layers the shot can hit. Areas on these layers count too, so hurtboxes can be hit. Zones put themselves on no layer, so shots pass through them.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Hitscan_property_pellets:
+
+.. rst-class:: classref-property
+
+:ref:`int<class_int>` **pellets** = ``1`` :ref:`🔗<class_Hitscan_property_pellets>`
+
+Rays per shot. Each applies :ref:`effects<class_Hitscan_property_effects>` to what it hits.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Hitscan_property_spread:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **spread** = ``0.0`` :ref:`🔗<class_Hitscan_property_spread>`
+
+How far, in degrees, a ray may stray from the aim. 0 is perfectly accurate.
 
 .. rst-class:: classref-item-separator
 

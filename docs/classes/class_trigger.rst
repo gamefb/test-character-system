@@ -17,7 +17,9 @@ Decides when the item fires, from the wielder's button presses and the fire rate
 Description
 -----------
 
-Each press of :ref:`action<class_Trigger_property_action>` on the wielder's :ref:`Brain<class_Brain>` fires once, and an automatic item keeps firing while it's held. If a :ref:`Magazine<class_Magazine>` is beside it, each shot takes a round. Delivery components such as :ref:`Hitscan<class_Hitscan>` listen to :ref:`fired<class_Trigger_signal_fired>`.
+Each press of :ref:`action<class_Trigger_property_action>` on the wielder's :ref:`Brain<class_Brain>` fires once, and an automatic item keeps firing while it's held. If a :ref:`Magazine<class_Magazine>` is beside it, each shot takes a round. Delivery components such as :ref:`Hitscan<class_Hitscan>`, :ref:`MeleeSweep<class_MeleeSweep>` and :ref:`Launcher<class_Launcher>` listen to :ref:`fired<class_Trigger_signal_fired>`. 
+
+A stunned or dead wielder can't fire, because its :ref:`Brain<class_Brain>` reports no presses. For a status that stops weapons only, such as Disarmed, use :ref:`blocked_by_tags<class_Trigger_property_blocked_by_tags>`.
 
 .. rst-class:: classref-reftable-group
 
@@ -27,15 +29,17 @@ Properties
 .. table::
    :widths: auto
 
-   +-------------------------------------+--------------------------------------------------------+----------------+
-   | :ref:`StringName<class_StringName>` | :ref:`action<class_Trigger_property_action>`           | ``&"primary"`` |
-   +-------------------------------------+--------------------------------------------------------+----------------+
-   | :ref:`float<class_float>`           | :ref:`fire_rate<class_Trigger_property_fire_rate>`     | ``5.0``        |
-   +-------------------------------------+--------------------------------------------------------+----------------+
-   | :ref:`bool<class_bool>`             | :ref:`automatic<class_Trigger_property_automatic>`     | ``false``      |
-   +-------------------------------------+--------------------------------------------------------+----------------+
-   | :ref:`float<class_float>`           | :ref:`buffer_time<class_Trigger_property_buffer_time>` | ``0.15``       |
-   +-------------------------------------+--------------------------------------------------------+----------------+
+   +------------------------------------------------------------------+----------------------------------------------------------------+----------------+
+   | :ref:`StringName<class_StringName>`                              | :ref:`action<class_Trigger_property_action>`                   | ``&"primary"`` |
+   +------------------------------------------------------------------+----------------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`                                        | :ref:`fire_rate<class_Trigger_property_fire_rate>`             | ``5.0``        |
+   +------------------------------------------------------------------+----------------------------------------------------------------+----------------+
+   | :ref:`bool<class_bool>`                                          | :ref:`automatic<class_Trigger_property_automatic>`             | ``false``      |
+   +------------------------------------------------------------------+----------------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`                                        | :ref:`buffer_time<class_Trigger_property_buffer_time>`         | ``0.15``       |
+   +------------------------------------------------------------------+----------------------------------------------------------------+----------------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`blocked_by_tags<class_Trigger_property_blocked_by_tags>` | ``[]``         |
+   +------------------------------------------------------------------+----------------------------------------------------------------+----------------+
 
 .. rst-class:: classref-section-separator
 
@@ -106,6 +110,18 @@ On: fire while held. Off: one shot per press.
 :ref:`float<class_float>` **buffer_time** = ``0.15`` :ref:`🔗<class_Trigger_property_buffer_time>`
 
 Seconds a press is remembered during cooldown, so fast clicks aren't lost.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Trigger_property_blocked_by_tags:
+
+.. rst-class:: classref-property
+
+:ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] **blocked_by_tags** = ``[]`` :ref:`🔗<class_Trigger_property_blocked_by_tags>`
+
+While the wielder has a status with one of these tags, the item doesn't fire, e.g. &"disarmed".
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

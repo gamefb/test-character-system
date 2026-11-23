@@ -21,6 +21,7 @@ Core
     class_componentmanager
     class_effectcontext
     class_namecheck
+    class_worldevents
 
 Movement
 ========
@@ -45,7 +46,9 @@ Character components
     :name: toc-class-ref-character-components
 
     class_aibrain
+    class_abilities.state
     class_abilities
+    class_attributes
     class_brain
     class_equipment
     class_faction
@@ -54,6 +57,7 @@ Character components
     class_inventory
     class_mouselook
     class_playerbrain
+    class_pool
     class_statuses.activestatus
     class_statuses
     class_weaponswitch
@@ -65,9 +69,12 @@ Item components
     :maxdepth: 1
     :name: toc-class-ref-item-components
 
+    class_grantabilities
+    class_grantmodifiers
     class_grantstatuses
     class_hitscan
     class_itemcomponent
+    class_launcher
     class_magazine
     class_meleesweep
     class_trigger
@@ -80,6 +87,7 @@ World
     :name: toc-class-ref-world
 
     class_effectzone
+    class_projectile
 
 Effects
 =======
@@ -89,10 +97,12 @@ Effects
     :name: toc-class-ref-effects
 
     class_applystatuseffect
+    class_changepooleffect
     class_damageeffect
     class_effect
     class_healeffect
     class_knockbackeffect
+    class_launchprojectileeffect
     class_modifyamounteffect
     class_removestatuseffect
     class_spawnsceneeffect
@@ -104,11 +114,28 @@ Conditions
     :maxdepth: 1
     :name: toc-class-ref-conditions
 
+    class_anycondition
+    class_chancecondition
     class_condition
+    class_damagetypecondition
     class_hastagcondition
     class_healthbelowcondition
+    class_hittagcondition
     class_ishostilecondition
     class_statcondition
+
+Amounts
+=======
+
+.. toctree::
+    :maxdepth: 1
+    :name: toc-class-ref-amounts
+
+    class_amount
+    class_healthamount
+    class_hitamount
+    class_randomamount
+    class_statamount
 
 Resources
 =========

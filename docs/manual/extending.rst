@@ -12,11 +12,14 @@ Ability, status, effect or component?
 
 New gameplay usually fits one of these places:
 
-- An **ability** is one action that happens once per press, then cools down.
+- An **ability** is one action that happens once per press, with a cooldown, a cost and a
+  cast time if you want them.
 - A **status** changes numbers and reacts to events, for a while or as long as something holds
   it.
 - An **effect** is one instant change to a target, such as damage or a knockback. Abilities,
   statuses, weapons and zones all run effects, so a new one works in all four.
+- An **amount** is a number worked out when an effect runs, such as "2 per point of strength".
+  A new one fits every effect that has a number.
 - A **component** is ongoing behaviour with its own memory, running every frame. On an item,
   it's an **item component**.
 - A **movement mode** or **layered move** is a new way for the character to move, under its
@@ -28,7 +31,8 @@ To place a new idea, ask in this order:
 2. Does it change a number, or react to hits or deaths, for a while or while equipped? Make it a
    **status**, which an ability, item or zone can apply.
 3. Is the missing piece one instant change, such as "spawn a puddle"? Write an **effect** and
-   use it in an ability or status.
+   use it in an ability or status. If only the number is missing, such as "more damage the
+   further away the target is", write an **amount** instead.
 4. Does it change how the character moves, such as climbing, gliding or wall jumps? Make it a
    **movement mode** or **layered move**.
 5. Does it need memory between frames or presses, a held button, or a change to how the
@@ -42,22 +46,26 @@ To place a new idea, ask in this order:
      - Good at
      - Limits
    * - Ability
-     - One-off actions such as a heal, a fireball, a dash or applying a buff. Built in the
-       Inspector with no code when the effects exist. Granted or removed during play by
-       changing ``slots``; AI calls ``use()``.
-     - Fires only on a fresh press: nothing while held, on release, charged or channelled. A
-       cooldown is its only cost: no charges, mana, cast time or interruption. Effects are
-       instant, so anything lasting goes through a status. It remembers nothing between uses
-       but its cooldown. Conditions sit on the effects, so a failed one skips its effect but
-       still spends the cooldown.
+     - One-off actions such as a heal, a fireball, a dash or applying a buff, with a cooldown,
+       charges, costs from pools, conditions, a cast time that can be interrupted, and status
+       tags that block it. Built in the Inspector with no code when the effects exist. Granted
+       or removed during play by changing ``slots``, or by an item; AI calls ``use()``.
+     - Starts only on a fresh press: nothing while held or on release, so no charge-up by
+       holding and no channelling. Effects are instant, so anything lasting goes through a
+       status. It remembers nothing between uses but its cooldown and charges.
    * - Status
-     - Stat changes, reactions to events (shields, thorns, burning), immunities and passives.
-       Built in the Inspector. Timed, stacked, or held by items and zones.
-     - Can't read buttons or run every frame, except ticks at ``tick_interval``. Only changes
-       numbers some component already owns.
+     - Stat changes, reactions to events (shields, thorns, crits, life steal, heal on kill),
+       immunities and passives. Built in the Inspector. Timed, stacked, or held by items and
+       zones.
+     - Can't read buttons or run every frame, except ticks at ``tick_interval``. Its triggers
+       have no cooldown of their own.
    * - Effect
      - Instant changes that every source can use. A few lines of code.
      - Remembers nothing: the resource is shared, so per-use values go in the context.
+   * - Amount
+     - A number that depends on who is involved. A few lines of code, and it then works in
+       damage, healing and pool effects alike.
+     - Remembers nothing either. It only returns a number; it can't change anything.
    * - Component
      - Anything that runs every frame, remembers state, reads held buttons, owns stats that
        statuses can change, or needs other components.
@@ -93,10 +101,47 @@ Some examples:
      - Ability
      - Once per press: a :ref:`KnockbackEffect<class_KnockbackEffect>` on the user, then a
        cooldown.
-   * - Being rooted or stunned stops dashing and climbing
+   * - Being rooted stops dashing and climbing
      - Status
      - Give the status a tag, and add the tag to each mode's or move's Blocked By Tags. See
        :ref:`doc_movement_statuses_events_cooldowns`.
+   * - A stun
+     - Status
+     - A status tagged ``stunned`` and nothing else: the :ref:`Brain<class_Brain>` stops on
+       it. ``examples/statuses/stunned.tres``.
+   * - A fireball that costs mana and takes a moment to cast
+     - Ability
+     - Costs, Cast Time and a :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>`.
+       ``examples/abilities/fireball.tres``.
+   * - Damage that grows with strength or level
+     - Setting
+     - A :ref:`StatAmount<class_StatAmount>` in the effect's Scaling, and the stat on an
+       :ref:`Attributes<class_Attributes>` component. See :ref:`doc_amounts`.
+   * - Critical hits
+     - Status
+     - A passive with a ``dealing_damage`` trigger and a
+       :ref:`ChanceCondition<class_ChanceCondition>`. ``examples/statuses/lucky_strikes.tres``.
+   * - Life steal, heal on kill
+     - Status
+     - Triggers on ``dealt_damage`` and ``killed``. ``examples/statuses/vampiric.tres`` and
+       ``bloodlust.tres``.
+   * - A shield that recharges out of combat
+     - Setting
+     - A :ref:`Pool<class_Pool>` with Absorbs Damage, Regen and Regen Delay.
+   * - Mana, stamina, rage
+     - Setting
+     - A :ref:`Pool<class_Pool>` for each.
+   * - A ring with +25 health; loot with random numbers
+     - Item
+     - :ref:`GrantModifiers<class_GrantModifiers>`. See
+       :ref:`doc_stats_and_abilities_from_equipment`.
+   * - A rocket launcher, a bow
+     - Item
+     - A :ref:`Launcher<class_Launcher>` and a :ref:`Projectile<class_Projectile>` scene. See
+       :ref:`doc_projectiles`.
+   * - Experience for kills, a quest that counts deaths
+     - Level script
+     - One :ref:`WorldEvents<class_WorldEvents>` listener. See :ref:`doc_events`.
    * - Shockwave on landing
      - Status
      - A trigger on ``walk_mode_entered``, the event the motor sends on landing.
@@ -119,7 +164,7 @@ Some examples:
      - Changes the fall on top of the air mode while a button is held. See
        :ref:`doc_extending_movement`.
 
-When new behaviour needs code, prefer a new :ref:`Effect<class_Effect>` over a new component where you can: one effect works in abilities, statuses, weapons and zones at once. Most of the grey area comes from the ability limits above. A spell with charges, a mana cost or a charge-up can't be an ability yet, so today it would be a component of its own.
+When new behaviour needs code, prefer a new :ref:`Effect<class_Effect>` over a new component where you can: one effect works in abilities, statuses, weapons and zones at once. Most of the grey area comes from the ability limits above. A spell that charges up while its button is held, or channels until it's let go, can't be an ability, so it would be a component of its own that reads the held button.
 
 .. _doc_extending_checklist:
 
@@ -130,7 +175,9 @@ Before you write a script
   conditions and targeting in the Inspector's resource lists.
 - **Do setup in** ``_start()``, **not** ``_ready()``. ``_start()`` runs once everything in
   ``_requires()`` is present, and never in the editor. Undo in ``_stop()`` whatever ``listen()``
-  doesn't undo for you: stat modifiers, groups, spawned nodes.
+  and ``on()`` don't undo for you: stat modifiers, groups, spawned nodes.
+- **Hear events with** ``on()``. ``on(&"took_damage", _on_took_damage)`` in ``_start()`` calls
+  your method for that event until the component stops. :ref:`doc_events` lists the events.
 - **Look things up when you need them.** ``find(Type)`` for a component beside yours,
   ``Component.of(node, Type)`` for one on another node. Both are cheap, so don't keep the
   result in a variable: components can come and go during play.
@@ -241,13 +288,27 @@ Item components extend :ref:`ItemComponent<class_ItemComponent>`, which adds ``w
 - The effects come from the Inspector, so the same component makes a sword, a burning axe or a
   healing touch.
 
-To make a sword, build an item scene with a :ref:`ComponentManager<class_ComponentManager>`, a Trigger and a MeleeSweep with a BoxShape3D about a metre across and a :ref:`DamageEffect<class_DamageEffect>` in its effects. A projectile weapon would follow the same pattern: on ``fired``, spawn a projectile scene, give it the effects, and have it apply them to what it touches.
+To make a sword, build an item scene with a :ref:`ComponentManager<class_ComponentManager>`, a Trigger and a MeleeSweep with a BoxShape3D about a metre across and a :ref:`DamageEffect<class_DamageEffect>` in its effects. A projectile weapon follows the same pattern: :ref:`Launcher<class_Launcher>` listens to ``fired`` and launches a :ref:`Projectile<class_Projectile>`, which applies the effects to what it touches; see :ref:`doc_projectiles`.
 
 **One that changes the wielder while equipped** finds what it needs in ``_start()`` and undoes everything in ``_stop()``, which runs on unequip. :ref:`Scope<class_Scope>` zooms the wielder's camera and slows it down while the aim button is held:
 
 .. source-file:: ../../character_system/examples/scripts/scope.gd
 
 Whatever an item changes on its wielder must be undone in ``_stop()``. A stat modifier left on the wielder's manager would slow the character for the rest of the game.
+
+An item component hears its wielder's events by passing the wielder to ``on()``, and that is undone on unequip like everything else:
+
+.. code-block:: gdscript
+
+    class_name KillCounter
+    extends ItemComponent
+    ## Counts this copy's kills, e.g. for a weapon that names itself after ten.
+
+    func _start() -> void:
+    	on(&"killed", _on_wielder_killed, 0, wielder)
+
+    func _on_wielder_killed(_ctx: EffectContext) -> void:
+    	item.state[&"kills"] = item.state.get(&"kills", 0) + 1  # Kept between equips.
 
 .. _doc_extending_effect:
 
@@ -265,7 +326,23 @@ An effect extends :ref:`Effect<class_Effect>` and overrides ``_execute(ctx)``. :
   such as a zone's ``body_entered``, where new areas can't be added yet.
 - It stores nothing on itself between uses.
 
-Conditions work on every effect without any code: put one in its ``conditions`` and the effect only runs when it passes. Effects that deal damage should scale by ``ctx.magnitude``, so status stacks and headshots strengthen them, as :ref:`DamageEffect<class_DamageEffect>` does.
+Conditions work on every effect without any code: put one in its ``conditions`` and the effect only runs when it passes. Effects that deal damage should scale by ``ctx.magnitude``, so status stacks and headshots strengthen them, as :ref:`DamageEffect<class_DamageEffect>` does. An effect with a number can take a ``scaling`` list too, in one line: ``Amount.total(amount, scaling, ctx)`` is the plain number plus every :ref:`Amount<class_Amount>` in the list.
+
+.. _doc_extending_amount:
+
+An amount
+---------
+
+An amount extends :ref:`Amount<class_Amount>` and overrides ``value(ctx)``. :ref:`StatAmount<class_StatAmount>` reads a stat from one side of the effect and multiplies it:
+
+.. source-file:: ../../character_system/resources/amounts/stat_amount.gd
+
+- ``ctx.source`` and ``ctx.target`` may be null or have no components.
+  ``ComponentManager.stat_of()`` returns 0 for those, so the amount adds nothing.
+- It keeps nothing between uses, like an effect.
+- It's read when the effect runs, so a stat that changed a moment ago already counts.
+
+The :ref:`Amount<class_Amount>` reference has a short one of your own to copy, which grows with distance.
 
 To make a water spell, give an ability two effects: an :ref:`ApplyStatusEffect<class_ApplyStatusEffect>` with Wet, and a SpawnSceneEffect with ``examples/zones/water_pool.tscn`` and a lifetime of 10 seconds.
 
@@ -337,9 +414,19 @@ None of these need a change to the system:
   component reads it with ``stat()``.
 - **A damage type** is any name in :ref:`DamageEffect<class_DamageEffect>`'s ``type``, such as
   ``lightning``. Resistance to it is the ``resist_lightning`` stat: add it to
-  :ref:`Health<class_Health>`'s resistances, or give it to a status as a modifier.
+  :ref:`Health<class_Health>`'s resistances, or give it to a status as a modifier. Extra
+  damage dealt with it is the ``bonus_lightning`` stat.
+- **A stat of your game's own**, such as ``strength``, doesn't even need a component of
+  yours: list it on an :ref:`Attributes<class_Attributes>` component in the Inspector.
+- **A pool** is a :ref:`Pool<class_Pool>` component with a name of your choosing, such as
+  ``energy``. Abilities spend it through their costs, and its two stats are ``max_energy``
+  and ``energy_regen``.
 - **An event** is any name sent with ``ComponentManager.notify(host, &"dodged")``. Status
-  triggers with that event react to it, and components hear it in ``_on_event()``.
+  triggers with that event react to it, and components hear it with
+  ``on(&"dodged", _on_dodged)``.
+- **A hit tag** is any name in a :ref:`Hurtbox<class_Hurtbox>`'s or a
+  :ref:`DamageEffect<class_DamageEffect>`'s tags, such as ``head`` or ``melee``. A
+  :ref:`HitTagCondition<class_HitTagCondition>` tests it.
 - **An input action** is added in the Input Map and to the
   :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions. Components then read it from the brain,
   and AI presses it with ``press()``.

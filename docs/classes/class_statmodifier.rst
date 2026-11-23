@@ -17,9 +17,15 @@ A change to one stat while it's applied.
 Description
 -----------
 
-A stat's value is (base + all adds) × all muls. The base comes from the component that owns the stat in :ref:`Component._stats()<class_Component_private_method__stats>`. Statuses apply theirs once per stack; see :ref:`StatusData.modifiers<class_StatusData_property_modifiers>`.
+A stat's value is (base + all adds) × (1 + all percents) × all muls. The base comes from the component that owns the stat in :ref:`Component._stats()<class_Component_private_method__stats>`. Statuses apply theirs once per stack; see :ref:`StatusData.modifiers<class_StatusData_property_modifiers>`.
 
-The built-in stats are ``max_health``, ``move_speed``, ``jump_velocity``, ``air_jumps`` and ``resist_<type>`` (e.g. ``resist_fire``, where 1 means immune). Your own components add more through :ref:`Component._stats()<class_Component_private_method__stats>`. Use a negative :ref:`add<class_StatModifier_property_add>` or a :ref:`mul<class_StatModifier_property_mul>` below 1 for penalties. A stat no component owns has nothing to change, so the modifier does nothing (the editor warns about the name).
+
+
+\ **Which field to use.** :ref:`add<class_StatModifier_property_add>` for flat changes ("+20 max health"). :ref:`percent<class_StatModifier_property_percent>` for bonuses that should add up ("+10% speed" on three items is +30%). :ref:`mul<class_StatModifier_property_mul>` for changes that should apply to everything else ("half speed while aiming").
+
+
+
+The built-in stats are ``max_health``, ``move_speed``, ``jump_velocity``, ``air_jumps``, ``cooldown_speed``, ``resist_<type>`` (e.g. ``resist_fire``, where 1 means immune) and ``bonus_<type>`` (e.g. ``bonus_fire``, where 0.2 means 20% more fire damage dealt). A :ref:`Pool<class_Pool>` adds ``max_<pool>`` and ``<pool>_regen``, an :ref:`Attributes<class_Attributes>` component adds any you list on it, and your own components add more through :ref:`Component._stats()<class_Component_private_method__stats>`.
 
 .. rst-class:: classref-reftable-group
 
@@ -29,13 +35,17 @@ Properties
 .. table::
    :widths: auto
 
-   +-------------------------------------+-----------------------------------------------+---------+
-   | :ref:`StringName<class_StringName>` | :ref:`stat<class_StatModifier_property_stat>` |         |
-   +-------------------------------------+-----------------------------------------------+---------+
-   | :ref:`float<class_float>`           | :ref:`add<class_StatModifier_property_add>`   | ``0.0`` |
-   +-------------------------------------+-----------------------------------------------+---------+
-   | :ref:`float<class_float>`           | :ref:`mul<class_StatModifier_property_mul>`   | ``1.0`` |
-   +-------------------------------------+-----------------------------------------------+---------+
+   +----------------------------------------------------------------+-----------------------------------------------------------+---------+
+   | :ref:`StringName<class_StringName>`                            | :ref:`stat<class_StatModifier_property_stat>`             |         |
+   +----------------------------------------------------------------+-----------------------------------------------------------+---------+
+   | :ref:`float<class_float>`                                      | :ref:`add<class_StatModifier_property_add>`               | ``0.0`` |
+   +----------------------------------------------------------------+-----------------------------------------------------------+---------+
+   | :ref:`float<class_float>`                                      | :ref:`percent<class_StatModifier_property_percent>`       | ``0.0`` |
+   +----------------------------------------------------------------+-----------------------------------------------------------+---------+
+   | :ref:`float<class_float>`                                      | :ref:`mul<class_StatModifier_property_mul>`               | ``1.0`` |
+   +----------------------------------------------------------------+-----------------------------------------------------------+---------+
+   | :ref:`Array<class_Array>`\[:ref:`Condition<class_Condition>`\] | :ref:`conditions<class_StatModifier_property_conditions>` | ``[]``  |
+   +----------------------------------------------------------------+-----------------------------------------------------------+---------+
 
 .. rst-class:: classref-section-separator
 
@@ -70,13 +80,37 @@ Added to the base value.
 
 ----
 
+.. _class_StatModifier_property_percent:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **percent** = ``0.0`` :ref:`🔗<class_StatModifier_property_percent>`
+
+Percentage added: 0.1 is 10% more, -0.1 is 10% less. Percentages from every modifier of the stat add up before they're applied.
+
+.. rst-class:: classref-item-separator
+
+----
+
 .. _class_StatModifier_property_mul:
 
 .. rst-class:: classref-property
 
 :ref:`float<class_float>` **mul** = ``1.0`` :ref:`🔗<class_StatModifier_property_mul>`
 
-Multiplies the total. 1.5 = +50%.
+Multiplies the total. 1.5 = +50%, 0 = none at all.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_StatModifier_property_conditions:
+
+.. rst-class:: classref-property
+
+:ref:`Array<class_Array>`\[:ref:`Condition<class_Condition>`\] **conditions** = ``[]`` :ref:`🔗<class_StatModifier_property_conditions>`
+
+The modifier only counts while all of these pass, e.g. a :ref:`HealthBelowCondition<class_HealthBelowCondition>` for "faster while badly hurt". They're checked on the character that has the modifier, each time the stat is read. :ref:`ComponentManager.stat_changed<class_ComponentManager_signal_stat_changed>` isn't emitted when one flips, so UI that shows such a stat should read it every frame.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

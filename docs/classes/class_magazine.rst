@@ -17,7 +17,7 @@ Limits shots to :ref:`capacity<class_Magazine_property_capacity>` and reloads fr
 Description
 -----------
 
-Rounds are kept in :ref:`ItemInstance.state<class_ItemInstance_property_state>`, so they survive unequipping and switching.
+Rounds are kept in :ref:`ItemInstance.state<class_ItemInstance_property_state>`, so they survive unequipping and switching. With a :ref:`reload_time<class_Magazine_property_reload_time>`, the item can't fire until the reload is done, and switching weapons mid-reload loses it.
 
 .. rst-class:: classref-reftable-group
 
@@ -27,13 +27,17 @@ Properties
 .. table::
    :widths: auto
 
-   +---------------------------------+---------------------------------------------------+--------+
-   | :ref:`ItemData<class_ItemData>` | :ref:`ammo<class_Magazine_property_ammo>`         |        |
-   +---------------------------------+---------------------------------------------------+--------+
-   | :ref:`int<class_int>`           | :ref:`capacity<class_Magazine_property_capacity>` | ``30`` |
-   +---------------------------------+---------------------------------------------------+--------+
-   | :ref:`int<class_int>`           | :ref:`rounds<class_Magazine_property_rounds>`     |        |
-   +---------------------------------+---------------------------------------------------+--------+
+   +---------------------------------+---------------------------------------------------------+-----------+
+   | :ref:`ItemData<class_ItemData>` | :ref:`ammo<class_Magazine_property_ammo>`               |           |
+   +---------------------------------+---------------------------------------------------------+-----------+
+   | :ref:`int<class_int>`           | :ref:`capacity<class_Magazine_property_capacity>`       | ``30``    |
+   +---------------------------------+---------------------------------------------------------+-----------+
+   | :ref:`float<class_float>`       | :ref:`reload_time<class_Magazine_property_reload_time>` | ``0.0``   |
+   +---------------------------------+---------------------------------------------------------+-----------+
+   | :ref:`bool<class_bool>`         | :ref:`auto_reload<class_Magazine_property_auto_reload>` | ``false`` |
+   +---------------------------------+---------------------------------------------------------+-----------+
+   | :ref:`int<class_int>`           | :ref:`rounds<class_Magazine_property_rounds>`           |           |
+   +---------------------------------+---------------------------------------------------------+-----------+
 
 .. rst-class:: classref-reftable-group
 
@@ -43,11 +47,13 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------+---------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`take<class_Magazine_method_take>`\ (\ )     |
-   +-------------------------+---------------------------------------------------+
-   | |void|                  | :ref:`reload<class_Magazine_method_reload>`\ (\ ) |
-   +-------------------------+---------------------------------------------------+
+   +-------------------------+---------------------------------------------------------------+
+   | :ref:`bool<class_bool>` | :ref:`is_reloading<class_Magazine_method_is_reloading>`\ (\ ) |
+   +-------------------------+---------------------------------------------------------------+
+   | :ref:`bool<class_bool>` | :ref:`take<class_Magazine_method_take>`\ (\ )                 |
+   +-------------------------+---------------------------------------------------------------+
+   | |void|                  | :ref:`reload<class_Magazine_method_reload>`\ (\ )             |
+   +-------------------------+---------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -66,6 +72,30 @@ Signals
 
 Emitted when the rounds loaded change: a shot or a reload.
 
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Magazine_signal_reload_started:
+
+.. rst-class:: classref-signal
+
+**reload_started**\ (\ ) :ref:`🔗<class_Magazine_signal_reload_started>`
+
+Emitted when a reload with a :ref:`reload_time<class_Magazine_property_reload_time>` begins, e.g. to play an animation.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Magazine_signal_reload_finished:
+
+.. rst-class:: classref-signal
+
+**reload_finished**\ (\ ) :ref:`🔗<class_Magazine_signal_reload_finished>`
+
+Emitted when the rounds from a reload are loaded.
+
 .. rst-class:: classref-section-separator
 
 ----
@@ -81,7 +111,7 @@ Property Descriptions
 
 :ref:`ItemData<class_ItemData>` **ammo** :ref:`🔗<class_Magazine_property_ammo>`
 
-The ammo item used to reload.
+The ammo item used to reload. Leave empty for a weapon that reloads for free.
 
 .. rst-class:: classref-item-separator
 
@@ -94,6 +124,30 @@ The ammo item used to reload.
 :ref:`int<class_int>` **capacity** = ``30`` :ref:`🔗<class_Magazine_property_capacity>`
 
 Rounds a full magazine holds.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Magazine_property_reload_time:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **reload_time** = ``0.0`` :ref:`🔗<class_Magazine_property_reload_time>`
+
+Seconds a reload takes. 0 is instant.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Magazine_property_auto_reload:
+
+.. rst-class:: classref-property
+
+:ref:`bool<class_bool>` **auto_reload** = ``false`` :ref:`🔗<class_Magazine_property_auto_reload>`
+
+Reload by itself when the trigger is pulled on an empty magazine.
 
 .. rst-class:: classref-item-separator
 
@@ -121,13 +175,25 @@ Rounds loaded. Kept in item.state, so it survives unequipping.
 Method Descriptions
 -------------------
 
+.. _class_Magazine_method_is_reloading:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **is_reloading**\ (\ ) :ref:`🔗<class_Magazine_method_is_reloading>`
+
+True while a reload with a :ref:`reload_time<class_Magazine_property_reload_time>` is under way.
+
+.. rst-class:: classref-item-separator
+
+----
+
 .. _class_Magazine_method_take:
 
 .. rst-class:: classref-method
 
 :ref:`bool<class_bool>` **take**\ (\ ) :ref:`🔗<class_Magazine_method_take>`
 
-Uses one round. Returns false when empty.
+Uses one round. Returns false when empty or reloading.
 
 .. rst-class:: classref-item-separator
 
@@ -139,7 +205,7 @@ Uses one round. Returns false when empty.
 
 |void| **reload**\ (\ ) :ref:`🔗<class_Magazine_method_reload>`
 
-Refills from the wielder's :ref:`Inventory<class_Inventory>`. Wielders without one (most AI) reload for free.
+Refills from the wielder's :ref:`Inventory<class_Inventory>`. Wielders without one (most AI) reload for free, and so does a magazine without an :ref:`ammo<class_Magazine_property_ammo>` item. With a :ref:`reload_time<class_Magazine_property_reload_time>` the rounds arrive when it has passed. Does nothing if the magazine is full, there's no ammo to load, or a reload is already under way.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

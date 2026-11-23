@@ -27,19 +27,25 @@ Properties
 .. table::
    :widths: auto
 
-   +---------------------------------------+-----------------------------------------------------------+-------+
-   | :ref:`StringName<class_StringName>`   | :ref:`id<class_ItemData_property_id>`                     |       |
-   +---------------------------------------+-----------------------------------------------------------+-------+
-   | :ref:`String<class_String>`           | :ref:`display_name<class_ItemData_property_display_name>` |       |
-   +---------------------------------------+-----------------------------------------------------------+-------+
-   | :ref:`Texture2D<class_Texture2D>`     | :ref:`icon<class_ItemData_property_icon>`                 |       |
-   +---------------------------------------+-----------------------------------------------------------+-------+
-   | :ref:`int<class_int>`                 | :ref:`max_stack<class_ItemData_property_max_stack>`       | ``1`` |
-   +---------------------------------------+-----------------------------------------------------------+-------+
-   | :ref:`StringName<class_StringName>`   | :ref:`slot<class_ItemData_property_slot>`                 |       |
-   +---------------------------------------+-----------------------------------------------------------+-------+
-   | :ref:`PackedScene<class_PackedScene>` | :ref:`scene<class_ItemData_property_scene>`               |       |
-   +---------------------------------------+-----------------------------------------------------------+-------+
+   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
+   | :ref:`StringName<class_StringName>`                      | :ref:`id<class_ItemData_property_id>`                           |          |
+   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
+   | :ref:`String<class_String>`                              | :ref:`display_name<class_ItemData_property_display_name>`       |          |
+   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
+   | :ref:`Texture2D<class_Texture2D>`                        | :ref:`icon<class_ItemData_property_icon>`                       |          |
+   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
+   | :ref:`String<class_String>`                              | :ref:`description<class_ItemData_property_description>`         |          |
+   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
+   | :ref:`int<class_int>`                                    | :ref:`max_stack<class_ItemData_property_max_stack>`             | ``1``    |
+   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
+   | :ref:`StringName<class_StringName>`                      | :ref:`slot<class_ItemData_property_slot>`                       |          |
+   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
+   | :ref:`PackedScene<class_PackedScene>`                    | :ref:`scene<class_ItemData_property_scene>`                     |          |
+   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
+   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] | :ref:`use_effects<class_ItemData_property_use_effects>`         | ``[]``   |
+   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
+   | :ref:`bool<class_bool>`                                  | :ref:`consumed_on_use<class_ItemData_property_consumed_on_use>` | ``true`` |
+   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
 
 .. rst-class:: classref-section-separator
 
@@ -86,6 +92,18 @@ For your inventory and HUD. The system doesn't use it.
 
 ----
 
+.. _class_ItemData_property_description:
+
+.. rst-class:: classref-property
+
+:ref:`String<class_String>` **description** :ref:`🔗<class_ItemData_property_description>`
+
+Tooltip text for your UI.
+
+.. rst-class:: classref-item-separator
+
+----
+
 .. _class_ItemData_property_max_stack:
 
 .. rst-class:: classref-property
@@ -117,6 +135,30 @@ How many fit in one inventory stack. Use 1 for items with their own state, such 
 :ref:`PackedScene<class_PackedScene>` **scene** :ref:`🔗<class_ItemData_property_scene>`
 
 Spawned when equipped. Its root is the model, with a :ref:`ComponentManager<class_ComponentManager>` and the :ref:`ItemComponent<class_ItemComponent>`\ s that decide what the item does as children.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ItemData_property_use_effects:
+
+.. rst-class:: classref-property
+
+:ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] **use_effects** = ``[]`` :ref:`🔗<class_ItemData_property_use_effects>`
+
+Run in order on the character that uses the item with :ref:`Inventory.use()<class_Inventory_method_use>`, e.g. a :ref:`HealEffect<class_HealEffect>` for a health potion or an :ref:`ApplyStatusEffect<class_ApplyStatusEffect>` for a strength elixir. Leave empty for items that can't be used this way.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ItemData_property_consumed_on_use:
+
+.. rst-class:: classref-property
+
+:ref:`bool<class_bool>` **consumed_on_use** = ``true`` :ref:`🔗<class_ItemData_property_consumed_on_use>`
+
+On: one is taken from the stack each time it's used. Off: it can be used again and again, e.g. a horn.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

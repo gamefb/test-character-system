@@ -10,7 +10,7 @@ ItemComponent
 
 **Inherits:** :ref:`Component<class_Component>` **<** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`GrantStatuses<class_GrantStatuses>`, :ref:`Hitscan<class_Hitscan>`, :ref:`Magazine<class_Magazine>`, :ref:`MeleeSweep<class_MeleeSweep>`, :ref:`Scope<class_Scope>`, :ref:`Trigger<class_Trigger>`
+**Inherited By:** :ref:`GrantAbilities<class_GrantAbilities>`, :ref:`GrantModifiers<class_GrantModifiers>`, :ref:`GrantStatuses<class_GrantStatuses>`, :ref:`Hitscan<class_Hitscan>`, :ref:`Launcher<class_Launcher>`, :ref:`Magazine<class_Magazine>`, :ref:`MeleeSweep<class_MeleeSweep>`, :ref:`Scope<class_Scope>`, :ref:`Trigger<class_Trigger>`
 
 Base class for components inside an item scene.
 
@@ -57,6 +57,18 @@ Properties
    | :ref:`Brain<class_Brain>`               | :ref:`brain<class_ItemComponent_property_brain>`     |
    +-----------------------------------------+------------------------------------------------------+
 
+.. rst-class:: classref-reftable-group
+
+Methods
+-------
+
+.. table::
+   :widths: auto
+
+   +-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>` | :ref:`wielder_has_tag<class_ItemComponent_method_wielder_has_tag>`\ (\ tags\: :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]\ ) |
+   +-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
+
 .. rst-class:: classref-section-separator
 
 ----
@@ -101,6 +113,23 @@ The copy being used. Keep per-copy state, such as rounds loaded, in item.state.
 - :ref:`Brain<class_Brain>` **@brain_getter**\ (\ )
 
 The wielder's :ref:`Brain<class_Brain>`, for reading aim and button presses.
+
+.. rst-class:: classref-section-separator
+
+----
+
+.. rst-class:: classref-descriptions-group
+
+Method Descriptions
+-------------------
+
+.. _class_ItemComponent_method_wielder_has_tag:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **wielder_has_tag**\ (\ tags\: :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]\ ) :ref:`🔗<class_ItemComponent_method_wielder_has_tag>`
+
+True while the wielder has a status with one of ``tags``, e.g. to stop the item working while its wielder is disarmed.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

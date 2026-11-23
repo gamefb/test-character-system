@@ -53,6 +53,7 @@ GROUPS = [
     ("World", "character_system/world/"),
     ("Effects", "character_system/resources/effects/"),
     ("Conditions", "character_system/resources/conditions/"),
+    ("Amounts", "character_system/resources/amounts/"),
     ("Resources", "character_system/resources/"),
     ("Examples", "character_system/examples/"),
 ]
