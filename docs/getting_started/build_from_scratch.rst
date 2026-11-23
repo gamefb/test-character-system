@@ -708,6 +708,10 @@ character.
      - static
      - Builds the ``EffectContext``: resolves a hurtbox to its character, sets ``magnitude``
        and ``tags``, and records where the hit landed.
+   * - ``raycast(space, query)`` / ``stops_shots(collider)``
+     - static
+     - The ray every shot, projectile and crosshair uses. It casts again past anything
+       ``stops_shots()`` says no to: areas that aren't hurtboxes, and dead characters.
    * - ``rids_of(character)``
      - static
      - The body and hurtbox RIDs, so a character's own shots ignore them. It searches the
@@ -1058,7 +1062,8 @@ Brain.
    * - ``Hitscan``
      - ``max_distance``, ``collision_mask``, ``pellets``, ``spread``, ``effects``
      - ``_requires()`` returns ``[Trigger]``; ``_start()`` keeps ``Hurtbox.rids_of(wielder)``;
-       on ``fired``, for each pellet raycast toward ``brain.aim_point`` excluding those RIDs,
+       on ``fired``, for each pellet ``Hurtbox.raycast()`` toward ``brain.aim_point``
+       excluding those RIDs,
        build the context with ``Hurtbox.hit()``, then ``Effect.apply_all``
    * - ``Grants``
      - ``statuses``, ``modifiers``, ``abilities: Dictionary[action, AbilityData]``

@@ -334,6 +334,9 @@ See `items/rifle.tres`. More to set in the Inspector:
   HIT_POINT. See `items/marksman_rifle.tres`.
 - **Headshots:** nothing on the weapon. Give the target a Hurtbox on its head with
   **Multiplier** 2.
+- **What a shot stops at:** the first body or Hurtbox on the layers in the Hitscan's
+  **Collision Mask**. It passes through other areas, such as trigger volumes, and through
+  dead characters.
 - **Something for the shooter on each shot**, such as a status that slows them while
   firing: the Trigger's **User Effects**.
 

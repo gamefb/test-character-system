@@ -79,7 +79,14 @@ A :ref:`Hurtbox<class_Hurtbox>` is an optional ``Area3D`` on a character, such a
 
 The tags end up on the hit, where a :ref:`HitCondition<class_HitCondition>` tests them: a head hurtbox tagged ``head`` lets a status give a bonus for headshots, set them alight or count them, with no code. The hit also records where it landed in ``position`` and ``normal``, so a :ref:`SpawnSceneEffect<class_SpawnSceneEffect>` with ``at`` set to ``HIT_POINT`` puts sparks or a decal there.
 
-Shots are physics rays, so collision layers decide what they can hit. ``Hitscan.collision_mask`` lists the layers a weapon hits, every layer by default; untick layers in the inspector to make, for example, a rifle that ignores a turrets layer. The ray also hits areas, which is how hurtboxes get hit. :ref:`EffectZone<class_EffectZone>` therefore sets its own layer to 0, so shots and AI sight lines pass through fire patches and pools. A zone still detects bodies, because detection uses its mask, not its layer.
+Shots are physics rays, so collision layers decide what they can hit. ``Hitscan.collision_mask`` lists the layers a weapon hits, every layer by default; untick layers in the inspector to make, for example, a rifle that ignores a turrets layer.
+
+Within those layers, a shot stops at the first body or :ref:`Hurtbox<class_Hurtbox>` in its way, and passes through two things that would otherwise soak it up:
+
+-  **Areas that aren't hurtboxes.** Trigger volumes, door sensors, an enemy's detection range and :ref:`EffectZone<class_EffectZone>`\ s never stop a shot, whatever layer they are on.
+-  **Dead characters.** A body or hurtbox whose character's :ref:`Health<class_Health>` is dead is passed through until it is revived, so a corpse is not cover.
+
+Projectiles in flight and the player's crosshair follow the same two rules, because all three use one ray, ``Hurtbox.raycast()``. To make corpses block again, or to let shots through something else, that function's ``stops_shots()`` is the one place to change. Melee swings and blasts take everything inside a shape, so nothing blocks them; a :ref:`DamageEffect<class_DamageEffect>` leaves the dead alone either way.
 
 A weapon's own wielder is never hit: :ref:`Hitscan<class_Hitscan>` collects the wielder's body and hurtboxes once, when the weapon is equipped, and every shot passes through them.
 
@@ -105,7 +112,7 @@ A :ref:`Projectile<class_Projectile>` is a shot that takes time to arrive: a roc
 .. source-file:: ../../character_system/kit/effects/launch_projectile_effect.gd
 
 -  **One effect launches it.** A :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` launches from whoever caused the effect, toward their aim. In an ability's effects it throws a fireball; in a :ref:`Trigger<class_Trigger>`'s ``user_effects``, which run on the wielder at each shot, it makes a rocket launcher or a bow. Code calls ``Projectile.launch()``.
--  **It moves with a ray.** Each physics frame it casts a ray from where it is to where it will be, so a fast projectile can't pass through a thin wall, and it hits hurtboxes as :ref:`Hitscan<class_Hitscan>` does. It never hits whoever launched it directly.
+-  **It moves with a ray.** Each physics frame it casts a ray from where it is to where it will be, so a fast projectile can't pass through a thin wall, and it hits and passes through the same things a :ref:`Hitscan<class_Hitscan>` shot does. It never hits whoever launched it directly.
 -  **The launcher hands over effects.** The effect's ``effects`` run on what the projectile hits, before the projectile scene's own, so one rocket scene can serve several weapons with different damage.
 -  **A blast is a second list.** With a ``blast_radius``, ``blast_effects`` run on everything in range of the impact, once per character, including what was hit and, unless a condition says otherwise, the shooter. ``blast_edge_strength`` fades it toward the edge through ``magnitude``. Put an :ref:`IsHostileCondition<class_IsHostileCondition>` on a blast effect to spare allies.
 -  **It outlives its launcher.** The projectile is added to the level, and its hits credit the launcher as ``source`` and the weapon or ability as ``origin``, so kills are attributed even if the weapon was put away meanwhile.

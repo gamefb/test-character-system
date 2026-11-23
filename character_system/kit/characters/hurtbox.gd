@@ -6,6 +6,12 @@ extends Area3D
 ## Characters without hurtboxes are hit through their own body collider. [member multiplier]
 ## scales effects that land here, e.g. 2 for headshots, and [member tags] label the hit so
 ## statuses can react to it ("headshots set the target alight").
+##
+## It also holds the ray that every shot uses, [method raycast], which decides what a shot
+## stops at.
+
+## How many things one ray can pass through before it gives up.
+const MAX_PASSED_THROUGH := 32
 
 ## The character this belongs to. Defaults to the scene root.
 @export var character: Node
@@ -32,6 +38,32 @@ static func hit(source: Variant, collider: Object, origin: Resource = null,
 	ctx.position = position
 	ctx.normal = normal
 	return ctx
+
+
+## Casts the ray of [param query] and returns the first thing a shot stops at, in the form
+## [method PhysicsDirectSpaceState3D.intersect_ray] uses, or an empty dictionary. The ray
+## passes through what [method stops_shots] says no to: areas that aren't hurtboxes, and the
+## dead. [Hitscan], [Projectile] and the [PlayerBrain]'s aim all look through this.
+static func raycast(space: PhysicsDirectSpaceState3D,
+		query: PhysicsRayQueryParameters3D) -> Dictionary:
+	query.collide_with_areas = true  # Hurtboxes are areas.
+	for i in MAX_PASSED_THROUGH:
+		var found: Dictionary = space.intersect_ray(query)
+		if not found or stops_shots(found.collider):
+			return found
+		query.exclude += [found.rid]
+	return {}
+
+
+## Whether a shot stops at [param collider]. A [Hurtbox] and a body do, unless their character
+## is dead. Any other area doesn't, so trigger volumes and detection ranges never soak up
+## shots. A wall has no [Health], so it always does.
+static func stops_shots(collider: Object) -> bool:
+	if collider is Area3D and not collider is Hurtbox:
+		return false
+	var health := Component.of(collider.character if collider is Hurtbox else collider,
+			Health) as Health
+	return not (health and health.is_dead())
 
 
 ## RIDs of a character's body and hurtboxes, so its own shots can ignore them. It searches the

@@ -73,6 +73,16 @@ func test_the_aim_point_is_what_the_crosshair_is_on() -> void:
 	brain.aim_mask = 0
 	await frames()
 	assert_almost_eq(brain.aim_point.z, -PlayerBrain.AIM_DISTANCE, 0.01, "a layer aimed through")
+	brain.aim_mask = 0xffffffff
+	wall.queue_free()
+	var volume := Area3D.new()
+	volume.add_child(CollisionShape3D.new())
+	(volume.get_child(0) as CollisionShape3D).shape = BoxShape3D.new()
+	volume.position = Vector3(0, 1.6, -5)
+	add_child_autofree(volume)
+	await frames()
+	assert_almost_eq(brain.aim_point.z, -PlayerBrain.AIM_DISTANCE, 0.01,
+			"an area that isn't a hurtbox is aimed through, as shots pass through it")
 
 
 func test_a_camera_behind_the_character_aims_from_the_character() -> void:

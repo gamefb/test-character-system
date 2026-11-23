@@ -1,5 +1,5 @@
 extends GutTest
-## Hitscan, ability cooldowns on game time, and teams as Godot groups.
+## Hitscan, what shots pass through, ability cooldowns on game time, and teams as Godot groups.
 
 const EX := "res://character_system/examples/"
 
@@ -42,6 +42,62 @@ func test_hitscan_hits_the_target_and_not_its_wielder() -> void:
 	await pull_trigger(shooter)
 	assert_eq((Component.of(target, Health) as Health).current, 90.0)
 	assert_eq((Component.of(shooter, Health) as Health).current, 100.0, "its own body is skipped")
+
+
+func trigger_volume(position: Vector3) -> Area3D:
+	var area := Area3D.new()
+	var shape := CollisionShape3D.new()
+	shape.shape = BoxShape3D.new()
+	(shape.shape as BoxShape3D).size = Vector3(4, 4, 1)
+	area.add_child(shape)
+	area.position = position
+	add_child_autofree(area)
+	return area
+
+
+func test_shots_pass_through_plain_areas_and_the_dead() -> void:
+	var shooter: CharacterBody3D = make_character()
+	var target: CharacterBody3D = make_character(Vector3(0, 0, -12))
+	trigger_volume(Vector3(0, 1, -4))
+	var corpse: CharacterBody3D = make_character(Vector3(0, 0, -8))
+	var head := Hurtbox.new()
+	head.character = corpse
+	head.add_child(CollisionShape3D.new())
+	(head.get_child(0) as CollisionShape3D).shape = SphereShape3D.new()
+	corpse.add_child(head)
+	head.position = Vector3(0, 1, 1)  # In front of the corpse, on the line of fire.
+	(Component.of(corpse, Health) as Health).change(-1000.0)
+	# The target has a detection range around it that isn't a hurtbox.
+	target.add_child(trigger_volume(Vector3.ZERO).duplicate())
+	var rifle: ItemData = load(EX + "items/rifle.tres")
+	(Component.of(shooter, Equipment) as Equipment).equip(ItemInstance.new(rifle))
+	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP
+	await get_tree().physics_frame
+	await pull_trigger(shooter)
+	assert_eq((Component.of(target, Health) as Health).current, 90.0,
+			"through the area, the dead body, its hurtbox and the target's own area")
+	(Component.of(corpse, Health) as Health).revive()
+	await get_tree().create_timer(0.3).timeout  # The rifle's cooldown.
+	await pull_trigger(shooter)
+	assert_eq((Component.of(corpse, Health) as Health).current, 90.0, "the living stop shots")
+	assert_eq((Component.of(target, Health) as Health).current, 90.0)
+
+
+func test_projectiles_pass_through_plain_areas_and_the_dead() -> void:
+	var shooter: CharacterBody3D = make_character()
+	var target: CharacterBody3D = make_character(Vector3(0, 0, -12))
+	trigger_volume(Vector3(0, 1, -4))
+	var corpse: CharacterBody3D = make_character(Vector3(0, 0, -8))
+	(Component.of(corpse, Health) as Health).change(-1000.0)
+	await get_tree().physics_frame
+	var hit := DamageEffect.new()
+	hit.amount = 15.0
+	var scene := PackedScene.new()
+	scene.pack(Projectile.new())
+	Projectile.launch(scene, shooter, Vector3(0, 1, -1), Vector3(0, 1, -12), [hit])
+	for i in 40:
+		await get_tree().physics_frame
+	assert_eq((Component.of(target, Health) as Health).current, 85.0)
 
 
 func test_hits_say_which_item_dealt_them() -> void:
