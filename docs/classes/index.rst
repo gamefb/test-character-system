@@ -17,34 +17,19 @@ Core
     :maxdepth: 1
     :name: toc-class-ref-core
 
-    class_abilities.state
-    class_abilities
-    class_abilitydata
     class_amount
     class_applystatuseffect
-    class_brain
-    class_charactermotor
     class_component
     class_componentmanager
     class_condition
     class_damageeffect
     class_effect
     class_effectcontext
-    class_equipment
     class_hastagcondition
     class_healeffect
     class_health
-    class_hurtbox
-    class_inventory
-    class_itemcomponent
-    class_itemdata
-    class_iteminstance
-    class_layeredmove
     class_modifyamounteffect
-    class_motornode
-    class_movementmode
     class_namecheck
-    class_pool
     class_removestatuseffect
     class_statamount
     class_statmodifier
@@ -52,7 +37,6 @@ Core
     class_statustrigger
     class_statuses.activestatus
     class_statuses
-    class_targeting
     class_worldevents
 
 Kit
@@ -63,12 +47,18 @@ Kit
     :name: toc-class-ref-kit
 
     class_aibrain
+    class_abilities.state
+    class_abilities
+    class_abilitydata
     class_airmode
     class_anycondition
+    class_brain
     class_chancecondition
     class_changepooleffect
+    class_charactermotor
     class_dashmove
     class_effectzone
+    class_equipment
     class_faction
     class_grants
     class_healthamount
@@ -76,18 +66,28 @@ Kit
     class_hitamount
     class_hitcondition
     class_hitscan
+    class_hurtbox
+    class_inventory
     class_ishostilecondition
+    class_itemcomponent
+    class_itemdata
+    class_iteminstance
     class_knockbackeffect
     class_launchprojectileeffect
+    class_layeredmove
     class_magazine
     class_meleesweep
+    class_motornode
     class_mouselook
+    class_movementmode
     class_playerbrain
+    class_pool
     class_projectile
     class_radiustargeting
     class_randomamount
     class_spawnsceneeffect
     class_statcondition
+    class_targeting
     class_trigger
     class_walkmode
     class_weaponswitch

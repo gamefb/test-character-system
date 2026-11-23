@@ -4,8 +4,9 @@ extends Area3D
 ## Affects bodies that enter or leave it, e.g. fire patches, water or a healing aura.
 ##
 ## Use [member status_while_inside] for states that last while inside (water, healing pads) and
-## [member on_enter] for one-off effects (a fire patch's Burning). The zone has no collision
-## layer, so shots and sight lines pass through it.
+## [member on_enter] for one-off effects (a fire patch's Burning). Shots pass through it, as
+## through any area that isn't a [Hurtbox], and it has no collision layer, so sight lines and
+## other physics queries do too.
 
 ## Given to each body while it is inside, e.g. Wet in deep water. Use a status with duration 0.
 ## Overlapping zones each hold it, so leaving one of two pools keeps the body wet.
@@ -20,7 +21,7 @@ var _holding: Array[Node3D] = []
 
 
 func _ready() -> void:
-	# No collision layer, so shots and sight lines pass through the zone. It still
+	# No collision layer, so sight lines and shape queries pass through the zone. It still
 	# detects bodies, because detection uses its collision mask, not its layer.
 	collision_layer = 0
 	body_entered.connect(_on_body_entered)

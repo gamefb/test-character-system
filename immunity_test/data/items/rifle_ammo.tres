@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://character_system/core/items/item_data.gd" id="1_p64lo"]
+[ext_resource type="Script" path="res://character_system/kit/items/item_data.gd" id="1_p64lo"]
 
 [resource]
 script = ExtResource("1_p64lo")

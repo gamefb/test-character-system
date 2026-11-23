@@ -78,7 +78,7 @@ Every host also needs one :ref:`ComponentManager<class_ComponentManager>`. A com
 Health
 ------
 
-.. source-file:: ../../character_system/core/characters/health.gd
+.. source-file:: ../../character_system/core/health.gd
 
 What death means (ragdoll, loot drop, game over) is decided by whatever connects to ``died``; every component on the character also hears it as the ``died`` event, and whoever dealt the killing blow hears ``killed``. A dead character takes no more hits and its :ref:`Brain<class_Brain>` reports no intent, so it stops moving, shooting and casting. ``revive()`` brings the character back and sends ``revived``.
 
@@ -93,7 +93,7 @@ Brain: the only difference between a player and an AI
 
 A :ref:`Brain<class_Brain>` publishes intent and nothing else. Every other component reads intent from the :ref:`Brain<class_Brain>` and never asks where it came from. Components read its buttons the way Godot's input docs read the :ref:`Input<class_Input>` singleton, polling in ``_process()`` or ``_physics_process()``: ``brain.is_action_just_pressed(&"jump")`` for a one-off action, and ``brain.is_action_pressed(&"primary")`` for one that lasts while it's held.
 
-.. source-file:: ../../character_system/core/characters/brain.gd
+.. source-file:: ../../character_system/kit/brains/brain.gd
 
 .. source-file:: ../../character_system/kit/brains/player_brain.gd
 
@@ -101,7 +101,7 @@ Input actions are created in Project > Project Settings > Input Map. Leave Camer
 
 :ref:`PlayerBrain<class_PlayerBrain>` takes presses from input events in ``_unhandled_input()``, so a click the UI uses never reaches the character. It polls releases every frame with ``Input.is_action_pressed()``, so a button let go while the game was paused, over the UI or in another window doesn't stay held, and an action bound to two keys stays held until both are up. AI and tests press buttons with ``press()`` and ``release()``. A press made from code counts from the next frame, so every node sees it exactly once wherever in the frame it was made; presses from input events count straight away, as they do in :ref:`Input<class_Input>`.
 
-**Aiming.** A :ref:`PlayerBrain<class_PlayerBrain>`'s ``aim_point`` is the first thing a ray from the camera meets, up to 100 metres away: the point under the crosshair. Weapons and thrown projectiles start where they are and go toward that point, so a gun held low at the hip hits what the crosshair is on at any range, and a wall between the gun and the target stops the shot, as it should. Three details keep that honest: the character's own body and hurtboxes are ignored; the ray starts level with the character, so a camera behind it can't aim at something in between; and the point is never closer than 1.5 metres, so a shot at a wall in the player's face doesn't turn round. Untick layers in **Aim Mask** to aim through them.
+**Aiming.** A :ref:`PlayerBrain<class_PlayerBrain>`'s ``aim_point`` is the first thing a ray from the camera meets, up to 100 metres away: the point under the crosshair. Weapons and thrown projectiles start where they are and go toward that point, so a gun held low at the hip hits what the crosshair is on at any range, and a wall between the gun and the target stops the shot, as it should. Three details keep that honest: the character's own body and hurtboxes are ignored; the ray starts level with the character, so a camera behind it can't aim at something in between; and the point is never closer than 1.5 metres, so a shot at a wall in the player's face doesn't turn round. Like a shot, the ray passes through areas that aren't hurtboxes and through dead characters, so the crosshair never rests on something a bullet would ignore. Untick layers in **Aim Mask** to aim through them as well.
 
 .. source-file:: ../../character_system/kit/brains/ai_brain.gd
 
@@ -162,11 +162,11 @@ Items and inventory
 
 Items have two parts. :ref:`ItemData<class_ItemData>` is the shared definition ("what a rifle is") and never changes while playing. :ref:`ItemInstance<class_ItemInstance>` is one copy ("this rifle, with 4 rounds loaded"). Stackable items such as ammo share one instance per stack.
 
-.. source-file:: ../../character_system/core/items/item_data.gd
+.. source-file:: ../../character_system/kit/items/item_data.gd
 
-.. source-file:: ../../character_system/core/items/item_instance.gd
+.. source-file:: ../../character_system/kit/items/item_instance.gd
 
-.. source-file:: ../../character_system/core/items/inventory.gd
+.. source-file:: ../../character_system/kit/items/inventory.gd
 
 ``items.duplicate()`` loops over a copy, because removing from an array while looping over it skips entries. Every change emits ``changed`` and also sends the ``inventory_changed`` event, which :ref:`Equipment<class_Equipment>` uses to unequip what was dropped and :ref:`WeaponSwitch<class_WeaponSwitch>` uses to draw a weapon. ``first()`` finds a stack, and ``remove_instance()`` drops one particular copy and keeps its state. Since :ref:`ItemInstance<class_ItemInstance>` is a :ref:`Resource<class_Resource>`, a whole inventory can be saved with ``ResourceSaver.save()``.
 
@@ -179,11 +179,11 @@ Abilities
 
 An ability is data: when it can be used, what it costs, who it targets and which effects it runs. :ref:`Effect<class_Effect>` and :ref:`EffectContext<class_EffectContext>` are explained in :ref:`doc_effects`.
 
-.. source-file:: ../../character_system/core/abilities/targeting.gd
+.. source-file:: ../../character_system/kit/abilities/targeting.gd
 
-.. source-file:: ../../character_system/core/abilities/ability_data.gd
+.. source-file:: ../../character_system/kit/abilities/ability_data.gd
 
-.. source-file:: ../../character_system/core/abilities/abilities.gd
+.. source-file:: ../../character_system/kit/abilities/abilities.gd
 
 Only ``effects`` is needed; everything else is switched on by filling it in.
 

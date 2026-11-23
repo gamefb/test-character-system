@@ -21,7 +21,7 @@ Needs the input actions ``left``, ``right``, ``forward`` and ``back`` (Project S
 
 Presses come from input events in ``_unhandled_input()``, so a click the UI uses doesn't reach the character. Releases are polled every frame, so a button let go while the game was paused, over the UI or in another window doesn't stay held.
 
-\ **Aiming.** :ref:`Brain.aim_point<class_Brain_property_aim_point>` is the point the middle of the screen is on: the first thing a ray from the :ref:`camera<class_PlayerBrain_property_camera>` meets. Weapons shoot from themselves toward that point, so a gun held at the hip still hits what the crosshair is on, at any range.
+\ **Aiming.** :ref:`Brain.aim_point<class_Brain_property_aim_point>` is the point the middle of the screen is on: the first thing a ray from the :ref:`camera<class_PlayerBrain_property_camera>` meets that would stop a shot (see :ref:`Hurtbox.raycast()<class_Hurtbox_method_raycast>`). Weapons shoot from themselves toward that point, so a gun held at the hip still hits what the crosshair is on, at any range.
 
 .. rst-class:: classref-reftable-group
 

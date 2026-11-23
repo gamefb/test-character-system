@@ -32,7 +32,7 @@ Every physics frame, the motor:
 3. calls ``move_and_slide()``, the only place in the system that does,
 4. asks the mode whether to hand over to another, e.g. WalkMode hands over to AirMode once the floor is gone. If it doesn't, any other mode may take over by itself.
 
-.. source-file:: ../../character_system/core/motor/character_motor.gd
+.. source-file:: ../../character_system/kit/motor/character_motor.gd
 
 Three rules keep features from getting in each other's way:
 
@@ -123,8 +123,8 @@ The base classes
 
 :ref:`MotorNode<class_MotorNode>` is what modes and moves share: ``motor``, ``body``, ``stat()``, stats of their own, and the ``_enter()``, ``_exit()`` and ``_physics_update()`` hooks. Extend :ref:`MovementMode<class_MovementMode>` or :ref:`LayeredMove<class_LayeredMove>` rather than this.
 
-.. source-file:: ../../character_system/core/motor/motor_node.gd
+.. source-file:: ../../character_system/kit/motor/motor_node.gd
 
-.. source-file:: ../../character_system/core/motor/movement_mode.gd
+.. source-file:: ../../character_system/kit/motor/movement_mode.gd
 
-.. source-file:: ../../character_system/core/motor/layered_move.gd
+.. source-file:: ../../character_system/kit/motor/layered_move.gd

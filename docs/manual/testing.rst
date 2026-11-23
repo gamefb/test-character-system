@@ -23,7 +23,7 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - Presses and releases, a release while paused or never seen, a press the UI used, two keys on one action, an AI press seen once by every node, automatic fire held and tapped
    * - ``test_player_brain.gd``
      - 6
-     - Weapon actions and extra actions are passed on; a Camera left empty is found; missing Input Map actions are skipped without errors; the aim point is what the crosshair is on, never behind the weapon, and a camera behind the character doesn't aim at what is in between
+     - Weapon actions and extra actions are passed on; a Camera left empty is found; missing Input Map actions are skipped without errors; the aim point is what the crosshair is on, never behind the weapon and never on an area a shot would pass through, and a camera behind the character doesn't aim at what is in between
    * - ``test_inventory.gd``
      - 12
      - Weapon switching (drawing, wrapping around, holstering, dropping, each weapon's own rounds) and the carrying rule between Inventory and Equipment
@@ -34,8 +34,8 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - 1
      - The agent is found by itself, a new path is only asked for once the target has moved ``repath_distance``, and it aims ``aim_height`` above the target
    * - ``test_combat_parts.gd``
-     - 6
-     - Hitscan hits the target and not its wielder, and says which item dealt the hit; cooldowns block reuse and wait while paused; teams are groups
+     - 8
+     - Hitscan hits the target and not its wielder, and says which item dealt the hit; shots and projectiles pass through plain areas, dead bodies and their hurtboxes, and stop at the living; cooldowns block reuse and wait while paused; teams are groups
    * - ``test_examples.gd``
      - 8
      - Every example loads and does what its name says: Burning, the traits, Wet, Warded, Thorns, the abilities and the items
@@ -171,7 +171,7 @@ Walking costs a little more than before stuns existed, because everything that r
 Verification status
 -------------------
 
-All 214 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
+All 216 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
 
 .. list-table::
    :header-rows: 1
@@ -179,13 +179,13 @@ All 214 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 an
    * - Check
      - Godot 4.8 beta 4
    * - GUT tests (23 files above, test_statuses.gd included)
-     - 214 of 214, 958 asserts
+     - 216 of 216, 963 asserts
    * - ``immunity_test`` scene
      - 43 of 43
    * - Test level, ``--self-test``
      - 18 of 18
    * - ``core/`` on its own, with ``kit/`` and ``examples/`` deleted
-     - All 35 scripts load
+     - All 20 scripts load
    * - Code examples in ``RECIPES.md``
      - All compile
 

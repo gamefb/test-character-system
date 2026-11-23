@@ -47,8 +47,7 @@ func _fire() -> void:
 	for i in pellets:
 		var to: Vector3 = from + Projectile.spread_direction(aim, spread) * max_distance
 		var query := PhysicsRayQueryParameters3D.create(from, to, collision_mask, _wielder_rids)
-		query.collide_with_areas = true  # So hurtboxes can be hit.
-		var hit: Dictionary = muzzle.get_world_3d().direct_space_state.intersect_ray(query)
+		var hit: Dictionary = Hurtbox.raycast(muzzle.get_world_3d().direct_space_state, query)
 		if hit:
 			Effect.apply_all(effects, Hurtbox.hit(wielder, hit.collider,
 					item.data if item else null, hit.position, hit.normal))

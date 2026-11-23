@@ -3,7 +3,7 @@
 Project layout and pitfalls
 ===========================
 
-The scripts live in ``character_system/``, in two halves. ``core/`` is the system itself: it loads on its own, and nothing in it mentions a script outside it. ``kit/`` holds ready-made parts built on the core, the same way your own will be: use them, change them, or delete the ones your game doesn't need. Your own data and scenes stay outside both, so the system can be copied to another project as one folder. Each script file holds one ``class_name``.
+The scripts live in ``character_system/``, in two halves. ``core/`` is the rules everything shares: components, stats, events, effects, health and statuses. It loads on its own and needs no script outside it. ``kit/`` holds the features built on those rules, the same way your own will be: brains, movement, pools, abilities, items, weapons and projectiles. Use them, change them, or delete the ones your game doesn't need. Your own data and scenes stay outside both, so the system can be copied to another project as one folder. Each script file holds one ``class_name``.
 
 .. code:: text
 
@@ -15,39 +15,61 @@ The scripts live in ``character_system/``, in two halves. ``core/`` is the syste
    │   ├── icons/                    editor icons, one per node type
    │   ├── examples/                 statuses, traits, items, zones, abilities, projectiles,
    │   │                             a character and scripts to copy
-   │   ├── core/                     the system: keep all of it
+   │   ├── core/                     the rules: 20 scripts, keep all of them
    │   │   ├── component.gd          the base class of every component
    │   │   ├── component_manager.gd  add one to every host; stats and events
-   │   │   ├── effect_context.gd
+   │   │   ├── effect_context.gd     who did what to whom
    │   │   ├── world_events.gd       hears every host's events
+   │   │   ├── health.gd             health, death and resistances
    │   │   ├── name_check.gd         finds mistyped stat, event, tag and pool names
    │   │   ├── stats/                stat_modifier
    │   │   ├── effects/              effect (base), damage, heal, apply_status,
    │   │   │                         remove_status, modify_amount
    │   │   ├── conditions/           condition (base), has_tag
    │   │   ├── amounts/              amount (base), stat_amount
-   │   │   ├── statuses/             statuses, status_data, status_trigger
-   │   │   ├── characters/           health, pool, brain, hurtbox
-   │   │   ├── abilities/            abilities, ability_data, targeting (base)
-   │   │   ├── items/                item_data, item_instance, item_component (base),
-   │   │   │                         inventory, equipment
-   │   │   └── motor/                character_motor, motor_node, movement_mode,
-   │   │                             layered_move (bases)
-   │   └── kit/                      ready-made parts: keep what you use
-   │       ├── brains/               player_brain, ai_brain, mouse_look
-   │       ├── motor/                walk_mode, air_mode, dash_move
-   │       ├── characters/           faction, weapon_switch
-   │       ├── items/                trigger, magazine, hitscan, melee_sweep, grants
+   │   │   └── statuses/             statuses, status_data, status_trigger
+   │   └── kit/                      the features: 44 scripts, keep what you use
+   │       ├── brains/               brain, player_brain, ai_brain, mouse_look
+   │       ├── motor/                character_motor, motor_node, movement_mode,
+   │       │                         layered_move, walk_mode, air_mode, dash_move
+   │       ├── characters/           pool, hurtbox, faction, weapon_switch
+   │       ├── abilities/            abilities, ability_data, targeting, radius_targeting
+   │       ├── items/                item_data, item_instance, item_component, inventory,
+   │       │                         equipment, trigger, magazine, hitscan, melee_sweep,
+   │       │                         grants
    │       ├── world/                effect_zone, projectile
    │       ├── effects/              knockback, spawn_scene, launch_projectile, change_pool
    │       ├── conditions/           health_below, stat, is_hostile, chance, hit, any
-   │       ├── amounts/              health, hit, random
-   │       └── abilities/            radius_targeting
+   │       └── amounts/              health, hit, random
    ├── data/                         your .tres files
    ├── scenes/                       your characters, items and levels
    ├── tests/                        test_*.gd, run with GUT; benchmark.gd
    ├── test_level/                   a playable level with every part in it
    └── immunity_test/                scripted checks: immunities, zones, items
+
+**What the kit folders need.** Every kit script needs the core. Some also need another kit folder, which matters when you delete or replace one:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Folder
+     - Also needs
+   * - ``brains/``
+     - ``characters/`` (the player's aim ignores its own :ref:`Hurtbox<class_Hurtbox>`\ es)
+   * - ``motor/``
+     - ``brains/``
+   * - ``characters/``
+     - Nothing, except :ref:`WeaponSwitch<class_WeaponSwitch>`, which needs ``brains/`` and ``items/``
+   * - ``abilities/``
+     - ``brains/`` and ``characters/`` (costs come from a :ref:`Pool<class_Pool>`)
+   * - ``items/``
+     - ``brains/`` and ``characters/``; :ref:`Grants<class_Grants>` needs ``abilities/``, and :ref:`Hitscan<class_Hitscan>` needs ``world/``
+   * - ``world/``
+     - ``characters/``
+   * - ``effects/``, ``conditions/``, ``amounts/``
+     - One thing each at most: knockback needs ``motor/``, launching a projectile needs ``brains/`` and ``world/``, changing a pool and the hostility check need ``characters/``
+
+So a game with its own movement deletes ``motor/`` and the knockback effect, and a game with its own inventory replaces ``items/`` and the weapon switch. CI checks the first half of the promise on every pull request: it deletes ``kit/`` and ``examples/`` and loads every core script.
 
 **Base classes are abstract.** :ref:`Component<class_Component>`, :ref:`Effect<class_Effect>`, :ref:`Condition<class_Condition>`, :ref:`Amount<class_Amount>`, :ref:`Targeting<class_Targeting>`, :ref:`ItemComponent<class_ItemComponent>`, :ref:`MotorNode<class_MotorNode>`, :ref:`MovementMode<class_MovementMode>` and :ref:`LayeredMove<class_LayeredMove>` are marked ``@abstract``, so nobody adds one as a node or creates one as a resource by mistake, and Godot reports an effect, amount or targeting script that forgot the one method it must write. This needs Godot 4.5 or newer; the project is developed on 4.8.
 

@@ -17,7 +17,7 @@ Affects bodies that enter or leave it, e.g. fire patches, water or a healing aur
 Description
 -----------
 
-Use :ref:`status_while_inside<class_EffectZone_property_status_while_inside>` for states that last while inside (water, healing pads) and :ref:`on_enter<class_EffectZone_property_on_enter>` for one-off effects (a fire patch's Burning). The zone has no collision layer, so shots and sight lines pass through it.
+Use :ref:`status_while_inside<class_EffectZone_property_status_while_inside>` for states that last while inside (water, healing pads) and :ref:`on_enter<class_EffectZone_property_on_enter>` for one-off effects (a fire patch's Burning). Shots pass through it, as through any area that isn't a :ref:`Hurtbox<class_Hurtbox>`, and it has no collision layer, so sight lines and other physics queries do too.
 
 .. rst-class:: classref-reftable-group
 

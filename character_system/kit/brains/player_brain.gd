@@ -13,8 +13,9 @@ extends Brain
 ## game was paused, over the UI or in another window doesn't stay held.
 ##
 ## [b]Aiming.[/b] [member Brain.aim_point] is the point the middle of the screen is on: the
-## first thing a ray from the [member camera] meets. Weapons shoot from themselves toward that
-## point, so a gun held at the hip still hits what the crosshair is on, at any range.
+## first thing a ray from the [member camera] meets that would stop a shot (see
+## [method Hurtbox.raycast]). Weapons shoot from themselves toward that point, so a gun held at
+## the hip still hits what the crosshair is on, at any range.
 
 ## Input actions passed on to [method Brain.is_action_pressed]. Add your own to
 ## [member extra_actions] instead of changing this list.
@@ -103,8 +104,7 @@ func _point_under_crosshair() -> Vector3:
 		from += forward * maxf(forward.dot(body.global_position - from), 0.0)
 	var far: Vector3 = from + forward * AIM_DISTANCE
 	var query := PhysicsRayQueryParameters3D.create(from, far, aim_mask, _own_rids)
-	query.collide_with_areas = true  # Hurtboxes are areas.
-	var hit: Dictionary = camera.get_world_3d().direct_space_state.intersect_ray(query)
+	var hit: Dictionary = Hurtbox.raycast(camera.get_world_3d().direct_space_state, query)
 	if not hit:
 		return far
 	return from + forward * maxf(from.distance_to(hit.position), MIN_AIM_DISTANCE)

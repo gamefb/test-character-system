@@ -80,7 +80,7 @@ Pools
 
 A :ref:`Pool<class_Pool>` is a number that's spent and regained: mana, stamina, energy, rage. A character has one per kind, each named in the Inspector.
 
-.. source-file:: ../../character_system/core/characters/pool.gd
+.. source-file:: ../../character_system/kit/characters/pool.gd
 
 -  **Spending.** An ability's ``costs`` take from pools by name, a :ref:`ChangePoolEffect<class_ChangePoolEffect>` adds or takes from any effect list, and code calls ``spend()``, which takes nothing unless the pool has enough.
 -  **Two stats each.** ``max_<pool>`` and ``<pool>_regen`` go through the manager, so a status can raise the maximum or the refill rate. The current amount is cut down when the maximum drops.

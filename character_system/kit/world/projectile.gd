@@ -103,8 +103,7 @@ func _physics_process(delta: float) -> void:
 	var from: Vector3 = global_position
 	var to: Vector3 = from + velocity * delta
 	var query := PhysicsRayQueryParameters3D.create(from, to, collision_mask, _excluded)
-	query.collide_with_areas = true  # So hurtboxes can be hit.
-	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
+	var hit: Dictionary = Hurtbox.raycast(get_world_3d().direct_space_state, query)
 	if hit:
 		global_position = hit.position
 		_impact(Hurtbox.hit(source, hit.collider, origin, hit.position, hit.normal))

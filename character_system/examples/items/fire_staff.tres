@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="PackedScene" path="res://character_system/examples/items/scenes/fire_staff.tscn" id="1_sgcls"]
-[ext_resource type="Script" path="res://character_system/core/items/item_data.gd" id="2_7j5tn"]
+[ext_resource type="Script" path="res://character_system/kit/items/item_data.gd" id="2_7j5tn"]
 [ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_irxjo"]
 
 [resource]

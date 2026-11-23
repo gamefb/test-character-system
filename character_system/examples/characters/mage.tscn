@@ -1,15 +1,15 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_if2bx"]
-[ext_resource type="Script" path="res://character_system/core/characters/health.gd" id="2_v7m7r"]
+[ext_resource type="Script" path="res://character_system/core/health.gd" id="2_v7m7r"]
 [ext_resource type="Script" path="res://character_system/core/statuses/statuses.gd" id="3_enw71"]
-[ext_resource type="Script" path="res://character_system/core/characters/brain.gd" id="4_5vxg2"]
-[ext_resource type="Script" path="res://character_system/core/characters/pool.gd" id="5_xhvig"]
-[ext_resource type="Script" path="res://character_system/core/abilities/abilities.gd" id="6_xlam8"]
-[ext_resource type="Script" path="res://character_system/core/abilities/ability_data.gd" id="7_7i2p4"]
+[ext_resource type="Script" path="res://character_system/kit/brains/brain.gd" id="4_5vxg2"]
+[ext_resource type="Script" path="res://character_system/kit/characters/pool.gd" id="5_xhvig"]
+[ext_resource type="Script" path="res://character_system/kit/abilities/abilities.gd" id="6_xlam8"]
+[ext_resource type="Script" path="res://character_system/kit/abilities/ability_data.gd" id="7_7i2p4"]
 [ext_resource type="Resource" path="res://character_system/examples/abilities/fireball.tres" id="8_gabv3"]
-[ext_resource type="Script" path="res://character_system/core/items/inventory.gd" id="9_w2g0x"]
-[ext_resource type="Script" path="res://character_system/core/items/equipment.gd" id="10_13ibg"]
+[ext_resource type="Script" path="res://character_system/kit/items/inventory.gd" id="9_w2g0x"]
+[ext_resource type="Script" path="res://character_system/kit/items/equipment.gd" id="10_13ibg"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_kaxq7"]
 
