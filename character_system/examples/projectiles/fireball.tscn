@@ -1,0 +1,56 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://character_system/world/projectile.gd" id="1_84w7s"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="2_8gto2"]
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="3_1yams"]
+[ext_resource type="Script" path="res://character_system/resources/amounts/_base/amount.gd" id="4_8yhyn"]
+[ext_resource type="Script" path="res://character_system/resources/amounts/stat_amount.gd" id="5_ea30g"]
+[ext_resource type="Script" path="res://character_system/resources/effects/damage_effect.gd" id="6_amxts"]
+[ext_resource type="Script" path="res://character_system/resources/effects/apply_status_effect.gd" id="7_7j5dg"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/burning.tres" id="8_hguhi"]
+
+[sub_resource type="Resource" id="Resource_pfjg6"]
+script = ExtResource("5_ea30g")
+stat = &"spell_power"
+of = 1
+per_point = 2.0
+
+[sub_resource type="Resource" id="Resource_ny6vb"]
+script = ExtResource("6_amxts")
+amount = 20.0
+scaling = Array[ExtResource("4_8yhyn")]([SubResource("Resource_pfjg6")])
+type = &"fire"
+tags = Array[StringName]([])
+conditions = Array[ExtResource("3_1yams")]([])
+
+[sub_resource type="Resource" id="Resource_lwflq"]
+script = ExtResource("7_7j5dg")
+status = ExtResource("8_hguhi")
+conditions = Array[ExtResource("3_1yams")]([])
+
+[sub_resource type="Resource" id="Resource_csiq7"]
+script = ExtResource("6_amxts")
+amount = 10.0
+scaling = Array[ExtResource("4_8yhyn")]([])
+type = &"fire"
+tags = Array[StringName]([])
+conditions = Array[ExtResource("3_1yams")]([])
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r0lip"]
+albedo_color = Color(1, 0.45, 0.1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_8oh5c"]
+material = SubResource("StandardMaterial3D_r0lip")
+radius = 0.2
+height = 0.4
+
+[node name="Fireball" type="Node3D"]
+script = ExtResource("1_84w7s")
+speed = 25.0
+effects = Array[ExtResource("2_8gto2")]([SubResource("Resource_ny6vb"), SubResource("Resource_lwflq")])
+blast_radius = 3.0
+blast_effects = Array[ExtResource("2_8gto2")]([SubResource("Resource_csiq7")])
+blast_edge_strength = 0.5
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_8oh5c")

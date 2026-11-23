@@ -34,13 +34,8 @@ func _requires() -> Array[Script]:
 
 
 func _start() -> void:
+	on(&"inventory_changed", _on_inventory_changed)
 	_draw_if_empty()
-
-
-func _on_event(event: StringName, _ctx: EffectContext) -> void:
-	if event == &"inventory_changed":
-		# After the change finishes, never in the middle of it.
-		_draw_if_empty.call_deferred()
 
 
 ## The weapons carried, in the order they were picked up.
@@ -84,3 +79,8 @@ func holster() -> void:
 func _draw_if_empty() -> void:
 	if running and auto_draw and not _holstered and current() == null:
 		select(0)
+
+
+func _on_inventory_changed(_ctx: EffectContext) -> void:
+	# After the change finishes, never in the middle of it.
+	_draw_if_empty.call_deferred()

@@ -26,12 +26,13 @@ extends Node
 ## [br]2. When the host is ready (after the host's own [code]_ready()[/code]), every component
 ## whose [method _requires] are present gets [method _start]. A component added later, during
 ## play, starts as soon as it's added.
-## [br]3. While running, it hears events through [method _on_event], and its
+## [br]3. While running, it hears the events it asked for with [method on], and its
 ## [code]_process()[/code], [code]_physics_process()[/code] and input callbacks run. Before it
 ## starts they don't run at all, so they can use what [method _requires] promises without null
 ## checks.
 ## [br]4. [method _stop] runs when it leaves the tree, when the host is freed, or when something
-## it requires is removed. Everything connected with [method listen] is disconnected.
+## it requires is removed. Everything connected with [method listen] or [method on] is
+## disconnected.
 ## [br]5. If what it required comes back, [method _start] runs again. Write [method _start] and
 ## [method _stop] so they can run more than once.
 ##
@@ -48,10 +49,10 @@ extends Node
 ## [/codeblock]
 ##
 ## [b]Writing your own.[/b] Extend this class and override any of [method _requires],
-## [method _stats], [method _start], [method _stop], [method _on_event] and
-## [method _warnings]. Do setup in [method _start], not [code]_ready()[/code]: it runs once
-## everything is in place, and never in the editor. This outline shows where each part goes;
-## [Stamina] in [code]examples/scripts/[/code] is a complete one to copy.
+## [method _stats], [method _start], [method _stop] and [method _warnings]. Do setup in
+## [method _start], not [code]_ready()[/code]: it runs once everything is in place, and never
+## in the editor. This outline shows where each part goes; [Stamina] in
+## [code]examples/scripts/[/code] is a complete one to copy.
 ##
 ## [codeblock]
 ## @tool  # Optional: shows this component's warnings in the editor.
@@ -68,6 +69,7 @@ extends Node
 ##
 ## func _start() -> void:
 ## 	listen(manager.stat_changed, _on_stat_changed)  # Disconnected on stop.
+## 	on(&"taking_damage", _on_taking_damage)  # An event on this host. Also undone on stop.
 ##
 ## func _process(_delta: float) -> void:
 ## 	pass  # Runs only while the component runs, e.g. to recharge.
@@ -75,9 +77,8 @@ extends Node
 ## func _on_stat_changed(_stat_name: StringName) -> void:
 ## 	pass  # E.g. cut the shield down when max_shield drops.
 ##
-## func _on_event(event: StringName, ctx: EffectContext) -> void:
-## 	if event == &"taking_damage":
-## 		ctx.amount *= 0.5  # A hit about to land: absorb half of it.
+## func _on_taking_damage(ctx: EffectContext) -> void:
+## 	ctx.mul *= 0.5  # A hit about to land: take half of it.
 ## [/codeblock]
 ##
 ## [b]Rules of thumb.[/b]
@@ -85,8 +86,8 @@ extends Node
 ## need them. They can be removed and added during play, and [method find] is cheap.
 ## [br]- Don't store stat values. Read [method stat] each time, or [method listen] to
 ## [signal ComponentManager.stat_changed]; a stored speed ignores every status.
-## [br]- Connect with [method listen], not [code]connect()[/code], so connections are undone
-## when the component stops.
+## [br]- Connect with [method listen], not [code]connect()[/code], and hear events with
+## [method on], so both are undone when the component stops.
 ## [br]- A component that's optional for yours (used if present) doesn't go in
 ## [method _requires]. [method find] it and check for null.
 
@@ -105,6 +106,7 @@ var running := false
 
 var _manager: ComponentManager
 var _connections: Array[Array] = []  # [Signal, Callable] pairs made with listen().
+var _subscriptions: Array[Array] = []  # [ComponentManager, event, Callable] made with on().
 # The process_mode to restore when the component starts.
 var _mode := PROCESS_MODE_INHERIT
 # Whether a "can't start" error was already shown.
@@ -122,7 +124,7 @@ var _required: Array[Script] = []
 ## [/codeblock]
 ## It works on a scene that hasn't been added to the level yet, e.g. to set a spawned
 ## enemy's [member Faction.team] before [code]add_child()[/code].
-static func of(node: Node, type: Script) -> Component:
+static func of(node: Variant, type: Script) -> Component:
 	var m := ComponentManager.of(node)
 	return m.find(type) if m else null
 
@@ -188,6 +190,14 @@ func find(type: Script) -> Component:
 	return _manager.find(type) if _manager else null
 
 
+## Returns every [param type] component on the same host, in scene order. Subclasses count.
+## Use it for components a host can have several of, such as [Pool]. The answer isn't
+## remembered, so call it in [method _start] or when something happens, not every frame.
+func find_all(type: Script) -> Array[Component]:
+	var none: Array[Component] = []
+	return _manager.find_all(type) if _manager else none
+
+
 ## Returns the first node of the built-in class [param type] anywhere under the host, or null.
 ## Use it to fill in an export that was left empty, the way [PlayerBrain] finds its camera:
 ## [codeblock]
@@ -223,6 +233,36 @@ func stat(stat_name: StringName) -> float:
 func listen(sig: Signal, method: Callable) -> void:
 	sig.connect(method)
 	_connections.append([sig, method])
+
+
+## Calls [param method] with the event's [EffectContext] each time [param event] is sent to
+## this host, until this component stops. Use it in [method _start].
+##
+## It's the usual way to react to something that happened to the character:
+## [codeblock]
+## func _start() -> void:
+## 	on(&"took_damage", _on_took_damage)
+## 	on(&"killed", _on_killed)
+##
+## func _on_took_damage(ctx: EffectContext) -> void:
+## 	print("Lost %s to %s damage" % [ctx.amount, ctx.damage_type])
+##
+## func _on_killed(ctx: EffectContext) -> void:
+## 	kills += 1  # ctx.target is who died.
+## [/codeblock]
+## The context is null for events sent without one, such as [code]started[/code]. The built-in
+## events are listed under [method _on_event].
+## [br][br]A higher [param priority] hears the event earlier. Positive priorities run before
+## status triggers and negative ones after them, so use a negative priority to see a hit once
+## every status has changed it; see [method ComponentManager.send] for the exact order.
+## [br][br]Pass [param node] to hear another host's events instead, e.g. an item listening to
+## its wielder: [code]on(&"killed", _on_wielder_killed, 0, wielder)[/code]. A node without a
+## [ComponentManager] has no events, so nothing happens.
+func on(event: StringName, method: Callable, priority: int = 0, node: Node = null) -> void:
+	var m: ComponentManager = ComponentManager.of(node) if node else _manager
+	if m:
+		m.subscribe(event, method, priority)
+		_subscriptions.append([m, event, method])
 
 
 ## Call after changing a number that [method _stats] returns, so statuses and readers see it.
@@ -283,20 +323,32 @@ func _start() -> void:
 
 ## Called when this component is removed, or something it requires is removed.
 ##
-## Also called when the host is freed. Connections made with [method listen] are undone right
-## after it, so only undo what [method _start] did by other means.
+## Also called when the host is freed. Connections made with [method listen] and [method on]
+## are undone right after it, so only undo what [method _start] did by other means.
 func _stop() -> void:
 	pass
 
 
 ## Called for every event sent to this host, e.g. &"died", &"took_damage" or your own.
 ##
+## To react to one or two events, [method on] is simpler: it calls a method of yours for just
+## that event. Override this to see every event, as [Statuses] does to run status triggers.
 ## Only running components hear events. Built-in events and their [param _ctx]:
 ## [br]- [code]dealing_damage[/code], [code]taking_damage[/code]: a hit about to land. Change
-## [member EffectContext.amount] to change the damage.
+## [member EffectContext.add], [member EffectContext.percent] and [member EffectContext.mul]
+## to change the damage.
+## [br]- [code]absorbing_damage[/code]: the same hit with its final number in
+## [member EffectContext.amount]. Lower it by what a shield soaks up.
 ## [br]- [code]dealt_damage[/code], [code]took_damage[/code]: the same hit, after it landed.
-## [br]- [code]died[/code]: the killing blow, or null.
-## [br]- [code]started[/code], [code]inventory_changed[/code]: null.
+## [br]- [code]giving_healing[/code], [code]receiving_healing[/code], [code]gave_healing[/code],
+## [code]received_healing[/code]: the same for healing.
+## [br]- [code]died[/code]: the killing blow, or null. [code]killed[/code]: the same blow, sent
+## to whoever dealt it.
+## [br]- [code]ability_cast_started[/code], [code]ability_used[/code],
+## [code]ability_interrupted[/code]: [member EffectContext.origin] is the [AbilityData].
+## [br]- [code]started[/code], [code]revived[/code], [code]inventory_changed[/code]: null.
+## [br]- The [CharacterMotor] adds one for each mode and move, such as
+## [code]walk_mode_entered[/code] and [code]dash_move_started[/code].
 ## [br]Send your own with [method ComponentManager.notify]. Prefer events for "something
 ## happened to this character"; for one component's own changes, a signal is simpler.
 func _on_event(_event: StringName, _ctx: EffectContext) -> void:
@@ -327,7 +379,8 @@ func _begin() -> void:
 	_start()
 
 
-## Called by the [ComponentManager]. Stops the component and undoes every [method listen].
+## Called by the [ComponentManager]. Stops the component and undoes every [method listen] and
+## [method on].
 func _halt() -> void:
 	if not running:
 		return
@@ -339,6 +392,12 @@ func _halt() -> void:
 		if is_instance_valid(sig.get_object()) and sig.is_connected(pair[1]):
 			sig.disconnect(pair[1])
 	_connections.clear()
+	for entry in _subscriptions:
+		# Not typed: another host's manager may have been freed by now.
+		var m = entry[0]
+		if is_instance_valid(m):
+			m.unsubscribe(entry[1], entry[2])
+	_subscriptions.clear()
 
 
 # Called by the ComponentManager when other leaves: true if this component required other's

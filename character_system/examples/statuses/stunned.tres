@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_5tdsw"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_2ryr7"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_6yqba"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_khogi"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_0x5l8"]
+
+[resource]
+script = ExtResource("4_khogi")
+id = &"stunned"
+display_name = "Stunned"
+description = "Can't move, shoot or use abilities for 2 seconds. The Brain stops on this tag."
+tags = Array[StringName]([&"stunned"])
+immune_to = Array[StringName]([])
+apply_conditions = Array[ExtResource("1_5tdsw")]([])
+duration = 2.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_2ryr7")]([])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_6yqba")]([])
+on_tick = Array[ExtResource("3_6yqba")]([])
+on_remove = Array[ExtResource("3_6yqba")]([])
+triggers = Array[ExtResource("5_0x5l8")]([])

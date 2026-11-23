@@ -1,0 +1,73 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_v7m7r"]
+[ext_resource type="Script" path="res://character_system/characters/components/health.gd" id="2_enw71"]
+[ext_resource type="Script" path="res://character_system/characters/components/statuses.gd" id="3_5vxg2"]
+[ext_resource type="Script" path="res://character_system/characters/brains/_base/brain.gd" id="4_xhvig"]
+[ext_resource type="Script" path="res://character_system/characters/components/attributes.gd" id="5_xlam8"]
+[ext_resource type="Script" path="res://character_system/characters/components/pool.gd" id="6_7i2p4"]
+[ext_resource type="Script" path="res://character_system/characters/components/abilities.gd" id="7_gabv3"]
+[ext_resource type="Script" path="res://character_system/resources/abilities/ability_data.gd" id="8_w2g0x"]
+[ext_resource type="Resource" path="res://character_system/examples/abilities/fireball.tres" id="9_13ibg"]
+[ext_resource type="Script" path="res://character_system/characters/components/inventory.gd" id="10_kaxq7"]
+[ext_resource type="Script" path="res://character_system/characters/components/equipment.gd" id="11_v2qn8"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_j6w21"]
+
+[node name="Mage" type="CharacterBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_j6w21")
+
+[node name="Hand" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.2, -0.5)
+
+[node name="ComponentManager" type="Node" parent="."]
+script = ExtResource("1_v7m7r")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_enw71")
+max_health = 80.0
+
+[node name="Statuses" type="Node" parent="."]
+script = ExtResource("3_5vxg2")
+
+[node name="Brain" type="Node" parent="."]
+script = ExtResource("4_xhvig")
+
+[node name="Attributes" type="Node" parent="."]
+script = ExtResource("5_xlam8")
+stats = Dictionary[StringName, float]({
+&"crit_chance": 0.05,
+&"level": 1.0,
+&"spell_power": 5.0
+})
+
+[node name="Mana" type="Node" parent="."]
+script = ExtResource("6_7i2p4")
+regen = 5.0
+
+[node name="Shield" type="Node" parent="."]
+script = ExtResource("6_7i2p4")
+pool = &"shield"
+max_value = 30.0
+regen = 10.0
+regen_delay = 3.0
+absorbs_damage = true
+
+[node name="Abilities" type="Node" parent="."]
+script = ExtResource("7_gabv3")
+slots = Dictionary[StringName, ExtResource("8_w2g0x")]({
+&"secondary": ExtResource("9_13ibg")
+})
+
+[node name="Inventory" type="Node" parent="."]
+script = ExtResource("10_kaxq7")
+
+[node name="Equipment" type="Node" parent="."]
+script = ExtResource("11_v2qn8")
+sockets = Dictionary[StringName, NodePath]({
+&"ring": NodePath("../Hand"),
+&"weapon": NodePath("../Hand")
+})

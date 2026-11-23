@@ -1,0 +1,33 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_0x60q"]
+[ext_resource type="Script" path="res://character_system/items/components/grant_modifiers.gd" id="2_eis3p"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="3_6rvte"]
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="4_4mmjs"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qp8er"]
+albedo_color = Color(0.9, 0.75, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hcb7o"]
+material = SubResource("StandardMaterial3D_qp8er")
+size = Vector3(0.1, 0.1, 0.1)
+
+[sub_resource type="Resource" id="Resource_erifg"]
+script = ExtResource("3_6rvte")
+stat = &"max_health"
+add = 25.0
+percent = 0.0
+mul = 1.0
+conditions = Array[ExtResource("4_4mmjs")]([])
+
+[node name="RingOfVigor" type="Node3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_hcb7o")
+
+[node name="ComponentManager" type="Node" parent="."]
+script = ExtResource("1_0x60q")
+
+[node name="GrantModifiers" type="Node" parent="."]
+script = ExtResource("2_eis3p")
+modifiers = Array[ExtResource("3_6rvte")]([SubResource("Resource_erifg")])

@@ -53,7 +53,8 @@ func _swing() -> void:
 	# Character -> its context, keeping the strongest when several of its parts are inside.
 	var hits: Dictionary[Node, EffectContext] = {}
 	for hit in blade.get_world_3d().direct_space_state.intersect_shape(query, 32):
-		var ctx := Hurtbox.hit(wielder, hit.collider, item.data if item else null)
+		var ctx := Hurtbox.hit(wielder, hit.collider, item.data if item else null,
+				query.transform.origin)
 		if not hits.has(ctx.target) or ctx.magnitude > hits[ctx.target].magnitude:
 			hits[ctx.target] = ctx
 	for ctx: EffectContext in hits.values():

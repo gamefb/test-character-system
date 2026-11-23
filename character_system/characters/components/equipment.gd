@@ -34,22 +34,16 @@ var equipped: Dictionary[StringName, ItemInstance] = {}
 var _nodes: Dictionary[StringName, Node] = {}
 
 
-func _on_event(event: StringName, _ctx: EffectContext) -> void:
-	if event != &"inventory_changed":
-		return
-	var bag := find(Inventory) as Inventory
-	if bag:
-		for slot in equipped.keys():
-			if equipped[slot] not in bag.items:
-				unequip(slot)  # No longer carried.
-
-
 func _warnings() -> PackedStringArray:
 	var out := PackedStringArray()
 	for slot in sockets:
 		if not has_node(sockets[slot]):
 			out.append("The '%s' socket doesn't point at a node." % slot)
 	return out
+
+
+func _start() -> void:
+	on(&"inventory_changed", _on_inventory_changed)
 
 
 ## Equips [param item], replacing whatever is in its slot. The replaced item stays carried.
@@ -95,3 +89,11 @@ func unequip(slot: StringName) -> ItemInstance:
 		_nodes.erase(slot)
 		changed.emit(slot)
 	return item
+
+
+func _on_inventory_changed(_ctx: EffectContext) -> void:
+	var bag := find(Inventory) as Inventory
+	if bag:
+		for slot in equipped.keys():
+			if equipped[slot] not in bag.items:
+				unequip(slot)  # No longer carried.

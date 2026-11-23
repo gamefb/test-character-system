@@ -36,3 +36,12 @@ var item: ItemInstance
 var brain: Brain:
 	get:
 		return Component.of(wielder, Brain)
+
+
+## True while the wielder has a status with one of [param tags], e.g. to stop the item working
+## while its wielder is disarmed.
+func wielder_has_tag(tags: Array[StringName]) -> bool:
+	if tags.is_empty():
+		return false
+	var statuses := Component.of(wielder, Statuses) as Statuses
+	return statuses != null and tags.any(statuses.has_tag)

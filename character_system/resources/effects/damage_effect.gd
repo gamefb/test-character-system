@@ -2,27 +2,60 @@ class_name DamageEffect
 extends Effect
 ## Deals damage, scaled by magnitude and reduced by the target's resistance to its type.
 ##
-## Before the hit lands, the source hears [code]dealing_damage[/code] and the target
-## [code]taking_damage[/code], so their statuses can change [member EffectContext.amount]. After
-## it lands they hear [code]dealt_damage[/code] and [code]took_damage[/code].
+## The number starts as [member amount] plus everything in [member scaling], times
+## [member EffectContext.magnitude]. Then, in a fixed order:
+## [br]1. The source's [code]bonus_<type>[/code] stat is added as a percentage, e.g.
+## [code]bonus_fire[/code] 0.2 for 20% more fire damage.
+## [br]2. The source hears [code]dealing_damage[/code] and the target
+## [code]taking_damage[/code]. Their statuses and components change
+## [member EffectContext.add], [member EffectContext.percent] and [member EffectContext.mul].
+## [br]3. The totals are applied: (amount + add) × (1 + percent) × mul.
+## [br]4. The target's [code]resist_<type>[/code] stat takes its share: 0.5 halves it, 1 is
+## immune, and a negative value is a weakness (-0.5 is 50% more).
+## [br]5. The target hears [code]absorbing_damage[/code] with the final number in
+## [member EffectContext.amount]. Shields lower it by what they soak up.
+## [br]6. [Health] loses what's left, and the source hears [code]dealt_damage[/code] and the
+## target [code]took_damage[/code]. A killing blow also sends [code]died[/code] to the target
+## and [code]killed[/code] to the source.
+## [br][br]Steps 2 and 3 don't depend on the order statuses were applied in. A target that is
+## already dead is left alone: no damage and no events.
 
-## Damage before magnitude and resistance.
+## Damage before scaling, magnitude and resistance.
 @export var amount: float = 10.0
-## Matched against the target's resist_<type> stat, e.g. resist_fire.
+## Added to [member amount] each time it runs, e.g. a [StatAmount] for 2 per point of the
+## user's strength, or a [HealthAmount] for 5% of the target's health.
+@export var scaling: Array[Amount] = []
+## Matched against the source's bonus_<type> stat and the target's resist_<type> stat, e.g.
+## bonus_fire and resist_fire. [DamageTypeCondition] tests it.
 @export var type: StringName = &"physical"
+## Labels for this hit, e.g. &"melee" or &"explosion", beside any the [Hurtbox] added.
+## [HitTagCondition] tests them, so a status can react to melee hits only.
+@export var tags: Array[StringName] = []
 
 
 func _execute(ctx: EffectContext) -> void:
 	var health := Component.of(ctx.target, Health) as Health
-	if not health:
+	if not health or health.is_dead():
 		return
-	var resist_stat := StringName("resist_" + type)
-	var resist: float = clampf(ComponentManager.stat_of(ctx.target, resist_stat), 0.0, 1.0)
-	ctx.amount = amount * ctx.magnitude * (1.0 - resist)
-	# Before: statuses may change ctx.amount (shields, crits, damage buffs).
+	# This effect's tags only last while it runs; the hit's own tags (a hurtbox's) stay.
+	var hit_tags: Array[StringName] = ctx.tags
+	ctx.tags = hit_tags.duplicate()
+	for tag in tags:
+		if tag not in ctx.tags:
+			ctx.tags.append(tag)
+	ctx.damage_type = type
+	ctx.reset_amount(Amount.total(amount, scaling, ctx) * ctx.magnitude)
+	ctx.percent = ComponentManager.stat_of(ctx.source, StringName("bonus_" + type))
+	# Before: both sides add to ctx.add, ctx.percent and ctx.mul (armour, crits, damage buffs).
 	ComponentManager.notify(ctx.source, &"dealing_damage", ctx)
 	ComponentManager.notify(ctx.target, &"taking_damage", ctx)
-	health.change(-maxf(ctx.amount, 0.0), ctx)
-	# After: statuses may react (thorns, on-hit procs).
+	var resist: float = minf(ComponentManager.stat_of(ctx.target, StringName("resist_" + type)), 1.0)
+	ctx.reset_amount(ctx.resolve() * (1.0 - resist))
+	# The number is final: shields soak up what they can.
+	ComponentManager.notify(ctx.target, &"absorbing_damage", ctx)
+	ctx.amount = maxf(ctx.amount, 0.0)
+	health.change(-ctx.amount, ctx)
+	# After: statuses may react (thorns, life steal, on-hit procs).
 	ComponentManager.notify(ctx.source, &"dealt_damage", ctx)
 	ComponentManager.notify(ctx.target, &"took_damage", ctx)
+	ctx.tags = hit_tags

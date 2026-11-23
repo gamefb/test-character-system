@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_neinx"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_gslx3"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_uferl"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_vnjso"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_20b3y"]
+[ext_resource type="Script" path="res://character_system/resources/amounts/_base/amount.gd" id="6_dklpw"]
+[ext_resource type="Script" path="res://character_system/resources/amounts/hit_amount.gd" id="7_oeweq"]
+[ext_resource type="Script" path="res://character_system/resources/effects/heal_effect.gd" id="8_y0g0o"]
+
+[sub_resource type="Resource" id="Resource_ofew8"]
+script = ExtResource("7_oeweq")
+fraction = 0.25
+
+[sub_resource type="Resource" id="Resource_ux41s"]
+script = ExtResource("8_y0g0o")
+amount = 0.0
+scaling = Array[ExtResource("6_dklpw")]([SubResource("Resource_ofew8")])
+conditions = Array[ExtResource("1_neinx")]([])
+
+[sub_resource type="Resource" id="Resource_1b6kt"]
+script = ExtResource("5_20b3y")
+event = &"dealt_damage"
+conditions = Array[ExtResource("1_neinx")]([])
+affects_other = false
+react_to_statuses = false
+effects = Array[ExtResource("3_uferl")]([SubResource("Resource_ux41s")])
+
+[resource]
+script = ExtResource("4_vnjso")
+id = &"vampiric"
+display_name = "Vampiric"
+description = "Heals the holder for a quarter of the damage it deals."
+tags = Array[StringName]([])
+immune_to = Array[StringName]([])
+apply_conditions = Array[ExtResource("1_neinx")]([])
+duration = 0.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_gslx3")]([])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_uferl")]([])
+on_tick = Array[ExtResource("3_uferl")]([])
+on_remove = Array[ExtResource("3_uferl")]([])
+triggers = Array[ExtResource("5_20b3y")]([SubResource("Resource_1b6kt")])

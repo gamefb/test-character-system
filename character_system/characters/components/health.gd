@@ -9,7 +9,11 @@ extends Component
 ## starts at full health, innate passives included, whatever the node order.
 ##
 ## [DamageEffect] and [HealEffect] call [method change] for you. Every component on the
-## character hears [code]died[/code] as an event.
+## character hears [code]died[/code] as an event, and whoever dealt the killing blow hears
+## [code]killed[/code], so "heal on kill" is a status trigger and experience for kills is one
+## [WorldEvents] listener.
+## [br][br]For a shield that soaks up damage before health, add a [Pool] with
+## [member Pool.absorbs_damage] on.
 
 ## Emitted when health or the maximum changes, including when a max-health buff starts or ends.
 signal changed(current: float, maximum: float)
@@ -21,7 +25,8 @@ signal died(ctx: EffectContext)
 	set(value):
 		max_health = value
 		update_stats()
-## Fraction of each damage type that is ignored, e.g. { &"fire": 0.5 }. 1 = immune.
+## Fraction of each damage type that is ignored, e.g. { &"fire": 0.5 }. 1 = immune, and a
+## negative number is a weakness: -0.5 takes 50% more.
 ## Statuses change these through stats named resist_<type>, e.g. resist_fire.
 @export var resistances: Dictionary[StringName, float] = {}:
 	set(value):
@@ -47,13 +52,9 @@ func _stats() -> Dictionary[StringName, float]:
 
 func _start() -> void:
 	listen(manager.stat_changed, _on_stat_changed)
+	on(&"started", _settle)
 	if manager.started:
 		# Added mid-game: the character has already started.
-		_settle()
-
-
-func _on_event(event: StringName, _ctx: EffectContext) -> void:
-	if event == &"started":
 		_settle()
 
 
@@ -79,17 +80,24 @@ func change(amount: float, ctx: EffectContext = null) -> void:
 		died.emit(ctx)
 		if manager:
 			manager.send(&"died", ctx)
+		if ctx and ctx.source != host:
+			# Safe if the killer has no components or is already gone.
+			ComponentManager.notify(ctx.source, &"killed", ctx)
 
 
-## Brings the character back with [param amount] health, or full health if left out.
+## Brings the character back with [param amount] health, or full health if left out. Every
+## component hears [code]revived[/code].
 func revive(amount := -1.0) -> void:
+	var was_dead: bool = is_dead()
 	_current = maximum() if amount < 0.0 else minf(amount, maximum())
 	_full = false
 	changed.emit(_current, maximum())
+	if was_dead and manager:
+		manager.send(&"revived", null)
 
 
 # The character has finished starting: from now on, health only changes through change().
-func _settle() -> void:
+func _settle(_ctx: EffectContext = null) -> void:
 	if _full:
 		_current = maximum()
 		_full = false

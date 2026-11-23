@@ -1,0 +1,42 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_2m5os"]
+[ext_resource type="Script" path="res://character_system/items/components/grant_abilities.gd" id="2_d8la7"]
+[ext_resource type="Script" path="res://character_system/resources/abilities/ability_data.gd" id="3_o14i4"]
+[ext_resource type="Resource" path="res://character_system/examples/abilities/fireball.tres" id="4_uqqte"]
+[ext_resource type="Script" path="res://character_system/items/components/grant_modifiers.gd" id="5_whje6"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="6_rh4h2"]
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="7_4jfsx"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2f0oi"]
+albedo_color = Color(0.5, 0.25, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_8qfe5"]
+material = SubResource("StandardMaterial3D_2f0oi")
+size = Vector3(0.06, 0.06, 1.2)
+
+[sub_resource type="Resource" id="Resource_no4t4"]
+script = ExtResource("6_rh4h2")
+stat = &"bonus_fire"
+add = 0.2
+percent = 0.0
+mul = 1.0
+conditions = Array[ExtResource("7_4jfsx")]([])
+
+[node name="FireStaff" type="Node3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_8qfe5")
+
+[node name="ComponentManager" type="Node" parent="."]
+script = ExtResource("1_2m5os")
+
+[node name="GrantAbilities" type="Node" parent="."]
+script = ExtResource("2_d8la7")
+abilities = Dictionary[StringName, ExtResource("3_o14i4")]({
+&"secondary": ExtResource("4_uqqte")
+})
+
+[node name="GrantModifiers" type="Node" parent="."]
+script = ExtResource("5_whje6")
+modifiers = Array[ExtResource("6_rh4h2")]([SubResource("Resource_no4t4")])

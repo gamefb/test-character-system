@@ -32,5 +32,5 @@ func _stop() -> void:
 
 
 ## True if [param other] is in the group of a team this character fights.
-func is_hostile(other: Node) -> bool:
-	return is_instance_valid(other) and hostile_to.any(other.is_in_group)
+func is_hostile(other: Variant) -> bool:
+	return is_instance_valid(other) and other is Node and hostile_to.any(other.is_in_group)

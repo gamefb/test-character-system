@@ -43,7 +43,8 @@ func _process(_delta: float) -> void:
 	move_dir = dir.slide(Vector3.UP).normalized() * input.length()
 	aim_point = camera.global_position - camera.global_basis.z * 100.0
 	for a in _actions:
-		if is_action_pressed(a) and not Input.is_action_pressed(a):
+		# Read _held directly: a button let go while stunned must not stay held.
+		if _held.has(a) and not Input.is_action_pressed(a):
 			release(a)
 
 

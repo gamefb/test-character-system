@@ -67,8 +67,12 @@ func _start() -> void:
 
 
 func _stop() -> void:
+	# The component is going away, often with its character: take the stat modifiers back off,
+	# but don't run on_remove, which is for a status that ends.
 	for data: StatusData in active.keys():
-		remove(data)  # Takes its stat modifiers back off.
+		_set_stacks(data, active[data], 0)
+	active.clear()
+	changed.emit()
 
 
 func _on_event(event: StringName, ctx: EffectContext) -> void:
@@ -86,7 +90,8 @@ func _on_event(event: StringName, ctx: EffectContext) -> void:
 					t.event == event and active.has(data)
 					and (t.react_to_statuses or not ctx.from_status)
 			):
-				_run(t.effects, data, active[data], other if t.affects_other else host, ctx)
+				_run(t.effects, data, active[data], other if t.affects_other else host, ctx,
+						t.conditions)
 
 
 ## Applies a status, handling conditions, blocking, removal of opposing statuses,
@@ -149,6 +154,23 @@ func drop_hold(data: StatusData) -> void:
 		changed.emit()
 
 
+## Removes every status with [param tag], e.g. &"poison" for an antidote. Returns how many
+## were removed.
+func remove_tagged(tag: StringName) -> int:
+	var count: int = 0
+	for data: StatusData in active.keys():
+		if tag in data.tags and active.has(data):
+			remove(data)
+			count += 1
+	return count
+
+
+## How many stacks of [param data] are active, or 0.
+func stacks_of(data: StatusData) -> int:
+	var s: ActiveStatus = active.get(data)
+	return s.stacks if s else 0
+
+
 ## True if any active status has [param tag].
 func has_tag(tag: StringName) -> bool:
 	for data: StatusData in active:
@@ -180,21 +202,27 @@ func _set_stacks(data: StatusData, s: ActiveStatus, count: int) -> void:
 	while s.stacks < count:
 		s.stacks += 1
 		for m in data.modifiers:
-			manager.add_modifier(m)
+			manager.add_modifier(m, data)
 	while s.stacks > count:
 		s.stacks -= 1
 		for m in data.modifiers:
 			manager.remove_modifier(m)
 
 
-func _run(effects: Array[Effect], data: StatusData, s: ActiveStatus,
-		target: Node = host, cause: EffectContext = null) -> void:
+func _run(effects: Array[Effect], data: StatusData, s: ActiveStatus, target: Node = host,
+		cause: EffectContext = null, conditions: Array[Condition] = []) -> void:
+	if cause and cause.depth >= EffectContext.MAX_DEPTH:
+		push_warning("Status '%s' on '%s': triggers kept setting each other off, so the chain "
+				% [data.id, host.name] + "was cut. Check triggers with React To Statuses on.")
+		return
 	# Effects on the holder credit whoever applied the status; effects on others credit the holder.
 	var ctx := EffectContext.new(s.source if target == host else host, target, data)
 	ctx.magnitude = maxi(s.stacks, 1)
 	ctx.from_status = true
 	ctx.cause = cause
-	Effect.apply_all(effects, ctx)
+	ctx.depth = cause.depth + 1 if cause else 0
+	if Condition.all_pass(conditions, ctx):
+		Effect.apply_all(effects, ctx)
 
 
 ## Runtime state of one status on this character.

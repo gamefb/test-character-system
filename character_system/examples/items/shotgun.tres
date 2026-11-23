@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://character_system/examples/items/scenes/shotgun.tscn" id="1_wm5ha"]
+[ext_resource type="Script" path="res://character_system/resources/items/item_data.gd" id="2_kdhcq"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_p2dsq"]
+
+[resource]
+script = ExtResource("2_kdhcq")
+id = &"shotgun"
+display_name = "Shotgun"
+description = "Eight pellets of 3 damage in a 4 degree cone. Six shells, reloaded in 1.2 seconds, for free: its Magazine has no ammo item."
+max_stack = 1
+slot = &"weapon"
+scene = ExtResource("1_wm5ha")
+use_effects = Array[ExtResource("3_p2dsq")]([])
+consumed_on_use = true

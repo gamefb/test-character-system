@@ -4,9 +4,10 @@ class_name Inventory
 extends Component
 ## The items a character carries, as stacks.
 ##
-## It knows nothing about what items do. Every change emits [signal changed] and is also
-## sent to the host's components as the [code]inventory_changed[/code] event, which
-## [Equipment] and [WeaponSwitch] use.
+## Every change emits [signal changed] and is also sent to the host's components as the
+## [code]inventory_changed[/code] event, which [Equipment] and [WeaponSwitch] use.
+## [method use] runs an item's [member ItemData.use_effects] on the character, for potions
+## and other consumables.
 
 ## Emitted whenever items are added or removed.
 signal changed
@@ -54,6 +55,23 @@ func remove(data: ItemData, amount := 1) -> bool:
 			if item.count == 0:
 				items.erase(item)
 	_changed()
+	return true
+
+
+## Uses one [param data]: runs its [member ItemData.use_effects] on this character and, if
+## it's [member ItemData.consumed_on_use], takes one from the stack. Returns false, doing
+## nothing, if none is carried or the item has no use effects.
+## [codeblock]
+## func _unhandled_input(event: InputEvent) -> void:
+## 	if event.is_action_pressed(&"quick_heal"):
+## 		(Component.of(player, Inventory) as Inventory).use(health_potion)
+## [/codeblock]
+func use(data: ItemData) -> bool:
+	if not data or data.use_effects.is_empty() or count(data) <= 0:
+		return false
+	Effect.apply_all(data.use_effects, EffectContext.new(host, host, data))
+	if data.consumed_on_use:
+		remove(data, 1)
 	return true
 
 

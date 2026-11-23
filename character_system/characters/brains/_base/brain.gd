@@ -29,11 +29,31 @@ extends Component
 ## brain.press(&"primary")  # A tap: press and release in the same frame.
 ## brain.release(&"primary")
 ## [/codeblock]
+##
+## [b]Stuns and death.[/b] While the character is dead, or has a status with one of
+## [member blocked_by_tags], the brain reports no intent: [member move_dir] is zero and no
+## action counts as pressed. Everything that reads the brain stops with it, so a status tagged
+## [code]stunned[/code] stops walking, jumping, shooting, switching weapons and abilities
+## without any of them knowing about stuns. To stop one thing only, use its own Blocked By
+## Tags instead: [member MotorNode.blocked_by_tags] (rooted), [member Trigger.blocked_by_tags]
+## (disarmed) or [member AbilityData.blocked_by_tags] (silenced).
 
-## Desired movement in world space. Length 0 to 1.
-var move_dir := Vector3.ZERO
+## While the character has a status with one of these tags, it can't act at all.
+@export var blocked_by_tags: Array[StringName] = [&"stunned"]
+## Off: a dead character can't act until [method Health.revive]. On: death doesn't stop the
+## brain, e.g. for a ghost or a turret without [Health].
+@export var acts_while_dead := false
+
+## Desired movement in world space. Length 0 to 1. Zero while [method is_blocked].
+var move_dir: Vector3:
+	get:
+		return Vector3.ZERO if is_blocked() else _move_dir
+	set(value):
+		_move_dir = value
 ## World-space point the character is aiming at.
 var aim_point := Vector3.ZERO
+
+var _move_dir := Vector3.ZERO
 
 # Action -> (physics frame, process frame) on which it counts as just pressed. Pressed actions
 # are in _held; a tap may already be released while still just pressed.
@@ -59,15 +79,31 @@ func release(action: StringName) -> void:
 	_held.erase(action)
 
 
+## True while the character can't act: it's dead, or a status has one of
+## [member blocked_by_tags]. Presses made meanwhile are lost; a button still held when it ends
+## counts as held again.
+func is_blocked() -> bool:
+	if not acts_while_dead:
+		var health := find(Health) as Health
+		if health and health.is_dead():
+			return true
+	if blocked_by_tags.is_empty():
+		return false
+	var statuses := find(Statuses) as Statuses
+	return statuses != null and blocked_by_tags.any(statuses.has_tag)
+
+
 ## True while [param action] is held down, like [method Input.is_action_pressed].
 func is_action_pressed(action: StringName) -> bool:
-	return _held.has(action)
+	return _held.has(action) and not is_blocked()
 
 
 ## True during the frame [param action] was pressed, like [method Input.is_action_just_pressed].
 ## Works in both [code]_process()[/code] and [code]_physics_process()[/code], and a tap counts
 ## even if it was released in the same frame.
 func is_action_just_pressed(action: StringName) -> bool:
+	if is_blocked():
+		return false
 	var frames: Vector2i = _pressed_on.get(action, -Vector2i.ONE)
 	if Engine.is_in_physics_frame():
 		return frames.x == Engine.get_physics_frames()

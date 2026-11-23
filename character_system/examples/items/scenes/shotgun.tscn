@@ -1,0 +1,50 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_wnjxw"]
+[ext_resource type="Script" path="res://character_system/items/components/trigger.gd" id="2_07gp6"]
+[ext_resource type="Script" path="res://character_system/items/components/magazine.gd" id="3_qgt6s"]
+[ext_resource type="Script" path="res://character_system/items/components/hitscan.gd" id="4_qrb5w"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="5_v4rgi"]
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="6_n7v57"]
+[ext_resource type="Script" path="res://character_system/resources/amounts/_base/amount.gd" id="7_6mhk8"]
+[ext_resource type="Script" path="res://character_system/resources/effects/damage_effect.gd" id="8_gcmqf"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cafj3"]
+albedo_color = Color(0.3, 0.2, 0.15, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wi0cb"]
+material = SubResource("StandardMaterial3D_cafj3")
+size = Vector3(0.12, 0.12, 0.6)
+
+[sub_resource type="Resource" id="Resource_cmg7n"]
+script = ExtResource("8_gcmqf")
+amount = 3.0
+scaling = Array[ExtResource("7_6mhk8")]([])
+type = &"physical"
+tags = Array[StringName]([])
+conditions = Array[ExtResource("6_n7v57")]([])
+
+[node name="Shotgun" type="Node3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_wi0cb")
+
+[node name="ComponentManager" type="Node" parent="."]
+script = ExtResource("1_wnjxw")
+
+[node name="Trigger" type="Node" parent="."]
+script = ExtResource("2_07gp6")
+fire_rate = 1.5
+
+[node name="Magazine" type="Node" parent="."]
+script = ExtResource("3_qgt6s")
+capacity = 6
+reload_time = 1.2
+auto_reload = true
+
+[node name="Hitscan" type="Node" parent="."]
+script = ExtResource("4_qrb5w")
+max_distance = 30.0
+pellets = 8
+spread = 4.0
+effects = Array[ExtResource("5_v4rgi")]([SubResource("Resource_cmg7n")])

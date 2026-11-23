@@ -1,0 +1,51 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_cp64s"]
+[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_nmqup"]
+[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_fp7pm"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_c65oo"]
+[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_4fvgo"]
+[ext_resource type="Script" path="res://character_system/resources/conditions/damage_type_condition.gd" id="6_kaaov"]
+[ext_resource type="Script" path="res://character_system/resources/effects/modify_amount_effect.gd" id="7_wiroh"]
+
+[sub_resource type="Resource" id="Resource_31qlg"]
+script = ExtResource("6_kaaov")
+types = Array[StringName]([&"fire"])
+subject = 0
+negate = false
+
+[sub_resource type="Resource" id="Resource_xubhn"]
+script = ExtResource("7_wiroh")
+add = 0.0
+percent = 0.0
+mul = 0.5
+per_stack = false
+tag = &""
+conditions = Array[ExtResource("1_cp64s")]([SubResource("Resource_31qlg")])
+
+[sub_resource type="Resource" id="Resource_r0flc"]
+script = ExtResource("5_4fvgo")
+event = &"taking_damage"
+conditions = Array[ExtResource("1_cp64s")]([])
+affects_other = false
+react_to_statuses = true
+effects = Array[ExtResource("3_fp7pm")]([SubResource("Resource_xubhn")])
+
+[resource]
+script = ExtResource("4_c65oo")
+id = &"fire_ward"
+display_name = "Fire ward"
+description = "Halves fire damage taken, burn ticks included. Other damage gets through."
+tags = Array[StringName]([])
+immune_to = Array[StringName]([])
+apply_conditions = Array[ExtResource("1_cp64s")]([])
+duration = 0.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_nmqup")]([])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_fp7pm")]([])
+on_tick = Array[ExtResource("3_fp7pm")]([])
+on_remove = Array[ExtResource("3_fp7pm")]([])
+triggers = Array[ExtResource("5_4fvgo")]([SubResource("Resource_r0flc")])
