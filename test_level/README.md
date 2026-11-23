@@ -53,5 +53,5 @@ left out of the level unnoticed.
 - `scenes/dummy.tscn`: a target with health, statuses and a head hurtbox.
 - The pickups and nameplates come from `immunity_test/`.
 
-Good to know: shots leave from the weapon, not from the camera, so up close they land a
-little below and to the right of the crosshair.
+Shots leave from the weapon in the player's hand and land where the crosshair is, at any
+range: the `PlayerBrain` aims at the first thing the middle of the screen is on.

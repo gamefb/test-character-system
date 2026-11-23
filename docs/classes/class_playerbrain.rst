@@ -21,6 +21,8 @@ Needs the input actions ``left``, ``right``, ``forward`` and ``back`` (Project S
 
 Presses come from input events in ``_unhandled_input()``, so a click the UI uses doesn't reach the character. Releases are polled every frame, so a button let go while the game was paused, over the UI or in another window doesn't stay held.
 
+\ **Aiming.** :ref:`Brain.aim_point<class_Brain_property_aim_point>` is the point the middle of the screen is on: the first thing a ray from the :ref:`camera<class_PlayerBrain_property_camera>` meets. Weapons shoot from themselves toward that point, so a gun held at the hip still hits what the crosshair is on, at any range.
+
 .. rst-class:: classref-reftable-group
 
 Properties
@@ -29,11 +31,13 @@ Properties
 .. table::
    :widths: auto
 
-   +------------------------------------------------------------------+----------------------------------------------------------------+--------+
-   | :ref:`Camera3D<class_Camera3D>`                                  | :ref:`camera<class_PlayerBrain_property_camera>`               |        |
-   +------------------------------------------------------------------+----------------------------------------------------------------+--------+
-   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`extra_actions<class_PlayerBrain_property_extra_actions>` | ``[]`` |
-   +------------------------------------------------------------------+----------------------------------------------------------------+--------+
+   +------------------------------------------------------------------+----------------------------------------------------------------+----------------+
+   | :ref:`Camera3D<class_Camera3D>`                                  | :ref:`camera<class_PlayerBrain_property_camera>`               |                |
+   +------------------------------------------------------------------+----------------------------------------------------------------+----------------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`extra_actions<class_PlayerBrain_property_extra_actions>` | ``[]``         |
+   +------------------------------------------------------------------+----------------------------------------------------------------+----------------+
+   | :ref:`int<class_int>`                                            | :ref:`aim_mask<class_PlayerBrain_property_aim_mask>`           | ``4294967295`` |
+   +------------------------------------------------------------------+----------------------------------------------------------------+----------------+
 
 .. rst-class:: classref-section-separator
 
@@ -51,6 +55,22 @@ Constants
 **ACTIONS** = ``Array[StringName]([&"primary", &"secondary", &"jump", &"reload", &"interact", &"next_weapon", &"previous_weapon"])`` :ref:`🔗<class_PlayerBrain_constant_ACTIONS>`
 
 Input actions passed on to :ref:`Brain.is_action_pressed()<class_Brain_method_is_action_pressed>`. Add your own to :ref:`extra_actions<class_PlayerBrain_property_extra_actions>` instead of changing this list.
+
+.. _class_PlayerBrain_constant_AIM_DISTANCE:
+
+.. rst-class:: classref-constant
+
+**AIM_DISTANCE** = ``100.0`` :ref:`🔗<class_PlayerBrain_constant_AIM_DISTANCE>`
+
+How far the player can aim, in metres. With nothing in the way, the aim point is this far along the camera's line of sight.
+
+.. _class_PlayerBrain_constant_MIN_AIM_DISTANCE:
+
+.. rst-class:: classref-constant
+
+**MIN_AIM_DISTANCE** = ``1.5`` :ref:`🔗<class_PlayerBrain_constant_MIN_AIM_DISTANCE>`
+
+The aim point is never closer than this, so a shot at a wall right in front of the character leaves the weapon forwards, not back toward a point behind its muzzle.
 
 .. rst-class:: classref-section-separator
 
@@ -84,6 +104,18 @@ Movement is relative to this camera, and the character aims where it looks. Leav
 :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] **extra_actions** = ``[]`` :ref:`🔗<class_PlayerBrain_property_extra_actions>`
 
 Your own input actions to pass on as well, e.g. &"sprint" or &"ability_1". Add each one to the Input Map too.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_PlayerBrain_property_aim_mask:
+
+.. rst-class:: classref-property
+
+:ref:`int<class_int>` **aim_mask** = ``4294967295`` :ref:`🔗<class_PlayerBrain_property_aim_mask>`
+
+The physics layers the crosshair can rest on. Untick a layer to aim through it.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

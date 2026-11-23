@@ -18,12 +18,14 @@ try everything here in play, open `test_level/test_level.tscn` and press F6.
 3. Add a **WalkMode** and an **AirMode** as children of the `CharacterMotor`, so the character
    can walk, jump and fall.
 4. A player needs a **Camera3D** and an AI a **NavigationAgent3D** somewhere under the
-   character. The brain finds it by itself.
+   character. The brain finds it by itself. The player aims at whatever the middle of the
+   camera's view is on, so a crosshair goes in the centre of the screen; weapons shoot from
+   where they are held and still hit that point.
 5. Fix any yellow warning triangles in the Scene dock. They name what's missing.
 
 A component without what it needs waits instead of crashing, and starts once it's added.
-`examples/characters/mage.tscn` is a small character to look at: health, attributes, a mana
-pool, a shield and a Fireball.
+`examples/characters/mage.tscn` is a small character to look at: health, stats of her own, a
+mana pool, a shield and a Fireball.
 
 ### Give a character its own stats
 

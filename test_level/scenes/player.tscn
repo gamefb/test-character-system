@@ -41,7 +41,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 current = true
 
 [node name="Hand" type="Node3D" parent="Head/Camera3D" unique_id=1328178281]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, -0.15, -0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, -0.25, -0.6)
 
 [node name="Worn" type="Node3D" parent="." unique_id=2042210559]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

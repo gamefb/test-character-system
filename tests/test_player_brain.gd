@@ -37,6 +37,56 @@ func press(action: StringName) -> void:
 	get_viewport().push_input(event)
 
 
+func frames() -> void:
+	for i in 2:
+		await get_tree().physics_frame
+	await get_tree().process_frame
+
+
+func wall_at(z: float) -> StaticBody3D:
+	var wall := StaticBody3D.new()
+	var shape := CollisionShape3D.new()
+	shape.shape = BoxShape3D.new()
+	(shape.shape as BoxShape3D).size = Vector3(4, 4, 1)
+	wall.add_child(shape)
+	wall.position = Vector3(0, 1.6, z)
+	add_child_autofree(wall)
+	return wall
+
+
+func test_the_aim_point_is_what_the_crosshair_is_on() -> void:
+	for action in MOVES:
+		add_action(action)
+	var brain: PlayerBrain = make_player()
+	brain.camera.position = Vector3(0, 1.6, 0)
+	await frames()
+	assert_almost_eq(brain.aim_point, Vector3(0, 1.6, -PlayerBrain.AIM_DISTANCE),
+			Vector3.ONE * 0.01, "nothing in the way: as far as the player can aim")
+	var wall: StaticBody3D = wall_at(-10.5)
+	await frames()
+	assert_almost_eq(brain.aim_point, Vector3(0, 1.6, -10), Vector3.ONE * 0.01,
+			"the near face of the wall the camera looks at")
+	wall.position.z = -1.3
+	await frames()
+	assert_almost_eq(brain.aim_point, Vector3(0, 1.6, -PlayerBrain.MIN_AIM_DISTANCE),
+			Vector3.ONE * 0.01, "a wall in the player's face: never behind the weapon")
+	brain.aim_mask = 0
+	await frames()
+	assert_almost_eq(brain.aim_point.z, -PlayerBrain.AIM_DISTANCE, 0.01, "a layer aimed through")
+
+
+func test_a_camera_behind_the_character_aims_from_the_character() -> void:
+	for action in MOVES:
+		add_action(action)
+	var brain: PlayerBrain = make_player()
+	brain.camera.position = Vector3(0, 1.6, 4)
+	wall_at(2.0)  # Between the camera and the character.
+	wall_at(-20.5)
+	await frames()
+	assert_almost_eq(brain.aim_point, Vector3(0, 1.6, -20), Vector3.ONE * 0.01,
+			"what is between the camera and the character is not aimed at")
+
+
 func test_weapon_actions_are_passed_on() -> void:
 	for action in MOVES + [&"next_weapon", &"previous_weapon"]:
 		add_action(action)

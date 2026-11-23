@@ -19,7 +19,7 @@ minutes.
 | `character_system/kit/` | Ready-made parts built on the core: brains, movement modes, weapons, projectiles, zones and more. Keep what you use. |
 | `character_system/examples/` | Statuses, items, abilities and scripts to copy. Start with `character_system/RECIPES.md`. |
 | `addons/character_system_warnings/` | Editor plugin that warns about mistyped stat, event and tag names. |
-| `tests/` | GUT unit tests (212 tests), and `benchmark.gd`. |
+| `tests/` | GUT unit tests (214 tests), and `benchmark.gd`. |
 | `test_level/` | A playable level with every part of the system in it, and a self-test that plays it. |
 | `immunity_test/` | A scripted scene that runs 43 checks on immunities, zones and items. |
 | `docs/` | The documentation site (Sphinx). |

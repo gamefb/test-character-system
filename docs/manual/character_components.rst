@@ -101,6 +101,8 @@ Input actions are created in Project > Project Settings > Input Map. Leave Camer
 
 :ref:`PlayerBrain<class_PlayerBrain>` takes presses from input events in ``_unhandled_input()``, so a click the UI uses never reaches the character. It polls releases every frame with ``Input.is_action_pressed()``, so a button let go while the game was paused, over the UI or in another window doesn't stay held, and an action bound to two keys stays held until both are up. AI and tests press buttons with ``press()`` and ``release()``. A press made from code counts from the next frame, so every node sees it exactly once wherever in the frame it was made; presses from input events count straight away, as they do in :ref:`Input<class_Input>`.
 
+**Aiming.** A :ref:`PlayerBrain<class_PlayerBrain>`'s ``aim_point`` is the first thing a ray from the camera meets, up to 100 metres away: the point under the crosshair. Weapons and thrown projectiles start where they are and go toward that point, so a gun held low at the hip hits what the crosshair is on at any range, and a wall between the gun and the target stops the shot, as it should. Three details keep that honest: the character's own body and hurtboxes are ignored; the ray starts level with the character, so a camera behind it can't aim at something in between; and the point is never closer than 1.5 metres, so a shot at a wall in the player's face doesn't turn round. Untick layers in **Aim Mask** to aim through them.
+
 .. source-file:: ../../character_system/kit/brains/ai_brain.gd
 
 Because AI presses the same "buttons" as the player, with ``press()`` and ``release()``, every weapon and ability works for AI with no extra code.

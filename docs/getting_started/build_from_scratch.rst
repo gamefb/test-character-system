@@ -448,7 +448,9 @@ stats of its own, and knows its team. All extend ``Component``.
    * - ``PlayerBrain``
      - ``camera`` (empty: the first ``Camera3D`` under the host), ``ACTIONS`` list
      - Fill ``move_dir`` and ``aim_point`` in ``_process``, and release any held action
-       ``Input`` no longer has pressed; record presses from ``_unhandled_input``
+       ``Input`` no longer has pressed; record presses from ``_unhandled_input``. The aim
+       point is the first thing a ray from the camera meets, ignoring the character itself,
+       so weapons that shoot from the hand hit what the crosshair is on
    * - ``AIBrain``
      - ``agent: NavigationAgent3D`` (empty: the first one under the host),
        ``repath_distance``, ``target``

@@ -106,15 +106,15 @@ func _check_shrines_and_hazards() -> void:
 func _check_combat() -> void:
 	var target: Node3D = _level.get_node(^"Targets/Plain")
 	var health := Component.of(target, Health) as Health
-	# A little to the left and looking slightly up, so the gun in the right hand points at
-	# the head: shots leave from the weapon, not from the camera.
-	_player.global_position = target.global_position + Vector3(-0.15, 0.1, 6)
+	# Straight in front, with the crosshair on the head. The rifle is held low and to the
+	# right, and still hits what the crosshair is on.
+	_player.global_position = target.global_position + Vector3(0, 0.1, 6)
 	_player.rotation = Vector3.ZERO
-	(_player.get_node(^"Head/Camera3D") as Camera3D).rotation.x = 0.05
+	(_player.get_node(^"Head/Camera3D") as Camera3D).rotation.x = 0.02
 	await _frames(10)
 	await _tap(&"primary")
 	check(health.maximum() - health.current == 20.0,
-			"a rifle shot at a dummy's head does double damage: %s" % health.current)
+			"a shot lands where the crosshair is: the head, for double damage")
 	var mana := Pool.named(_player, &"mana")
 	await _tap(&"ability_3")
 	await _frames(60)

@@ -22,8 +22,8 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - 9
      - Presses and releases, a release while paused or never seen, a press the UI used, two keys on one action, an AI press seen once by every node, automatic fire held and tapped
    * - ``test_player_brain.gd``
-     - 4
-     - Weapon actions and extra actions are passed on; a Camera left empty is found; missing Input Map actions are skipped without errors
+     - 6
+     - Weapon actions and extra actions are passed on; a Camera left empty is found; missing Input Map actions are skipped without errors; the aim point is what the crosshair is on, never behind the weapon, and a camera behind the character doesn't aim at what is in between
    * - ``test_inventory.gd``
      - 12
      - Weapon switching (drawing, wrapping around, holstering, dropping, each weapon's own rounds) and the carrying rule between Inventory and Equipment
@@ -116,7 +116,7 @@ The test level
 
 The characters, items and zones are set up in the Inspector from ``character_system/examples/``. The level's one script does what a game does around them: it adds the input actions, equips what the player picks up, uses potions and grenades, draws the text on screen and brings the dead back.
 
-Started with ``--self-test``, the level plays itself and prints 18 checks: the player is walked over every pickup, shrine and zone, then fires, casts, drinks and throws. The first two checks are that the level uses every class and every example in ``character_system/``, so a new part can't be left out unnoticed.
+Started with ``--self-test``, the level plays itself and prints 18 checks: the player is walked over every pickup, shrine and zone, then fires, casts, drinks and throws. One check is that a rifle held at the hip hits the head the crosshair is on. The first two checks are that the level uses every class and every example in ``character_system/``, so a new part can't be left out unnoticed.
 
 .. code-block:: shell
 
@@ -171,7 +171,7 @@ Walking costs a little more than before stuns existed, because everything that r
 Verification status
 -------------------
 
-All 212 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
+All 214 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
 
 .. list-table::
    :header-rows: 1
@@ -179,7 +179,7 @@ All 212 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 an
    * - Check
      - Godot 4.8 beta 4
    * - GUT tests (23 files above, test_statuses.gd included)
-     - 212 of 212, 953 asserts
+     - 214 of 214, 958 asserts
    * - ``immunity_test`` scene
      - 43 of 43
    * - Test level, ``--self-test``
