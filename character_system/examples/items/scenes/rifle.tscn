@@ -1,14 +1,14 @@
 [gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_y7lar"]
-[ext_resource type="Script" path="res://character_system/items/components/trigger.gd" id="2_g8stb"]
-[ext_resource type="Script" path="res://character_system/items/components/magazine.gd" id="3_lfjxt"]
+[ext_resource type="Script" path="res://character_system/kit/items/trigger.gd" id="2_g8stb"]
+[ext_resource type="Script" path="res://character_system/kit/items/magazine.gd" id="3_lfjxt"]
 [ext_resource type="Resource" path="res://character_system/examples/items/rifle_ammo.tres" id="4_jmbir"]
-[ext_resource type="Script" path="res://character_system/items/components/hitscan.gd" id="5_vp7uw"]
-[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="6_62noy"]
-[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="7_4k3qv"]
-[ext_resource type="Script" path="res://character_system/resources/effects/damage_effect.gd" id="8_32my3"]
-[ext_resource type="Script" path="res://character_system/resources/conditions/has_tag_condition.gd" id="9_tep5a"]
+[ext_resource type="Script" path="res://character_system/kit/items/hitscan.gd" id="5_vp7uw"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="6_62noy"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="7_4k3qv"]
+[ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="8_32my3"]
+[ext_resource type="Script" path="res://character_system/core/conditions/has_tag_condition.gd" id="9_tep5a"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jc7gx"]
 albedo_color = Color(0.25, 0.25, 0.25, 1)

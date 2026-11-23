@@ -5,11 +5,13 @@ Overview
 
 Every character, weapon and hazard in the game is a plain node with small component children, and every gameplay change passes through one effect pipeline. A player, a hostile AI and a friendly AI are the same scene with different components and data. A rifle and a magic ring are built the same way.
 
-The document targets Godot 4.4 or later with GDScript, because the code uses typed dictionaries. It covers three systems that share one foundation:
+The document targets Godot 4.8 with GDScript; the code uses typed dictionaries and ``@abstract`` classes, so it needs 4.5 at the least. The scripts come in two halves: ``core/`` is the system and loads on its own, and ``kit/`` is a set of ready-made parts built on it, such as brains, movement modes, weapons and projectiles, which you can keep, change or replace with your own. It covers three systems that share one foundation:
 
--  **Characters**: stats, health, movement, input or AI, inventory, weapon switching, abilities and faction as separate components.
--  **Equipment**: items whose behavior comes from their components, such as fire rate, magazine and hit detection.
+-  **Characters**: stats, health, pools such as mana and shields, movement, input or AI, inventory, weapon switching, abilities and faction as separate components.
+-  **Equipment**: items whose behavior comes from their components, such as fire rate, magazine, hit detection, projectiles, stat bonuses and granted abilities.
 -  **Statuses and passives**: data-driven conditions that anything can apply to anything, in the style of Baldur's Gate 3, including conditions on effects, conditions on whether a status can be applied at all, and statuses that change damage before it lands.
+
+Most new content is data. A weapon that scales with strength, a spell with a mana cost and a cast time, a crit passive, a ring with random bonuses and a stun are all built in the Inspector from parts that already exist; :ref:`doc_ability_status_or_component` shows where each kind of idea goes.
 
 .. _doc_design_rules:
 
@@ -21,7 +23,9 @@ Design rules
 3. **Components find each other by type, through a hub.** Each host has one :ref:`ComponentManager<class_ComponentManager>`. Components register with it by themselves and look each other up through it, so there are no hard-coded node paths and no required root class. A component lists what it can't work without in ``_requires()``; until those parts are present it waits, with a warning in the editor, instead of crashing. A new kind of component never needs a change to the manager.
 4. **One way to change gameplay state.** Damage, healing and statuses are all :ref:`Effect<class_Effect>` resources. Weapons, abilities, statuses and the environment all run the same effects.
 5. **Numbers live on the component that uses them.** :ref:`Health<class_Health>` owns ``max_health`` and :ref:`CharacterMotor<class_CharacterMotor>` owns ``move_speed``. Statuses and items change them with modifiers, and readers ask for the current value at the moment of use.
-6. **Everything is documented in the code.** Comments starting with ``##`` are documentation comments. Godot shows them in its built-in help (press F1 and search for a class name) and as tooltips on exported properties in the inspector.
+6. **Changes add up the same way everywhere.** A stat and a hit are both worked out as (base + adds) × (1 + percents) × muls, from totals that are collected first and applied once. The result never depends on which status or item came first.
+7. **Intent has one source.** Everything a character does starts from its :ref:`Brain<class_Brain>`, so a player and an AI use the same weapons and abilities, and a stun or a death stops all of them in one place.
+8. **Everything is documented in the code.** Comments starting with ``##`` are documentation comments. Godot shows them in its built-in help (press F1 and search for a class name) and as tooltips on exported properties in the inspector.
 
 .. _doc_godot_terms_used_in_this_document:
 

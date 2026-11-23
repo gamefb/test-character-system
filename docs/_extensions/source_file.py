@@ -1,6 +1,6 @@
 """A ``source-file`` directive: a project file's code, folded under its path.
 
-    .. source-file:: ../../character_system/core/_base/component.gd
+    .. source-file:: ../../character_system/core/component.gd
 
 It takes the same options as ``literalinclude`` and reads the file when the site is built, so
 the listing always matches the code. Files of 30 lines or fewer start unfolded; add ``:open:``

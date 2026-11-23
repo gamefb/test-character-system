@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="StatusData" load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_pusod"]
-[ext_resource type="Script" path="res://character_system/resources/stats/stat_modifier.gd" id="2_f8ptm"]
-[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_416ko"]
-[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="4_w4x37"]
-[ext_resource type="Script" path="res://character_system/resources/statuses/status_trigger.gd" id="5_bwfyj"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_pusod"]
+[ext_resource type="Script" path="res://character_system/core/stats/stat_modifier.gd" id="2_f8ptm"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_416ko"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="4_w4x37"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_trigger.gd" id="5_bwfyj"]
 
 [sub_resource type="Resource" id="Resource_rwbtn"]
 script = ExtResource("2_f8ptm")

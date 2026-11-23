@@ -13,8 +13,14 @@ func make_character() -> CharacterBody3D:
 	var hand := Node3D.new()
 	hand.name = "Hand"
 	var gear := Equipment.new()
-	gear.sockets = { &"weapon": ^"../Hand", &"cloak": ^"../Hand", &"neck": ^"../Hand" }
+	gear.sockets = {
+		&"weapon": ^"../Hand", &"cloak": ^"../Hand", &"neck": ^"../Hand", &"ring": ^"../Hand",
+	}
+	var shape := CollisionShape3D.new()
+	shape.shape = CapsuleShape3D.new()
+	shape.position.y = 1.0
 	var parts: Array[Node] = [
+		shape,
 		hand,
 		ComponentManager.new(),
 		Statuses.new(),
@@ -62,8 +68,10 @@ func test_every_example_loads() -> void:
 			assert_not_null(res.scene, path + " has a scene")
 		elif res is PackedScene:
 			var node: Node = (res as PackedScene).instantiate()
-			assert_true(node is EffectZone or ComponentManager.of(node) != null,
-					path + " is a zone or an item scene")
+			assert_true(
+					node is EffectZone or node is Projectile or ComponentManager.of(node) != null
+					or node.get_script() == null,
+					path + " is a zone, a projectile, an item scene, a character or a plain scene")
 			node.free()
 
 

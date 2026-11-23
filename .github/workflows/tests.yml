@@ -1,0 +1,58 @@
+# Runs the unit tests, the scene checks, the linter and the core-alone check.
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: 4.8-beta4
+  GUT_VERSION: v9.7.1
+  GDTOOLKIT_VERSION: 4.5.0
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/godot.zip" \
+            "https://github.com/godotengine/godot-builds/releases/download/$GODOT_VERSION/Godot_v${GODOT_VERSION}_linux.x86_64.zip"
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP/godot"
+          mkdir -p "$HOME/.local/bin"
+          ln -s "$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}_linux.x86_64" "$HOME/.local/bin/godot"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Install GUT
+        run: |
+          git clone --quiet --depth 1 --branch "$GUT_VERSION" https://github.com/bitwes/Gut "$RUNNER_TEMP/gut"
+          cp -r "$RUNNER_TEMP/gut/addons/gut" addons/gut
+      - name: Lint
+        run: |
+          pip install --quiet "gdtoolkit==$GDTOOLKIT_VERSION"
+          gdlint character_system tests addons/character_system_warnings immunity_test test_level
+      - name: Core loads on its own
+        # Before the full import, so the copy has no import cache to lean on.
+        run: |
+          mkdir "$RUNNER_TEMP/core_only"
+          cp -r project.godot character_system "$RUNNER_TEMP/core_only/"
+          rm -rf "$RUNNER_TEMP/core_only/character_system/kit" "$RUNNER_TEMP/core_only/character_system/examples"
+          godot --headless --path "$RUNNER_TEMP/core_only" --import 2>&1 | tee core.log
+          ! grep -E "SCRIPT ERROR|Parse Error" core.log
+          godot --headless --path "$RUNNER_TEMP/core_only" -s "$PWD/tests/check_scripts_load.gd"
+      - name: Import the project
+        run: |
+          godot --headless --import 2>&1 | tee import.log
+          ! grep -E "SCRIPT ERROR|Parse Error" import.log
+      - name: Unit tests
+        run: godot --headless -s addons/gut/gut_cmdln.gd -gexit
+      - name: Scene checks
+        run: godot --headless --fixed-fps 60 res://immunity_test/immunity_test.tscn
+      - name: Test level
+        run: godot --headless --fixed-fps 60 res://test_level/test_level.tscn -- --self-test

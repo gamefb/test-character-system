@@ -1,0 +1,69 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_if2bx"]
+[ext_resource type="Script" path="res://character_system/core/characters/health.gd" id="2_v7m7r"]
+[ext_resource type="Script" path="res://character_system/core/statuses/statuses.gd" id="3_enw71"]
+[ext_resource type="Script" path="res://character_system/core/characters/brain.gd" id="4_5vxg2"]
+[ext_resource type="Script" path="res://character_system/core/characters/pool.gd" id="5_xhvig"]
+[ext_resource type="Script" path="res://character_system/core/abilities/abilities.gd" id="6_xlam8"]
+[ext_resource type="Script" path="res://character_system/core/abilities/ability_data.gd" id="7_7i2p4"]
+[ext_resource type="Resource" path="res://character_system/examples/abilities/fireball.tres" id="8_gabv3"]
+[ext_resource type="Script" path="res://character_system/core/items/inventory.gd" id="9_w2g0x"]
+[ext_resource type="Script" path="res://character_system/core/items/equipment.gd" id="10_13ibg"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_kaxq7"]
+
+[node name="Mage" type="CharacterBody3D" unique_id=701653118]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=123733221]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_kaxq7")
+
+[node name="Hand" type="Node3D" parent="." unique_id=175729006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 1.2, -0.5)
+
+[node name="ComponentManager" type="Node" parent="." unique_id=1671962212]
+script = ExtResource("1_if2bx")
+stats = Dictionary[StringName, float]({
+&"crit_chance": 0.05,
+&"level": 1.0,
+&"spell_power": 5.0
+})
+
+[node name="Health" type="Node" parent="." unique_id=2093347403]
+script = ExtResource("2_v7m7r")
+max_health = 80.0
+
+[node name="Statuses" type="Node" parent="." unique_id=914122536]
+script = ExtResource("3_enw71")
+
+[node name="Brain" type="Node" parent="." unique_id=247838157]
+script = ExtResource("4_5vxg2")
+
+[node name="Mana" type="Node" parent="." unique_id=553505744]
+script = ExtResource("5_xhvig")
+regen = 5.0
+
+[node name="Shield" type="Node" parent="." unique_id=1310295846]
+script = ExtResource("5_xhvig")
+pool = &"shield"
+max_value = 30.0
+regen = 10.0
+regen_delay = 3.0
+absorbs_damage = true
+
+[node name="Abilities" type="Node" parent="." unique_id=1942903425]
+script = ExtResource("6_xlam8")
+slots = Dictionary[StringName, ExtResource("7_7i2p4")]({
+&"secondary": ExtResource("8_gabv3")
+})
+
+[node name="Inventory" type="Node" parent="." unique_id=16282857]
+script = ExtResource("9_w2g0x")
+
+[node name="Equipment" type="Node" parent="." unique_id=1514928216]
+script = ExtResource("10_13ibg")
+sockets = Dictionary[StringName, NodePath]({
+&"ring": NodePath("../Hand"),
+&"weapon": NodePath("../Hand")
+})

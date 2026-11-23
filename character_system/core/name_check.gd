@@ -5,17 +5,23 @@ extends RefCounted
 ##
 ## Stats, events and tags are typed as text, so [code]move_sped[/code] or
 ## [code]took_damgae[/code] would otherwise do nothing without any error. This checks:
-## [br]- stat names in [StatModifier] and [StatCondition] against the stats components and
-## movement modes and moves declare in [code]_stats()[/code] ([code]resist_<type>[/code] is
-## always allowed),
+## [br]- stat names in [StatModifier], [StatCondition], [StatAmount] and [ChanceCondition]
+## against the stats components and movement modes and moves declare in
+## [code]_stats()[/code], the ones listed in [member ComponentManager.stats] in your scenes, and the
+## two each [Pool] adds ([code]resist_<type>[/code] and [code]bonus_<type>[/code] are always
+## allowed),
+## [br]- pool names in [ChangePoolEffect] and [member AbilityData.costs] against the [Pool]s
+## in your scenes,
 ## [br]- [member StatusTrigger.event] against the events scripts send with
 ## [method ComponentManager.notify] or [method ComponentManager.send], and the ones the
 ## [CharacterMotor] sends for each mode and move with a [code]class_name[/code], such as
 ## [code]walk_mode_entered[/code],
-## [br]- tags in [member StatusData.immune_to], [member StatusData.removes_tags] and
-## [HasTagCondition] against the tags your saved statuses have.
+## [br]- tags in [member StatusData.immune_to], [member StatusData.removes_tags],
+## [member AbilityData.blocked_by_tags], [HasTagCondition] and [RemoveStatusEffect] against
+## the tags your saved statuses have.
 ## [br]The editor shows the results above the Inspector (enable the Character System Warnings
-## plugin) and as warnings on [Statuses], [GrantStatuses], [Abilities] and [Hitscan].
+## plugin) and as warnings on [Statuses], [Grants],
+## [Abilities], [Hitscan] and [MeleeSweep].
 ##
 ## To check the resources your own component holds, return the results from its
 ## [method Component._warnings] (the script needs [code]@tool[/code]):
@@ -34,6 +40,7 @@ static var _scanned_at: int = -_RESCAN_MS
 static var _stats := PackedStringArray()
 static var _events := PackedStringArray()
 static var _tags := PackedStringArray()
+static var _pools := PackedStringArray()
 
 
 ## Problems in [param object] and the resources stored inside it, as messages.
@@ -59,6 +66,7 @@ static func handles(object: Object) -> bool:
 	return (
 			object is StatusData or object is StatusTrigger or object is StatModifier
 			or object is Condition or object is Effect or object is AbilityData
+			or object is Amount or object is ItemData
 	)
 
 
@@ -80,6 +88,12 @@ static func known_tags() -> PackedStringArray:
 	return _tags
 
 
+## Names of the [Pool]s in saved scenes, e.g. mana.
+static func known_pools() -> PackedStringArray:
+	_scan()
+	return _pools
+
+
 ## Forgets the scan, so the next check reads the project again.
 static func rescan() -> void:
 	_scanned_at = -_RESCAN_MS
@@ -95,9 +109,24 @@ static func _check(object: Object, out: PackedStringArray, is_root: bool) -> voi
 	if not is_root and res.resource_path and not res.resource_path.contains("::"):
 		# Saved in its own file: checked when that file is open.
 		return
-	if object is StatModifier or object is StatCondition:
+	# By property, not by class, so resources of your own are checked the same way.
+	if &"stat" in object:
 		_check_name(object.get(&"stat"), _stats, "stat",
 				"No component has a stat called '%s', so this does nothing.", out, true)
+	if object.get(&"bonus_stat"):
+		_check_name(object.get(&"bonus_stat"), _stats, "stat",
+				"Bonus Stat: no component has a stat called '%s'.", out, true)
+	if object is Effect and &"pool" in object:
+		_check_name(object.get(&"pool"), _pools, "pool",
+				"No Pool in a saved scene is called '%s'.", out)
+	if object is AbilityData:
+		for pool_name in object.get(&"costs"):
+			_check_name(pool_name, _pools, "pool",
+					"Costs: no Pool in a saved scene is called '%s'.", out)
+		for tag in object.get(&"blocked_by_tags"):
+			_check_name(tag, _tags, "tag", "Blocked By Tags: no status has the tag '%s'.", out)
+	if object is RemoveStatusEffect and object.get(&"tag"):
+		_check_name(object.get(&"tag"), _tags, "tag", "No status has the tag '%s'.", out)
 	if object is StatusTrigger:
 		_check_name(object.get(&"event"), _events, "event",
 				"No script sends an event called '%s', so this trigger never runs.", out)
@@ -130,7 +159,9 @@ static func _check_name(name, known: PackedStringArray, kind: String, message: S
 	if text.is_empty():
 		out.append("No %s set, so this does nothing." % kind)
 		return
-	if text in known or (allow_resist and text.begins_with("resist_")):
+	# Damage types are open-ended, so their two stats can't be listed.
+	if text in known or (allow_resist and (
+			text.begins_with("resist_") or text.begins_with("bonus_"))):
 		return
 	var line: String = message % text
 	var guess: String = _closest(text, known)
@@ -161,9 +192,16 @@ static func _scan() -> void:
 	if Time.get_ticks_msec() - _scanned_at < _RESCAN_MS:
 		return
 	_scanned_at = Time.get_ticks_msec()
-	_stats = _component_stats()
+	var stats := {}
+	for stat_name in _component_stats():
+		stats[stat_name] = true
 	var events := {}
 	var tags := {}
+	var pools := {}
+	# A ComponentManager's stats and a Pool's name, as saved in scenes.
+	var listed := RegEx.create_from_string(
+			"(?ms)^stats = Dictionary\\[StringName, float\\]\\(\\{(.*?)\\}\\)")
+	var pool_line := RegEx.create_from_string("(?m)^pool = &\"(\\w+)\"")
 	var send := RegEx.create_from_string("(?:send|notify)\\s*\\((?:[^,()]*,\\s*)?&?\"(\\w+)\"")
 	var tag_line := RegEx.create_from_string("(?m)^tags = Array\\[StringName\\]\\(\\[(.*)\\]\\)")
 	var name := RegEx.create_from_string("\"(\\w+)\"")
@@ -176,10 +214,22 @@ static func _scan() -> void:
 			for line in tag_line.search_all(text):
 				for m in name.search_all(line.get_string(1)):
 					tags[m.get_string(1)] = true
+			for block in listed.search_all(text):
+				for m in name.search_all(block.get_string(1)):
+					stats[m.get_string(1)] = true
+			for m in pool_line.search_all(text):
+				pools[m.get_string(1)] = true
+			if text.contains("/pool.gd\""):
+				pools["mana"] = true  # The default name isn't saved in the scene.
+	for pool_name in pools:
+		stats["max_" + pool_name] = true
+		stats[pool_name + "_regen"] = true
 	for event in _motor_events():
 		events[event] = true
+	_stats = PackedStringArray(stats.keys())
 	_events = PackedStringArray(events.keys())
 	_tags = PackedStringArray(tags.keys())
+	_pools = PackedStringArray(pools.keys())
 
 
 # Stat names in the _stats() of every script that extends Component.

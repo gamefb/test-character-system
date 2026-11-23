@@ -17,114 +17,80 @@ Core
     :maxdepth: 1
     :name: toc-class-ref-core
 
+    class_abilities.state
+    class_abilities
+    class_abilitydata
+    class_amount
+    class_applystatuseffect
+    class_brain
+    class_charactermotor
     class_component
     class_componentmanager
+    class_condition
+    class_damageeffect
+    class_effect
     class_effectcontext
-    class_namecheck
-
-Movement
-========
-
-.. toctree::
-    :maxdepth: 1
-    :name: toc-class-ref-movement
-
-    class_airmode
-    class_charactermotor
-    class_dashmove
-    class_layeredmove
-    class_motornode
-    class_movementmode
-    class_walkmode
-
-Character components
-====================
-
-.. toctree::
-    :maxdepth: 1
-    :name: toc-class-ref-character-components
-
-    class_aibrain
-    class_abilities
-    class_brain
     class_equipment
-    class_faction
+    class_hastagcondition
+    class_healeffect
     class_health
     class_hurtbox
     class_inventory
-    class_mouselook
-    class_playerbrain
-    class_statuses.activestatus
-    class_statuses
-    class_weaponswitch
-
-Item components
-===============
-
-.. toctree::
-    :maxdepth: 1
-    :name: toc-class-ref-item-components
-
-    class_grantstatuses
-    class_hitscan
     class_itemcomponent
-    class_magazine
-    class_meleesweep
-    class_trigger
-
-World
-=====
-
-.. toctree::
-    :maxdepth: 1
-    :name: toc-class-ref-world
-
-    class_effectzone
-
-Effects
-=======
-
-.. toctree::
-    :maxdepth: 1
-    :name: toc-class-ref-effects
-
-    class_applystatuseffect
-    class_damageeffect
-    class_effect
-    class_healeffect
-    class_knockbackeffect
-    class_modifyamounteffect
-    class_removestatuseffect
-    class_spawnsceneeffect
-
-Conditions
-==========
-
-.. toctree::
-    :maxdepth: 1
-    :name: toc-class-ref-conditions
-
-    class_condition
-    class_hastagcondition
-    class_healthbelowcondition
-    class_ishostilecondition
-    class_statcondition
-
-Resources
-=========
-
-.. toctree::
-    :maxdepth: 1
-    :name: toc-class-ref-resources
-
-    class_abilitydata
     class_itemdata
     class_iteminstance
-    class_radiustargeting
+    class_layeredmove
+    class_modifyamounteffect
+    class_motornode
+    class_movementmode
+    class_namecheck
+    class_pool
+    class_removestatuseffect
+    class_statamount
     class_statmodifier
     class_statusdata
     class_statustrigger
+    class_statuses.activestatus
+    class_statuses
     class_targeting
+    class_worldevents
+
+Kit
+===
+
+.. toctree::
+    :maxdepth: 1
+    :name: toc-class-ref-kit
+
+    class_aibrain
+    class_airmode
+    class_anycondition
+    class_chancecondition
+    class_changepooleffect
+    class_dashmove
+    class_effectzone
+    class_faction
+    class_grants
+    class_healthamount
+    class_healthbelowcondition
+    class_hitamount
+    class_hitcondition
+    class_hitscan
+    class_ishostilecondition
+    class_knockbackeffect
+    class_launchprojectileeffect
+    class_magazine
+    class_meleesweep
+    class_mouselook
+    class_playerbrain
+    class_projectile
+    class_radiustargeting
+    class_randomamount
+    class_spawnsceneeffect
+    class_statcondition
+    class_trigger
+    class_walkmode
+    class_weaponswitch
 
 Examples
 ========

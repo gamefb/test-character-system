@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_rt13f"]
+[ext_resource type="Script" path="res://character_system/core/stats/stat_modifier.gd" id="2_8d45l"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_t83rb"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="4_ehttu"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_trigger.gd" id="5_suxwn"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="6_sgql1"]
+[ext_resource type="Script" path="res://character_system/core/effects/heal_effect.gd" id="7_yw850"]
+
+[sub_resource type="Resource" id="Resource_ptv4c"]
+script = ExtResource("7_yw850")
+amount = 15.0
+
+[sub_resource type="Resource" id="Resource_kyn7v"]
+script = ExtResource("5_suxwn")
+event = &"killed"
+effects = Array[ExtResource("3_t83rb")]([SubResource("Resource_ptv4c")])
+
+[resource]
+script = ExtResource("4_ehttu")
+id = &"bloodlust"
+display_name = "Bloodlust"
+description = "Heals the holder for 15 each time it kills something."
+triggers = Array[ExtResource("5_suxwn")]([SubResource("Resource_kyn7v")])

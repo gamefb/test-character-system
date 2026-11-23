@@ -2,7 +2,7 @@ config_version=5
 
 [application]
 config/name="test-character-system"
-config/features=PackedStringArray("4.4")
+config/features=PackedStringArray("4.8")
 
 [physics]
 3d/physics_engine="Jolt Physics"

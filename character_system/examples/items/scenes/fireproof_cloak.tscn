@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_n7fna"]
-[ext_resource type="Script" path="res://character_system/items/components/grant_statuses.gd" id="2_q5br6"]
-[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="3_eorpv"]
+[ext_resource type="Script" path="res://character_system/kit/items/grants.gd" id="2_q5br6"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="3_eorpv"]
 [ext_resource type="Resource" path="res://character_system/examples/statuses/fireproof.tres" id="4_o386a"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_amhss"]
@@ -20,6 +20,6 @@ mesh = SubResource("BoxMesh_0dhgv")
 [node name="ComponentManager" type="Node" parent="."]
 script = ExtResource("1_n7fna")
 
-[node name="GrantStatuses" type="Node" parent="."]
+[node name="Grants" type="Node" parent="."]
 script = ExtResource("2_q5br6")
 statuses = Array[ExtResource("3_eorpv")]([ExtResource("4_o386a")])

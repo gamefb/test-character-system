@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_neinx"]
+[ext_resource type="Script" path="res://character_system/core/stats/stat_modifier.gd" id="2_gslx3"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_uferl"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="4_vnjso"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_trigger.gd" id="5_20b3y"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="6_dklpw"]
+[ext_resource type="Script" path="res://character_system/kit/amounts/hit_amount.gd" id="7_oeweq"]
+[ext_resource type="Script" path="res://character_system/core/effects/heal_effect.gd" id="8_y0g0o"]
+
+[sub_resource type="Resource" id="Resource_ofew8"]
+script = ExtResource("7_oeweq")
+
+[sub_resource type="Resource" id="Resource_ux41s"]
+script = ExtResource("8_y0g0o")
+amount = 0.0
+scaling = Array[ExtResource("6_dklpw")]([SubResource("Resource_ofew8")])
+
+[sub_resource type="Resource" id="Resource_1b6kt"]
+script = ExtResource("5_20b3y")
+event = &"dealt_damage"
+effects = Array[ExtResource("3_uferl")]([SubResource("Resource_ux41s")])
+
+[resource]
+script = ExtResource("4_vnjso")
+id = &"vampiric"
+display_name = "Vampiric"
+description = "Heals the holder for a quarter of the damage it deals."
+triggers = Array[ExtResource("5_20b3y")]([SubResource("Resource_1b6kt")])

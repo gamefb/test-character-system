@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_8k7gp"]
+[ext_resource type="Script" path="res://character_system/core/stats/stat_modifier.gd" id="2_rxiyu"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_7krqj"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="4_tfluq"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_trigger.gd" id="5_l8mde"]
+[ext_resource type="Script" path="res://character_system/kit/conditions/hit_condition.gd" id="6_h04h8"]
+[ext_resource type="Script" path="res://character_system/core/effects/modify_amount_effect.gd" id="7_57ygs"]
+
+[sub_resource type="Resource" id="Resource_bijfi"]
+script = ExtResource("6_h04h8")
+tags = Array[StringName]([&"head"])
+
+[sub_resource type="Resource" id="Resource_586hy"]
+script = ExtResource("7_57ygs")
+percent = 0.5
+tag = &"crit"
+
+[sub_resource type="Resource" id="Resource_485nf"]
+script = ExtResource("5_l8mde")
+event = &"dealing_damage"
+conditions = Array[ExtResource("1_8k7gp")]([SubResource("Resource_bijfi")])
+effects = Array[ExtResource("3_7krqj")]([SubResource("Resource_586hy")])
+
+[resource]
+script = ExtResource("4_tfluq")
+id = &"sharpshooter"
+display_name = "Sharpshooter"
+description = "Hits on a Hurtbox tagged \"head\" deal 50% more and are labelled \"crit\"."
+triggers = Array[ExtResource("5_l8mde")]([SubResource("Resource_485nf")])

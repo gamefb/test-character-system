@@ -12,10 +12,13 @@ extends Node
 ## It does three jobs:
 ## [br]- [b]Lookup.[/b] [method find] returns a component by type. It remembers the answer
 ## until the host's children change, so it's cheap enough to call every frame.
-## [br]- [b]Stats.[/b] Components declare numbers in [method Component._stats]; [method stat]
-## returns them with every [StatModifier] applied, and [signal stat_changed] reports changes.
-## [br]- [b]Events.[/b] [method send] passes an event to every running component's
-## [method Component._on_event].
+## [br]- [b]Stats.[/b] Components declare numbers in [method Component._stats], and
+## [member stats] lists any others; [method stat] returns them with every [StatModifier]
+## applied, and [signal stat_changed] reports changes. [method modifiers_of] lists what is
+## changing a stat, for a character sheet.
+## [br]- [b]Events.[/b] Every event is a signal. [method event] returns the signal for one
+## event on this host, and [method send] emits it. [WorldEvents] has the same signals for
+## every host at once.
 ##
 ## From other code, use the static helpers [method of], [method notify] and [method stat_of].
 ## They take any node and do nothing (or return 0) if it has no manager, so they're safe on
@@ -24,6 +27,7 @@ extends Node
 ## var speed := ComponentManager.stat_of(player, &"move_speed")
 ## ComponentManager.notify(player, &"level_up")
 ## ComponentManager.of(player).stat_changed.connect(_on_player_stat_changed)
+## ComponentManager.of(player).event(&"took_damage").connect(_on_player_hurt)
 ## [/codeblock]
 ## Keep this node's default name. [method of] looks for a child with that name first, and only
 ## searches all the children when there isn't one.
@@ -33,6 +37,18 @@ extends Node
 ## [method Component.update_stats]. Read the new value with [method stat]. Useful for UI, such as
 ## a health bar that follows max health.
 signal stat_changed(stat_name: StringName)
+## Emitted for every event sent to this host, before the event's own signal. [Statuses] uses
+## it to run status triggers. To hear one event, connect to [method event] instead.
+signal event_sent(event_name: StringName, ctx: EffectContext)
+
+## Stats of your game's own, and their values before statuses and items: strength, level,
+## crit_chance. A stat listed here works everywhere stats do, with no script: a [StatModifier]
+## changes it, a [StatAmount] scales an effect with it, and [method stat] reads it. A
+## component that returns the same name from [method Component._stats] wins.
+@export var stats: Dictionary[StringName, float] = {}:
+	set(value):
+		stats = value
+		refresh_stats()
 
 ## True once the host is ready and its components have had the chance to start. At that moment
 ## every running component also hears the [code]started[/code] event.
@@ -46,19 +62,27 @@ var host: Node:
 var _starting := false
 var _components: Array[Component] = []
 var _modifiers: Array[StatModifier] = []
+var _modifier_sources: Array[Object] = []  # What added each modifier, in the same order.
 var _cache: Dictionary[StringName, float] = {}  # Stat values, cleared whenever anything changes.
+var _bases: Dictionary[StringName, float] = {}  # Base values, cleared when a component changes.
+var _resolving: Dictionary[StringName, bool] = {}  # Stats being worked out right now.
 var _found: Dictionary[Script, Component] = {}  # find() answers, cleared when children change.
+var _events: Dictionary[StringName, Signal] = {}  # The signals event() has handed out.
 
 
-## Returns [param node]'s [ComponentManager] child, or null. Safe on null or freed nodes.
-static func of(node: Node) -> ComponentManager:
+## Returns [param node]'s [ComponentManager] child, or null. Safe on null or freed nodes:
+## [param node] has no type so that a node freed a moment ago can be passed straight in.
+static func of(node: Variant) -> ComponentManager:
 	if not is_instance_valid(node):
 		return null
+	var valid := node as Node  # Typed from here on, which is quicker to call.
+	if not valid:
+		return null
 	# The usual name is a quick lookup; searching the children is the fallback.
-	var named := node.get_node_or_null(^"ComponentManager") as ComponentManager
+	var named := valid.get_node_or_null(^"ComponentManager") as ComponentManager
 	if named:
 		return named
-	for child in node.get_children():
+	for child in valid.get_children():
 		if child is ComponentManager:
 			return child
 	return null
@@ -67,17 +91,17 @@ static func of(node: Node) -> ComponentManager:
 ## Sends [param event] to [param node]'s components, if it has a [ComponentManager].
 ##
 ## Use it for your own events, e.g. [code]&"jumped"[/code] or [code]&"level_up"[/code]. Every
-## running component hears it in [method Component._on_event], and status triggers with that
-## [member StatusTrigger.event] fire. Leave out [param ctx] and a context with [param node] as
-## the target is made for you; pass your own to say who caused it.
-static func notify(node: Node, event: StringName, ctx: EffectContext = null) -> void:
+## listener connected with [method event] or [method Component.on] hears it, and status
+## triggers with that [member StatusTrigger.event] fire. Leave out [param ctx] and a context
+## with [param node] as the target is made for you; pass your own to say who caused it.
+static func notify(node: Variant, event: StringName, ctx: EffectContext = null) -> void:
 	var m: ComponentManager = of(node)
 	if m:
 		m.send(event, ctx if ctx else EffectContext.new(null, node))
 
 
 ## Reads [param stat_name] from [param node], or 0 if it has no [ComponentManager].
-static func stat_of(node: Node, stat_name: StringName) -> float:
+static func stat_of(node: Variant, stat_name: StringName) -> float:
 	var m: ComponentManager = of(node)
 	return m.stat(stat_name) if m else 0.0
 
@@ -145,6 +169,17 @@ func find(type: Script) -> Component:
 	return _found[type]
 
 
+## Every component on the host that is a [param type] (subclasses count), in scene order, e.g.
+## all of a character's [Pool]s. Unlike [method find], the answer isn't remembered, so don't
+## call it every frame.
+func find_all(type: Script) -> Array[Component]:
+	var out: Array[Component] = []
+	for child in (host.get_children() if host else []):
+		if is_instance_of(child, type):
+			out.append(child)
+	return out
+
+
 ## True if a registered (in the scene) component is a [param type]. Used to decide
 ## whether a component has everything it requires.
 func has_registered(type: Script) -> bool:
@@ -154,38 +189,129 @@ func has_registered(type: Script) -> bool:
 	return false
 
 
-## Sends [param event] to the [method Component._on_event] of every running component.
-## Components that are stopped, or not yet started, miss it. From outside the host, use
-## [method notify], which also copes with a null node.
-func send(event: StringName, ctx: EffectContext) -> void:
-	for c in _components.duplicate():
-		if c.running:
-			c._on_event(event, ctx)
+## Sends [param event_name] to this host: emits [signal event_sent], then the event's own
+## signal if anything has asked for it with [method event], then the same event on
+## [WorldEvents]. From outside the host, use [method notify], which also copes with a null
+## node.
+func send(event_name: StringName, ctx: EffectContext) -> void:
+	event_sent.emit(event_name, ctx)
+	if _events.has(event_name):
+		_events[event_name].emit(ctx)
+	WorldEvents.emit(host, event_name, ctx)
 
 
-## Current value of a stat: (base + all adds) * all muls. The base comes from the component
-## that lists it in [method Component._stats]. With no such component, nothing reads it anyway.
+## The signal for one event on this host, e.g. [code]event(&"took_damage")[/code]. It's an
+## ordinary signal: connect a method that takes the event's [EffectContext], which is null for
+## events sent without one. Components use [method Component.on], which also disconnects when
+## the component stops; everything else connects directly, such as a HUD:
+## [codeblock]
+## func _ready() -> void:
+## 	ComponentManager.of(player).event(&"took_damage").connect(_flash_red)
+##
+## func _flash_red(ctx: EffectContext) -> void:
+## 	flash.modulate.a = clampf(ctx.amount / 20.0, 0.2, 1.0)
+## [/codeblock]
+## As with any signal, a connection ends by itself when the listener is freed, and listeners
+## are called in the order they connected. [method Component._start] lists the built-in events.
+func event(event_name: StringName) -> Signal:
+	if not _events.has(event_name):
+		# Prefixed, so an event may share its name with one of Node's own signals.
+		var signal_name := StringName("event_" + event_name)
+		add_user_signal(signal_name, [{ "name": "ctx", "type": TYPE_OBJECT }])
+		_events[event_name] = Signal(self, signal_name)
+	return _events[event_name]
+
+
+## Sets the base value of a stat in [member stats], adding it if it isn't listed yet.
+func set_base(stat_name: StringName, value: float) -> void:
+	stats[stat_name] = value
+	_bases.erase(stat_name)
+	_cache.erase(stat_name)
+	stat_changed.emit(stat_name)
+
+
+## Adds [param amount] to the base value of a stat in [member stats], e.g. a level on level
+## up: [code]manager.add_base(&"level", 1)[/code]. Everything scaled by the stat follows.
+func add_base(stat_name: StringName, amount: float) -> void:
+	set_base(stat_name, stats.get(stat_name, 0.0) + amount)
+
+
+## Current value of a stat: (base + all adds) × (1 + all percents) × all muls. The base comes
+## from the component that lists it in [method Component._stats], or is 0 if none does.
 ##
 ## For example, with [member CharacterMotor.move_speed] 5 and modifiers [code]add 1[/code],
-## [code]mul 1.5[/code] and [code]mul 0.5[/code], [code]move_speed[/code] is
+## [code]percent 0.5[/code] and [code]mul 0.5[/code], [code]move_speed[/code] is
 ## (5 + 1) × 1.5 × 0.5 = 4.5. Results are cached until something changes, so read it whenever
-## you need it instead of keeping a copy.
+## you need it instead of keeping a copy. A stat with a conditional modifier (see
+## [member StatModifier.conditions]) is worked out on every read instead.
 func stat(stat_name: StringName) -> float:
-	if not _cache.has(stat_name):
-		var base: float = 0.0
+	if _cache.has(stat_name):
+		return _cache[stat_name]
+	var base: float = base_of(stat_name)
+	if _resolving.has(stat_name):
+		# A condition on one of this stat's own modifiers is reading it.
+		return base
+	_resolving[stat_name] = true
+	var add: float = 0.0
+	var percent: float = 0.0
+	var mul: float = 1.0
+	var conditional := false
+	for i in _modifiers.size():
+		var m: StatModifier = _modifiers[i]
+		if m.stat != stat_name:
+			continue
+		if not m.conditions.is_empty():
+			conditional = true
+			if not _conditions_pass(i):
+				continue
+		add += m.add
+		percent += m.percent
+		mul *= m.mul
+	_resolving.erase(stat_name)
+	var value: float = (base + add) * (1.0 + percent) * mul
+	if not conditional:
+		_cache[stat_name] = value
+	return value
+
+
+## A stat's value before any [StatModifier]: what the component that owns it returns from
+## [method Component._stats], else its value in [member stats], else 0.
+func base_of(stat_name: StringName) -> float:
+	if not _bases.has(stat_name):
+		var base: float = stats.get(stat_name, 0.0)
 		for c in _components:
 			var owned: Dictionary[StringName, float] = c._stats()
 			if owned.has(stat_name):
 				base = owned[stat_name]
 				break
-		var add: float = 0.0
-		var mul: float = 1.0
-		for m in _modifiers:
-			if m.stat == stat_name:
-				add += m.add
-				mul *= m.mul
-		_cache[stat_name] = (base + add) * mul
-	return _cache[stat_name]
+		_bases[stat_name] = base
+	return _bases[stat_name]
+
+
+## Everything changing [param stat_name] right now, in the order it was added, for a character
+## sheet or a tooltip that explains a number. Each entry is a Dictionary with:
+## [br]- [code]modifier[/code]: the [StatModifier].
+## [br]- [code]source[/code]: what added it, e.g. the [StatusData], or null if it wasn't said.
+## [br]- [code]active[/code]: false while the modifier's conditions don't pass.
+## [codeblock]
+## var lines := ["Base %s" % manager.base_of(&"move_speed")]
+## for entry in manager.modifiers_of(&"move_speed"):
+## 	var m: StatModifier = entry.modifier
+## 	var status := entry.source as StatusData
+## 	lines.append("%s: +%s, +%d%%, x%s"
+## 			% [status.display_name if status else "?", m.add, m.percent * 100.0, m.mul])
+## [/codeblock]
+func modifiers_of(stat_name: StringName) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for i in _modifiers.size():
+		var m: StatModifier = _modifiers[i]
+		if m.stat == stat_name:
+			out.append({
+				"modifier": m,
+				"source": _modifier_sources[i],
+				"active": m.conditions.is_empty() or _conditions_pass(i),
+			})
+	return out
 
 
 ## Applies [param m] until [method remove_modifier] takes it off. [Statuses] does this for
@@ -194,6 +320,7 @@ func stat(stat_name: StringName) -> float:
 ## Keep the same object to remove it later. Most changes are better as a status (a
 ## [StatusData] with [member StatusData.modifiers]), which can end by itself and appear on a
 ## status bar; use this for changes your own code controls, such as aiming down sights.
+## [param source] is whatever is behind it (a status, an item), for [method modifiers_of].
 ## [codeblock]
 ## var aiming := StatModifier.new()
 ## aiming.stat = &"move_speed"
@@ -201,15 +328,19 @@ func stat(stat_name: StringName) -> float:
 ## manager.add_modifier(aiming)  # Half speed...
 ## manager.remove_modifier(aiming)  # ...until this.
 ## [/codeblock]
-func add_modifier(m: StatModifier) -> void:
+func add_modifier(m: StatModifier, source: Object = null) -> void:
 	_modifiers.append(m)
+	_modifier_sources.append(source)
 	_cache.erase(m.stat)
 	stat_changed.emit(m.stat)
 
 
 ## Removes one copy of [param m]. A modifier added twice must be removed twice.
 func remove_modifier(m: StatModifier) -> void:
-	_modifiers.erase(m)
+	var index: int = _modifiers.find(m)
+	if index != -1:
+		_modifiers.remove_at(index)
+		_modifier_sources.remove_at(index)
 	_cache.erase(m.stat)
 	stat_changed.emit(m.stat)
 
@@ -219,10 +350,14 @@ func remove_modifier(m: StatModifier) -> void:
 func refresh_stats() -> void:
 	var names: Array = _cache.keys()
 	_cache.clear()
+	_bases.clear()
 	for c in _components:
 		for stat_name in c._stats():
 			if stat_name not in names:
 				names.append(stat_name)
+	for stat_name in stats:
+		if stat_name not in names:
+			names.append(stat_name)
 	for stat_name in names:
 		stat_changed.emit(stat_name)
 
@@ -290,11 +425,18 @@ func _start_all() -> void:
 func _stats_changed_by(c: Component) -> void:
 	for stat_name in c._stats():
 		_cache.erase(stat_name)
+		_bases.erase(stat_name)
 		stat_changed.emit(stat_name)
 
 
 func _found_clear() -> void:
 	_found.clear()
+
+
+# Whether the conditions of the modifier at index pass, checked on the host.
+func _conditions_pass(index: int) -> bool:
+	var ctx := EffectContext.new(host, host, _modifier_sources[index] as Resource)
+	return Condition.all_pass(_modifiers[index].conditions, ctx)
 
 
 func _editor_notification(what: int) -> void:

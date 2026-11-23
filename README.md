@@ -1,19 +1,26 @@
 # Character System
 
-A component-driven character system for Godot 4.4 and later: characters, equipment and
-Baldur's Gate 3-style statuses built from small nodes and data you edit in the Inspector.
+A component-driven character system for Godot 4.8: characters, equipment, abilities
+and Baldur's Gate 3-style statuses built from small nodes and data you edit in the Inspector.
+Stats, mana and shields, damage that scales with a character, crits, costs and cast times,
+projectiles and gear with bonuses need no code.
 
 **Documentation:** https://gamefb.github.io/test-character-system/
 
-New to it? Start with the Quick start page, which builds a small level in about fifteen minutes.
+New to it? Open `test_level/test_level.tscn` and press F6 to walk around a level with every
+part in it, then follow the Quick start page, which builds a small level in about fifteen
+minutes.
 
 ## What's here
 
 | Folder | What it is |
 | --- | --- |
-| `character_system/` | The system: core, components, items, resources and examples. Start with `RECIPES.md`. |
+| `character_system/core/` | The system itself. It loads on its own: copy this and build your game's parts on it. |
+| `character_system/kit/` | Ready-made parts built on the core: brains, movement modes, weapons, projectiles, zones and more. Keep what you use. |
+| `character_system/examples/` | Statuses, items, abilities and scripts to copy. Start with `character_system/RECIPES.md`. |
 | `addons/character_system_warnings/` | Editor plugin that warns about mistyped stat, event and tag names. |
-| `tests/` | GUT unit tests (105 tests). |
+| `tests/` | GUT unit tests (214 tests), and `benchmark.gd`. |
+| `test_level/` | A playable level with every part of the system in it, and a self-test that plays it. |
 | `immunity_test/` | A scripted scene that runs 43 checks on immunities, zones and items. |
 | `docs/` | The documentation site (Sphinx). |
 
@@ -25,7 +32,11 @@ from the AssetLib tab, then:
 ```shell
 godot --headless -s addons/gut/gut_cmdln.gd -gexit
 godot --headless --fixed-fps 60 res://immunity_test/immunity_test.tscn
+godot --headless --fixed-fps 60 res://test_level/test_level.tscn -- --self-test
 ```
+
+GitHub Actions runs all three, the linter and a check that `core/` loads on its own, on every
+pull request (`.github/workflows/tests.yml`).
 
 ## Building the docs
 
