@@ -1,3 +1,4 @@
+@tool
 class_name PoolAmount
 extends Amount
 ## A share of what is in a [Pool], such as 2% of the target's maximum health for a bleed, or

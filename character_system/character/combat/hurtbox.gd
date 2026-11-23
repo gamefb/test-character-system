@@ -1,3 +1,4 @@
+@tool
 @icon("res://character_system/icons/hurtbox.svg")
 class_name Hurtbox
 extends Area3D
@@ -80,5 +81,10 @@ static func rids_of(character: Variant) -> Array[RID]:
 
 
 func _ready() -> void:
-	if not character:
+	if not character and not Engine.is_editor_hint():
 		character = owner
+
+
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Tags become a list to pick from.

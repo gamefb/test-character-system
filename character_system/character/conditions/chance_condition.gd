@@ -1,3 +1,4 @@
+@tool
 class_name ChanceCondition
 extends Condition
 ## Passes some of the time: a critical hit chance, a 1 in 5 chance to set alight.

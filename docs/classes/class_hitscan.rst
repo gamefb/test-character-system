@@ -8,9 +8,9 @@
 Hitscan
 =======
 
-**Inherits:** :ref:`ItemComponent<class_ItemComponent>` **<** :ref:`Component<class_Component>` **<** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`WeaponDelivery<class_WeaponDelivery>` **<** :ref:`ItemComponent<class_ItemComponent>` **<** :ref:`Component<class_Component>` **<** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-Fires an instant ray on each :ref:`Trigger<class_Trigger>` shot and applies :ref:`effects<class_Hitscan_property_effects>` to what it hits.
+Fires an instant ray on each :ref:`Trigger<class_Trigger>` shot and applies :ref:`WeaponDelivery.effects<class_WeaponDelivery_property_effects>` to what it hits.
 
 .. rst-class:: classref-introduction-group
 
@@ -29,17 +29,13 @@ Properties
 .. table::
    :widths: auto
 
-   +----------------------------------------------------------+--------------------------------------------------------------+----------------+
-   | :ref:`float<class_float>`                                | :ref:`max_distance<class_Hitscan_property_max_distance>`     | ``100.0``      |
-   +----------------------------------------------------------+--------------------------------------------------------------+----------------+
-   | :ref:`int<class_int>`                                    | :ref:`collision_mask<class_Hitscan_property_collision_mask>` | ``4294967295`` |
-   +----------------------------------------------------------+--------------------------------------------------------------+----------------+
-   | :ref:`int<class_int>`                                    | :ref:`pellets<class_Hitscan_property_pellets>`               | ``1``          |
-   +----------------------------------------------------------+--------------------------------------------------------------+----------------+
-   | :ref:`float<class_float>`                                | :ref:`spread<class_Hitscan_property_spread>`                 | ``0.0``        |
-   +----------------------------------------------------------+--------------------------------------------------------------+----------------+
-   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] | :ref:`effects<class_Hitscan_property_effects>`               | ``[]``         |
-   +----------------------------------------------------------+--------------------------------------------------------------+----------------+
+   +---------------------------+----------------------------------------------------------+-----------+
+   | :ref:`float<class_float>` | :ref:`max_distance<class_Hitscan_property_max_distance>` | ``100.0`` |
+   +---------------------------+----------------------------------------------------------+-----------+
+   | :ref:`int<class_int>`     | :ref:`pellets<class_Hitscan_property_pellets>`           | ``1``     |
+   +---------------------------+----------------------------------------------------------+-----------+
+   | :ref:`float<class_float>` | :ref:`spread<class_Hitscan_property_spread>`             | ``0.0``   |
+   +---------------------------+----------------------------------------------------------+-----------+
 
 .. rst-class:: classref-section-separator
 
@@ -62,25 +58,13 @@ How far the ray reaches, in metres.
 
 ----
 
-.. _class_Hitscan_property_collision_mask:
-
-.. rst-class:: classref-property
-
-:ref:`int<class_int>` **collision_mask** = ``4294967295`` :ref:`🔗<class_Hitscan_property_collision_mask>`
-
-Physics layers the shot can hit. Areas on these layers count too, so hurtboxes can be hit. Zones put themselves on no layer, so shots pass through them.
-
-.. rst-class:: classref-item-separator
-
-----
-
 .. _class_Hitscan_property_pellets:
 
 .. rst-class:: classref-property
 
 :ref:`int<class_int>` **pellets** = ``1`` :ref:`🔗<class_Hitscan_property_pellets>`
 
-Rays per shot. Each applies :ref:`effects<class_Hitscan_property_effects>` to what it hits.
+Rays per shot. Each applies :ref:`WeaponDelivery.effects<class_WeaponDelivery_property_effects>` to what it hits.
 
 .. rst-class:: classref-item-separator
 
@@ -93,18 +77,6 @@ Rays per shot. Each applies :ref:`effects<class_Hitscan_property_effects>` to wh
 :ref:`float<class_float>` **spread** = ``0.0`` :ref:`🔗<class_Hitscan_property_spread>`
 
 How far, in degrees, a ray may stray from the aim. 0 is perfectly accurate.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_Hitscan_property_effects:
-
-.. rst-class:: classref-property
-
-:ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] **effects** = ``[]`` :ref:`🔗<class_Hitscan_property_effects>`
-
-Applied in order to whatever the ray hits. A :ref:`Hurtbox<class_Hurtbox>` scales them through :ref:`EffectContext.magnitude<class_EffectContext_property_magnitude>`, e.g. 2 for a headshot.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

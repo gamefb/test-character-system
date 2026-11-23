@@ -68,17 +68,19 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------+------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                  | :ref:`press<class_Brain_method_press>`\ (\ action\: :ref:`StringName<class_StringName>`\ )                                   |
-   +-------------------------+------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                  | :ref:`release<class_Brain_method_release>`\ (\ action\: :ref:`StringName<class_StringName>`\ )                               |
-   +-------------------------+------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`is_blocked<class_Brain_method_is_blocked>`\ (\ )                                                                       |
-   +-------------------------+------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`is_action_pressed<class_Brain_method_is_action_pressed>`\ (\ action\: :ref:`StringName<class_StringName>`\ )           |
-   +-------------------------+------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`is_action_just_pressed<class_Brain_method_is_action_just_pressed>`\ (\ action\: :ref:`StringName<class_StringName>`\ ) |
-   +-------------------------+------------------------------------------------------------------------------------------------------------------------------+
+   +---------------------------+------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Brain<class_Brain>` | :ref:`find_on<class_Brain_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                              |
+   +---------------------------+------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                    | :ref:`press<class_Brain_method_press>`\ (\ action\: :ref:`StringName<class_StringName>`\ )                                   |
+   +---------------------------+------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                    | :ref:`release<class_Brain_method_release>`\ (\ action\: :ref:`StringName<class_StringName>`\ )                               |
+   +---------------------------+------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`   | :ref:`is_blocked<class_Brain_method_is_blocked>`\ (\ )                                                                       |
+   +---------------------------+------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`   | :ref:`is_action_pressed<class_Brain_method_is_action_pressed>`\ (\ action\: :ref:`StringName<class_StringName>`\ )           |
+   +---------------------------+------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`   | :ref:`is_action_just_pressed<class_Brain_method_is_action_just_pressed>`\ (\ action\: :ref:`StringName<class_StringName>`\ ) |
+   +---------------------------+------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -136,6 +138,18 @@ World-space point the character is aiming at.
 
 Method Descriptions
 -------------------
+
+.. _class_Brain_method_find_on:
+
+.. rst-class:: classref-method
+
+:ref:`Brain<class_Brain>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Brain_method_find_on>`
+
+The **Brain** of ``node``'s character, or null if there is none. Safe on a freed node.
+
+.. rst-class:: classref-item-separator
+
+----
 
 .. _class_Brain_method_press:
 

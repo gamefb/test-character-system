@@ -1,3 +1,4 @@
+@tool
 class_name StatAmount
 extends Amount
 ## A stat's value times [member per_point], e.g. 2 damage per point of the user's strength.

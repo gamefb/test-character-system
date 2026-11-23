@@ -1,3 +1,4 @@
+@tool
 class_name ModifyAmountEffect
 extends Effect
 ## Changes the damage or healing of the hit that set off a status trigger.

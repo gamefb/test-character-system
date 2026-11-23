@@ -180,8 +180,11 @@ Before you write a script
 - **Hear events with** ``on()``. ``on(&"took_damage", _on_took_damage)`` in ``_start()`` calls
   your method for that event until the component stops. :ref:`doc_events` lists the events.
 - **Look things up when you need them.** ``find(Type)`` for a component beside yours,
-  ``Component.of(node, Type)`` for one on another node. Both are cheap, so don't keep the
-  result in a variable: components can come and go during play.
+  ``Health.find_on(node)`` for one on another node. Both are cheap, so don't keep the
+  result in a variable: components can come and go during play. The built-in components a
+  game looks up have ``find_on()``; for your own, ``Component.of(node, Type) as Type`` does
+  the same, and :ref:`Component.of<class_Component_method_of>` shows the two lines that give
+  your type its own.
 - **Read numbers with** ``stat()`` **at the moment you use them.** Numbers statuses should be
   able to change go in your component's ``_stats()``; call ``update_stats()`` when you change
   one yourself.
@@ -190,7 +193,10 @@ Before you write a script
   :ref:`EffectContext<class_EffectContext>`, per-character state in a component, and an item's
   own state, such as rounds loaded, in ``item.state``.
 - **Cope with what isn't there.** An effect can hit a wall and a condition can check a crate,
-  so check for null after every ``Component.of()``.
+  so check for null after every ``find_on()``.
+- **Give a name field its usual name.** An exported ``stat``, ``pool``, ``event``, ``tag``,
+  ``tags``, ``blocks`` or ``blocked_by`` in a script that starts with ``@tool`` becomes a
+  :ref:`list to pick from <doc_name_lists>` in the Inspector, with no code.
 - **Add** ``@tool`` **to components for editor warnings.** The base class turns processing off
   in the editor and never calls ``_start()`` there, but your own ``_ready()`` would still run,
   which is one more reason to set up in ``_start()``. The
@@ -278,17 +284,32 @@ An item component
 
 Item components extend :ref:`ItemComponent<class_ItemComponent>`, which adds ``wielder`` (the character holding the item), ``item`` (this copy of it) and ``brain`` (the wielder's brain). There are two common kinds.
 
-**One that acts when the item is used** listens to the item's :ref:`Trigger<class_Trigger>`, which decides when it fires. :ref:`MeleeSweep<class_MeleeSweep>` hits everything inside a shape in front of the item:
+**One that decides what a shot reaches** extends :ref:`WeaponDelivery<class_WeaponDelivery>` and writes one method, ``_fire()``, which runs each time the item's :ref:`Trigger<class_Trigger>` fires. :ref:`MeleeSweep<class_MeleeSweep>` hits everything inside a shape in front of the item:
 
 .. source-file:: ../../character_system/character/items/melee_sweep.gd
 
-- ``_requires()`` returns ``[Trigger]``, and ``_start()`` listens to its ``fired`` signal.
-- The wielder's body and hurtboxes are collected once, in ``_start()``, so swings pass through
-  them.
-- ``Hurtbox.hit()`` builds each hit's context: it turns a hurtbox into its character, applies
-  its multiplier, and records the item as ``origin``.
-- The effects come from the Inspector, so the same component makes a sword, a burning axe or a
-  healing touch.
+The base class brings the rest, so a new one has only its own settings and its ``_fire()``:
+
+- the Effects and Collision Mask fields, and the name warnings for the effects,
+- the wait for a Trigger and the connection to its ``fired`` signal,
+- ``_wielder_rids``, the wielder's body and hurtboxes, so shots can pass through them,
+- ``context_for(collider, position, normal)``, which builds each hit's context: it turns a
+  hurtbox into its character, applies its multiplier, and records the item as ``origin``.
+
+This one hits whatever a :ref:`Targeting<class_Targeting>` finds around the wielder, which makes a shock baton out of the same targeting an ability uses:
+
+.. code-block:: gdscript
+
+    class_name Pulse
+    extends WeaponDelivery
+
+    @export var targeting: Targeting
+
+    func _fire() -> void:
+    	for target in targeting.find(context_for(wielder)):
+    		Effect.apply_all(effects, context_for(target))
+
+An item component that acts on use without hitting anything, such as a flashlight, extends :ref:`ItemComponent<class_ItemComponent>` and listens to the Trigger itself: return ``[Trigger]`` from ``_requires()`` and call ``listen((find(Trigger) as Trigger).fired, _on_fired)`` in ``_start()``.
 
 To make a sword, build an item scene with a :ref:`ComponentManager<class_ComponentManager>`, a Trigger and a MeleeSweep with a BoxShape3D about a metre across and a :ref:`DamageEffect<class_DamageEffect>` in its effects. A projectile weapon needs no delivery component: a :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` in the Trigger's ``user_effects`` launches a :ref:`Projectile<class_Projectile>`, which applies the effects to what it touches; see :ref:`doc_projectiles`.
 
@@ -328,7 +349,22 @@ An effect extends :ref:`Effect<class_Effect>` and overrides ``_execute(ctx)``. :
   such as a zone's ``body_entered``, where new areas can't be added yet.
 - It stores nothing on itself between uses.
 
-Conditions work on every effect without any code: put one in its ``conditions`` and the effect only runs when it passes. Effects that deal damage should scale by ``ctx.magnitude``, so status stacks and headshots strengthen them, as :ref:`DamageEffect<class_DamageEffect>` does. An effect with a number can take a ``scaling`` list too, in one line: ``Amount.total(amount, scaling, ctx)`` is the plain number plus every :ref:`Amount<class_Amount>` in the list.
+Conditions work on every effect without any code: put one in its ``conditions`` and the effect only runs when it passes.
+
+**An effect with a number** extends :ref:`AmountEffect<class_AmountEffect>` instead. That gives it the Amount and Scaling fields of :ref:`DamageEffect<class_DamageEffect>` and :ref:`HealEffect<class_HealEffect>`, and ``total(ctx)``: the plain number plus every :ref:`Amount<class_Amount>` in the list, times ``ctx.magnitude``, so status stacks and headshots strengthen it. This one moves mana from the target to whoever caused it, and takes more for each point of the user's spell power once a :ref:`StatAmount<class_StatAmount>` is in its Scaling:
+
+.. code-block:: gdscript
+
+    class_name SiphonEffect
+    extends AmountEffect
+
+    func _execute(ctx: EffectContext) -> void:
+    	var theirs := Pool.named(ctx.target, &"mana")
+    	var mine := Pool.named(ctx.source, &"mana")
+    	if theirs and mine:  # Either may have no mana, or be a wall.
+    		var taken: float = minf(theirs.current, total(ctx))
+    		theirs.change(-taken)
+    		mine.change(taken)
 
 .. _doc_extending_amount:
 

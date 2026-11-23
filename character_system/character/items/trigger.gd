@@ -36,6 +36,11 @@ var _buffered: float = 0.0
 var _cooldown: float = 0.0
 
 
+## The [Trigger] on the item scene [param node], or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> Trigger:
+	return Component.of(node, Trigger) as Trigger
+
+
 func _warnings() -> PackedStringArray:
 	return NameCheck.problems_in(user_effects)
 

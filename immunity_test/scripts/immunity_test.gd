@@ -67,17 +67,17 @@ func wear(who: Node, data: ItemData) -> void:
 
 
 func bag(who: Node) -> Inventory:
-	return Component.of(who, Inventory) as Inventory
+	return Inventory.find_on(who)
 
 
 func gear(who: Node) -> Equipment:
-	return Component.of(who, Equipment) as Equipment
+	return Equipment.find_on(who)
 
 
 ## Presses and releases [param action] on [param who]'s brain, like a player would, and waits
 ## until every component has had a frame to see it.
 func press(who: Node, action: StringName) -> void:
-	var brain := Component.of(who, Brain) as Brain
+	var brain := Brain.find_on(who)
 	brain.press(action)
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -104,7 +104,7 @@ func until(condition: Callable, timeout := 10.0) -> void:
 
 ## Aims at [param target], pulls the trigger once and lets go.
 func shoot(who: Node, target: Node3D) -> void:
-	var brain := Component.of(who, Brain) as Brain
+	var brain := Brain.find_on(who)
 	brain.aim_point = target.global_position + Vector3.UP
 	brain.press(&"primary")
 	await wait(0.1)
@@ -113,15 +113,15 @@ func shoot(who: Node, target: Node3D) -> void:
 
 
 func health(who: Node) -> float:
-	return (Component.of(who, Health) as Health).current
+	return Health.find_on(who).current
 
 
 func has(who: Node, tag: StringName) -> bool:
-	return (Component.of(who, Statuses) as Statuses).has_tag(tag)
+	return Statuses.find_on(who).has_tag(tag)
 
 
 func hold_count(who: Node, data: StatusData) -> int:
-	var s = (Component.of(who, Statuses) as Statuses).active.get(data)
+	var s = Statuses.find_on(who).active.get(data)
 	return s.holds if s else 0
 
 
@@ -339,10 +339,10 @@ func _cleric_track() -> void:
 func _record(who: Node) -> void:
 	_refused[who] = []
 	_hits[who] = []
-	var statuses := Component.of(who, Statuses) as Statuses
+	var statuses := Statuses.find_on(who)
 	statuses.refused.connect(
 			func(data: StatusData, _source: Node) -> void: _refused[who].append(data.id))
-	var health_component := Component.of(who, Health) as Health
+	var health_component := Health.find_on(who)
 	# In an array so the lambda can change it.
 	var last := [health_component.current]
 	health_component.changed.connect(func(current: float, _maximum: float) -> void:

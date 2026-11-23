@@ -90,6 +90,11 @@ var _blocked := false  # Whether movement is blocked, worked out once a physics 
 var _push := Vector3.ZERO  # Sideways knockback, kept in the body's velocity between frames.
 
 
+## The [CharacterMotor] of [param node]'s character, or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> CharacterMotor:
+	return Component.of(node, CharacterMotor) as CharacterMotor
+
+
 func _physics_process(delta: float) -> void:
 	_consumed.clear()
 	_blocked = is_blocked()

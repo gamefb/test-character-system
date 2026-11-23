@@ -6,6 +6,9 @@ For any class, press **F1** in Godot and search its name for the full reference.
 system? The Quick start page of the documentation builds a whole level, step by step. To
 try everything here in play, open `test_level/test_level.tscn` and press F6.
 
+A field that holds a name (a stat, a pool, an event, a tag, something to block) opens a list
+of the names the project already has. Pick one, or type a new one.
+
 ## Characters
 
 ### Make a character
@@ -168,7 +171,7 @@ New Resource > **StatusData**. The fields you'll use most:
 Give it at least one tag, such as `fire`. Tags are how immunities and conditions find it.
 Examples: `statuses/burning.tres`, `poisoned.tres`, `haste.tres`, `thorns.tres`.
 
-From code: `(Component.of(enemy, Statuses) as Statuses).add(burning, player)`, where
+From code: `Statuses.find_on(enemy).add(burning, player)`, where
 `burning` is the loaded StatusData and `player` caused it.
 
 ### Make something immune
@@ -323,7 +326,7 @@ var bonus := StatModifier.new()
 bonus.stat = &"max_health"
 bonus.add = randf_range(5.0, 25.0)
 ring.state[&"modifiers"] = [bonus]
-(Component.of(player, Inventory) as Inventory).add_instance(ring)
+Inventory.find_on(player).add_instance(ring)
 ```
 
 Grant a status instead (the next recipe) when the bonus should show on a status bar, grant
@@ -417,7 +420,7 @@ New Resource > **ItemData**: leave `slot` empty, set `max_stack`, and put what i
 (`items/mana_potion.tres`), or an ApplyStatusEffect for an elixir. Then:
 
 ```gdscript
-(Component.of(player, Inventory) as Inventory).use(potion_data)  # False if none is left.
+Inventory.find_on(player).use(potion_data)  # False if none is left.
 ```
 
 One is taken from the stack on each use, unless **Consumed On Use** is off.
@@ -445,7 +448,7 @@ Add a **WeaponSwitch** to the character (it needs a brain, Inventory and Equipme
 Inventory; the first one is drawn, the rest wait. From code:
 
 ```gdscript
-var switch := Component.of(player, WeaponSwitch) as WeaponSwitch
+var switch := WeaponSwitch.find_on(player)
 switch.cycle(1)  # Next weapon; -1 = previous.
 switch.select(0)  # The first weapon picked up.
 switch.holster()  # Put it away.
@@ -454,10 +457,10 @@ switch.holster()  # Put it away.
 ### Pick up, wear and drop items
 
 ```gdscript
-var bag := Component.of(player, Inventory) as Inventory
+var bag := Inventory.find_on(player)
 bag.add(ammo_data, 30)  # Fills existing stacks first.
 bag.add_instance(dropped_rifle)  # Keeps that copy's rounds.
-var gear := Component.of(player, Equipment) as Equipment
+var gear := Equipment.find_on(player)
 gear.equip(bag.first(ring_data))  # Put on something from the bag.
 gear.unequip(&"ring")  # Take it off; it stays in the bag.
 bag.remove_instance(bag.first(rifle_data))  # Drops it; it's unequipped automatically.
@@ -509,7 +512,7 @@ that scene. It flies from the user toward where they're aiming. See
 
 ```gdscript
 func _ready() -> void:
-	(Component.of(player, Abilities) as Abilities).failed.connect(_on_ability_failed)
+	Abilities.find_on(player).failed.connect(_on_ability_failed)
 
 func _on_ability_failed(_ability: AbilityData, reason: StringName) -> void:
 	match reason:
@@ -623,7 +626,8 @@ The Extending the system page of the documentation has a complete, tested exampl
 also in `starter_pack/scripts/`. In short:
 
 - **Effect:** extend `Effect` and override `_execute(ctx)`. The target may have none of the
-  components you need, so check for null.
+  components you need, so check for null. If it has a number, extend `AmountEffect` instead:
+  it brings the **Amount** and **Scaling** fields, and `total(ctx)` adds them up.
 - **Condition:** extend `Condition` and override `_test(node) -> bool`, or `check(ctx)` to
   compare both sides, as `IsHostileCondition` does.
 - **Amount:** extend `Amount` and override `value(ctx) -> float`. It then fits in every
@@ -634,18 +638,25 @@ also in `starter_pack/scripts/`. In short:
 - **Item component:** extend `ItemComponent`. `wielder`, `item` and `brain` are ready in
   `_start()`, and anything it changes on the wielder must be undone in `_stop()`. See
   `starter_pack/scripts/scope.gd`.
+- **A new way for a weapon to hit** (a cone, a beam, chain lightning): extend
+  `WeaponDelivery` and write `_fire()`. The trigger, the **Effects** list and
+  `context_for(what_was_hit)` come with it. See `character/items/melee_sweep.gd`.
+
+Name a field `stat`, `pool`, `event`, `tag`, `tags`, `blocks` or `blocked_by`, start the
+script with `@tool`, and the Inspector offers the project's names for it, like the built-in
+fields. To reach your component from other scripts, `Component.of(node, MyType) as MyType`
+works for any type; the built-in ones have a shortcut, such as `Health.find_on(node)`.
 
 A complete effect, which moves mana from the target to whoever caused it:
 
 ```gdscript
 # With a class_name, it appears in the effect list in the Inspector.
+@tool  # So the Inspector lists the project's pools for the field below.
 class_name SiphonEffect
-extends Effect
+extends AmountEffect  # Brings Amount and Scaling: the most taken each time.
 
 ## The pool to take from and give to, e.g. &"mana".
 @export var pool: StringName = &"mana"
-## The most taken each time.
-@export var amount: float = 10.0
 
 
 # It works wherever effects do: a weapon's hit, an ability, a status tick.
@@ -653,7 +664,7 @@ func _execute(ctx: EffectContext) -> void:
 	var theirs := Pool.named(ctx.target, pool)
 	if not theirs:  # The target may have no such pool, or be a wall.
 		return
-	var taken: float = minf(theirs.current, amount * ctx.magnitude)
+	var taken: float = minf(theirs.current, total(ctx))
 	theirs.change(-taken)
 	var mine := Pool.named(ctx.source, pool)
 	if mine:

@@ -78,6 +78,29 @@ static func handles(object: Object) -> bool:
 	)
 
 
+## Turns a name field into a list to pick from in the Inspector, filled with the names the
+## project already has, while still taking a new one typed in. Call it from
+## [code]_validate_property()[/code] in a [code]@tool[/code] script; the system's own
+## resources and components do. Fields are recognised by name, as [method problems] does:
+## [code]stat[/code], [code]pool[/code], [code]event[/code], [code]tag[/code],
+## [code]blocks[/code], [code]blocked_by[/code] and the keys of [code]costs[/code].
+static func suggest(object: Object, property: Dictionary) -> void:
+	var known: PackedStringArray = _names_for(object, property.name)
+	if known.is_empty():
+		return
+	var list: String = ",".join(known)
+	match property.type:
+		TYPE_STRING_NAME, TYPE_STRING:
+			property.hint = PROPERTY_HINT_ENUM_SUGGESTION
+			property.hint_string = list
+		TYPE_ARRAY:  # Each element is a name.
+			property.hint_string = "%d/%d:%s" % [
+					TYPE_STRING_NAME, PROPERTY_HINT_ENUM_SUGGESTION, list]
+		TYPE_DICTIONARY:  # Each key is a name; the value's type stays as declared.
+			property.hint_string = "%d/%d:%s;%s" % [TYPE_STRING_NAME,
+					PROPERTY_HINT_ENUM_SUGGESTION, list, property.hint_string.get_slice(";", 1)]
+
+
 ## Stat names declared by components, e.g. move_speed.
 static func known_stats() -> PackedStringArray:
 	_scan()
@@ -108,6 +131,30 @@ static func rescan() -> void:
 
 
 #region Checking
+
+
+# The names a field called field_name on object may hold, or none if it isn't a name field.
+# Other fields return early, so only looking at a name field scans the project.
+static func _names_for(object: Object, field_name: StringName) -> PackedStringArray:
+	match field_name:
+		&"stat", &"bonus_stat":
+			return known_stats()
+		&"costs":
+			return known_pools()
+		&"pool":
+			# A Pool's own field is where the name is made up, not picked.
+			return PackedStringArray() if object is Pool else known_pools()
+		&"event":
+			return known_events()
+		&"tag", &"tags", &"immune_to", &"removes_tags":
+			return known_tags()
+		&"blocks":
+			_scan()
+			return _blockable
+		&"blocked_by":
+			_scan()
+			return _blocking
+	return PackedStringArray()
 
 
 static func _check(object: Object, out: PackedStringArray, is_root: bool) -> void:
@@ -251,12 +298,18 @@ static func _scan() -> void:
 		stats[pool_name + "_regen"] = true
 	for event in _motor_events():
 		events[event] = true
-	_stats = PackedStringArray(stats.keys())
-	_events = PackedStringArray(events.keys())
-	_tags = PackedStringArray(tags.keys())
-	_pools = PackedStringArray(pools.keys())
-	_blockable = PackedStringArray(blockable.keys())
-	_blocking = PackedStringArray(blocking.keys())
+	_stats = _sorted(stats)
+	_events = _sorted(events)
+	_tags = _sorted(tags)
+	_pools = _sorted(pools)
+	_blockable = _sorted(blockable)
+	_blocking = _sorted(blocking)
+
+
+static func _sorted(names: Dictionary) -> PackedStringArray:
+	var out := PackedStringArray(names.keys())
+	out.sort()
+	return out
 
 
 # Stat names in the _stats() of every script that extends Component.

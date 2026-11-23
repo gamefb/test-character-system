@@ -1,3 +1,4 @@
+@tool
 class_name StatusTrigger
 extends Resource
 ## Runs effects when the status holder takes part in an event.
@@ -27,3 +28,8 @@ extends Resource
 ## Run in order each time the event happens. [member EffectContext.cause] holds the
 ## event's own context, which [ModifyAmountEffect] changes and [HitAmount] reads.
 @export var effects: Array[Effect] = []
+
+
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Name fields become lists to pick from.

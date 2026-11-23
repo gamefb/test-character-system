@@ -57,7 +57,7 @@ Item components
      - What the wielder has while the item is equipped: passives, stat changes and abilities
      - ``statuses``, ``modifiers``, ``abilities``
 
-The flow inside an item is a short signal chain: :ref:`Trigger<class_Trigger>` asks :ref:`Magazine<class_Magazine>` (if present) for a round, then emits ``fired``; every delivery component (:ref:`Hitscan<class_Hitscan>`, :ref:`MeleeSweep<class_MeleeSweep>`) listens for ``fired`` and applies its ``effects`` to what it hits. Each hit's context records the item's :ref:`ItemData<class_ItemData>` as ``origin``, so a kill feed can say "killed by Rifle".
+The flow inside an item is a short signal chain: :ref:`Trigger<class_Trigger>` asks :ref:`Magazine<class_Magazine>` (if present) for a round, then emits ``fired``; every :ref:`WeaponDelivery<class_WeaponDelivery>` (:ref:`Hitscan<class_Hitscan>`, :ref:`MeleeSweep<class_MeleeSweep>`, or one of your own) listens for ``fired`` and applies its ``effects`` to what it hits. Each hit's context records the item's :ref:`ItemData<class_ItemData>` as ``origin``, so a kill feed can say "killed by Rifle".
 
 .. source-file:: ../../character_system/character/items/trigger.gd
 
@@ -88,9 +88,11 @@ Within those layers, a shot stops at the first body or :ref:`Hurtbox<class_Hurtb
 
 Projectiles in flight and the player's crosshair follow the same two rules, because all three use one ray, ``Hurtbox.raycast()``. To make corpses block shots, give the character a death status without ``targeting`` in its Blocks; to let shots through something else, ``stops_shots()`` is the one place to change. Melee swings and blasts take everything inside a shape, so nothing blocks them; a :ref:`DamageEffect<class_DamageEffect>` leaves the dead alone either way.
 
-A weapon's own wielder is never hit: :ref:`Hitscan<class_Hitscan>` collects the wielder's body and hurtboxes once, when the weapon is equipped, and every shot passes through them.
+A weapon's own wielder is never hit: every :ref:`WeaponDelivery<class_WeaponDelivery>` collects the wielder's body and hurtboxes once, when the weapon is equipped, and every shot passes through them.
 
 .. source-file:: ../../character_system/character/combat/hurtbox.gd
+
+.. source-file:: ../../character_system/character/items/weapon_delivery.gd
 
 .. source-file:: ../../character_system/character/items/hitscan.gd
 
@@ -98,7 +100,7 @@ A weapon's own wielder is never hit: :ref:`Hitscan<class_Hitscan>` collects the 
 
 .. source-file:: ../../character_system/character/items/melee_sweep.gd
 
-:ref:`MeleeSweep<class_MeleeSweep>` follows the :ref:`Hitscan<class_Hitscan>` pattern: require :ref:`Trigger<class_Trigger>`, listen to ``fired`` in ``_start()``, find targets, and build each context with ``Hurtbox.hit()``. It hits each character once per swing, through its most vulnerable part inside the shape. :ref:`doc_extending_item_component` covers writing your own.
+:ref:`MeleeSweep<class_MeleeSweep>` and :ref:`Hitscan<class_Hitscan>` share a base class, :ref:`WeaponDelivery<class_WeaponDelivery>`, which holds the effects and the collision mask, waits for the :ref:`Trigger<class_Trigger>` and builds each hit's context with ``context_for()``. Each of them only writes ``_fire()``: what one shot reaches. MeleeSweep hits each character once per swing, through its most vulnerable part inside the shape. :ref:`doc_extending_item_component` covers writing your own.
 
 .. _doc_projectiles:
 

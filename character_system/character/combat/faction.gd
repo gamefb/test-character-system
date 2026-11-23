@@ -22,6 +22,11 @@ extends Component
 @export var hostile_to: Array[StringName] = []
 
 
+## The [Faction] of [param node]'s character, or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> Faction:
+	return Component.of(node, Faction) as Faction
+
+
 func _start() -> void:
 	if team:
 		host.add_to_group(team)

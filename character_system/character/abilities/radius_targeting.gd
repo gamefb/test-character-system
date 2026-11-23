@@ -30,7 +30,7 @@ func find(ctx: EffectContext) -> Array[Node]:
 	query.transform = Transform3D(Basis(), user.global_position)
 	query.collide_with_areas = true  # So hurtboxes count.
 	query.exclude = Hurtbox.rids_of(user)
-	var faction := Component.of(user, Faction) as Faction
+	var faction := Faction.find_on(user)
 	for hit in user.get_world_3d().direct_space_state.intersect_shape(query, 64):
 		# A hurtbox stands for its character.
 		var target: Node = hit.collider.character if hit.collider is Hurtbox else hit.collider

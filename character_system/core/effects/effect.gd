@@ -1,3 +1,4 @@
+@tool
 @icon("res://character_system/icons/effect.svg")
 @abstract
 class_name Effect
@@ -16,13 +17,13 @@ extends Resource
 ## @export var strength := 5.0
 ##
 ## func _execute(ctx: EffectContext) -> void:
-## 	var motor := Component.of(ctx.target, CharacterMotor) as CharacterMotor
+## 	var motor := CharacterMotor.find_on(ctx.target)
 ## 	if motor:  # Walls and props have no motor.
 ## 		motor.push(Vector3.UP * strength * ctx.magnitude)
 ## [/codeblock]
 ##
 ## [b]Where effects run.[/b] The same effect resource works in all of these:
-## [br]- weapons: [member Hitscan.effects], on whatever the shot hits,
+## [br]- weapons: [member WeaponDelivery.effects], on whatever the shot hits,
 ## [br]- abilities: [member AbilityData.effects], on each target,
 ## [br]- statuses: [member StatusData.on_apply], [member StatusData.on_tick],
 ## [member StatusData.on_remove] and [member StatusTrigger.effects],
@@ -40,6 +41,11 @@ extends Resource
 static func apply_all(effects: Array[Effect], ctx: EffectContext) -> void:
 	for e in effects:
 		e.apply(ctx)
+
+
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
 
 
 ## Runs the effect if all [member conditions] pass. Callers use this, never [method _execute].

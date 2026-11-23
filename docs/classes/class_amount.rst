@@ -19,7 +19,7 @@ A number worked out when an effect runs, instead of typed in: "2 per point of st
 Description
 -----------
 
-Effects with a number have a plain field for it, such as :ref:`DamageEffect.amount<class_DamageEffect_property_amount>`, and a ``scaling`` list of these beside it. Each one's :ref:`value()<class_Amount_method_value>` is added to the plain number, so "10 + 2 per strength" is amount 10 with one :ref:`StatAmount<class_StatAmount>` in scaling. The built-in ones are :ref:`StatAmount<class_StatAmount>`, :ref:`PoolAmount<class_PoolAmount>`, :ref:`HitAmount<class_HitAmount>` and :ref:`RandomAmount<class_RandomAmount>`. To make your own, extend this class and override :ref:`value()<class_Amount_method_value>`:
+Effects with a number have a plain field for it, such as :ref:`AmountEffect.amount<class_AmountEffect_property_amount>`, and a ``scaling`` list of these beside it. Each one's :ref:`value()<class_Amount_method_value>` is added to the plain number, so "10 + 2 per strength" is amount 10 with one :ref:`StatAmount<class_StatAmount>` in scaling. The built-in ones are :ref:`StatAmount<class_StatAmount>`, :ref:`PoolAmount<class_PoolAmount>`, :ref:`HitAmount<class_HitAmount>` and :ref:`RandomAmount<class_RandomAmount>`. To make your own, extend this class and override :ref:`value()<class_Amount_method_value>`:
 
 ::
 

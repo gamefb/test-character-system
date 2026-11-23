@@ -58,6 +58,11 @@ var _pressed_on: Dictionary[StringName, Vector2i] = {}
 var _held: Dictionary[StringName, bool] = {}
 
 
+## The [Brain] of [param node]'s character, or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> Brain:
+	return Component.of(node, Brain) as Brain
+
+
 func _warnings() -> PackedStringArray:
 	var brains: Array = host.get_children().filter(func(node: Node) -> bool: return node is Brain)
 	if brains.size() > 1:

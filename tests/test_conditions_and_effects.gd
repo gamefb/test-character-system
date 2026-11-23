@@ -58,7 +58,7 @@ func test_any_condition_needs_only_one() -> void:
 	assert_false(either.check(ctx), "an empty list never passes")
 	either.conditions = [wet, hurt]
 	assert_false(either.check(ctx))
-	(Component.of(who, Statuses) as Statuses).add(tagged(&"wet"))
+	Statuses.find_on(who).add(tagged(&"wet"))
 	assert_true(either.check(ctx), "wet is enough")
 	either.negate = true
 	assert_false(either.check(ctx))

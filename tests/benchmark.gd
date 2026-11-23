@@ -61,8 +61,8 @@ func walk(count: int) -> float:
 		@warning_ignore("integer_division")
 		var c := make_character(Vector3((i % side) * 2.5 - side, 0.1, (i / side) * 2.5 - side))
 		level.add_child(c)
-		(Component.of(c, Inventory) as Inventory).add(load(EX + "items/rifle.tres"))
-		(Component.of(c, Brain) as Brain).move_dir = Vector3.RIGHT if i % 2 else Vector3.BACK
+		Inventory.find_on(c).add(load(EX + "items/rifle.tres"))
+		Brain.find_on(c).move_dir = Vector3.RIGHT if i % 2 else Vector3.BACK
 	await frames(30)
 	var best: float = INF
 	for run in 3:
@@ -86,20 +86,20 @@ func micro() -> void:
 	root.add_child(a)
 	root.add_child(b)
 	await frames(2)
-	var brain := Component.of(a, Brain) as Brain
+	var brain := Brain.find_on(a)
 	time("find(Health)", 200000, func() -> void: brain.find(Health))
 	time("Component.of(node, Health)", 200000, func() -> void: Component.of(a, Health))
 	time("stat_of(move_speed)", 200000,
 			func() -> void: ComponentManager.stat_of(a, &"move_speed"))
 	for who: Node in [a, b]:
 		# So nobody dies during the timing.
-		(Component.of(who, Health) as Health).max_value = 1e9
-		(Component.of(who, Health) as Health).revive()
+		Health.find_on(who).max_value = 1e9
+		Health.find_on(who).revive()
 	var hit := DamageEffect.new()
 	hit.amount = 0.001
 	time("one damage hit", HITS, func() -> void: hit.apply(EffectContext.new(a, b)))
-	(Component.of(b, Statuses) as Statuses).add(load(EX + "statuses/thorns.tres"))
-	(Component.of(b, Statuses) as Statuses).add(load(EX + "statuses/warded.tres"))
+	Statuses.find_on(b).add(load(EX + "statuses/thorns.tres"))
+	Statuses.find_on(b).add(load(EX + "statuses/warded.tres"))
 	time("hit on a warded target with a thorns reply", HITS,
 			func() -> void: hit.apply(EffectContext.new(a, b)))
 	var many: Array[Node] = []

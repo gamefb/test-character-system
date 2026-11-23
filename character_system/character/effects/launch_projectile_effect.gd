@@ -27,7 +27,7 @@ func _execute(ctx: EffectContext) -> void:
 	var from_weapon: bool = ctx.position.is_finite()
 	var from: Vector3 = ctx.position if from_weapon else user.global_position + Vector3.UP * height
 	var toward: Vector3 = from - user.global_basis.z
-	var brain := Component.of(user, Brain) as Brain
+	var brain := Brain.find_on(user)
 	var target := ctx.target as Node3D
 	if brain:
 		toward = brain.aim_point

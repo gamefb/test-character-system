@@ -1,3 +1,4 @@
+@tool
 class_name HasTagCondition
 extends Condition
 ## Passes if the node has a status with [member tag], e.g. &"wet".
@@ -7,5 +8,5 @@ extends Condition
 
 
 func _test(node: Node) -> bool:
-	var statuses := Component.of(node, Statuses) as Statuses
+	var statuses := Statuses.find_on(node)
 	return statuses != null and statuses.has_tag(tag)

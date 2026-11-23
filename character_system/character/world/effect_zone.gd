@@ -35,7 +35,7 @@ func _exit_tree() -> void:
 
 
 func _on_body_entered(body: Node3D) -> void:
-	var statuses := Component.of(body, Statuses) as Statuses
+	var statuses := Statuses.find_on(body)
 	if status_while_inside and statuses and statuses.add(status_while_inside):
 		_holding.append(body)
 	Effect.apply_all(on_enter, EffectContext.new(null, body))
@@ -49,6 +49,6 @@ func _on_body_exited(body: Node3D) -> void:
 func _drop_hold(body: Node3D) -> void:
 	if body in _holding:
 		_holding.erase(body)
-		var statuses := Component.of(body, Statuses) as Statuses
+		var statuses := Statuses.find_on(body)
 		if statuses:
 			statuses.drop_hold(status_while_inside)

@@ -1,3 +1,4 @@
+@tool
 class_name PoolBelowCondition
 extends Condition
 ## Passes while a [Pool] is below a share of its maximum, e.g. health under half for an

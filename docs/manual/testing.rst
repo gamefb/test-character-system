@@ -16,8 +16,8 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - Tests
      - What it checks
    * - ``test_core.gd``
-     - 14
-     - Components start in any order and once a requirement arrives, only process and get input while running, keep their own process mode, and stop and restart with a requirement (but keep running while another of its type is left); stats combine and update, and a new component reports its stats; events reach running components only; lookups work before the host is in the scene and follow components that come and go
+     - 15
+     - Components start in any order and once a requirement arrives, only process and get input while running, keep their own process mode, and stop and restart with a requirement (but keep running while another of its type is left); stats combine and update, and a new component reports its stats; events reach running components only; lookups work before the host is in the scene and follow components that come and go, and ``find_on()`` is safe on null, freed and plain nodes
    * - ``test_input.gd``
      - 9
      - Presses and releases, a release while paused or never seen, a press the UI used, two keys on one action, an AI press seen once by every node, automatic fire held and tapped
@@ -40,8 +40,8 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - 8
      - Every example loads and does what its name says: Burning, the traits, Wet, Warded, Thorns, the abilities and the items
    * - ``test_name_check.gd``
-     - 13
-     - Known names pass, including a pool's two stats and the ones listed in a manager's Stats; typos are flagged with a guess in stats, events, tags and pools, in amounts, ability costs, Blocked By lists and a status's Blocks too; resources deep inside a status are checked, the examples are clean, the Inspector warning shows and hides
+     - 15
+     - Known names pass, including a pool's two stats and the ones listed in a manager's Stats; typos are flagged with a guess in stats, events, tags and pools, in amounts, ability costs, Blocked By lists and a status's Blocks too; resources deep inside a status are checked, the examples are clean, the Inspector warning shows and hides; name fields get a list to pick from, as plain names, array elements and dictionary keys, and every script with a name field is set up to show it
    * - ``test_damage_pipeline.gd``
      - 13
      - Armour and a shield give the same result in either order; percentages add up and multipliers multiply; a modifier can count every stack; the hit reports what landed; the source's ``bonus_<type>`` and the target's resistance and weakness; a ward against one damage type; hurtbox tags reaching triggers and crits being labelled; a trigger's conditions checked once; a Pool soaking up damage, for all types or some; listeners that still edit the amount directly
@@ -76,8 +76,8 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - 8
      - The newer examples do what their names say: Stunned and Silenced, Vampiric and Bloodlust, Fire ward, Sharpshooter, Lucky strikes, the ring, the staff and the shotgun, the health potion, and the mage casting a Fireball and losing its shield before its health
    * - ``test_extending.gd``
-     - 11
-     - The scripts on :ref:`doc_extending`: GlideMove slows the fall only while held and leaves the double jump alone, WallSlideMode takes over by itself and jumps off the wall, radius targeting finds enemies in range, the hostility condition spares allies, a spawned scene appears where the target is and goes after its lifetime, a melee swing hits only what's in front, Sprint spends from a pool while held, cleans up and stops when the pool is empty, Scope slows only while aiming, AttackNearest picks the nearest enemy and attacks it, an enemy built from it shoots the player, and the HUD shows health, statuses and ammo
+     - 13
+     - The scripts on :ref:`doc_extending`: GlideMove slows the fall only while held and leaves the double jump alone, WallSlideMode takes over by itself and jumps off the wall, radius targeting finds enemies in range, the hostility condition spares allies, a spawned scene appears where the target is and goes after its lifetime, a melee swing hits only what's in front, Sprint spends from a pool while held, cleans up and stops when the pool is empty, Scope slows only while aiming, AttackNearest picks the nearest enemy and attacks it, an enemy built from it shoots the player, the HUD shows health, statuses and ammo, a weapon part of your own needs only ``_fire()``, and an effect of your own that extends AmountEffect gets the amount, the scaling and the magnitude
    * - ``test_quick_start.gd``
      - 1
      - The :ref:`quick start <doc_quick_start>` level, built as the page describes it, plays as promised
@@ -149,6 +149,8 @@ Performance
      - 0.5 µs
    * - ``Component.of(node, Health)``
      - 0.7 µs
+   * - ``Health.find_on(node)``
+     - 0.8 µs
    * - One damage hit
      - 17 µs
    * - A hit on a warded target with a thorns reply
@@ -156,14 +158,14 @@ Performance
    * - Freeing one character
      - about 100 µs
 
-Against the version before health became a pool and statuses listed their blocks, measured in the same session, walking costs the same (within 1%) and a hit about 6% more: it passes through two more function calls on its way into the pool. Asking whether something is blocked is one dictionary look on the manager, which is why the brain and the motor can ask many times a frame, and an event nobody listens to costs about 0.3 µs.
+The base classes for effects with a number and for weapon parts, and the typed ``find_on()`` lookups, changed none of these beyond the difference between two runs of the same code. Against the version before health became a pool and statuses listed their blocks, measured in the same session, walking costs the same (within 1%) and a hit about 6% more: it passes through two more function calls on its way into the pool. Asking whether something is blocked is one dictionary look on the manager, which is why the brain and the motor can ask many times a frame, and an event nobody listens to costs about 0.3 µs.
 
 .. _doc_verification_status:
 
 Verification status
 -------------------
 
-All 221 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
+All 226 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
 
 .. list-table::
    :header-rows: 1
@@ -171,19 +173,21 @@ All 221 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 an
    * - Check
      - Godot 4.8 beta 4
    * - GUT tests (23 files above, test_statuses.gd included)
-     - 221 of 221, 1005 asserts
+     - 226 of 226, 1068 asserts
    * - ``immunity_test`` scene
      - 43 of 43
    * - Test level, ``--self-test``
      - 18 of 18
    * - ``core/`` on its own, with ``character/`` and ``starter_pack/`` deleted
-     - All 21 scripts load
+     - All 22 scripts load
    * - ``core/`` and ``character/``, with ``starter_pack/`` deleted
-     - All 64 scripts load
+     - All 66 scripts load
    * - Code examples in ``RECIPES.md``
      - All compile
 
 Breaking the system on purpose makes the tests fail. Six changes were tried on the November 22 additions, and each failed at least one test: a :ref:`ModifyAmountEffect<class_ModifyAmountEffect>` that edits the amount in sequence, a Brain that is never blocked, a ``Statuses._stop()`` that runs ``on_remove``, a Trigger that throws away what a frame overshot the fire rate by, an ability that pays when its cast starts, and dead targets that still take hits. Each part of the input design fails its own test when undone: counting a press from code in the current frame, skipping the release check, forgetting a press when it's released, and dropping the extra physics frame. Earlier, with the 38-check version of the scene, ignoring ``immune_to`` failed 6 checks, ignoring ``removes_tags`` 1, ignoring ``react_to_statuses`` 1, and items that never drop their holds 3. Letting the motor's ``consume_action()`` hand out a press twice, or running every movement mode each frame instead of only the current one, makes ``test_motor.gd`` fail.
+
+The Inspector was looked at once, on November 23, by running the editor under a software renderer and taking screenshots: a status's Tags and Blocks, an ability's Costs and Blocked By and a modifier's Stat each showed a list of the project's names, and a :ref:`Health<class_Health>` node showed Death Status, Resistances, Max Value, Regen and Regen Delay with the other pool fields hidden. One list, a status's Blocks, was opened by a script and is the picture on :ref:`doc_name_lists`; for the others, a script run in editor mode printed what each list holds. Nobody has clicked through the Inspector by hand.
 
 The scripts follow the GDScript style guide, and ``gdlint`` reports no problems. A script that checks the rules it doesn't (the order of methods, continuation lines, trailing commas, numbers, quotes and comment spacing) reported nothing on the project as it stood before the November 22 additions; it isn't part of the repository and hasn't been run on them. The documentation builds with no warnings, so every link in the generated class reference resolves.
 

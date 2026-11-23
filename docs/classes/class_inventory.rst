@@ -40,6 +40,8 @@ Methods
    :widths: auto
 
    +-----------------------------------------+--------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Inventory<class_Inventory>`       | :ref:`find_on<class_Inventory_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                            |
+   +-----------------------------------------+--------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`int<class_int>`                   | :ref:`count<class_Inventory_method_count>`\ (\ data\: :ref:`ItemData<class_ItemData>`\ )                                       |
    +-----------------------------------------+--------------------------------------------------------------------------------------------------------------------------------+
    | |void|                                  | :ref:`add<class_Inventory_method_add>`\ (\ data\: :ref:`ItemData<class_ItemData>`, amount\: :ref:`int<class_int>` = 1\ )       |
@@ -97,6 +99,18 @@ The stacks carried, in order. Change it through :ref:`add()<class_Inventory_meth
 
 Method Descriptions
 -------------------
+
+.. _class_Inventory_method_find_on:
+
+.. rst-class:: classref-method
+
+:ref:`Inventory<class_Inventory>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Inventory_method_find_on>`
+
+The **Inventory** of ``node``'s character, or null if there is none. Safe on a freed node.
+
+.. rst-class:: classref-item-separator
+
+----
 
 .. _class_Inventory_method_count:
 
@@ -158,7 +172,7 @@ Uses one ``data``: runs its :ref:`ItemData.use_effects<class_ItemData_property_u
 
     func _unhandled_input(event: InputEvent) -> void:
         if event.is_action_pressed(&"quick_heal"):
-            (Component.of(player, Inventory) as Inventory).use(health_potion)
+            Inventory.find_on(player).use(health_potion)
 
 .. rst-class:: classref-item-separator
 

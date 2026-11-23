@@ -43,6 +43,18 @@ Properties
    | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\]         | :ref:`user_effects<class_Trigger_property_user_effects>` | ``[]``         |
    +------------------------------------------------------------------+----------------------------------------------------------+----------------+
 
+.. rst-class:: classref-reftable-group
+
+Methods
+-------
+
+.. table::
+   :widths: auto
+
+   +-------------------------------+---------------------------------------------------------------------------------------------------+
+   | :ref:`Trigger<class_Trigger>` | :ref:`find_on<class_Trigger_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| |
+   +-------------------------------+---------------------------------------------------------------------------------------------------+
+
 .. rst-class:: classref-section-separator
 
 ----
@@ -136,6 +148,23 @@ The names this item answers to. It doesn't fire while the wielder has a status t
 :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] **user_effects** = ``[]`` :ref:`🔗<class_Trigger_property_user_effects>`
 
 Run in order on the wielder each time the item fires, e.g. a :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` for a rocket launcher or a bow, a :ref:`KnockbackEffect<class_KnockbackEffect>` for recoil, or a cost paid from a :ref:`Pool<class_Pool>`. Their :ref:`EffectContext.position<class_EffectContext_property_position>` is where the item is, so what they launch or spawn leaves from the weapon.
+
+.. rst-class:: classref-section-separator
+
+----
+
+.. rst-class:: classref-descriptions-group
+
+Method Descriptions
+-------------------
+
+.. _class_Trigger_method_find_on:
+
+.. rst-class:: classref-method
+
+:ref:`Trigger<class_Trigger>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Trigger_method_find_on>`
+
+The **Trigger** on the item scene ``node``, or null if there is none. Safe on a freed node.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

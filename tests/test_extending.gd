@@ -54,7 +54,7 @@ func physics_frames() -> void:
 
 ## Presses and releases an action, letting every component see it.
 func tap(who: Node, action: StringName) -> void:
-	var brain := Component.of(who, Brain) as Brain
+	var brain := Brain.find_on(who)
 	brain.press(action)
 	for i in 3:
 		await get_tree().process_frame
@@ -120,12 +120,58 @@ func test_melee_sweep_hits_what_is_in_front() -> void:
 	sweep.shape = box
 	sweep.effects = [DamageEffect.new()]
 	var sword: ItemData = item([Trigger.new(), sweep])
-	(Component.of(swinger, Equipment) as Equipment).equip(ItemInstance.new(sword))
+	Equipment.find_on(swinger).equip(ItemInstance.new(sword))
 	await physics_frames()
 	await tap(swinger, &"primary")
-	assert_eq((Component.of(front, Health) as Health).current, 90.0)
-	assert_eq((Component.of(behind, Health) as Health).current, 100.0)
-	assert_eq((Component.of(swinger, Health) as Health).current, 100.0, "never the wielder")
+	assert_eq(Health.find_on(front).current, 90.0)
+	assert_eq(Health.find_on(behind).current, 100.0)
+	assert_eq(Health.find_on(swinger).current, 100.0, "never the wielder")
+
+
+## A new weapon part writes only what a shot reaches.
+class Pulse extends WeaponDelivery:
+	var targeting := RadiusTargeting.new()
+
+	func _fire() -> void:
+		for target in targeting.find(context_for(wielder)):
+			Effect.apply_all(effects, context_for(target))
+
+
+func test_a_new_weapon_part_only_writes_what_a_shot_reaches() -> void:
+	var wielder: CharacterBody3D = make_character(Vector3.ZERO, [Brain.new()])
+	var near: CharacterBody3D = make_character(Vector3(0, 0, -3))
+	var far: CharacterBody3D = make_character(Vector3(0, 0, -20))
+	var pulse := Pulse.new()
+	pulse.effects = [DamageEffect.new()]
+	var baton: ItemData = item([Trigger.new(), pulse])
+	Equipment.find_on(wielder).equip(ItemInstance.new(baton))
+	await physics_frames()
+	await tap(wielder, &"primary")
+	assert_eq(Health.find_on(near).current, 90.0, "the trigger, effects and context are inherited")
+	assert_eq(Health.find_on(far).current, 100.0)
+	assert_eq(Health.find_on(wielder).current, 100.0)
+
+
+## A new effect with a number writes only what the number does.
+class ShoveEffect extends AmountEffect:
+	func _execute(ctx: EffectContext) -> void:
+		(ctx.target as Node3D).position.z -= total(ctx)
+
+
+func test_a_new_effect_with_a_number_inherits_amount_and_scaling() -> void:
+	var pusher: CharacterBody3D = make_character()
+	var pushed: CharacterBody3D = make_character(Vector3(0, 0, -2))
+	ComponentManager.of(pusher).set_base(&"strength", 4.0)
+	var per_strength := StatAmount.new()
+	per_strength.stat = &"strength"
+	per_strength.per_point = 0.5
+	var shove := ShoveEffect.new()
+	shove.amount = 1.0
+	shove.scaling = [per_strength]
+	var ctx := EffectContext.new(pusher, pushed)
+	ctx.magnitude = 2.0
+	shove.apply(ctx)
+	assert_eq(pushed.position.z, -8.0, "(1 + 4 strength x 0.5) x 2 further away")
 
 
 func test_sprint_spends_a_pool_while_held_and_cleans_up() -> void:
@@ -135,7 +181,7 @@ func test_sprint_spends_a_pool_while_held_and_cleans_up() -> void:
 	var runner: CharacterBody3D = make_character(Vector3.ZERO,
 			[Brain.new(), walker(), stamina, sprint])
 	var manager := ComponentManager.of(runner)
-	var brain := Component.of(runner, Brain) as Brain
+	var brain := Brain.find_on(runner)
 	brain.press(&"sprint")
 	for i in 3:
 		await get_tree().process_frame
@@ -160,9 +206,9 @@ func test_sprint_spends_a_pool_while_held_and_cleans_up() -> void:
 func test_scope_slows_the_wielder_only_while_aiming() -> void:
 	var shooter: CharacterBody3D = make_character(Vector3.ZERO, [Brain.new(), walker()])
 	var manager := ComponentManager.of(shooter)
-	var gear := Component.of(shooter, Equipment) as Equipment
+	var gear := Equipment.find_on(shooter)
 	gear.equip(ItemInstance.new(item([Scope.new()])))
-	(Component.of(shooter, Brain) as Brain).press(&"secondary")
+	Brain.find_on(shooter).press(&"secondary")
 	for i in 2:
 		await get_tree().process_frame
 	assert_eq(manager.stat(&"move_speed"), 2.5, "half speed while aiming")
@@ -196,15 +242,15 @@ func test_an_enemy_with_attack_nearest_shoots_the_player() -> void:
 	]
 	var enemy: CharacterBody3D = make_character(Vector3.ZERO, parts)
 	var rifle: ItemData = load(EX + "items/rifle.tres")
-	(Component.of(enemy, Equipment) as Equipment).equip(ItemInstance.new(rifle))
+	Equipment.find_on(enemy).equip(ItemInstance.new(rifle))
 	await wait_seconds(0.75)
-	assert_eq((Component.of(player, Health) as Health).current, 90.0, "one shot, at the chest")
+	assert_eq(Health.find_on(player).current, 90.0, "one shot, at the chest")
 
 
 func test_character_hud_shows_health_statuses_and_ammo() -> void:
 	var hero: CharacterBody3D = make_character(Vector3.ZERO, [Brain.new(), Statuses.new()])
 	var rifle: ItemData = load(EX + "items/rifle.tres")
-	(Component.of(hero, Equipment) as Equipment).equip(ItemInstance.new(rifle))
+	Equipment.find_on(hero).equip(ItemInstance.new(rifle))
 	var hud := Control.new()
 	var bar := ProgressBar.new()
 	bar.name = "HealthBar"
@@ -216,8 +262,8 @@ func test_character_hud_shows_health_statuses_and_ammo() -> void:
 	hud.set_script(HUD)
 	hud.set(&"character", hero)
 	add_child_autofree(hud)
-	(Component.of(hero, Health) as Health).change(-30.0)
-	(Component.of(hero, Statuses) as Statuses).add(load(EX + "statuses/haste.tres"))
+	Health.find_on(hero).change(-30.0)
+	Statuses.find_on(hero).add(load(EX + "statuses/haste.tres"))
 	await get_tree().process_frame
 	assert_eq(bar.value, 70.0)
 	assert_eq((hud.get_node("Statuses") as Label).text, "Haste")
@@ -258,8 +304,8 @@ func make_mover(extra: Array[MotorNode]) -> CharacterBody3D:
 func test_glide_move_slows_the_fall_while_held() -> void:
 	var glide := GlideMove.new()
 	var body: CharacterBody3D = await make_mover([glide])
-	var brain := Component.of(body, Brain) as Brain
-	var air := (Component.of(body, CharacterMotor) as CharacterMotor).get_mode(AirMode) as AirMode
+	var brain := Brain.find_on(body)
+	var air := CharacterMotor.find_on(body).get_mode(AirMode) as AirMode
 	await tap(body, &"jump")
 	for i in 40:
 		await get_tree().physics_frame
@@ -281,8 +327,8 @@ func test_glide_move_slows_the_fall_while_held() -> void:
 func test_wall_slide_mode_takes_over_by_itself() -> void:
 	var slide := WallSlideMode.new()
 	var body: CharacterBody3D = await make_mover([slide])
-	var motor := Component.of(body, CharacterMotor) as CharacterMotor
-	var brain := Component.of(body, Brain) as Brain
+	var motor := CharacterMotor.find_on(body)
+	var brain := Brain.find_on(body)
 	brain.move_dir = Vector3.RIGHT
 	await tap(body, &"jump")
 	for i in 40:

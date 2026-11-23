@@ -51,7 +51,7 @@ func test_percentages_add_up_before_multipliers() -> void:
 func test_a_conditional_modifier_follows_its_condition() -> void:
 	var host: Node3D = make_host([], { &"speed": 10.0 })
 	var manager := ComponentManager.of(host)
-	var health := Component.of(host, Health) as Health
+	var health := Health.find_on(host)
 	var hurt := PoolBelowCondition.new()
 	hurt.fraction = 0.5
 	var adrenaline: StatModifier = modifier(&"speed", 0.0, 0.5)
@@ -82,7 +82,7 @@ func test_modifiers_of_explains_a_number() -> void:
 	var haste := StatusData.new()
 	haste.display_name = "Haste"
 	haste.modifiers = [modifier(&"speed", 0.0, 0.5), modifier(&"max_health", 10.0)]
-	(Component.of(host, Statuses) as Statuses).add(haste)
+	Statuses.find_on(host).add(haste)
 	var aiming: StatModifier = modifier(&"speed", 0.0, 0.0, 0.5)
 	manager.add_modifier(aiming)
 	var entries: Array[Dictionary] = manager.modifiers_of(&"speed")
@@ -183,7 +183,7 @@ func test_pools_are_found_by_name() -> void:
 	assert_eq(Pool.named(host, &"stamina"), stamina)
 	assert_null(Pool.named(host, &"rage"))
 	assert_null(Pool.named(null, &"mana"), "safe on anything")
-	var health := Component.of(host, Health) as Health
+	var health := Health.find_on(host)
 	assert_eq(Pool.named(host, &"health"), health, "health is the pool named health")
 	assert_eq(ComponentManager.of(host).find_all(Pool),
 			[health, mana, stamina] as Array[Component])
@@ -192,7 +192,7 @@ func test_pools_are_found_by_name() -> void:
 func test_health_is_a_pool() -> void:
 	var host: Node3D = make_host()
 	var manager := ComponentManager.of(host)
-	var health := Component.of(host, Health) as Health
+	var health := Health.find_on(host)
 	assert_eq(health.pool, &"health")
 	assert_eq(manager.stat(&"max_health"), 100.0, "its stats are named like any pool's")
 	manager.add_modifier(modifier(&"health_regen", 10.0))
@@ -222,7 +222,7 @@ func test_a_pool_gives_a_status_while_it_is_empty() -> void:
 	stamina.pool = &"stamina"
 	stamina.status_while_empty = exhausted
 	var host: Node3D = make_host([stamina])
-	var statuses := Component.of(host, Statuses) as Statuses
+	var statuses := Statuses.find_on(host)
 	assert_false(statuses.active.has(exhausted))
 	stamina.change(-100.0)
 	assert_true(statuses.active.has(exhausted), "given when the pool runs out")

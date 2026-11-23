@@ -189,6 +189,17 @@ func test_lookups_follow_components_that_come_and_go() -> void:
 	needed.free()
 
 
+func test_find_on_is_a_typed_lookup_that_is_safe_on_anything() -> void:
+	var health := Health.new()
+	host.add_child(health)
+	assert_eq(Health.find_on(host), health)
+	assert_null(Statuses.find_on(host), "none of that type")
+	assert_null(Health.find_on(null))
+	assert_null(Health.find_on(autofree(Node.new())), "not a character")
+	host.free()
+	assert_null(Health.find_on(host), "freed")
+
+
 func test_new_component_reports_its_stats() -> void:
 	add_child_autofree(host)
 	var manager := ComponentManager.of(host)

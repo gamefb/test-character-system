@@ -18,6 +18,7 @@ Core
     :name: toc-class-ref-core
 
     class_amount
+    class_amounteffect
     class_applystatuseffect
     class_component
     class_componentmanager
@@ -90,6 +91,7 @@ Character
     class_targeting
     class_trigger
     class_walkmode
+    class_weapondelivery
     class_weaponswitch
 
 Starter pack

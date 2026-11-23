@@ -45,11 +45,11 @@ The host also needs a :ref:`ComponentManager<class_ComponentManager>` child. Com
 
 If a component can't start, the editor shows a warning on it and the Output panel reports once what's missing. The rest of the host keeps working.
 
-\ **Using components from other code.** Get one with :ref:`of()<class_Component_method_of>`, read stats with :ref:`ComponentManager.stat_of()<class_ComponentManager_method_stat_of>` and send events with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>`. All three are safe on null or freed nodes and on nodes without components, such as walls.
+\ **Using components from other code.** Get one with its type's ``find_on()``, such as :ref:`Health.find_on()<class_Health_method_find_on>`, read stats with :ref:`ComponentManager.stat_of()<class_ComponentManager_method_stat_of>` and send events with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>`. All three are safe on null or freed nodes and on nodes without components, such as walls.
 
 ::
 
-    var health := Component.of(body, Health) as Health  # null if body has no Health.
+    var health := Health.find_on(body)  # null if body has no Health.
     if health:
         health.change(-10.0)
 
@@ -216,11 +216,16 @@ Method Descriptions
 
 Returns the ``type`` component on ``node``, or null. Safe on null or freed nodes.
 
-Use it from any script: effects, level scripts, UI. Subclasses count, so asking for :ref:`Brain<class_Brain>` finds a :ref:`PlayerBrain<class_PlayerBrain>` or :ref:`AIBrain<class_AIBrain>`. Cast the result to use its members:
+Use it from any script: effects, level scripts, UI. Subclasses count, so asking for :ref:`Brain<class_Brain>` finds a :ref:`PlayerBrain<class_PlayerBrain>` or :ref:`AIBrain<class_AIBrain>`. The components a game looks up most have a typed shortcut, such as :ref:`Health.find_on()<class_Health_method_find_on>`. For a type of your own, cast the result, or give the type the same two lines:
 
 ::
 
-    var statuses := Component.of(enemy, Statuses) as Statuses
+    var statuses := Statuses.find_on(enemy)
+    var sprint := Component.of(enemy, Sprint) as Sprint
+
+    # In sprint.gd, so other scripts can write Sprint.find_on(enemy):
+    static func find_on(node: Variant) -> Sprint:
+        return Component.of(node, Sprint) as Sprint
 
 It works on a scene that hasn't been added to the level yet, e.g. to set a spawned enemy's :ref:`Faction.team<class_Faction_property_team>` before ``add_child()``.
 

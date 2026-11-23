@@ -8,9 +8,9 @@
 HealEffect
 ==========
 
-**Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`AmountEffect<class_AmountEffect>` **<** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-Restores health, scaled by magnitude.
+Restores health: :ref:`AmountEffect.total()<class_AmountEffect_method_total>`, e.g. with a :ref:`PoolAmount<class_PoolAmount>` in its scaling for 30% of the health the target is missing, or a :ref:`HitAmount<class_HitAmount>` for life steal.
 
 .. rst-class:: classref-introduction-group
 
@@ -18,49 +18,6 @@ Description
 -----------
 
 Healing goes through the same steps as damage, without types or resistance. The source hears ``giving_healing`` and the target ``receiving_healing`` before it lands, so statuses can change :ref:`EffectContext.add<class_EffectContext_property_add>`, :ref:`EffectContext.percent<class_EffectContext_property_percent>` and :ref:`EffectContext.mul<class_EffectContext_property_mul>` (a curse that halves healing, a talent that adds 20%). After it lands they hear ``gave_healing`` and ``received_healing``. A target that is dead, or has a status that blocks ``healing``, isn't healed; use :ref:`Health.revive()<class_Health_method_revive>` for the dead.
-
-.. rst-class:: classref-reftable-group
-
-Properties
-----------
-
-.. table::
-   :widths: auto
-
-   +----------------------------------------------------------+---------------------------------------------------+----------+
-   | :ref:`float<class_float>`                                | :ref:`amount<class_HealEffect_property_amount>`   | ``10.0`` |
-   +----------------------------------------------------------+---------------------------------------------------+----------+
-   | :ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] | :ref:`scaling<class_HealEffect_property_scaling>` | ``[]``   |
-   +----------------------------------------------------------+---------------------------------------------------+----------+
-
-.. rst-class:: classref-section-separator
-
-----
-
-.. rst-class:: classref-descriptions-group
-
-Property Descriptions
----------------------
-
-.. _class_HealEffect_property_amount:
-
-.. rst-class:: classref-property
-
-:ref:`float<class_float>` **amount** = ``10.0`` :ref:`🔗<class_HealEffect_property_amount>`
-
-Health restored, before scaling and magnitude.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_HealEffect_property_scaling:
-
-.. rst-class:: classref-property
-
-:ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] **scaling** = ``[]`` :ref:`🔗<class_HealEffect_property_scaling>`
-
-Added to :ref:`amount<class_HealEffect_property_amount>` each time it runs, e.g. a :ref:`PoolAmount<class_PoolAmount>` for 30% of the health the target is missing, or a :ref:`HitAmount<class_HitAmount>` for a quarter of the damage just dealt (life steal).
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

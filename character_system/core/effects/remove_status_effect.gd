@@ -1,3 +1,4 @@
+@tool
 class_name RemoveStatusEffect
 extends Effect
 ## Takes a status away from the target: one status, or every status with a tag.
@@ -13,7 +14,7 @@ extends Effect
 
 
 func _execute(ctx: EffectContext) -> void:
-	var statuses := Component.of(ctx.target, Statuses) as Statuses
+	var statuses := Statuses.find_on(ctx.target)
 	if not statuses:
 		return
 	if status:

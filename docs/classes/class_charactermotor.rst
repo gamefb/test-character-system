@@ -77,15 +77,17 @@ Methods
 .. table::
    :widths: auto
 
-   +-----------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`                 | :ref:`is_blocked<class_CharacterMotor_method_is_blocked>`\ (\ )                                                       |
-   +-----------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`                 | :ref:`consume_action<class_CharacterMotor_method_consume_action>`\ (\ action\: :ref:`StringName<class_StringName>`\ ) |
-   +-----------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
-   | :ref:`MovementMode<class_MovementMode>` | :ref:`get_mode<class_CharacterMotor_method_get_mode>`\ (\ type\: :ref:`Script<class_Script>`\ )                       |
-   +-----------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
-   | |void|                                  | :ref:`push<class_CharacterMotor_method_push>`\ (\ velocity\: :ref:`Vector3<class_Vector3>`\ )                         |
-   +-----------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
+   +---------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
+   | :ref:`CharacterMotor<class_CharacterMotor>` | :ref:`find_on<class_CharacterMotor_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|              |
+   +---------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                     | :ref:`is_blocked<class_CharacterMotor_method_is_blocked>`\ (\ )                                                       |
+   +---------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                     | :ref:`consume_action<class_CharacterMotor_method_consume_action>`\ (\ action\: :ref:`StringName<class_StringName>`\ ) |
+   +---------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
+   | :ref:`MovementMode<class_MovementMode>`     | :ref:`get_mode<class_CharacterMotor_method_get_mode>`\ (\ type\: :ref:`Script<class_Script>`\ )                       |
+   +---------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
+   | |void|                                      | :ref:`push<class_CharacterMotor_method_push>`\ (\ velocity\: :ref:`Vector3<class_Vector3>`\ )                         |
+   +---------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -241,6 +243,18 @@ The character being moved.
 
 Method Descriptions
 -------------------
+
+.. _class_CharacterMotor_method_find_on:
+
+.. rst-class:: classref-method
+
+:ref:`CharacterMotor<class_CharacterMotor>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_CharacterMotor_method_find_on>`
+
+The **CharacterMotor** of ``node``'s character, or null if there is none. Safe on a freed node.
+
+.. rst-class:: classref-item-separator
+
+----
 
 .. _class_CharacterMotor_method_is_blocked:
 

@@ -50,6 +50,8 @@ Methods
    :widths: auto
 
    +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Abilities<class_Abilities>`   | :ref:`find_on<class_Abilities_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                        |
+   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
    | :ref:`bool<class_bool>`             | :ref:`use<class_Abilities_method_use>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )                              |
    +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
    | :ref:`bool<class_bool>`             | :ref:`can_use<class_Abilities_method_can_use>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )                      |
@@ -175,6 +177,18 @@ The ability being cast right now, or null.
 
 Method Descriptions
 -------------------
+
+.. _class_Abilities_method_find_on:
+
+.. rst-class:: classref-method
+
+:ref:`Abilities<class_Abilities>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Abilities_method_find_on>`
+
+The **Abilities** of ``node``'s character, or null if there is none. Safe on a freed node.
+
+.. rst-class:: classref-item-separator
+
+----
 
 .. _class_Abilities_method_use:
 

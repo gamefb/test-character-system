@@ -21,6 +21,11 @@ extends Component
 var _holstered := false
 
 
+## The [WeaponSwitch] of [param node]'s character, or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> WeaponSwitch:
+	return Component.of(node, WeaponSwitch) as WeaponSwitch
+
+
 func _process(_delta: float) -> void:
 	var brain := find(Brain) as Brain
 	if brain.is_action_just_pressed(&"next_weapon"):

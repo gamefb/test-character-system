@@ -43,7 +43,7 @@ func _warnings() -> PackedStringArray:
 
 
 func _start() -> void:
-	var holder := Component.of(wielder, Statuses) as Statuses
+	var holder := Statuses.find_on(wielder)
 	for s in statuses if holder else []:
 		if holder.add(s, wielder):
 			_statuses.append(s)
@@ -52,20 +52,20 @@ func _start() -> void:
 	for m in (modifiers + rolled) if wielder_manager else []:
 		wielder_manager.add_modifier(m, item.data if item else null)
 		_modifiers.append(m)
-	var caster := Component.of(wielder, Abilities) as Abilities
+	var caster := Abilities.find_on(wielder)
 	for action in abilities if caster else {}:
 		_replaced[action] = caster.slots.get(action)
 		caster.slots[action] = abilities[action]
 
 
 func _stop() -> void:
-	var holder := Component.of(wielder, Statuses) as Statuses
+	var holder := Statuses.find_on(wielder)
 	for s in _statuses if holder else []:
 		holder.drop_hold(s)
 	var wielder_manager := ComponentManager.of(wielder)
 	for m in _modifiers if wielder_manager else []:
 		wielder_manager.remove_modifier(m)
-	var caster := Component.of(wielder, Abilities) as Abilities
+	var caster := Abilities.find_on(wielder)
 	for action in _replaced if caster else {}:
 		if caster.slots.get(action) != abilities.get(action):
 			continue  # Something else took the slot meanwhile: leave it.

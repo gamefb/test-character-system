@@ -1,3 +1,4 @@
+@tool
 class_name StatusData
 extends Resource
 ## A status or passive, saved as a .tres file.
@@ -78,6 +79,11 @@ enum Stacking {
 @export var triggers: Array[StatusTrigger] = []
 
 
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
+
+
 ## How many stacks this status can have.
 func stack_limit() -> int:
 	return max_stacks if stacking == Stacking.STACK else 1
@@ -86,7 +92,7 @@ func stack_limit() -> int:
 ## True if [param target] isn't immune to this status and its [member apply_conditions] pass.
 ## UI can call this too, e.g. to show "Immune".
 func can_apply(target: Node, source: Node = null) -> bool:
-	var statuses := Component.of(target, Statuses) as Statuses
+	var statuses := Statuses.find_on(target)
 	if statuses and statuses.is_immune_to(self):
 		return false
 	return Condition.all_pass(apply_conditions, EffectContext.new(source, target, self))

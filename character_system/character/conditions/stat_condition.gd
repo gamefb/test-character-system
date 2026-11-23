@@ -1,3 +1,4 @@
+@tool
 class_name StatCondition
 extends Condition
 ## Passes if the node's [member stat] is at least [member value].

@@ -1,3 +1,4 @@
+@tool
 class_name HitCondition
 extends Condition
 ## Passes when the hit is of a kind: a damage type, a tag, or both.

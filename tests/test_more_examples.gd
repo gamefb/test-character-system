@@ -59,8 +59,8 @@ func hit(target: Node, amount := 10.0, type: StringName = &"physical",
 
 func test_stunned_stops_everything_and_silenced_stops_spells() -> void:
 	var who: CharacterBody3D = make_character()
-	var brain := Component.of(who, Brain) as Brain
-	var abilities := Component.of(who, Abilities) as Abilities
+	var brain := Brain.find_on(who)
+	var abilities := Abilities.find_on(who)
 	var fireball: AbilityData = ex("abilities/fireball.tres")
 	statuses(who).add(ex("statuses/silenced.tres"))
 	assert_false(brain.is_blocked())
@@ -123,20 +123,20 @@ func test_lucky_strikes_follow_the_crit_chance_stat() -> void:
 
 func test_gear_examples_change_stats_and_grant_abilities() -> void:
 	var who: CharacterBody3D = make_character()
-	var gear := Component.of(who, Equipment) as Equipment
+	var gear := Equipment.find_on(who)
 	gear.equip(ItemInstance.new(ex("items/ring_of_vigor.tres")))
 	assert_eq(ComponentManager.stat_of(who, &"max_health"), 125.0)
 	gear.equip(ItemInstance.new(ex("items/fire_staff.tres")))
-	assert_eq((Component.of(who, Abilities) as Abilities).slots[&"secondary"],
+	assert_eq(Abilities.find_on(who).slots[&"secondary"],
 			ex("abilities/fireball.tres"))
 	assert_almost_eq(ComponentManager.stat_of(who, &"bonus_fire"), 0.2, 0.001)
 	gear.equip(ItemInstance.new(ex("items/shotgun.tres")))
 	await get_tree().process_frame
-	assert_false((Component.of(who, Abilities) as Abilities).slots.has(&"secondary"),
+	assert_false(Abilities.find_on(who).slots.has(&"secondary"),
 			"the staff took its ability with it")
 	var shotgun: Node = gear.node_in(&"weapon")
 	assert_eq((Component.of(shotgun, Hitscan) as Hitscan).pellets, 8)
-	var shells := Component.of(shotgun, Magazine) as Magazine
+	var shells := Magazine.find_on(shotgun)
 	shells.rounds = 0
 	shells.reload()
 	assert_true(shells.is_reloading(), "no ammo item: it reloads for free, but takes time")
@@ -144,7 +144,7 @@ func test_gear_examples_change_stats_and_grant_abilities() -> void:
 
 func test_health_potion_heals_and_is_used_up() -> void:
 	var who: CharacterBody3D = make_character()
-	var bag := Component.of(who, Inventory) as Inventory
+	var bag := Inventory.find_on(who)
 	bag.add(ex("items/health_potion.tres"), 2)
 	health(who).change(-70.0)
 	assert_true(bag.use(ex("items/health_potion.tres")))
@@ -164,9 +164,9 @@ func test_mage_casts_a_fireball_and_has_a_shield() -> void:
 	for node: Node in [shape, ComponentManager.new(), Health.new(), Statuses.new()]:
 		target.add_child(node)
 	add_child_autofree(target)
-	var abilities := Component.of(mage, Abilities) as Abilities
+	var abilities := Abilities.find_on(mage)
 	var mana := Pool.named(mage, &"mana")
-	(Component.of(mage, Brain) as Brain).aim_point = target.position + Vector3.UP
+	Brain.find_on(mage).aim_point = target.position + Vector3.UP
 	for i in 2:
 		await get_tree().physics_frame
 	assert_true(abilities.use(ex("abilities/fireball.tres")))

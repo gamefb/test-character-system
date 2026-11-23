@@ -14,7 +14,7 @@ extends Component
 ## [member StatusData.tick_interval]. Characters with nothing but passives cost nothing per frame.
 ##
 ## [codeblock]
-## var statuses := Component.of(enemy, Statuses) as Statuses
+## var statuses := Statuses.find_on(enemy)
 ## if not statuses.add(burning, player):
 ## 	print("Immune")  # Or connect to the refused signal.
 ## [/codeblock]
@@ -31,6 +31,11 @@ signal refused(data: StatusData, source: Node)
 ## Every status this character has right now, with its runtime state. Read it, but change it
 ## through [method add], [method remove] and [method drop_hold].
 var active: Dictionary[StatusData, ActiveStatus] = {}
+
+
+## The [Statuses] of [param node]'s character, or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> Statuses:
+	return Component.of(node, Statuses) as Statuses
 
 
 static func _overlaps(a: Array[StringName], b: Array[StringName]) -> bool:

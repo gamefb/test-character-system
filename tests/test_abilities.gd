@@ -214,7 +214,7 @@ func test_a_status_is_held_for_as_long_as_the_cast() -> void:
 
 func test_an_ability_can_need_a_target() -> void:
 	var friend: Node3D = make_host()
-	(Component.of(friend, Health) as Health).change(-50.0)
+	Health.find_on(friend).change(-50.0)
 	var nobody := FixedTargeting.new()
 	var spell: AbilityData = mend()
 	spell.targeting = nobody
@@ -225,7 +225,7 @@ func test_an_ability_can_need_a_target() -> void:
 	assert_eq(mana.current, 50.0)
 	nobody.targets = [friend]
 	assert_true(abilities.use(spell))
-	assert_eq((Component.of(friend, Health) as Health).current, 60.0)
+	assert_eq(Health.find_on(friend).current, 60.0)
 	nobody.targets = []
 	spell.needs_target = false
 	abilities.reset_cooldown()
@@ -245,7 +245,7 @@ func test_user_effects_run_on_the_user() -> void:
 	drain.effects = [bite]
 	health.change(-50.0)
 	abilities.use(drain)
-	assert_eq((Component.of(enemy, Health) as Health).current, 80.0)
+	assert_eq(Health.find_on(enemy).current, 80.0)
 	assert_eq(health.current, 60.0, "the heal half of a life drain")
 
 

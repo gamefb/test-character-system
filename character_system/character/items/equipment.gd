@@ -13,7 +13,7 @@ extends Component
 ## item that leaves the Inventory (dropped, sold, used up) is unequipped.
 ##
 ## [codeblock]
-## var gear := Component.of(player, Equipment) as Equipment
+## var gear := Equipment.find_on(player)
 ## var cloak := preload("res://character_system/starter_pack/items/fireproof_cloak.tres")
 ## gear.equip(ItemInstance.new(cloak))
 ## [/codeblock]
@@ -32,6 +32,11 @@ signal changed(slot: StringName)
 ## What is equipped in each slot.
 var equipped: Dictionary[StringName, ItemInstance] = {}
 var _nodes: Dictionary[StringName, Node] = {}
+
+
+## The [Equipment] of [param node]'s character, or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> Equipment:
+	return Component.of(node, Equipment) as Equipment
 
 
 func _warnings() -> PackedStringArray:
@@ -73,7 +78,7 @@ func equip(item: ItemInstance) -> void:
 ## The scene spawned for the item in [param slot], or null if the slot is empty. Its item
 ## components are on it, e.g. for an ammo counter:
 ## [codeblock]
-## var magazine := Component.of(gear.node_in(&"weapon"), Magazine) as Magazine
+## var magazine := Magazine.find_on(gear.node_in(&"weapon"))
 ## [/codeblock]
 func node_in(slot: StringName) -> Node:
 	return _nodes.get(slot)

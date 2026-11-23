@@ -22,11 +22,11 @@ func make_host(parts: Array = []) -> Node3D:
 
 
 func health_of(node: Node) -> Health:
-	return Component.of(node, Health) as Health
+	return Health.find_on(node)
 
 
 func statuses_of(node: Node) -> Statuses:
-	return Component.of(node, Statuses) as Statuses
+	return Statuses.find_on(node)
 
 
 func modify(add := 0.0, percent := 0.0, mul := 1.0) -> ModifyAmountEffect:

@@ -8,6 +8,6 @@ extends Effect
 
 
 func _execute(ctx: EffectContext) -> void:
-	var statuses := Component.of(ctx.target, Statuses) as Statuses
+	var statuses := Statuses.find_on(ctx.target)
 	if statuses:
 		statuses.add(status, ctx.source)

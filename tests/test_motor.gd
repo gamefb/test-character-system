@@ -26,7 +26,7 @@ func test_double_jump_air_mode_first() -> void:
 
 func test_walks_at_move_speed_and_stats_change_it() -> void:
 	var body := _make_character()
-	var brain := Component.of(body, Brain) as Brain
+	var brain := Brain.find_on(body)
 	await _land(body)
 	brain.move_dir = Vector3.RIGHT
 	await _physics_frames(3)
@@ -49,7 +49,7 @@ func test_walks_at_move_speed_and_stats_change_it() -> void:
 
 func test_dash() -> void:
 	var body := _make_character(false, true)
-	var brain := Component.of(body, Brain) as Brain
+	var brain := Brain.find_on(body)
 	var dash := _part(body, DashMove) as DashMove
 	await _land(body)
 
@@ -192,7 +192,7 @@ func test_statuses_block_modes_and_moves() -> void:
 	var motor := _motor_of(body)
 	var air := _part(body, AirMode) as AirMode
 	var dash := _part(body, DashMove) as DashMove
-	var statuses := Component.of(body, Statuses) as Statuses
+	var statuses := Statuses.find_on(body)
 	air.blocked_by = [&"flight"]
 	var rooted: StatusData = load("res://character_system/starter_pack/statuses/rooted.tres")
 	var grounded := StatusData.new()
@@ -253,8 +253,8 @@ func test_motor_sends_events() -> void:
 	damage.amount = 5.0
 	trigger.effects = [damage]
 	stomp.triggers = [trigger]
-	(Component.of(body, Statuses) as Statuses).add(stomp)
-	var health := Component.of(body, Health) as Health
+	Statuses.find_on(body).add(stomp)
+	var health := Health.find_on(body)
 	var before := health.current
 	await _tap(body, &"jump")
 	await _land(body)
@@ -317,7 +317,7 @@ func _physics_frames(count: int) -> void:
 
 
 func _tap(body: CharacterBody3D, action: StringName) -> void:
-	var brain := Component.of(body, Brain) as Brain
+	var brain := Brain.find_on(body)
 	brain.press(action)
 	await _physics_frames(3)
 	brain.release(action)
@@ -333,7 +333,7 @@ func _land(body: CharacterBody3D) -> void:
 
 
 func _motor_of(body: CharacterBody3D) -> CharacterMotor:
-	return Component.of(body, CharacterMotor) as CharacterMotor
+	return CharacterMotor.find_on(body)
 
 
 ## The first node under the motor that is a [param type].

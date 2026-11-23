@@ -19,7 +19,7 @@ Your own data and scenes stay outside all three, so the system can be copied to 
    ├── character_system/
    │   ├── RECIPES.md                one-page answers to "how do I…"
    │   ├── icons/                    editor icons, one per node type
-   │   ├── core/                     the rules: 21 scripts, keep all of them
+   │   ├── core/                     the rules: 22 scripts, keep all of them
    │   │   ├── component.gd          the base class of every component
    │   │   ├── component_manager.gd  add one to every host; stats, events and blocks
    │   │   ├── effect_context.gd     who did what to whom
@@ -28,20 +28,20 @@ Your own data and scenes stay outside all three, so the system can be copied to 
    │   │   ├── health.gd             the pool named health; resistances and death
    │   │   ├── name_check.gd         finds mistyped stat, event, tag, pool and block names
    │   │   ├── stats/                stat_modifier
-   │   │   ├── effects/              effect (base), damage, heal, apply_status,
-   │   │   │                         remove_status, modify_amount
+   │   │   ├── effects/              effect and amount_effect (bases), damage, heal,
+   │   │   │                         apply_status, remove_status, modify_amount
    │   │   ├── conditions/           condition (base), has_tag
    │   │   ├── amounts/              amount (base), stat_amount
    │   │   └── statuses/             statuses, status_data, status_trigger, dead.tres
-   │   ├── character/                the scaffold: 43 scripts, keep what you use
+   │   ├── character/                the scaffold: 44 scripts, keep what you use
    │   │   ├── brains/               brain, player_brain, ai_brain, mouse_look
    │   │   ├── motor/                character_motor, motor_node, movement_mode,
    │   │   │                         layered_move, walk_mode, air_mode, dash_move
    │   │   ├── combat/               hurtbox, faction
    │   │   ├── abilities/            abilities, ability_data, targeting, radius_targeting
    │   │   ├── items/                item_data, item_instance, item_component, inventory,
-   │   │   │                         equipment, weapon_switch, trigger, magazine, hitscan,
-   │   │   │                         melee_sweep, grants
+   │   │   │                         equipment, weapon_switch, trigger, magazine,
+   │   │   │                         weapon_delivery (base), hitscan, melee_sweep, grants
    │   │   ├── world/                effect_zone, projectile
    │   │   ├── effects/              knockback, spawn_scene, launch_projectile, change_pool
    │   │   ├── conditions/           pool_below, stat, is_hostile, chance, hit, any

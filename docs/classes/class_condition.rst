@@ -29,7 +29,7 @@ Description
     extends Condition
 
     func _test(node: Node) -> bool:
-        var statuses := Component.of(node, Statuses) as Statuses
+        var statuses := Statuses.find_on(node)
         return statuses != null and statuses.has_tag(&"fire")
 
 Set :ref:`subject<class_Condition_property_subject>` to check whoever caused it instead ("only rangers can apply this"), and :ref:`negate<class_Condition_property_negate>` to flip the result. The built-in ones are :ref:`HasTagCondition<class_HasTagCondition>`, :ref:`StatCondition<class_StatCondition>`, :ref:`PoolBelowCondition<class_PoolBelowCondition>` and :ref:`IsHostileCondition<class_IsHostileCondition>`.

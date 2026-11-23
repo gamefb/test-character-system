@@ -27,7 +27,7 @@ It only runs every frame while a status has a :ref:`StatusData.duration<class_St
 
 ::
 
-    var statuses := Component.of(enemy, Statuses) as Statuses
+    var statuses := Statuses.find_on(enemy)
     if not statuses.add(burning, player):
         print("Immune")  # Or connect to the refused signal.
 
@@ -53,21 +53,23 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`add<class_Statuses_method_add>`\ (\ data\: :ref:`StatusData<class_StatusData>`, source\: :ref:`Node<class_Node>` = null\ ) |
-   +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                  | :ref:`remove<class_Statuses_method_remove>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                                    |
-   +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                  | :ref:`drop_hold<class_Statuses_method_drop_hold>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                              |
-   +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`int<class_int>`   | :ref:`remove_tagged<class_Statuses_method_remove_tagged>`\ (\ tag\: :ref:`StringName<class_StringName>`\ )                       |
-   +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`int<class_int>`   | :ref:`stacks_of<class_Statuses_method_stacks_of>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                              |
-   +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`has_tag<class_Statuses_method_has_tag>`\ (\ tag\: :ref:`StringName<class_StringName>`\ )                                   |
-   +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`is_immune_to<class_Statuses_method_is_immune_to>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                        |
-   +-------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   +---------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Statuses<class_Statuses>` | :ref:`find_on<class_Statuses_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                               |
+   +---------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`         | :ref:`add<class_Statuses_method_add>`\ (\ data\: :ref:`StatusData<class_StatusData>`, source\: :ref:`Node<class_Node>` = null\ ) |
+   +---------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                          | :ref:`remove<class_Statuses_method_remove>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                                    |
+   +---------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                          | :ref:`drop_hold<class_Statuses_method_drop_hold>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                              |
+   +---------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`int<class_int>`           | :ref:`remove_tagged<class_Statuses_method_remove_tagged>`\ (\ tag\: :ref:`StringName<class_StringName>`\ )                       |
+   +---------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`int<class_int>`           | :ref:`stacks_of<class_Statuses_method_stacks_of>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                              |
+   +---------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`         | :ref:`has_tag<class_Statuses_method_has_tag>`\ (\ tag\: :ref:`StringName<class_StringName>`\ )                                   |
+   +---------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`         | :ref:`is_immune_to<class_Statuses_method_is_immune_to>`\ (\ data\: :ref:`StatusData<class_StatusData>`\ )                        |
+   +---------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -135,6 +137,18 @@ Every status this character has right now, with its runtime state. Read it, but 
 
 Method Descriptions
 -------------------
+
+.. _class_Statuses_method_find_on:
+
+.. rst-class:: classref-method
+
+:ref:`Statuses<class_Statuses>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Statuses_method_find_on>`
+
+The **Statuses** of ``node``'s character, or null if there is none. Safe on a freed node.
+
+.. rst-class:: classref-item-separator
+
+----
 
 .. _class_Statuses_method_add:
 

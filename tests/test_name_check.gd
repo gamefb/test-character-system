@@ -229,6 +229,58 @@ func test_components_warn_about_their_resources() -> void:
 		node.free()
 
 
+func field(name: String, type: int, hint_string := "") -> Dictionary:
+	return {"name": name, "type": type, "hint": PROPERTY_HINT_NONE, "hint_string": hint_string}
+
+
+func test_name_fields_get_lists_to_pick_from() -> void:
+	var stat: Dictionary = field("stat", TYPE_STRING_NAME)
+	NameCheck.suggest(StatModifier.new(), stat)
+	assert_eq(stat.hint, PROPERTY_HINT_ENUM_SUGGESTION, "a list that still takes new names")
+	assert_has(stat.hint_string.split(","), "move_speed")
+	var blocks: Dictionary = field("blocks", TYPE_ARRAY, "21:")
+	NameCheck.suggest(StatusData.new(), blocks)
+	assert_string_starts_with(blocks.hint_string, "21/3:", "each element is a name to pick")
+	assert_has(blocks.hint_string.get_slice(":", 1).split(","), "everything")
+	var costs: Dictionary = field("costs", TYPE_DICTIONARY, "21:;3:")
+	NameCheck.suggest(AbilityData.new(), costs)
+	assert_string_starts_with(costs.hint_string, "21/3:", "each key is a pool to pick")
+	assert_string_ends_with(costs.hint_string, ";3:", "values stay numbers")
+	assert_has(costs.hint_string.get_slice(";", 0).get_slice(":", 1).split(","), "mana")
+	var amount: Dictionary = field("amount", TYPE_FLOAT)
+	NameCheck.suggest(DamageEffect.new(), amount)
+	assert_eq(amount.hint, PROPERTY_HINT_NONE, "other fields are left alone")
+	var own_name: Dictionary = field("pool", TYPE_STRING_NAME)
+	NameCheck.suggest(autofree(Pool.new()), own_name)
+	assert_eq(own_name.hint, PROPERTY_HINT_NONE, "a pool's own name is made up, not picked")
+
+
+## The lists only show if the script runs in the editor and asks NameCheck for them.
+func test_every_script_with_a_name_field_shows_its_list() -> void:
+	var name_field := RegEx.create_from_string("(?m)^@export[^\\n]* var (stat|bonus_stat|costs"
+			+ "|pool|event|tags?|immune_to|removes_tags|blocks|blocked_by)\\b")
+	var checked: int = 0
+	var folders: Array[String] = ["res://character_system"]
+	while not folders.is_empty():
+		var folder: String = folders.pop_back()
+		for name: String in DirAccess.get_directories_at(folder):
+			folders.append(folder.path_join(name))
+		for name: String in DirAccess.get_files_at(folder):
+			var path: String = folder.path_join(name)
+			if not name.ends_with(".gd") or not name_field.search(FileAccess.get_file_as_string(path)):
+				continue
+			checked += 1
+			var script: Script = load(path)
+			assert_true(script.is_tool(), path + " needs @tool")
+			var asks := false
+			while script and not asks:
+				asks = script.get_script_method_list().any(
+						func(m: Dictionary) -> bool: return m.name == "_validate_property")
+				script = script.get_base_script()
+			assert_true(asks, path + " or a class it extends needs _validate_property")
+	assert_gt(checked, 15)
+
+
 func test_inspector_warning_shows_and_hides() -> void:
 	var m: StatModifier = modifier(&"move_sped")
 	var warning: Label = NameWarning.new()

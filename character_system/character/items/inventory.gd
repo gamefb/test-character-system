@@ -17,6 +17,11 @@ signal changed
 @export var items: Array[ItemInstance] = []
 
 
+## The [Inventory] of [param node]'s character, or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> Inventory:
+	return Component.of(node, Inventory) as Inventory
+
+
 ## Total number of [param data] across all stacks.
 func count(data: ItemData) -> int:
 	return items.reduce(func(total: int, item: ItemInstance) -> int:
@@ -64,7 +69,7 @@ func remove(data: ItemData, amount := 1) -> bool:
 ## [codeblock]
 ## func _unhandled_input(event: InputEvent) -> void:
 ## 	if event.is_action_pressed(&"quick_heal"):
-## 		(Component.of(player, Inventory) as Inventory).use(health_potion)
+## 		Inventory.find_on(player).use(health_potion)
 ## [/codeblock]
 func use(data: ItemData) -> bool:
 	if not data or data.use_effects.is_empty() or count(data) <= 0:

@@ -36,6 +36,11 @@ var rounds: int:
 var _reload_left: float = 0.0
 
 
+## The [Magazine] on the item scene [param node], or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> Magazine:
+	return Component.of(node, Magazine) as Magazine
+
+
 func _process(delta: float) -> void:
 	if _reload_left > 0.0:
 		_reload_left -= delta
@@ -84,14 +89,14 @@ func reload() -> void:
 
 # How many rounds a reload would load right now.
 func _loadable() -> int:
-	var inventory := Component.of(wielder, Inventory) as Inventory
+	var inventory := Inventory.find_on(wielder)
 	var needed: int = capacity - rounds
 	return mini(needed, inventory.count(ammo)) if inventory and ammo else needed
 
 
 func _load() -> void:
 	var needed: int = _loadable()
-	var inventory := Component.of(wielder, Inventory) as Inventory
+	var inventory := Inventory.find_on(wielder)
 	if inventory and ammo:
 		inventory.remove(ammo, needed)
 	rounds += needed

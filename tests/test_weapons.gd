@@ -25,7 +25,7 @@ func make_character(position := Vector3.ZERO, extra: Array[Node] = []) -> Charac
 
 
 func health_of(node: Node) -> Health:
-	return Component.of(node, Health) as Health
+	return Health.find_on(node)
 
 
 ## An item whose scene holds a ComponentManager and the given item components.
@@ -68,7 +68,7 @@ func physics_frames(count := 2) -> void:
 
 
 func pull_trigger(who: Node) -> void:
-	var brain := Component.of(who, Brain) as Brain
+	var brain := Brain.find_on(who)
 	brain.press(&"primary")
 	# A press counts from the next frame; process_frame comes just before nodes run.
 	for i in 3:
@@ -91,7 +91,7 @@ func test_fire_rate_does_not_drop_with_the_frame_rate() -> void:
 	trigger.fire_rate = 10.0
 	var shots: Array = [0]
 	trigger.fired.connect(func() -> void: shots[0] += 1)
-	(Component.of(wielder, Brain) as Brain).press(&"primary")
+	Brain.find_on(wielder).press(&"primary")
 	# 7 seconds of frames that don't divide evenly into the 0.1 s between shots.
 	for i in 100:
 		trigger._process(0.07)
@@ -149,9 +149,9 @@ func test_shotgun_pellets_each_hit() -> void:
 	barrel.pellets = 5
 	barrel.spread = 1.0
 	barrel.effects = [damage(4.0)]
-	(Component.of(shooter, Equipment) as Equipment).equip(
+	Equipment.find_on(shooter).equip(
 			ItemInstance.new(item([Trigger.new(), barrel])))
-	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP
+	Brain.find_on(shooter).aim_point = target.global_position + Vector3.UP
 	await physics_frames()
 	await pull_trigger(shooter)
 	assert_eq(health_of(target).current, 80.0, "five pellets of 4")
@@ -253,8 +253,8 @@ func test_a_weapon_fires_projectiles_through_its_triggers_effects() -> void:
 	var string := Trigger.new()
 	string.user_effects = [loose]
 	var bow: ItemData = item([string])
-	(Component.of(shooter, Equipment) as Equipment).equip(ItemInstance.new(bow))
-	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP
+	Equipment.find_on(shooter).equip(ItemInstance.new(bow))
+	Brain.find_on(shooter).aim_point = target.global_position + Vector3.UP
 	var origins: Array = []
 	ComponentManager.of(target).event(&"took_damage").connect(
 			func(ctx: EffectContext) -> void: origins.append(ctx.origin))
@@ -268,7 +268,7 @@ func test_a_weapon_fires_projectiles_through_its_triggers_effects() -> void:
 func test_an_ability_can_launch_a_projectile() -> void:
 	var caster: CharacterBody3D = make_character(Vector3.ZERO, [Abilities.new()])
 	var target: CharacterBody3D = make_character(Vector3(0, 0, -8))
-	(Component.of(caster, Brain) as Brain).aim_point = target.global_position + Vector3.UP
+	Brain.find_on(caster).aim_point = target.global_position + Vector3.UP
 	await physics_frames()
 	var throw := LaunchProjectileEffect.new()
 	throw.projectile = projectile_scene()
@@ -278,7 +278,7 @@ func test_an_ability_can_launch_a_projectile() -> void:
 	var health: Health = health_of(target)
 	watch_signals(health)
 	health.max_value = 30.0
-	assert_true((Component.of(caster, Abilities) as Abilities).use(fireball))
+	assert_true(Abilities.find_on(caster).use(fireball))
 	await physics_frames(20)
 	assert_true(health.is_dead())
 	var ctx: EffectContext = get_signal_parameters(health, "died")[0]

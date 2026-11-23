@@ -1,3 +1,4 @@
+@tool
 class_name StatModifier
 extends Resource
 ## A change to one stat while it's applied.
@@ -32,3 +33,8 @@ extends Resource
 ## stat is read. [signal ComponentManager.stat_changed] isn't emitted when one flips, so UI
 ## that shows such a stat should read it every frame.
 @export var conditions: Array[Condition] = []
+
+
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Name fields become lists to pick from.

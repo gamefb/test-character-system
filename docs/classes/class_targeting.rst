@@ -30,7 +30,7 @@ This base version targets the user. :ref:`RadiusTargeting<class_RadiusTargeting>
 
     func find(ctx: EffectContext) -> Array[Node]:
         var user := ctx.source as Node3D
-        var brain := Component.of(user, Brain) as Brain
+        var brain := Brain.find_on(user)
         var to: Vector3 = user.global_position.move_toward(brain.aim_point, reach)
         var query := PhysicsRayQueryParameters3D.create(user.global_position, to)
         query.exclude = Hurtbox.rids_of(user)  # Not the user itself.

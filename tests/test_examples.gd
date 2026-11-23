@@ -122,7 +122,7 @@ func test_thorns_hurt_the_attacker() -> void:
 func test_abilities_heal_and_haste_the_user() -> void:
 	var who: CharacterBody3D = make_character()
 	health(who).change(-50.0)
-	var abilities := Component.of(who, Abilities) as Abilities
+	var abilities := Abilities.find_on(who)
 	assert_true(abilities.use(ex("abilities/second_wind.tres")))
 	assert_eq(health(who).current, 80.0)
 	assert_false(abilities.use(ex("abilities/second_wind.tres")), "on cooldown")
@@ -132,12 +132,12 @@ func test_abilities_heal_and_haste_the_user() -> void:
 
 func test_items_equip_and_grant_their_passives() -> void:
 	var who: CharacterBody3D = make_character()
-	var bag := Component.of(who, Inventory) as Inventory
+	var bag := Inventory.find_on(who)
 	bag.add(ex("items/rifle.tres"))
 	bag.add(ex("items/flare_gun.tres"))
 	bag.add(ex("items/rifle_ammo.tres"), 30)
 	await get_tree().process_frame
-	var gear := Component.of(who, Equipment) as Equipment
+	var gear := Equipment.find_on(who)
 	assert_eq(gear.equipped[&"weapon"].data, ex("items/rifle.tres"), "first weapon drawn")
 	gear.equip(ItemInstance.new(ex("items/fireproof_cloak.tres")))
 	gear.equip(ItemInstance.new(ex("items/ward_amulet.tres")))

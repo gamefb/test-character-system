@@ -10,6 +10,6 @@ extends Condition
 
 
 func check(ctx: EffectContext) -> bool:
-	var faction := Component.of(ctx.source, Faction) as Faction
+	var faction := Faction.find_on(ctx.source)
 	var hostile: bool = faction == null or faction.is_hostile(ctx.target)
 	return hostile != negate

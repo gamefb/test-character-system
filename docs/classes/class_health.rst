@@ -45,13 +45,15 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`is_dead<class_Health_method_is_dead>`\ (\ )                                                                                           |
-   +-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                  | :ref:`change<class_Health_method_change>`\ (\ amount\: :ref:`float<class_float>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |
-   +-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                  | :ref:`revive<class_Health_method_revive>`\ (\ amount\: :ref:`float<class_float>` = -1.0\ )                                                  |
-   +-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Health<class_Health>` | :ref:`find_on<class_Health_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                                            |
+   +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`     | :ref:`is_dead<class_Health_method_is_dead>`\ (\ )                                                                                           |
+   +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                      | :ref:`change<class_Health_method_change>`\ (\ amount\: :ref:`float<class_float>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |
+   +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                      | :ref:`revive<class_Health_method_revive>`\ (\ amount\: :ref:`float<class_float>` = -1.0\ )                                                  |
+   +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -111,6 +113,18 @@ Damage type to the base of ``resist_<type>``: 0.5 halves fire, 1 is immune, and 
 
 Method Descriptions
 -------------------
+
+.. _class_Health_method_find_on:
+
+.. rst-class:: classref-method
+
+:ref:`Health<class_Health>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Health_method_find_on>`
+
+The **Health** of ``node``'s character, or null if there is none. Safe on a freed node.
+
+.. rst-class:: classref-item-separator
+
+----
 
 .. _class_Health_method_is_dead:
 

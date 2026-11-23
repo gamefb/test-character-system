@@ -1,3 +1,4 @@
+@tool
 class_name AbilityData
 extends Resource
 ## An active ability: when it can be used, what it costs, who it targets and what it does.
@@ -59,3 +60,8 @@ extends Resource
 ## Run in order on the user each time the ability fires, whoever it targets, e.g. a
 ## [LaunchProjectileEffect] for a fireball, recoil, or the heal half of a life drain.
 @export var user_effects: Array[Effect] = []
+
+
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Name fields become lists to pick from.

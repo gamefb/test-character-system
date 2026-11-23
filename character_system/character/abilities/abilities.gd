@@ -44,6 +44,11 @@ var _cast_left: float = 0.0
 var _states: Dictionary[AbilityData, State] = {}
 
 
+## The [Abilities] of [param node]'s character, or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> Abilities:
+	return Component.of(node, Abilities) as Abilities
+
+
 func _process(delta: float) -> void:
 	# Game time: cooldowns stop while the game is paused and follow Engine.time_scale.
 	var recharge: float = delta * maxf(stat(&"cooldown_speed"), 0.0)

@@ -18,7 +18,7 @@ Most new content is data. A weapon that scales with strength, a spell with a man
 Design rules
 ------------
 
-1. **Compose, never inherit.** There is no ``Player`` or ``Enemy`` class. A character is whatever its components make it.
+1. **Compose characters, never inherit them.** There is no ``Player`` or ``Enemy`` class. A character is whatever its components make it. Base classes are kept for parts of one kind that would otherwise repeat the same fields: every effect with a number extends :ref:`AmountEffect<class_AmountEffect>`, and every way a weapon hits extends :ref:`WeaponDelivery<class_WeaponDelivery>`, so a new one is a few lines.
 2. **Data in Resources, behavior in Nodes.** Designers create ``.tres`` files (statuses, abilities, items). Programmers write components once.
 3. **Components find each other by type, through a hub.** Each host has one :ref:`ComponentManager<class_ComponentManager>`. Components register with it by themselves and look each other up through it, so there are no hard-coded node paths and no required root class. A component lists what it can't work without in ``_requires()``; until those parts are present it waits, with a warning in the editor, instead of crashing. A new kind of component never needs a change to the manager.
 4. **One way to change gameplay state.** Damage, healing and statuses are all :ref:`Effect<class_Effect>` resources. Weapons, abilities, statuses and the environment all run the same effects.

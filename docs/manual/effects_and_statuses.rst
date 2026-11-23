@@ -14,7 +14,11 @@ Effects
 
 .. source-file:: ../../character_system/core/effects/effect.gd
 
-To make a new effect, extend :ref:`Effect<class_Effect>`, add ``@export`` fields for its numbers, and write ``_execute()``. Conditions then work on it automatically. :ref:`doc_extending_effect` walks through one.
+To make a new effect, extend :ref:`Effect<class_Effect>`, add ``@export`` fields for its settings, and write ``_execute()``. Conditions then work on it automatically. An effect with a number extends :ref:`AmountEffect<class_AmountEffect>`, which is all of this:
+
+.. source-file:: ../../character_system/core/effects/amount_effect.gd
+
+:ref:`doc_extending_effect` walks through one of each.
 
 .. _doc_damage_pipeline:
 
@@ -73,7 +77,7 @@ Healing goes through steps 1, 3, 4, 7 and 8 with its own events: ``giving_healin
 Amounts
 -------
 
-An effect's plain number is the same for everyone. Its ``scaling`` list makes it depend on who is involved: each :ref:`Amount<class_Amount>` in it is worked out when the effect runs and added on. :ref:`DamageEffect<class_DamageEffect>`, :ref:`HealEffect<class_HealEffect>` and :ref:`ChangePoolEffect<class_ChangePoolEffect>` all have one.
+An effect's plain number is the same for everyone. Its ``scaling`` list makes it depend on who is involved: each :ref:`Amount<class_Amount>` in it is worked out when the effect runs and added on. :ref:`DamageEffect<class_DamageEffect>`, :ref:`HealEffect<class_HealEffect>` and :ref:`ChangePoolEffect<class_ChangePoolEffect>` all have one, from their base class :ref:`AmountEffect<class_AmountEffect>`, and so does any effect of your own that extends it.
 
 .. source-file:: ../../character_system/core/amounts/amount.gd
 

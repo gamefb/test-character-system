@@ -10,7 +10,7 @@ ItemComponent
 
 **Inherits:** :ref:`Component<class_Component>` **<** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`Grants<class_Grants>`, :ref:`Hitscan<class_Hitscan>`, :ref:`Magazine<class_Magazine>`, :ref:`MeleeSweep<class_MeleeSweep>`, :ref:`Scope<class_Scope>`, :ref:`Trigger<class_Trigger>`
+**Inherited By:** :ref:`Grants<class_Grants>`, :ref:`Magazine<class_Magazine>`, :ref:`Scope<class_Scope>`, :ref:`Trigger<class_Trigger>`, :ref:`WeaponDelivery<class_WeaponDelivery>`
 
 Base class for components inside an item scene.
 

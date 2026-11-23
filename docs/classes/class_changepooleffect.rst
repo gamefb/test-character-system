@@ -8,9 +8,9 @@
 ChangePoolEffect
 ================
 
-**Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`AmountEffect<class_AmountEffect>` **<** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-Adds to or takes from one of the target's :ref:`Pool<class_Pool>`\ s, e.g. a mana potion, a stamina drain or a shield recharge. Targets without that pool are left alone.
+Adds :ref:`AmountEffect.total()<class_AmountEffect_method_total>` to one of the target's :ref:`Pool<class_Pool>`\ s, or takes it away when the amount is negative: a mana potion, a stamina drain or a shield recharge. Targets without that pool are left alone.
 
 .. rst-class:: classref-reftable-group
 
@@ -20,13 +20,9 @@ Properties
 .. table::
    :widths: auto
 
-   +----------------------------------------------------------+---------------------------------------------------------+-------------+
-   | :ref:`StringName<class_StringName>`                      | :ref:`pool<class_ChangePoolEffect_property_pool>`       | ``&"mana"`` |
-   +----------------------------------------------------------+---------------------------------------------------------+-------------+
-   | :ref:`float<class_float>`                                | :ref:`amount<class_ChangePoolEffect_property_amount>`   | ``10.0``    |
-   +----------------------------------------------------------+---------------------------------------------------------+-------------+
-   | :ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] | :ref:`scaling<class_ChangePoolEffect_property_scaling>` | ``[]``      |
-   +----------------------------------------------------------+---------------------------------------------------------+-------------+
+   +-------------------------------------+---------------------------------------------------+-------------+
+   | :ref:`StringName<class_StringName>` | :ref:`pool<class_ChangePoolEffect_property_pool>` | ``&"mana"`` |
+   +-------------------------------------+---------------------------------------------------+-------------+
 
 .. rst-class:: classref-section-separator
 
@@ -44,30 +40,6 @@ Property Descriptions
 :ref:`StringName<class_StringName>` **pool** = ``&"mana"`` :ref:`🔗<class_ChangePoolEffect_property_pool>`
 
 The pool to change, e.g. &"mana". Matches :ref:`Pool.pool<class_Pool_property_pool>`.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_ChangePoolEffect_property_amount:
-
-.. rst-class:: classref-property
-
-:ref:`float<class_float>` **amount** = ``10.0`` :ref:`🔗<class_ChangePoolEffect_property_amount>`
-
-Added to the pool, before scaling and magnitude. Negative takes away.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_ChangePoolEffect_property_scaling:
-
-.. rst-class:: classref-property
-
-:ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] **scaling** = ``[]`` :ref:`🔗<class_ChangePoolEffect_property_scaling>`
-
-Added to :ref:`amount<class_ChangePoolEffect_property_amount>` each time it runs, e.g. a :ref:`StatAmount<class_StatAmount>` of the target's max_mana for a share of the whole pool.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

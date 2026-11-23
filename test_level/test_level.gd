@@ -55,12 +55,12 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	var brain := Component.of(_player, Brain) as Brain
+	var brain := Brain.find_on(_player)
 	for action: StringName in quick_items:
 		if brain.is_action_just_pressed(action):
-			(Component.of(_player, Inventory) as Inventory).use(quick_items[action])
+			Inventory.find_on(_player).use(quick_items[action])
 	for soldier: Node3D in get_tree().get_nodes_in_group(&"faces_aim"):
-		var aim: Vector3 = (Component.of(soldier, Brain) as Brain).aim_point
+		var aim: Vector3 = Brain.find_on(soldier).aim_point
 		aim.y = soldier.global_position.y
 		if aim.distance_to(soldier.global_position) > 0.1:
 			soldier.look_at(aim)
@@ -74,9 +74,9 @@ func describe(character: Node) -> String:
 	for p: Pool in ComponentManager.of(character).find_all(Pool):
 		pools.append("%s %d/%d" % [String(p.pool).capitalize(), p.current, p.maximum()])
 	lines.append("   ".join(pools))
-	var weapon: ItemInstance = (Component.of(character, WeaponSwitch) as WeaponSwitch).current()
+	var weapon: ItemInstance = WeaponSwitch.find_on(character).current()
 	lines.append("Weapon: %s" % (weapon.data.display_name if weapon else "none"))
-	var abilities := Component.of(character, Abilities) as Abilities
+	var abilities := Abilities.find_on(character)
 	var spells: PackedStringArray = []
 	for action: StringName in abilities.slots:
 		var ability: AbilityData = abilities.slots[action]
@@ -85,9 +85,9 @@ func describe(character: Node) -> String:
 				"ready" if wait == 0.0 else "%.1f s" % wait)
 		spells.append("%s: %s" % [ability.display_name, state])
 	lines.append("   ".join(spells))
-	var gear := Component.of(character, Equipment) as Equipment
+	var gear := Equipment.find_on(character)
 	var carried: PackedStringArray = []
-	for item: ItemInstance in (Component.of(character, Inventory) as Inventory).items:
+	for item: ItemInstance in Inventory.find_on(character).items:
 		var worn: String = " (on)" if item in gear.equipped.values() else ""
 		carried.append("%s%s%s" % [item.data.display_name,
 				" ×%d" % item.count if item.count > 1 else "", worn])
@@ -109,9 +109,9 @@ func _add_action(action: StringName, event: InputEvent) -> void:
 
 # Weapons are drawn by the WeaponSwitch. Anything else with a slot is put on if it's free.
 func _on_picked_up(by: Node, item: ItemData) -> void:
-	var gear := Component.of(by, Equipment) as Equipment
+	var gear := Equipment.find_on(by)
 	if gear and item.slot and item.slot != &"weapon" and not gear.equipped.has(item.slot):
-		gear.equip((Component.of(by, Inventory) as Inventory).first(item))
+		gear.equip(Inventory.find_on(by).first(item))
 
 
 # A number floats up from every hit in the level, whoever dealt it.
@@ -135,6 +135,6 @@ func _on_took_damage(host: Node, ctx: EffectContext) -> void:
 func _on_died(host: Node, _ctx: EffectContext) -> void:
 	if host.is_in_group(&"respawns"):
 		await get_tree().create_timer(RESPAWN_TIME).timeout
-		var health := Component.of(host, Health) as Health  # Null if it was freed meanwhile.
+		var health := Health.find_on(host)  # Null if it was freed meanwhile.
 		if health:
 			health.revive()

@@ -27,6 +27,11 @@ var body: CharacterBody3D
 var event_prefix: String
 
 
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
+
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_ENTER_TREE:
 		motor = get_parent() as CharacterMotor

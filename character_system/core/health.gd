@@ -31,6 +31,11 @@ signal died(ctx: EffectContext)
 		update_stats()
 
 
+## The [Health] of [param node]'s character, or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> Health:
+	return Component.of(node, Health) as Health
+
+
 func _init() -> void:
 	pool = &"health"
 
@@ -40,6 +45,7 @@ func _validate_property(property: Dictionary) -> void:
 	if property.name in [&"pool", &"status_while_empty", &"starts_full", &"absorbs_damage",
 			&"absorbed_types"]:
 		property.usage = PROPERTY_USAGE_NONE
+	super(property)
 
 
 func _stats() -> Dictionary[StringName, float]:
