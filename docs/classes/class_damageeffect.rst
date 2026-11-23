@@ -31,7 +31,7 @@ The number starts as :ref:`amount<class_DamageEffect_property_amount>` plus ever
 
 6. :ref:`Health<class_Health>` loses what's left, and the source hears ``dealt_damage`` and the target ``took_damage``. A killing blow also sends ``died`` to the target and ``killed`` to the source. 
 
-Steps 2 and 3 don't depend on the order statuses were applied in. A target that is already dead is left alone: no damage and no events.
+Steps 2 and 3 don't depend on the order statuses were applied in. A target with no health left, or with a status that blocks ``damage``, is left alone: no damage and no events.
 
 .. rst-class:: classref-reftable-group
 
@@ -78,7 +78,7 @@ Damage before scaling, magnitude and resistance.
 
 :ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] **scaling** = ``[]`` :ref:`🔗<class_DamageEffect_property_scaling>`
 
-Added to :ref:`amount<class_DamageEffect_property_amount>` each time it runs, e.g. a :ref:`StatAmount<class_StatAmount>` for 2 per point of the user's strength, or a :ref:`HealthAmount<class_HealthAmount>` for 5% of the target's health.
+Added to :ref:`amount<class_DamageEffect_property_amount>` each time it runs, e.g. a :ref:`StatAmount<class_StatAmount>` for 2 per point of the user's strength, or a :ref:`PoolAmount<class_PoolAmount>` for 5% of the target's health.
 
 .. rst-class:: classref-item-separator
 

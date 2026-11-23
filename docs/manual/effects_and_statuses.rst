@@ -79,11 +79,11 @@ An effect's plain number is the same for everyone. Its ``scaling`` list makes it
 
 .. source-file:: ../../character_system/core/amounts/stat_amount.gd
 
-.. source-file:: ../../character_system/kit/amounts/health_amount.gd
+.. source-file:: ../../character_system/character/amounts/pool_amount.gd
 
-.. source-file:: ../../character_system/kit/amounts/hit_amount.gd
+.. source-file:: ../../character_system/character/amounts/hit_amount.gd
 
-.. source-file:: ../../character_system/kit/amounts/random_amount.gd
+.. source-file:: ../../character_system/character/amounts/random_amount.gd
 
 .. list-table::
    :header-rows: 1
@@ -95,9 +95,9 @@ An effect's plain number is the same for everyone. Its ``scaling`` list makes it
    * - A spell that grows with level on a curve
      - 0 + StatAmount (``level``, with a curve from level 1 to the top level)
    * - Poison that takes 2% of maximum health per tick
-     - 0 + :ref:`HealthAmount<class_HealthAmount>` (of TARGET, MAXIMUM, 0.02)
+     - 0 + :ref:`PoolAmount<class_PoolAmount>` (of TARGET, MAXIMUM, 0.02)
    * - A potion that heals 30% of missing health
-     - 0 + HealthAmount (of TARGET, MISSING, 0.3)
+     - 0 + PoolAmount (of TARGET, MISSING, 0.3)
    * - Life steal of a quarter of the damage dealt
      - A heal of 0 + :ref:`HitAmount<class_HitAmount>` (0.25), in a ``dealt_damage`` trigger
    * - 8 to 12 damage
@@ -116,17 +116,17 @@ Other effects
 
 :ref:`ModifyAmountEffect<class_ModifyAmountEffect>` is how statuses take part in step 3 of the pipeline. :ref:`DamageEffect<class_DamageEffect>` announces the hit before it lands, a status trigger reacts with this effect, and the effect adds to the totals of the pending hit through ``ctx.cause``. ``per_stack`` makes each stack of the status count, and ``tag`` labels the hit, such as ``crit``.
 
-.. source-file:: ../../character_system/kit/effects/change_pool_effect.gd
+.. source-file:: ../../character_system/character/effects/change_pool_effect.gd
 
-.. source-file:: ../../character_system/kit/effects/knockback_effect.gd
+.. source-file:: ../../character_system/character/effects/knockback_effect.gd
 
 :ref:`KnockbackEffect<class_KnockbackEffect>` shows the rule that every effect handles a target without the component it needs: a character is shoved through ``CharacterMotor.push()``, a physics prop gets an impulse, and a wall is left alone.
 
-.. source-file:: ../../character_system/kit/effects/spawn_scene_effect.gd
+.. source-file:: ../../character_system/character/effects/spawn_scene_effect.gd
 
 :ref:`SpawnSceneEffect<class_SpawnSceneEffect>` spawns a scene where the target is, such as a puddle that is itself an :ref:`EffectZone<class_EffectZone>`, so a status or an ability can leave ground that applies further statuses. With ``at`` set to ``HIT_POINT`` it spawns where the shot landed, for sparks or blood, and with ``SOURCE`` around whoever caused it.
 
-.. source-file:: ../../character_system/kit/effects/launch_projectile_effect.gd
+.. source-file:: ../../character_system/character/effects/launch_projectile_effect.gd
 
 :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` turns an ability into a fireball; :ref:`doc_projectiles` covers the projectile itself.
 
@@ -139,21 +139,21 @@ Conditions
 
 .. source-file:: ../../character_system/core/conditions/has_tag_condition.gd
 
-.. source-file:: ../../character_system/kit/conditions/health_below_condition.gd
+.. source-file:: ../../character_system/character/conditions/pool_below_condition.gd
 
-.. source-file:: ../../character_system/kit/conditions/stat_condition.gd
+.. source-file:: ../../character_system/character/conditions/stat_condition.gd
 
 ``_test(node) != negate`` is a compact way to flip the result: when ``negate`` is true, true becomes false and false becomes true. ``Condition.all_pass()`` is shared by effects and by status apply conditions, described under Status data.
 
-.. source-file:: ../../character_system/kit/conditions/is_hostile_condition.gd
+.. source-file:: ../../character_system/character/conditions/is_hostile_condition.gd
 
 :ref:`IsHostileCondition<class_IsHostileCondition>` compares both sides, so it overrides ``check(ctx)`` instead of ``_test(node)``. On a weapon's damage effect, it turns friendly fire off. :ref:`doc_extending_condition` shows how to write your own.
 
-.. source-file:: ../../character_system/kit/conditions/chance_condition.gd
+.. source-file:: ../../character_system/character/conditions/chance_condition.gd
 
-.. source-file:: ../../character_system/kit/conditions/hit_condition.gd
+.. source-file:: ../../character_system/character/conditions/hit_condition.gd
 
-.. source-file:: ../../character_system/kit/conditions/any_condition.gd
+.. source-file:: ../../character_system/character/conditions/any_condition.gd
 
 .. list-table::
    :header-rows: 1
@@ -164,8 +164,8 @@ Conditions
    * - :ref:`HasTagCondition<class_HasTagCondition>`
      - The node has a status with the tag
      - Bonus damage against wet targets
-   * - :ref:`HealthBelowCondition<class_HealthBelowCondition>`
-     - The node's health is below a fraction of its maximum
+   * - :ref:`PoolBelowCondition<class_PoolBelowCondition>`
+     - A pool, health unless you name another, is below a fraction of its maximum
      - Executes, last-stand abilities, a speed boost while badly hurt
    * - :ref:`StatCondition<class_StatCondition>`
      - A stat is at least a value
@@ -208,6 +208,14 @@ Status data
    * - ``immune_to``
      - Status tags it keeps out while active
      - Wet keeps out fire; an Undead trait keeps out poison
+   * - ``blocks``
+     - What the character can't do, or can't have done to it, while active (see
+       :ref:`what a status blocks <doc_stuns>`)
+     - Stunned blocks everything; Silenced blocks spells; Dead blocks everything, healing and
+       targeting
+   * - ``removes_timed``
+     - Ends every status with a duration when applied
+     - Death ends burning and poison; passives stay for a revive
    * - ``apply_conditions``
      - Rules for whether it can be applied at all
      - A burn that can't be applied to a target with ``resist_fire`` of 1 or more
@@ -343,7 +351,7 @@ WorldEvents is for things that belong to no one character: experience for kills,
 Example statuses
 ----------------
 
-These ship in ``character_system/examples/`` as ``.tres`` files with no code. Duplicate one (right-click > Duplicate) and change the copy.
+These ship in ``character_system/starter_pack/`` as ``.tres`` files with no code. Duplicate one (right-click > Duplicate) and change the copy.
 
 .. list-table::
    :header-rows: 1
@@ -379,9 +387,8 @@ These ship in ``character_system/examples/`` as ``.tres`` files with no code. Du
        ability applies it.
    * - Rooted
      - ``statuses/rooted.tres``
-     - ``tags`` = rooted. ``duration`` = 3. ``modifiers`` = ``move_speed`` × 0 and
-       ``jump_velocity`` × 0. Moves and modes with ``rooted`` in their Blocked By Tags stop
-       too.
+     - ``tags`` = rooted. ``duration`` = 3. ``blocks`` = movement, so the
+       :ref:`CharacterMotor<class_CharacterMotor>` stops steering, jumping and moves.
    * - Thorns (passive)
      - ``statuses/thorns.tres``
      - ``tags`` = thorns. ``duration`` = 0. ``triggers`` = on ``took_damage``, affect other,
@@ -398,12 +405,12 @@ These ship in ``character_system/examples/`` as ``.tres`` files with no code. Du
      - ``tags`` = construct. ``duration`` = 0. ``immune_to`` = fire, poison.
    * - Stunned
      - ``statuses/stunned.tres``
-     - ``tags`` = stunned. ``duration`` = 2. Nothing else: the :ref:`Brain<class_Brain>`
-       stops on the tag, so the character can't move, shoot or cast.
+     - ``tags`` = stunned. ``duration`` = 2. ``blocks`` = everything, which the
+       :ref:`Brain<class_Brain>` answers to, so the character can't move, shoot or cast.
    * - Silenced
      - ``statuses/silenced.tres``
-     - ``tags`` = silenced. ``duration`` = 4. Abilities with ``silenced`` in their Blocked By
-       Tags can't be used, such as the example Fireball.
+     - ``tags`` = silenced. ``duration`` = 4. ``blocks`` = spells, a name the example
+       Fireball has in its Blocked By. Other abilities still work.
    * - Vampiric (passive)
      - ``statuses/vampiric.tres``
      - ``triggers`` = on ``dealt_damage``, a heal of 0 with a
@@ -439,10 +446,10 @@ These ship in ``character_system/examples/`` as ``.tres`` files with no code. Du
    * - Bleeding
      - ``statuses/bleeding.tres``
      - ``tags`` = bleed. ``duration`` = 5, ``max_stacks`` = 3. ``on_tick`` every second = damage
-       0 with a :ref:`HealthAmount<class_HealthAmount>` of 2% of maximum health. The example
+       0 with a :ref:`PoolAmount<class_PoolAmount>` of 2% of maximum health. The example
        sword applies it.
 
-More ideas, built from the same fields. These aren't in ``examples/``:
+More ideas, built from the same fields. These aren't in the starter pack:
 
 .. list-table::
    :header-rows: 1
@@ -455,7 +462,7 @@ More ideas, built from the same fields. These aren't in ``examples/``:
        :ref:`ModifyAmountEffect<class_ModifyAmountEffect>` with ``add`` -3.
    * - Executioner (passive)
      - ``duration`` = 0. ``triggers`` = on ``dealing_damage``, affect other, with a
-       :ref:`HealthBelowCondition<class_HealthBelowCondition>` (fraction 0.3) in the trigger's
+       :ref:`PoolBelowCondition<class_PoolBelowCondition>` (fraction 0.3) in the trigger's
        conditions, and a ModifyAmountEffect with ``percent`` 0.5. Affect other makes the
        condition check the victim, not the attacker.
    * - Pyromancer (passive)
@@ -463,7 +470,7 @@ More ideas, built from the same fields. These aren't in ``examples/``:
        this character causes deals 20% more.
    * - Adrenaline (passive)
      - ``duration`` = 0. ``modifiers`` = ``move_speed`` percent 0.3, with a
-       HealthBelowCondition (fraction 0.5) in the modifier's conditions: faster while badly
+       PoolBelowCondition (fraction 0.5) in the modifier's conditions: faster while badly
        hurt.
    * - Fury
      - ``duration`` = 6, ``stacking`` = STACK, ``max_stacks`` = 5. ``triggers`` = on
@@ -510,7 +517,7 @@ A status can be refused in two ways, both checked by ``add()`` before anything e
    * - Only rangers can apply Hunter's mark
      - Hunter's mark: ``apply_conditions`` = HasTagCondition: subject SOURCE, tag ``ranger``
    * - Execution marks only land on wounded targets
-     - Execution mark: ``apply_conditions`` = HealthBelowCondition: fraction 0.25
+     - Execution mark: ``apply_conditions`` = PoolBelowCondition: fraction 0.25
 
 When a status is refused, ``add()`` returns false and :ref:`Statuses<class_Statuses>` emits ``refused``, so the UI can show "Immune". ``StatusData.can_apply()`` runs the same immunity and condition checks without applying anything, for example to grey out an ability before it is used. Because immunities live on the protector, a status's own resource doesn't show who is immune to it: search your statuses for its tags.
 
@@ -543,7 +550,7 @@ A passive is a status with ``duration`` 0. There is no separate passive system: 
 -  **Holds.** Each source that adds a passive is one hold, and ``drop_hold()`` drops one. The passive ends when no holds remain, so two rings of haste keep Haste until both come off.
 -  **Stacking.** With ``REFRESH``, a passive has one stack however many sources hold it. With ``STACK``, each hold adds a stack up to ``max_stacks``, so two rings of might give double the bonus.
 -  **Refusals.** A passive is checked once, when it is added. Innate passives are checked when the character starts. An item passive that is refused is not retried until the item is equipped again, and :ref:`Grants<class_Grants>` only drops holds on the passives it was given.
--  **Death.** Passives survive death, because only timed statuses end when a character dies, so a revived character keeps its traits and item passives.
+-  **Death.** Passives survive death, because the Dead status only ends statuses that have a duration, so a revived character keeps its traits and item passives.
 
 **Traits are passives with tags.** Characters have no tag list of their own. A trait such as undead, construct or fire immune is an innate passive whose only job may be to carry a tag. That is how characters get immunities:
 

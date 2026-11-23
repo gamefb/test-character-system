@@ -32,7 +32,7 @@ Every physics frame, the motor:
 3. calls ``move_and_slide()``, the only place in the system that does,
 4. asks the mode whether to hand over to another, e.g. WalkMode hands over to AirMode once the floor is gone. If it doesn't, any other mode may take over by itself.
 
-.. source-file:: ../../character_system/kit/motor/character_motor.gd
+.. source-file:: ../../character_system/character/motor/character_motor.gd
 
 Three rules keep features from getting in each other's way:
 
@@ -45,13 +45,13 @@ Three rules keep features from getting in each other's way:
 Walking, falling and double jumps
 ---------------------------------
 
-.. source-file:: ../../character_system/kit/motor/walk_mode.gd
+.. source-file:: ../../character_system/character/motor/walk_mode.gd
 
-.. source-file:: ../../character_system/kit/motor/air_mode.gd
+.. source-file:: ../../character_system/character/motor/air_mode.gd
 
 WalkMode and AirMode are written like Godot's own CharacterBody3D script template: gravity from ``get_gravity()``, so gravity zones work, ``velocity.x`` and ``velocity.z`` from the direction, and ``velocity.y`` for jumps. AirMode steers with ``move_toward()``, so the character keeps some of its speed in the air; lower ``air_acceleration`` keeps more.
 
-Air jumps come back every time the character takes off. How many there are is AirMode's ``air_jumps`` stat, so it works like any other number in the system: a status adding 1 makes a triple jump, boots can grant the jump through a status, and a rooted status can multiply it by 0. To give the jump only through an item, set :ref:`air_jumps<class_AirMode_property_air_jumps>` to 0 and let the item's status add to it. ``jumps_left`` is there for a HUD.
+Air jumps come back every time the character takes off. How many there are is AirMode's ``air_jumps`` stat, so it works like any other number in the system: a status adding 1 makes a triple jump, boots can grant the jump through a status. To give the jump only through an item, set :ref:`air_jumps<class_AirMode_property_air_jumps>` to 0 and let the item's status add to it. ``jumps_left`` is there for a HUD.
 
 Each mode hands over to the other: WalkMode to its ``air_mode`` and AirMode to its ``walk_mode``. Left empty, those are the AirMode and WalkMode beside them, so a character with just the two needs no setup. Point them at your own modes to change the flow, e.g. AirMode's ``walk_mode`` at a heavy landing mode.
 
@@ -60,7 +60,7 @@ Each mode hands over to the other: WalkMode to its ``air_mode`` and AirMode to i
 Dashing
 -------
 
-.. source-file:: ../../character_system/kit/motor/dash_move.gd
+.. source-file:: ../../character_system/character/motor/dash_move.gd
 
 DashMove replaces the velocity while it runs, so it works the same on the floor and in the air, ignores gravity, and can't be steered. Its cooldown is the Cooldown every layered move has (see :ref:`doc_movement_statuses_events_cooldowns`). Afterwards the mode takes over again: walking stops at once, while the air keeps some of the speed. Add a ``dash`` action to the Input Map and to the :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions, as for any action of your own.
 
@@ -87,14 +87,15 @@ Statuses, events and cooldowns
 
 Every mode and move gets these from its base class, so one you write yourself has them too.
 
-**Statuses that stop movement.** A status changes how fast the character moves through stats: Wet multiplies ``move_speed``, which every built-in mode reads. To stop a mode or move outright, give it **Blocked By Tags** in the Inspector. While the character has a status with one of those tags:
+**Statuses that stop movement.** A status changes how fast the character moves through stats: Wet multiplies ``move_speed``, which every built-in mode reads. To stop movement outright, a status lists ``movement`` in its **Blocks**, as the example :ref:`Rooted<doc_example_statuses>` does. The motor answers to that name (its **Blocked By**), and while it is blocked:
 
+- ``motor.move_dir``, which modes steer by, reads as zero, and ``consume_action()`` refuses presses, so there is no walking and no jumping;
 - a move can't start, and one already running ends;
-- a mode can't take over, and if it's in charge it hands back to the motor's start mode.
+- gravity, friction and pushes still apply, so a rooted character falls and can be knocked back.
 
-The example :ref:`Rooted<doc_example_statuses>` status has the tag ``rooted`` and multiplies ``move_speed`` and ``jump_velocity`` by 0. Add ``rooted`` to a DashMove's Blocked By Tags, and rooting stops dashing too. Use the same tag on every mode and move a status should stop. Don't block the start mode: it's where a blocked mode goes back to.
+A single mode or move can answer to a name of its own as well. Give a glide ``flight`` in its **Blocked By**, and a status that blocks ``flight`` stops gliding and nothing else: the move can't start, or the mode hands back to the motor's start mode. Don't block the start mode: it's where a blocked mode goes back to.
 
-A stun needs none of this to stop walking, jumping or starting a dash: a status tagged ``stunned`` makes the :ref:`Brain<class_Brain>` report no intent, and every mode and move reads the brain. Add ``stunned`` to a move's Blocked By Tags only to cut short one that is already under way, such as a dash in mid-air.
+A stun needs none of this to stop walking, jumping or starting a dash: a status that blocks ``everything`` makes the :ref:`Brain<class_Brain>` report no intent, and every mode and move reads the brain. Let it block ``movement`` as well to cut short a move that is already under way, such as a dash in mid-air.
 
 **Events.** The motor sends an :ref:`event<doc_events>` to the character's components and statuses each time a mode takes over or hands over, and each time a move starts or finishes. The name is the class name in snake_case, then what happened:
 
@@ -123,8 +124,8 @@ The base classes
 
 :ref:`MotorNode<class_MotorNode>` is what modes and moves share: ``motor``, ``body``, ``stat()``, stats of their own, and the ``_enter()``, ``_exit()`` and ``_physics_update()`` hooks. Extend :ref:`MovementMode<class_MovementMode>` or :ref:`LayeredMove<class_LayeredMove>` rather than this.
 
-.. source-file:: ../../character_system/kit/motor/motor_node.gd
+.. source-file:: ../../character_system/character/motor/motor_node.gd
 
-.. source-file:: ../../character_system/kit/motor/movement_mode.gd
+.. source-file:: ../../character_system/character/motor/movement_mode.gd
 
-.. source-file:: ../../character_system/kit/motor/layered_move.gd
+.. source-file:: ../../character_system/character/motor/layered_move.gd

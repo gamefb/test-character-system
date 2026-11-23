@@ -13,7 +13,7 @@ A stat no component owns has a base of 0. Modifiers on it still add up, which is
 
 -  **Stats are open-ended.** A new component adds its own numbers by returning them from ``_stats()``; nothing else changes. :ref:`Health<class_Health>` turns each entry in its ``resistances`` into a ``resist_<type>`` stat, so ``resist_poison`` needs no code either.
 -  **Your game's own stats need no script and no node.** The :ref:`ComponentManager<class_ComponentManager>` owns whatever you list in its **Stats** in the Inspector: ``strength``, ``level``, ``crit_chance``. See :ref:`doc_attributes`.
--  **Modifiers can be conditional.** A modifier with ``conditions`` only counts while they pass, checked on the character each time the stat is read: "+50% speed below half health" is a modifier with a :ref:`HealthBelowCondition<class_HealthBelowCondition>`. Such a stat isn't cached, and ``stat_changed`` isn't emitted when a condition flips, so UI that shows it should read it every frame.
+-  **Modifiers can be conditional.** A modifier with ``conditions`` only counts while they pass, checked on the character each time the stat is read: "+50% speed below half health" is a modifier with a :ref:`PoolBelowCondition<class_PoolBelowCondition>`. Such a stat isn't cached, and ``stat_changed`` isn't emitted when a condition flips, so UI that shows it should read it every frame.
 -  **A number can be explained.** ``base_of(stat)`` is the value before modifiers, and ``modifiers_of(stat)`` lists every modifier on it with what added it, such as the :ref:`StatusData<class_StatusData>` or the item. A character sheet can show "Move speed 4.5: base 5, Boots +1, Haste +50%, Aiming ×0.5".
 -  **Stacks are copies.** The same modifier resource can be added several times, once per status stack. ``remove_modifier`` removes one copy, so stacks unwind correctly.
 -  **Totals are cached.** WalkMode reads ``move_speed`` every physics frame, so each total is worked out once and reused until a modifier for it changes, the component that owns it is added or removed, or a component calls ``update_stats()`` after changing its own number. Stats with a conditional modifier are the exception.
@@ -78,12 +78,14 @@ A stat listed there is like any other: statuses and gear change it, effects scal
 Pools
 -----
 
-A :ref:`Pool<class_Pool>` is a number that's spent and regained: mana, stamina, energy, rage. A character has one per kind, each named in the Inspector.
+A :ref:`Pool<class_Pool>` is a number that's spent and regained: health, mana, stamina, energy, rage. A character has one per kind, each named in the Inspector. Everything that uses up or gives back a resource works on pools, so a new resource is a new Pool node and no code.
 
-.. source-file:: ../../character_system/kit/characters/pool.gd
+.. source-file:: ../../character_system/core/pool.gd
 
 -  **Spending.** An ability's ``costs`` take from pools by name, a :ref:`ChangePoolEffect<class_ChangePoolEffect>` adds or takes from any effect list, and code calls ``spend()``, which takes nothing unless the pool has enough.
 -  **Two stats each.** ``max_<pool>`` and ``<pool>_regen`` go through the manager, so a status can raise the maximum or the refill rate. The current amount is cut down when the maximum drops.
 -  **Regen that waits.** ``regen_delay`` restarts every time the pool is spent or drained.
 -  **A shield is a pool.** With ``absorbs_damage`` on, the pool hears ``absorbing_damage``, the last step before health, and takes what it can from the hit. ``absorbed_types`` limits it to some damage types. Regen and a delay make it recharge out of combat.
+-  **Running out.** ``status_while_empty`` is on the character for as long as the pool is empty, and comes off when it has something again: Exhausted on a stamina pool, say. What the character can't do meanwhile is that status's ``blocks``. The character needs a :ref:`Statuses<class_Statuses>` component for it.
+-  **Health is the pool named** ``health``. :ref:`Health<class_Health>` extends Pool, so costs, ``max_health``, ``health_regen``, :ref:`PoolAmount<class_PoolAmount>` and :ref:`PoolBelowCondition<class_PoolBelowCondition>` treat it like any other. Its status while empty is the death status; see :ref:`doc_health`.
 -  **Several per host.** ``find()`` returns the first component of a type, so pools are looked up by name with ``Pool.named(node, &"mana")``.

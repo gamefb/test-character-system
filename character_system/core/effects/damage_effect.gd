@@ -17,8 +17,9 @@ extends Effect
 ## [br]6. [Health] loses what's left, and the source hears [code]dealt_damage[/code] and the
 ## target [code]took_damage[/code]. A killing blow also sends [code]died[/code] to the target
 ## and [code]killed[/code] to the source.
-## [br][br]Steps 2 and 3 don't depend on the order statuses were applied in. A target that is
-## already dead is left alone: no damage and no events.
+## [br][br]Steps 2 and 3 don't depend on the order statuses were applied in. A target with
+## no health left, or with a status that blocks [code]damage[/code], is left alone: no damage
+## and no events.
 
 const _NO_NAMES: Array = []
 
@@ -28,7 +29,7 @@ static var _stat_names: Dictionary[StringName, Array] = {}
 ## Damage before scaling, magnitude and resistance.
 @export var amount: float = 10.0
 ## Added to [member amount] each time it runs, e.g. a [StatAmount] for 2 per point of the
-## user's strength, or a [HealthAmount] for 5% of the target's health.
+## user's strength, or a [PoolAmount] for 5% of the target's health.
 @export var scaling: Array[Amount] = []
 ## Matched against the source's bonus_<type> stat and the target's resist_<type> stat, e.g.
 ## bonus_fire and resist_fire. [HitCondition] tests it.
@@ -40,7 +41,8 @@ static var _stat_names: Dictionary[StringName, Array] = {}
 
 func _execute(ctx: EffectContext) -> void:
 	var health := Component.of(ctx.target, Health) as Health
-	if not health or health.is_dead():
+	# Nothing left to take, or a status is keeping damage off.
+	if not health or health.current <= 0.0 or health.manager.blocks.has(&"damage"):
 		return
 	# This effect's tags only last while it runs; the hit's own tags (a hurtbox's) stay.
 	var own_tags: int = ctx.tags.size()

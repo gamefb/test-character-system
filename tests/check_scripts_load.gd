@@ -1,7 +1,7 @@
 extends SceneTree
 ## Loads every script under [code]res://character_system[/code] and exits with 1 if one fails.
-## CI runs it on a copy of the project without [code]kit/[/code] and [code]examples/[/code],
-## to prove the core needs neither:
+## CI runs it on copies of the project without the folders above a layer, to prove that
+## [code]core/[/code] needs nothing else and [code]character/[/code] needs only the core:
 ## [codeblock lang=text]
 ## godot --headless --path <copy> -s <this file>
 ## [/codeblock]

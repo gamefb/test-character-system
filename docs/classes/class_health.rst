@@ -8,20 +8,20 @@
 Health
 ======
 
-**Inherits:** :ref:`Component<class_Component>` **<** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Pool<class_Pool>` **<** :ref:`Component<class_Component>` **<** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-Hit points, death and damage resistances.
+The pool named ``health``: what damage takes away and healing gives back.
 
 .. rst-class:: classref-introduction-group
 
 Description
 -----------
 
-The maximum is the ``max_health`` stat, so statuses and items can raise or lower it. Raising it doesn't heal; lowering it only cuts health above the new maximum. A character starts at full health, innate passives included, whatever the node order.
+It is a :ref:`Pool<class_Pool>`, so everything that works on pools works on health: an ability can cost health, ``max_health`` and ``health_regen`` are stats, and a bar that shows a pool shows health. On top of that it has resistances and the events of dying. 
 
-\ :ref:`DamageEffect<class_DamageEffect>` and :ref:`HealEffect<class_HealEffect>` call :ref:`change()<class_Health_method_change>` for you. Every component on the character hears ``died`` as an event, and whoever dealt the killing blow hears ``killed``, so "heal on kill" is a status trigger and experience for kills is one :ref:`WorldEvents<class_WorldEvents>` listener. 
+\ **Death is a status.** At zero the character gets :ref:`death_status<class_Health_property_death_status>`, which stays until :ref:`revive()<class_Health_method_revive>`. Health itself only stops changing; what a dead character can't do is written on that status, in its :ref:`StatusData.blocks<class_StatusData_property_blocks>`. Give a boss a different status, a "Downed" one that still lets it crawl, or leave the field empty for a game in which nothing dies. 
 
-For a shield that soaks up damage before health, add a :ref:`Pool<class_Pool>` with :ref:`Pool.absorbs_damage<class_Pool_property_absorbs_damage>` on.
+\ **Events.** ``died`` is sent to the character when health reaches zero, ``killed`` to whoever caused it, and ``revived`` when health comes back.
 
 .. rst-class:: classref-reftable-group
 
@@ -31,13 +31,11 @@ Properties
 .. table::
    :widths: auto
 
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------+-----------+
-   | :ref:`float<class_float>`                                                                             | :ref:`max_health<class_Health_property_max_health>`   | ``100.0`` |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------+-----------+
-   | :ref:`Dictionary<class_Dictionary>`\[:ref:`StringName<class_StringName>`, :ref:`float<class_float>`\] | :ref:`resistances<class_Health_property_resistances>` | ``{}``    |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------+-----------+
-   | :ref:`float<class_float>`                                                                             | :ref:`current<class_Health_property_current>`         |           |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------+-----------+
+   +-------------------------------------------------------------------------------------------------------+---------------------------------------------------------+--------------+
+   | :ref:`StatusData<class_StatusData>`                                                                   | :ref:`death_status<class_Health_property_death_status>` | ``<Object>`` |
+   +-------------------------------------------------------------------------------------------------------+---------------------------------------------------------+--------------+
+   | :ref:`Dictionary<class_Dictionary>`\[:ref:`StringName<class_StringName>`, :ref:`float<class_float>`\] | :ref:`resistances<class_Health_property_resistances>`   | ``{}``       |
+   +-------------------------------------------------------------------------------------------------------+---------------------------------------------------------+--------------+
 
 .. rst-class:: classref-reftable-group
 
@@ -47,15 +45,13 @@ Methods
 .. table::
    :widths: auto
 
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`float<class_float>` | :ref:`maximum<class_Health_method_maximum>`\ (\ )                                                                                           |
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`   | :ref:`is_dead<class_Health_method_is_dead>`\ (\ )                                                                                           |
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                    | :ref:`change<class_Health_method_change>`\ (\ amount\: :ref:`float<class_float>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                    | :ref:`revive<class_Health_method_revive>`\ (\ amount\: :ref:`float<class_float>` = -1.0\ )                                                  |
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   +-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>` | :ref:`is_dead<class_Health_method_is_dead>`\ (\ )                                                                                           |
+   +-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                  | :ref:`change<class_Health_method_change>`\ (\ amount\: :ref:`float<class_float>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |
+   +-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                  | :ref:`revive<class_Health_method_revive>`\ (\ amount\: :ref:`float<class_float>` = -1.0\ )                                                  |
+   +-------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -66,25 +62,13 @@ Methods
 Signals
 -------
 
-.. _class_Health_signal_changed:
-
-.. rst-class:: classref-signal
-
-**changed**\ (\ current\: :ref:`float<class_float>`, maximum\: :ref:`float<class_float>`\ ) :ref:`🔗<class_Health_signal_changed>`
-
-Emitted when health or the maximum changes, including when a max-health buff starts or ends.
-
-.. rst-class:: classref-item-separator
-
-----
-
 .. _class_Health_signal_died:
 
 .. rst-class:: classref-signal
 
 **died**\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) :ref:`🔗<class_Health_signal_died>`
 
-Emitted once when health reaches zero. ``ctx`` is the killing blow (may be null).
+Emitted when health reaches zero. ``ctx`` says who or what did it, or is null.
 
 .. rst-class:: classref-section-separator
 
@@ -95,17 +79,13 @@ Emitted once when health reaches zero. ``ctx`` is the killing blow (may be null)
 Property Descriptions
 ---------------------
 
-.. _class_Health_property_max_health:
+.. _class_Health_property_death_status:
 
 .. rst-class:: classref-property
 
-:ref:`float<class_float>` **max_health** = ``100.0`` :ref:`🔗<class_Health_property_max_health>`
+:ref:`StatusData<class_StatusData>` **death_status** = ``<Object>`` :ref:`🔗<class_Health_property_death_status>`
 
-.. rst-class:: classref-property-setget
-
-- |void| **@max_health_setter**\ (\ value\: :ref:`float<class_float>`\ )
-
-Health before statuses and items. They change it through the max_health stat.
+The status the character has while health is at zero. Empty: nothing happens at zero, apart from :ref:`died<class_Health_signal_died>` and the event of the same name.
 
 .. rst-class:: classref-item-separator
 
@@ -121,23 +101,7 @@ Health before statuses and items. They change it through the max_health stat.
 
 - |void| **@resistances_setter**\ (\ value\: :ref:`Dictionary<class_Dictionary>`\[:ref:`StringName<class_StringName>`, :ref:`float<class_float>`\]\ )
 
-Fraction of each damage type that is ignored, e.g. { &"fire": 0.5 }. 1 = immune, and a negative number is a weakness: -0.5 takes 50% more. Statuses change these through stats named resist\_<type>, e.g. resist_fire.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_Health_property_current:
-
-.. rst-class:: classref-property
-
-:ref:`float<class_float>` **current** :ref:`🔗<class_Health_property_current>`
-
-.. rst-class:: classref-property-setget
-
-- :ref:`float<class_float>` **@current_getter**\ (\ )
-
-Health right now.
+Damage type to the base of ``resist_<type>``: 0.5 halves fire, 1 is immune, and a negative number is a weakness.
 
 .. rst-class:: classref-section-separator
 
@@ -148,25 +112,13 @@ Health right now.
 Method Descriptions
 -------------------
 
-.. _class_Health_method_maximum:
-
-.. rst-class:: classref-method
-
-:ref:`float<class_float>` **maximum**\ (\ ) :ref:`🔗<class_Health_method_maximum>`
-
-The current maximum: :ref:`max_health<class_Health_property_max_health>` after statuses and items (the ``max_health`` stat).
-
-.. rst-class:: classref-item-separator
-
-----
-
 .. _class_Health_method_is_dead:
 
 .. rst-class:: classref-method
 
 :ref:`bool<class_bool>` **is_dead**\ (\ ) :ref:`🔗<class_Health_method_is_dead>`
 
-True once health has reached zero, until :ref:`revive()<class_Health_method_revive>`.
+Whether health is at zero and the character has a :ref:`death_status<class_Health_property_death_status>` to show for it.
 
 .. rst-class:: classref-item-separator
 
@@ -178,7 +130,7 @@ True once health has reached zero, until :ref:`revive()<class_Health_method_revi
 
 |void| **change**\ (\ amount\: :ref:`float<class_float>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) :ref:`🔗<class_Health_method_change>`
 
-Adds ``amount`` to health. Use a negative amount for damage. Ignored once dead.
+Adds ``amount``, or takes it away when it is negative. Nothing changes while dead: only :ref:`revive()<class_Health_method_revive>` brings a character back.
 
 .. rst-class:: classref-item-separator
 
@@ -190,7 +142,7 @@ Adds ``amount`` to health. Use a negative amount for damage. Ignored once dead.
 
 |void| **revive**\ (\ amount\: :ref:`float<class_float>` = -1.0\ ) :ref:`🔗<class_Health_method_revive>`
 
-Brings the character back with ``amount`` health, or full health if left out. Every component hears ``revived``.
+Sets health to ``amount``, or to the maximum if it is left out, and ends death.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

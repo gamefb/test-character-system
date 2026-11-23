@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_2iwnw"]
+[ext_resource type="Script" path="res://character_system/character/items/trigger.gd" id="2_gam4l"]
+[ext_resource type="Script" path="res://character_system/character/items/magazine.gd" id="3_rl8qj"]
+[ext_resource type="Script" path="res://character_system/character/items/hitscan.gd" id="4_6261x"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="5_mk2ee"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="6_wk4mi"]
+[ext_resource type="Script" path="res://character_system/character/conditions/is_hostile_condition.gd" id="7_vpucw"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="8_2tckh"]
+[ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="9_pq3xy"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c6nd8"]
+albedo_color = Color(0.2, 0.2, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6v64x"]
+material = SubResource("StandardMaterial3D_c6nd8")
+size = Vector3(0.07, 0.1, 0.8)
+
+[sub_resource type="Resource" id="Resource_tgkda"]
+script = ExtResource("7_vpucw")
+
+[sub_resource type="Resource" id="Resource_41m13"]
+script = ExtResource("9_pq3xy")
+amount = 8.0
+conditions = Array[ExtResource("6_wk4mi")]([SubResource("Resource_tgkda")])
+
+[node name="SoldierRifle" type="Node3D" unique_id=1288897371]
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=130638150]
+mesh = SubResource("BoxMesh_6v64x")
+
+[node name="ComponentManager" type="Node" parent="." unique_id=712395439]
+script = ExtResource("1_2iwnw")
+
+[node name="Trigger" type="Node" parent="." unique_id=1396609906]
+script = ExtResource("2_gam4l")
+fire_rate = 2.0
+
+[node name="Magazine" type="Node" parent="." unique_id=1751703247]
+script = ExtResource("3_rl8qj")
+capacity = 8
+reload_time = 1.5
+auto_reload = true
+
+[node name="Hitscan" type="Node" parent="." unique_id=2123729176]
+script = ExtResource("4_6261x")
+effects = Array[ExtResource("5_mk2ee")]([SubResource("Resource_41m13")])

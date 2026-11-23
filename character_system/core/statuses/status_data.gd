@@ -48,6 +48,20 @@ enum Stacking {
 ## Statuses with these tags are removed when this one is added, e.g. Wet puts out &"fire".
 ## Pair it with [member immune_to] to also keep them from coming back.
 @export var removes_tags: Array[StringName] = []
+## Ends every status that has a duration when this one is applied, e.g. for death or a cleanse.
+@export var removes_timed := false
+## What the character can't do, or can't have done to it, while this status is active. Each
+## thing that can be blocked answers to a name, [code]&"abilities"[/code] by default for an
+## ability, and a status that lists the name stops it. The names the system uses:
+## [br]- [code]everything[/code]: the [Brain], so moving and every action.
+## [br]- [code]movement[/code]: the [CharacterMotor]. [code]abilities[/code]: every
+## [AbilityData]. [code]weapons[/code]: every [Trigger].
+## [br]- [code]damage[/code] and [code]healing[/code]: a [DamageEffect] or [HealEffect] on
+## this character does nothing.
+## [br]- [code]targeting[/code]: shots pass through the character, and AI and area abilities
+## leave it alone.
+## [br]Add names of your own, such as [code]spells[/code], to a thing's Blocked By list.
+@export var blocks: Array[StringName] = []
 
 @export_group("Effects")
 ## Applied once per stack while active.

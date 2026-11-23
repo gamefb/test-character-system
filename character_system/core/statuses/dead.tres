@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_xfvx3"]
+[ext_resource type="Script" path="res://character_system/core/stats/stat_modifier.gd" id="2_x854e"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_3nnef"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="4_dg3tp"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_trigger.gd" id="5_hrhqm"]
+
+[resource]
+script = ExtResource("4_dg3tp")
+id = &"dead"
+display_name = "Dead"
+description = "Health is at zero. The character can't act, be healed or be targeted, and its timed statuses have ended. Health.revive() ends it."
+tags = Array[StringName]([&"dead"])
+removes_timed = true
+blocks = Array[StringName]([&"everything", &"healing", &"targeting"])

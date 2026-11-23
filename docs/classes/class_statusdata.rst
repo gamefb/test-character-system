@@ -29,41 +29,45 @@ Properties
 .. table::
    :widths: auto
 
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`StringName<class_StringName>`                                    | :ref:`id<class_StatusData_property_id>`                             |         |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`String<class_String>`                                            | :ref:`display_name<class_StatusData_property_display_name>`         |         |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Texture2D<class_Texture2D>`                                      | :ref:`icon<class_StatusData_property_icon>`                         |         |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`String<class_String>`                                            | :ref:`description<class_StatusData_property_description>`           |         |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]       | :ref:`tags<class_StatusData_property_tags>`                         | ``[]``  |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]       | :ref:`immune_to<class_StatusData_property_immune_to>`               | ``[]``  |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`Condition<class_Condition>`\]         | :ref:`apply_conditions<class_StatusData_property_apply_conditions>` | ``[]``  |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`float<class_float>`                                              | :ref:`duration<class_StatusData_property_duration>`                 | ``0.0`` |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Stacking<enum_StatusData_Stacking>`                              | :ref:`stacking<class_StatusData_property_stacking>`                 | ``0``   |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`int<class_int>`                                                  | :ref:`max_stacks<class_StatusData_property_max_stacks>`             | ``1``   |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]       | :ref:`removes_tags<class_StatusData_property_removes_tags>`         | ``[]``  |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`StatModifier<class_StatModifier>`\]   | :ref:`modifiers<class_StatusData_property_modifiers>`               | ``[]``  |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`float<class_float>`                                              | :ref:`tick_interval<class_StatusData_property_tick_interval>`       | ``0.0`` |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\]               | :ref:`on_apply<class_StatusData_property_on_apply>`                 | ``[]``  |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\]               | :ref:`on_tick<class_StatusData_property_on_tick>`                   | ``[]``  |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\]               | :ref:`on_remove<class_StatusData_property_on_remove>`               | ``[]``  |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`StatusTrigger<class_StatusTrigger>`\] | :ref:`triggers<class_StatusData_property_triggers>`                 | ``[]``  |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+---------+
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`StringName<class_StringName>`                                    | :ref:`id<class_StatusData_property_id>`                             |           |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`String<class_String>`                                            | :ref:`display_name<class_StatusData_property_display_name>`         |           |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Texture2D<class_Texture2D>`                                      | :ref:`icon<class_StatusData_property_icon>`                         |           |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`String<class_String>`                                            | :ref:`description<class_StatusData_property_description>`           |           |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]       | :ref:`tags<class_StatusData_property_tags>`                         | ``[]``    |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]       | :ref:`immune_to<class_StatusData_property_immune_to>`               | ``[]``    |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Array<class_Array>`\[:ref:`Condition<class_Condition>`\]         | :ref:`apply_conditions<class_StatusData_property_apply_conditions>` | ``[]``    |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`float<class_float>`                                              | :ref:`duration<class_StatusData_property_duration>`                 | ``0.0``   |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Stacking<enum_StatusData_Stacking>`                              | :ref:`stacking<class_StatusData_property_stacking>`                 | ``0``     |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`int<class_int>`                                                  | :ref:`max_stacks<class_StatusData_property_max_stacks>`             | ``1``     |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]       | :ref:`removes_tags<class_StatusData_property_removes_tags>`         | ``[]``    |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`bool<class_bool>`                                                | :ref:`removes_timed<class_StatusData_property_removes_timed>`       | ``false`` |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]       | :ref:`blocks<class_StatusData_property_blocks>`                     | ``[]``    |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Array<class_Array>`\[:ref:`StatModifier<class_StatModifier>`\]   | :ref:`modifiers<class_StatusData_property_modifiers>`               | ``[]``    |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`float<class_float>`                                              | :ref:`tick_interval<class_StatusData_property_tick_interval>`       | ``0.0``   |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\]               | :ref:`on_apply<class_StatusData_property_on_apply>`                 | ``[]``    |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\]               | :ref:`on_tick<class_StatusData_property_on_tick>`                   | ``[]``    |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\]               | :ref:`on_remove<class_StatusData_property_on_remove>`               | ``[]``    |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
+   | :ref:`Array<class_Array>`\[:ref:`StatusTrigger<class_StatusTrigger>`\] | :ref:`triggers<class_StatusData_property_triggers>`                 | ``[]``    |
+   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
 
 .. rst-class:: classref-reftable-group
 
@@ -254,6 +258,40 @@ The most stacks it can have. Only used with :ref:`STACK<class_StatusData_constan
 :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] **removes_tags** = ``[]`` :ref:`🔗<class_StatusData_property_removes_tags>`
 
 Statuses with these tags are removed when this one is added, e.g. Wet puts out &"fire". Pair it with :ref:`immune_to<class_StatusData_property_immune_to>` to also keep them from coming back.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_StatusData_property_removes_timed:
+
+.. rst-class:: classref-property
+
+:ref:`bool<class_bool>` **removes_timed** = ``false`` :ref:`🔗<class_StatusData_property_removes_timed>`
+
+Ends every status that has a duration when this one is applied, e.g. for death or a cleanse.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_StatusData_property_blocks:
+
+.. rst-class:: classref-property
+
+:ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] **blocks** = ``[]`` :ref:`🔗<class_StatusData_property_blocks>`
+
+What the character can't do, or can't have done to it, while this status is active. Each thing that can be blocked answers to a name, ``&"abilities"`` by default for an ability, and a status that lists the name stops it. The names the system uses: 
+
+- ``everything``: the :ref:`Brain<class_Brain>`, so moving and every action. 
+
+- ``movement``: the :ref:`CharacterMotor<class_CharacterMotor>`. ``abilities``: every :ref:`AbilityData<class_AbilityData>`. ``weapons``: every :ref:`Trigger<class_Trigger>`. 
+
+- ``damage`` and ``healing``: a :ref:`DamageEffect<class_DamageEffect>` or :ref:`HealEffect<class_HealEffect>` on this character does nothing. 
+
+- ``targeting``: shots pass through the character, and AI and area abilities leave it alone. 
+
+Add names of your own, such as ``spells``, to a thing's Blocked By list.
 
 .. rst-class:: classref-item-separator
 

@@ -1,7 +1,7 @@
 extends GutTest
-## The files in character_system/examples load and do what their descriptions say.
+## The files in character_system/starter_pack load and do what their descriptions say.
 
-const EX := "res://character_system/examples/"
+const EX := "res://character_system/starter_pack/"
 
 
 func ex(path: String) -> Resource:

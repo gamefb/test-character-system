@@ -1,7 +1,7 @@
 extends GutTest
 ## Weapons: fire rate, reloading, spread, projectiles and blasts.
 
-const EX := "res://character_system/examples/"
+const EX := "res://character_system/starter_pack/"
 
 
 func make_character(position := Vector3.ZERO, extra: Array[Node] = []) -> CharacterBody3D:
@@ -277,7 +277,7 @@ func test_an_ability_can_launch_a_projectile() -> void:
 	fireball.user_effects = [throw]
 	var health: Health = health_of(target)
 	watch_signals(health)
-	health.max_health = 30.0
+	health.max_value = 30.0
 	assert_true((Component.of(caster, Abilities) as Abilities).use(fireball))
 	await physics_frames(20)
 	assert_true(health.is_dead())

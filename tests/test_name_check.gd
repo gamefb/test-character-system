@@ -96,11 +96,16 @@ func test_amounts_pools_and_abilities_are_checked() -> void:
 	assert_string_contains(NameCheck.problems(draught)[0], "Did you mean 'mana'?")
 	var spell := AbilityData.new()
 	spell.costs = { &"mana": 5.0, &"stamnia": 5.0 }
-	spell.blocked_by_tags = [&"silenced", &"silensed"]
+	spell.blocked_by = [&"abilities", &"spells", &"spels"]
 	found = NameCheck.problems(spell)
 	assert_eq(found.size(), 2)
 	assert_string_contains(found[0], "'stamnia'")
-	assert_string_contains(found[1], "Did you mean 'silenced'?")
+	assert_string_contains(found[1], "Did you mean 'spells'?")
+	var daze := StatusData.new()
+	daze.blocks = [&"everything", &"spells", &"wepons"]
+	found = NameCheck.problems(daze)
+	assert_eq(found.size(), 1, "spells is known because the example Fireball answers to it")
+	assert_string_contains(found[0], "Did you mean 'weapons'?")
 	var cure := RemoveStatusEffect.new()
 	cure.tag = &"poisn"
 	assert_string_contains(NameCheck.problems(cure)[0], "Did you mean 'poison'?")
@@ -165,7 +170,7 @@ func test_problems_deep_inside_a_status_are_found() -> void:
 
 func test_statuses_saved_elsewhere_are_not_rechecked() -> void:
 	var apply := ApplyStatusEffect.new()
-	apply.status = load("res://character_system/examples/statuses/burning.tres")
+	apply.status = load("res://character_system/starter_pack/statuses/burning.tres")
 	assert_eq(NameCheck.problems(apply).size(), 0)
 
 
@@ -196,7 +201,7 @@ func test_every_example_is_clean() -> void:
 		"items/grenade.tres",
 	]
 	for path in paths:
-		var example: Resource = load("res://character_system/examples/" + path)
+		var example: Resource = load("res://character_system/starter_pack/" + path)
 		assert_eq(NameCheck.problems(example), PackedStringArray(), path)
 
 

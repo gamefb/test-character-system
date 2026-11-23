@@ -186,7 +186,7 @@ func test_a_trigger_checks_its_conditions_once_for_all_its_effects() -> void:
 	var target: Node3D = make_host()
 	var count := CountEffect.new()
 	var fragile: StatusData = reacting(&"took_damage", [count, count])
-	var hurt := HealthBelowCondition.new()
+	var hurt := PoolBelowCondition.new()
 	hurt.fraction = 0.5
 	fragile.triggers[0].conditions = [hurt]
 	statuses_of(target).add(fragile)

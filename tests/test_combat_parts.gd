@@ -1,7 +1,7 @@
 extends GutTest
 ## Hitscan, what shots pass through, ability cooldowns on game time, and teams as Godot groups.
 
-const EX := "res://character_system/examples/"
+const EX := "res://character_system/starter_pack/"
 
 
 func make_character(position := Vector3.ZERO, extra: Array[Node] = []) -> CharacterBody3D:
@@ -16,7 +16,8 @@ func make_character(position := Vector3.ZERO, extra: Array[Node] = []) -> Charac
 	hand.position = Vector3(0, 1, -0.8)
 	var gear := Equipment.new()
 	gear.sockets = { &"weapon": ^"../Hand" }
-	for node in [shape, hand, ComponentManager.new(), Health.new(), Brain.new(), gear] + extra:
+	for node in [shape, hand, ComponentManager.new(), Health.new(), Statuses.new(), Brain.new(),
+			gear] + extra:
 		body.add_child(node)
 	add_child_autofree(body)
 	return body
@@ -100,11 +101,46 @@ func test_projectiles_pass_through_plain_areas_and_the_dead() -> void:
 	assert_eq((Component.of(target, Health) as Health).current, 85.0)
 
 
+func test_a_weapons_projectile_leaves_from_the_weapon() -> void:
+	var shooter: CharacterBody3D = make_character()
+	var slow := Projectile.new()
+	slow.speed = 0.01
+	var shot := PackedScene.new()
+	shot.pack(slow)
+	slow.free()
+	var loose := LaunchProjectileEffect.new()
+	loose.projectile = shot
+	var string := Trigger.new()
+	string.user_effects = [loose]
+	var root := Node3D.new()
+	for node: Node in [ComponentManager.new(), string]:
+		root.add_child(node)
+		node.owner = root
+	var bow := ItemData.new()
+	bow.slot = &"weapon"
+	bow.scene = PackedScene.new()
+	bow.scene.pack(root)
+	root.free()
+	(Component.of(shooter, Equipment) as Equipment).equip(ItemInstance.new(bow))
+	(Component.of(shooter, Brain) as Brain).aim_point = Vector3(0, 1, -50)
+	var launched: Array[Projectile] = []
+	get_tree().node_added.connect(func(node: Node) -> void:
+		if node is Projectile:
+			launched.append(node))
+	await get_tree().physics_frame
+	await pull_trigger(shooter)
+	await get_tree().physics_frame
+	assert_eq(launched.size(), 1)
+	assert_almost_eq(launched[0].global_position, Vector3(0, 1, -0.8), Vector3.ONE * 0.05,
+			"at the hand that holds the weapon, not at the chest")
+	launched[0].queue_free()
+
+
 func test_hits_say_which_item_dealt_them() -> void:
 	var shooter: CharacterBody3D = make_character()
 	var target: CharacterBody3D = make_character(Vector3(0, 0, 6))
 	var health := Component.of(target, Health) as Health
-	health.max_health = 10.0  # One shot kills.
+	health.max_value = 10.0  # One shot kills.
 	var rifle: ItemData = load(EX + "items/rifle.tres")
 	(Component.of(shooter, Equipment) as Equipment).equip(ItemInstance.new(rifle))
 	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP

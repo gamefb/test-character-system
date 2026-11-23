@@ -62,7 +62,7 @@ Every source applies statuses the same way: it builds an :ref:`EffectContext<cla
 Environment
 -----------
 
-.. source-file:: ../../character_system/kit/world/effect_zone.gd
+.. source-file:: ../../character_system/character/world/effect_zone.gd
 
 -  **"While inside" status** (deep water, a healing aura): set ``status_while_inside`` to a status with duration 0. Each zone a body stands in is one hold, so leaving one of two overlapping pools keeps it wet. The zone only drops holds for bodies that accepted the status, so a refused body never loses a hold that another source gave it.
 -  **One-shot hazard** (a fire patch): ``on_enter`` = :ref:`ApplyStatusEffect<class_ApplyStatusEffect>` with a timed status such as Burning.

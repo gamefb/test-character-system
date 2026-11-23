@@ -1,10 +1,10 @@
 [gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_yc33m"]
-[ext_resource type="Script" path="res://character_system/kit/items/trigger.gd" id="2_nxd40"]
-[ext_resource type="Script" path="res://character_system/kit/items/magazine.gd" id="3_gfvxc"]
+[ext_resource type="Script" path="res://character_system/character/items/trigger.gd" id="2_nxd40"]
+[ext_resource type="Script" path="res://character_system/character/items/magazine.gd" id="3_gfvxc"]
 [ext_resource type="Resource" path="res://immunity_test/data/items/rifle_ammo.tres" id="4_ued0u"]
-[ext_resource type="Script" path="res://character_system/kit/items/hitscan.gd" id="5_0f6xr"]
+[ext_resource type="Script" path="res://character_system/character/items/hitscan.gd" id="5_0f6xr"]
 [ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="6_x6go5"]
 [ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="7_0tu3c"]
 [ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="8_hra6a"]

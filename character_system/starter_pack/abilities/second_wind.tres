@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AbilityData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="1_ny12b"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="2_t3ac4"]
+[ext_resource type="Script" path="res://character_system/core/effects/heal_effect.gd" id="3_53rir"]
+[ext_resource type="Script" path="res://character_system/character/abilities/ability_data.gd" id="4_ycrt2"]
+
+[sub_resource type="Resource" id="Resource_8jh6f"]
+script = ExtResource("3_53rir")
+amount = 30.0
+conditions = Array[ExtResource("2_t3ac4")]([])
+
+[resource]
+script = ExtResource("4_ycrt2")
+id = &"second_wind"
+display_name = "Second wind"
+cooldown = 10.0
+effects = Array[ExtResource("1_ny12b")]([SubResource("Resource_8jh6f")])

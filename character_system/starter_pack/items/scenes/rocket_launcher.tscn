@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_5rgpo"]
+[ext_resource type="Script" path="res://character_system/character/items/trigger.gd" id="2_482vf"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_t1uek"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="4_fc3v8"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="5_j5ayo"]
+[ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="6_kev0j"]
+[ext_resource type="PackedScene" path="res://character_system/starter_pack/projectiles/rocket.tscn" id="7_pntvg"]
+[ext_resource type="Script" path="res://character_system/character/effects/launch_projectile_effect.gd" id="8_tkjxt"]
+[ext_resource type="Script" path="res://character_system/character/items/magazine.gd" id="9_tvi4p"]
+[ext_resource type="Resource" path="res://character_system/starter_pack/items/rockets.tres" id="10_c18fh"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6nbga"]
+albedo_color = Color(0.25, 0.35, 0.25, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_q4604"]
+material = SubResource("StandardMaterial3D_6nbga")
+size = Vector3(0.18, 0.18, 0.9)
+
+[sub_resource type="Resource" id="Resource_qb7p6"]
+script = ExtResource("6_kev0j")
+amount = 40.0
+
+[sub_resource type="Resource" id="Resource_0gd7f"]
+script = ExtResource("8_tkjxt")
+projectile = ExtResource("7_pntvg")
+effects = Array[ExtResource("3_t1uek")]([SubResource("Resource_qb7p6")])
+
+[node name="RocketLauncher" type="Node3D" unique_id=79530776]
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=402546617]
+mesh = SubResource("BoxMesh_q4604")
+
+[node name="ComponentManager" type="Node" parent="." unique_id=501114956]
+script = ExtResource("1_5rgpo")
+
+[node name="Trigger" type="Node" parent="." unique_id=1228244178]
+script = ExtResource("2_482vf")
+fire_rate = 1.0
+user_effects = Array[ExtResource("3_t1uek")]([SubResource("Resource_0gd7f")])
+
+[node name="Magazine" type="Node" parent="." unique_id=2067121574]
+script = ExtResource("9_tvi4p")
+ammo = ExtResource("10_c18fh")
+capacity = 1
+reload_time = 1.5
+auto_reload = true

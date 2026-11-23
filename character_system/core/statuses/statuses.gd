@@ -72,6 +72,7 @@ func _stop() -> void:
 	# but don't run on_remove, which is for a status that ends.
 	for data: StatusData in active.keys():
 		_set_stacks(data, active[data], 0)
+		data.blocks.map(manager.unblock)
 	active.clear()
 	changed.emit()
 
@@ -80,11 +81,6 @@ func _stop() -> void:
 func _on_event(event: StringName, ctx: EffectContext) -> void:
 	if active.is_empty():
 		return
-	if event == &"died":
-		for data: StatusData in active.keys():
-			if data.duration > 0.0:
-				# Timed statuses end on death. Passives stay for a revive.
-				remove(data)
 	if not ctx:
 		return
 	var other: Node = ctx.target if ctx.source == host else ctx.source
@@ -108,8 +104,9 @@ func add(data: StatusData, source: Node = null) -> bool:
 		refused.emit(data, source)
 		return false
 	for other: StatusData in active.keys():
-		if _overlaps(other.tags, data.removes_tags):
-			remove(other)  # e.g. Wet puts out Burning.
+		if _overlaps(other.tags, data.removes_tags) or (data.removes_timed
+				and other.duration > 0.0 and other != data):
+			remove(other)  # e.g. Wet puts out Burning, and death ends what was ticking.
 
 	var s: ActiveStatus = active.get(data)
 	var is_new: bool = s == null
@@ -117,6 +114,7 @@ func add(data: StatusData, source: Node = null) -> bool:
 		s = ActiveStatus.new()
 		s.tick_in = data.tick_interval
 		active[data] = s
+		data.blocks.map(manager.block)
 		_update_processing()
 	if data.duration == 0.0:
 		s.holds += 1
@@ -139,6 +137,7 @@ func remove(data: StatusData) -> void:
 		return
 	_set_stacks(data, s, 0)
 	active.erase(data)
+	data.blocks.map(manager.unblock)
 	_update_processing()
 	_run(data.on_remove, data, s)
 	changed.emit()
@@ -181,15 +180,6 @@ func has_tag(tag: StringName) -> bool:
 		if tag in data.tags:
 			return true
 	return false
-
-
-## True if [param node] has a status with any of [param tags]. Safe on anything: a node with
-## no [Statuses] has none. It's how movement, weapons and abilities are blocked by statuses.
-static func has_any_tag(node: Variant, tags: Array[StringName]) -> bool:
-	if tags.is_empty():
-		return false
-	var statuses := Component.of(node, Statuses) as Statuses
-	return statuses != null and tags.any(statuses.has_tag)
 
 
 ## True if an active status or trait is immune to one of [param data]'s tags,

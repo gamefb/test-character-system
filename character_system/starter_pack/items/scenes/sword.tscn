@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_6ut2e"]
+[ext_resource type="Script" path="res://character_system/character/items/trigger.gd" id="2_6iydm"]
+[ext_resource type="Script" path="res://character_system/character/items/melee_sweep.gd" id="3_n51ox"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="4_qdnpc"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="5_otkbv"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="6_n2hiq"]
+[ext_resource type="Script" path="res://character_system/character/amounts/random_amount.gd" id="7_rcvi4"]
+[ext_resource type="Script" path="res://character_system/core/amounts/stat_amount.gd" id="8_lx5b6"]
+[ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="9_8okat"]
+[ext_resource type="Script" path="res://character_system/character/effects/knockback_effect.gd" id="10_lk4w2"]
+[ext_resource type="Script" path="res://character_system/core/effects/apply_status_effect.gd" id="11_s41fq"]
+[ext_resource type="Resource" path="res://character_system/starter_pack/statuses/bleeding.tres" id="12_qp27j"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y5348"]
+albedo_color = Color(0.8, 0.8, 0.9, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_urbf5"]
+material = SubResource("StandardMaterial3D_y5348")
+size = Vector3(0.06, 0.06, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mbkqi"]
+size = Vector3(1.6, 1.6, 1.8)
+
+[sub_resource type="Resource" id="Resource_kury7"]
+script = ExtResource("7_rcvi4")
+high = 4.0
+
+[sub_resource type="Resource" id="Resource_6s3i1"]
+script = ExtResource("8_lx5b6")
+stat = &"strength"
+
+[sub_resource type="Resource" id="Resource_w3lrm"]
+script = ExtResource("9_8okat")
+amount = 8.0
+scaling = Array[ExtResource("6_n2hiq")]([SubResource("Resource_kury7"), SubResource("Resource_6s3i1")])
+tags = Array[StringName]([&"melee"])
+
+[sub_resource type="Resource" id="Resource_j1gld"]
+script = ExtResource("10_lk4w2")
+strength = 6.0
+
+[sub_resource type="Resource" id="Resource_r0752"]
+script = ExtResource("11_s41fq")
+status = ExtResource("12_qp27j")
+
+[node name="Sword" type="Node3D" unique_id=376985646]
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=996442163]
+mesh = SubResource("BoxMesh_urbf5")
+
+[node name="ComponentManager" type="Node" parent="." unique_id=1778150416]
+script = ExtResource("1_6ut2e")
+
+[node name="Trigger" type="Node" parent="." unique_id=2039643971]
+script = ExtResource("2_6iydm")
+fire_rate = 2.0
+
+[node name="MeleeSweep" type="Node" parent="." unique_id=1550529136]
+script = ExtResource("3_n51ox")
+shape = SubResource("BoxShape3D_mbkqi")
+offset = Vector3(0, 0, -1.2)
+effects = Array[ExtResource("4_qdnpc")]([SubResource("Resource_w3lrm"), SubResource("Resource_j1gld"), SubResource("Resource_r0752")])

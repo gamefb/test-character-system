@@ -52,8 +52,8 @@ extends Node
 ## [b]Writing your own.[/b] Extend this class and override any of [method _requires],
 ## [method _stats], [method _start], [method _stop] and [method _warnings]. Do setup in
 ## [method _start], not [code]_ready()[/code]: it runs once everything is in place, and never
-## in the editor. This outline shows where each part goes; [Stamina] in
-## [code]examples/scripts/[/code] is a complete one to copy.
+## in the editor. This outline shows where each part goes; [Sprint] in
+## [code]starter_pack/scripts/[/code] is a complete one to copy.
 ##
 ## [codeblock]
 ## @tool  # Optional: shows this component's warnings in the editor.

@@ -52,9 +52,9 @@ func mend(cooldown := 1.0) -> AbilityData:
 	return ability
 
 
-func tagged(tag: StringName, duration := 5.0) -> StatusData:
+func blocking(what: StringName, duration := 5.0) -> StatusData:
 	var s := StatusData.new()
-	s.tags = [tag]
+	s.blocks = [what]
 	s.duration = duration
 	return s
 
@@ -116,7 +116,7 @@ func test_reset_cooldown_makes_it_ready() -> void:
 
 func test_conditions_decide_when_it_can_be_used() -> void:
 	var last_stand: AbilityData = mend()
-	var hurt := HealthBelowCondition.new()
+	var hurt := PoolBelowCondition.new()
 	hurt.fraction = 0.5
 	last_stand.conditions = [hurt]
 	assert_eq(abilities.why_not(last_stand), &"condition")
@@ -126,14 +126,18 @@ func test_conditions_decide_when_it_can_be_used() -> void:
 	assert_eq(health.current, 40.0)
 
 
-func test_a_status_tag_blocks_the_ability() -> void:
+func test_a_status_blocks_the_abilities_that_answer_to_it() -> void:
 	var spell: AbilityData = mend()
-	spell.blocked_by_tags = [&"silenced"]
-	var silenced: StatusData = tagged(&"silenced")
+	spell.blocked_by = [&"abilities", &"spells"]
+	var silenced: StatusData = blocking(&"spells")
 	statuses.add(silenced)
 	assert_eq(abilities.why_not(spell), &"blocked")
 	assert_true(abilities.can_use(mend()), "other abilities still work")
 	statuses.remove(silenced)
+	var dazed: StatusData = blocking(&"abilities")
+	statuses.add(dazed)
+	assert_eq(abilities.why_not(mend()), &"blocked", "every ability answers to abilities")
+	statuses.remove(dazed)
 	assert_true(abilities.use(spell))
 
 
@@ -178,9 +182,8 @@ func test_damage_can_interrupt_a_cast() -> void:
 func test_a_blocking_status_interrupts_a_cast() -> void:
 	var spell: AbilityData = mend()
 	spell.cast_time = 1.0
-	spell.blocked_by_tags = [&"silenced"]
 	abilities.use(spell)
-	statuses.add(tagged(&"silenced"))
+	statuses.add(blocking(&"abilities"))
 	abilities._process(0.1)
 	assert_null(abilities.casting)
 	abilities.use(mend(0.0))
@@ -188,7 +191,7 @@ func test_a_blocking_status_interrupts_a_cast() -> void:
 	var long: AbilityData = mend()
 	long.cast_time = 1.0
 	abilities.use(long)
-	statuses.add(tagged(&"stunned"))
+	statuses.add(blocking(&"everything"))
 	abilities._process(0.1)
 	assert_null(abilities.casting, "so does a stun")
 

@@ -52,7 +52,7 @@ func test_a_conditional_modifier_follows_its_condition() -> void:
 	var host: Node3D = make_host([], { &"speed": 10.0 })
 	var manager := ComponentManager.of(host)
 	var health := Component.of(host, Health) as Health
-	var hurt := HealthBelowCondition.new()
+	var hurt := PoolBelowCondition.new()
 	hurt.fraction = 0.5
 	var adrenaline: StatModifier = modifier(&"speed", 0.0, 0.5)
 	adrenaline.conditions = [hurt]
@@ -183,4 +183,59 @@ func test_pools_are_found_by_name() -> void:
 	assert_eq(Pool.named(host, &"stamina"), stamina)
 	assert_null(Pool.named(host, &"rage"))
 	assert_null(Pool.named(null, &"mana"), "safe on anything")
-	assert_eq(ComponentManager.of(host).find_all(Pool), [mana, stamina] as Array[Component])
+	var health := Component.of(host, Health) as Health
+	assert_eq(Pool.named(host, &"health"), health, "health is the pool named health")
+	assert_eq(ComponentManager.of(host).find_all(Pool),
+			[health, mana, stamina] as Array[Component])
+
+
+func test_health_is_a_pool() -> void:
+	var host: Node3D = make_host()
+	var manager := ComponentManager.of(host)
+	var health := Component.of(host, Health) as Health
+	assert_eq(health.pool, &"health")
+	assert_eq(manager.stat(&"max_health"), 100.0, "its stats are named like any pool's")
+	manager.add_modifier(modifier(&"health_regen", 10.0))
+	health.change(-50.0)
+	health._process(1.0)
+	assert_eq(health.current, 60.0, "so health_regen works with no extra code")
+	var blood_magic := AbilityData.new()
+	blood_magic.costs = { &"health": 25.0 }
+	var abilities := Abilities.new()
+	host.add_child(Brain.new())
+	host.add_child(abilities)
+	assert_true(abilities.use(blood_magic), "and an ability can cost health")
+	assert_eq(health.current, 35.0)
+	var share := PoolAmount.new()
+	share.part = PoolAmount.Part.MISSING
+	share.fraction = 1.0
+	assert_eq(share.value(EffectContext.new(host, host)), 65.0)
+	var low := PoolBelowCondition.new()
+	low.fraction = 0.5
+	assert_true(low.check(EffectContext.new(host, host)))
+
+
+func test_a_pool_gives_a_status_while_it_is_empty() -> void:
+	var exhausted := StatusData.new()
+	exhausted.blocks = [&"movement"]
+	var stamina := Pool.new()
+	stamina.pool = &"stamina"
+	stamina.status_while_empty = exhausted
+	var host: Node3D = make_host([stamina])
+	var statuses := Component.of(host, Statuses) as Statuses
+	assert_false(statuses.active.has(exhausted))
+	stamina.change(-100.0)
+	assert_true(statuses.active.has(exhausted), "given when the pool runs out")
+	assert_true(ComponentManager.blocked(host, &"movement"))
+	stamina.change(1.0)
+	assert_false(statuses.active.has(exhausted), "and taken back when it has something again")
+	var low := PoolBelowCondition.new()
+	low.pool = &"stamina"
+	low.fraction = 0.1
+	assert_true(low.check(EffectContext.new(host, host)), "conditions read any pool")
+	var rage := Pool.new()
+	rage.pool = &"rage"
+	rage.starts_full = false
+	rage.status_while_empty = exhausted
+	host.add_child(rage)
+	assert_true(statuses.active.has(exhausted), "a pool that starts empty gives it at once")

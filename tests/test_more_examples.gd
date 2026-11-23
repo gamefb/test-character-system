@@ -1,8 +1,8 @@
 extends GutTest
-## More of the files in character_system/examples: stuns, combat passives, gear with numbers,
+## More of the files in character_system/starter_pack: stuns, combat passives, gear with numbers,
 ## consumables, and a mage that casts.
 
-const EX := "res://character_system/examples/"
+const EX := "res://character_system/starter_pack/"
 
 
 func ex(path: String) -> Resource:

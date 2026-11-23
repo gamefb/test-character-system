@@ -1,10 +1,10 @@
 extends GutTest
 ## The pieces the Extending page builds on: radius targeting, the hostility condition, scene
-## spawning and melee swings, and the example Stamina, Scope, AttackNearest, HUD, GlideMove and
+## spawning and melee swings, and the example Sprint, Scope, AttackNearest, HUD, GlideMove and
 ## WallSlideMode scripts.
 
-const EX := "res://character_system/examples/"
-const HUD := preload("res://character_system/examples/scripts/character_hud.gd")
+const EX := "res://character_system/starter_pack/"
+const HUD := preload("res://character_system/starter_pack/scripts/character_hud.gd")
 
 
 func make_character(position := Vector3.ZERO, extra: Array[Node] = []) -> CharacterBody3D:
@@ -128,9 +128,12 @@ func test_melee_sweep_hits_what_is_in_front() -> void:
 	assert_eq((Component.of(swinger, Health) as Health).current, 100.0, "never the wielder")
 
 
-func test_stamina_speeds_up_while_held_and_cleans_up() -> void:
-	var stamina := Stamina.new()
-	var runner: CharacterBody3D = make_character(Vector3.ZERO, [Brain.new(), walker(), stamina])
+func test_sprint_spends_a_pool_while_held_and_cleans_up() -> void:
+	var stamina := Pool.new()
+	stamina.pool = &"stamina"
+	var sprint := Sprint.new()
+	var runner: CharacterBody3D = make_character(Vector3.ZERO,
+			[Brain.new(), walker(), stamina, sprint])
 	var manager := ComponentManager.of(runner)
 	var brain := Component.of(runner, Brain) as Brain
 	brain.press(&"sprint")
@@ -143,9 +146,15 @@ func test_stamina_speeds_up_while_held_and_cleans_up() -> void:
 	assert_eq(manager.stat(&"move_speed"), 5.0)
 	brain.press(&"sprint")
 	await get_tree().process_frame
-	runner.remove_child(stamina)
+	runner.remove_child(sprint)
 	assert_eq(manager.stat(&"move_speed"), 5.0, "removing it mid-sprint leaves no boost")
-	stamina.free()
+	sprint.free()
+	stamina.change(-1000.0)
+	runner.add_child(Sprint.new())
+	brain.press(&"sprint")
+	for i in 3:
+		await get_tree().process_frame
+	assert_eq(manager.stat(&"move_speed"), 5.0, "an empty pool: no sprint")
 
 
 func test_scope_slows_the_wielder_only_while_aiming() -> void:

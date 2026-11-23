@@ -1,0 +1,56 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_y7lar"]
+[ext_resource type="Script" path="res://character_system/character/items/trigger.gd" id="2_g8stb"]
+[ext_resource type="Script" path="res://character_system/character/items/magazine.gd" id="3_lfjxt"]
+[ext_resource type="Resource" path="res://character_system/starter_pack/items/rifle_ammo.tres" id="4_jmbir"]
+[ext_resource type="Script" path="res://character_system/character/items/hitscan.gd" id="5_vp7uw"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="6_62noy"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="7_4k3qv"]
+[ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="8_32my3"]
+[ext_resource type="Script" path="res://character_system/core/conditions/has_tag_condition.gd" id="9_tep5a"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jc7gx"]
+albedo_color = Color(0.25, 0.25, 0.25, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bl8ck"]
+material = SubResource("StandardMaterial3D_jc7gx")
+size = Vector3(0.1, 0.1, 0.7)
+
+[sub_resource type="Resource" id="Resource_uaj3g"]
+script = ExtResource("8_32my3")
+amount = 10.0
+type = &"physical"
+conditions = Array[ExtResource("7_4k3qv")]([])
+
+[sub_resource type="Resource" id="Resource_2cm04"]
+script = ExtResource("9_tep5a")
+tag = &"wet"
+subject = 0
+negate = false
+
+[sub_resource type="Resource" id="Resource_vm11p"]
+script = ExtResource("8_32my3")
+amount = 5.0
+type = &"physical"
+conditions = Array[ExtResource("7_4k3qv")]([SubResource("Resource_2cm04")])
+
+[node name="Rifle" type="Node3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_bl8ck")
+
+[node name="ComponentManager" type="Node" parent="."]
+script = ExtResource("1_y7lar")
+
+[node name="Trigger" type="Node" parent="."]
+script = ExtResource("2_g8stb")
+
+[node name="Magazine" type="Node" parent="."]
+script = ExtResource("3_lfjxt")
+ammo = ExtResource("4_jmbir")
+capacity = 12
+
+[node name="Hitscan" type="Node" parent="."]
+script = ExtResource("5_vp7uw")
+effects = Array[ExtResource("6_62noy")]([SubResource("Resource_uaj3g"), SubResource("Resource_vm11p")])

@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://character_system/kit/characters/hurtbox.gd" id="1_a5afc"]
+[ext_resource type="Script" path="res://character_system/character/combat/hurtbox.gd" id="1_a5afc"]
 [ext_resource type="Script" path="res://immunity_test/scripts/nameplate.gd" id="2_d6dww"]
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="3_gpgxw"]
 [ext_resource type="Script" path="res://character_system/core/statuses/statuses.gd" id="4_jrn1p"]
@@ -66,4 +66,4 @@ script = ExtResource("4_jrn1p")
 
 [node name="Health" type="Node" parent="." unique_id=1438737915]
 script = ExtResource("5_6dbe3")
-max_health = 200.0
+max_value = 200.0

@@ -193,17 +193,17 @@ func test_statuses_block_modes_and_moves() -> void:
 	var air := _part(body, AirMode) as AirMode
 	var dash := _part(body, DashMove) as DashMove
 	var statuses := Component.of(body, Statuses) as Statuses
-	dash.blocked_by_tags = [&"rooted"]
-	air.blocked_by_tags = [&"grounded"]
-	var rooted: StatusData = load("res://character_system/examples/statuses/rooted.tres")
-	var grounded := _tagged(&"grounded")
+	air.blocked_by = [&"flight"]
+	var rooted: StatusData = load("res://character_system/starter_pack/statuses/rooted.tres")
+	var grounded := StatusData.new()
+	grounded.blocks = [&"flight"]
 	await _land(body)
 
 	statuses.add(rooted)
 	await _tap(body, &"dash")
-	assert_false(dash.active, "Rooted stops a dash with rooted in its tags")
+	assert_false(dash.active, "Rooted blocks movement, which stops a dash")
 	await _tap(body, &"jump")
-	assert_is(motor.mode, WalkMode, "and the example status cancels jumps through jump_velocity")
+	assert_is(motor.mode, WalkMode, "and a jump")
 	statuses.remove(rooted)
 	await _tap(body, &"dash")
 	assert_true(dash.active, "Once it's gone, the dash works")
@@ -374,14 +374,6 @@ func _check_jumps(air_first: bool) -> void:
 	assert_is(motor.mode, WalkMode, "Landing goes back to walking")
 	await _tap(body, &"jump")
 	assert_eq(air.jumps_left, 1, "and the next take-off refills the air jump")
-
-
-## A status with [param tag] that lasts until removed.
-func _tagged(tag: StringName) -> StatusData:
-	var data := StatusData.new()
-	data.id = tag
-	data.tags = [tag]
-	return data
 
 
 ## Records the events its host receives.

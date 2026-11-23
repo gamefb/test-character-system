@@ -3,7 +3,7 @@
 Quick start
 ===========
 
-This page builds a small level in about fifteen minutes, with no code: a player with a rifle, a training dummy to shoot and a fire patch to walk into. Everything it uses ships in ``character_system/examples/``. ``tests/test_quick_start.gd`` builds the same level and checks it plays as described here.
+This page builds a small level in about fifteen minutes, with no code: a player with a rifle, a training dummy to shoot and a fire patch to walk into. Everything it uses ships in ``character_system/starter_pack/``. ``tests/test_quick_start.gd`` builds the same level and checks it plays as described here.
 
 1. Add the input actions
 ------------------------
@@ -62,7 +62,7 @@ Set two things in the Inspector:
   ``../Camera3D/Hand``. The key is the slot the rifle goes in, and the path starts from the
   Equipment node.
 - **Inventory > Items:** add two elements, each a new ItemInstance. Set the first one's Data to
-  ``examples/items/rifle.tres``. Set the second one's Data to ``examples/items/rifle_ammo.tres``
+  ``starter_pack/items/rifle.tres``. Set the second one's Data to ``starter_pack/items/rifle_ammo.tres``
   and its Count to 30.
 
 When the game starts, WeaponSwitch draws the rifle, because the hands are empty and the Inventory holds a weapon.
@@ -75,7 +75,7 @@ Add another **CharacterBody3D** named Dummy at (0, 0, -6), six metres in front o
 5. Add a fire patch
 -------------------
 
-Drag ``character_system/examples/zones/fire_patch.tscn`` from the FileSystem dock into the scene, as a child of Level, and set its position to (4, 0, 0).
+Drag ``character_system/starter_pack/zones/fire_patch.tscn`` from the FileSystem dock into the scene, as a child of Level, and set its position to (4, 0, 0).
 
 6. Play
 -------

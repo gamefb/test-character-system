@@ -15,11 +15,11 @@ minutes.
 
 | Folder | What it is |
 | --- | --- |
-| `character_system/core/` | The rules everything shares, in 20 scripts: components, stats, events, effects, health and statuses. It loads on its own. |
-| `character_system/kit/` | The features built on the core: brains, movement, pools, abilities, items, weapons, projectiles and zones. Keep what you use. |
-| `character_system/examples/` | Statuses, items, abilities and scripts to copy. Start with `character_system/RECIPES.md`. |
+| `character_system/core/` | The rules everything shares, in 21 scripts: components, stats, events, effects, pools, health and statuses. It loads on its own. |
+| `character_system/character/` | What a character and its gear are assembled from: brains, movement, abilities, inventory, weapon parts, zones and projectiles. Keep what you use. |
+| `character_system/starter_pack/` | Ready-made statuses, items, abilities and zones to copy. Start with `character_system/RECIPES.md`. |
 | `addons/character_system_warnings/` | Editor plugin that warns about mistyped stat, event and tag names. |
-| `tests/` | GUT unit tests (216 tests), and `benchmark.gd`. |
+| `tests/` | GUT unit tests (221 tests), and `benchmark.gd`. |
 | `test_level/` | A playable level with every part of the system in it, and a self-test that plays it. |
 | `immunity_test/` | A scripted scene that runs 43 checks on immunities, zones and items. |
 | `docs/` | The documentation site (Sphinx). |
@@ -35,7 +35,7 @@ godot --headless --fixed-fps 60 res://immunity_test/immunity_test.tscn
 godot --headless --fixed-fps 60 res://test_level/test_level.tscn -- --self-test
 ```
 
-GitHub Actions runs all three, the linter and a check that `core/` loads on its own, on every
+GitHub Actions runs all three, the linter and a check that each layer loads without the ones built on it, on every
 pull request (`.github/workflows/tests.yml`).
 
 ## Building the docs

@@ -27,7 +27,7 @@ extends Resource
 @export var percent: float = 0.0
 ## Multiplies the total. 1.5 = +50%, 0 = none at all.
 @export var mul: float = 1.0
-## The modifier only counts while all of these pass, e.g. a [HealthBelowCondition] for "faster
+## The modifier only counts while all of these pass, e.g. a [PoolBelowCondition] for "faster
 ## while badly hurt". They're checked on the character that has the modifier, each time the
 ## stat is read. [signal ComponentManager.stat_changed] isn't emitted when one flips, so UI
 ## that shows such a stat should read it every frame.

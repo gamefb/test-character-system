@@ -73,8 +73,6 @@ func describe(character: Node) -> String:
 	var pools: PackedStringArray = []
 	for p: Pool in ComponentManager.of(character).find_all(Pool):
 		pools.append("%s %d/%d" % [String(p.pool).capitalize(), p.current, p.maximum()])
-	var stamina := Component.of(character, Stamina) as Stamina
-	pools.append("Stamina %d/%d" % [stamina.current, stamina.stat(&"max_stamina")])
 	lines.append("   ".join(pools))
 	var weapon: ItemInstance = (Component.of(character, WeaponSwitch) as WeaponSwitch).current()
 	lines.append("Weapon: %s" % (weapon.data.display_name if weapon else "none"))

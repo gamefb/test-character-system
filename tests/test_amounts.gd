@@ -100,13 +100,13 @@ func test_a_share_of_health() -> void:
 	var target: Node3D = make_host()
 	health_of(target).change(-60.0)
 	var ctx := EffectContext.new(null, target)
-	var share := HealthAmount.new()
+	var share := PoolAmount.new()
 	share.fraction = 0.5
-	share.part = HealthAmount.Part.MAXIMUM
+	share.part = PoolAmount.Part.MAXIMUM
 	assert_eq(share.value(ctx), 50.0)
-	share.part = HealthAmount.Part.CURRENT
+	share.part = PoolAmount.Part.CURRENT
 	assert_eq(share.value(ctx), 20.0)
-	share.part = HealthAmount.Part.MISSING
+	share.part = PoolAmount.Part.MISSING
 	assert_eq(share.value(ctx), 30.0)
 	assert_eq(share.value(EffectContext.new(null, autofree(Node.new()))), 0.0, "no Health: 0")
 	var mend := HealEffect.new()

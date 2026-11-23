@@ -19,7 +19,7 @@ extends Resource
 ##
 ## Set [member subject] to check whoever caused it instead ("only rangers can apply this"),
 ## and [member negate] to flip the result. The built-in ones are [HasTagCondition],
-## [StatCondition], [HealthBelowCondition] and [IsHostileCondition].
+## [StatCondition], [PoolBelowCondition] and [IsHostileCondition].
 ##
 ## A check that needs both sides, such as "the source is hostile to the target", overrides
 ## [method check] instead and reads [member EffectContext.source] and

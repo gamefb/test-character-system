@@ -4,8 +4,8 @@ extends Node
 ## [codeblock lang=text]
 ## godot --headless --fixed-fps 60 res://test_level/test_level.tscn -- --self-test
 ## [/codeblock]
-## It first checks that the level uses every class and every example in
-## [code]character_system/[/code], so a new part can't be left out of the level unnoticed.
+## It first checks that the level uses every class in [code]character_system/[/code] and
+## every file in the starter pack, so a new part can't be left out of the level unnoticed.
 
 ## Classes that can't be placed in a level.
 const NOT_CONTENT: Array[StringName] = [&"EffectContext", &"WorldEvents", &"NameCheck"]
@@ -47,7 +47,7 @@ func _check_coverage() -> void:
 			unused.append(entry["class"])
 	check(unused.is_empty(), "the level uses every class: %s" % ", ".join(unused))
 	var missing: PackedStringArray = []
-	var folders: Array[String] = [SYSTEM + "examples"]
+	var folders: Array[String] = [SYSTEM + "starter_pack"]
 	while not folders.is_empty():
 		var folder: String = folders.pop_back()
 		for name: String in DirAccess.get_directories_at(folder):
@@ -55,7 +55,7 @@ func _check_coverage() -> void:
 		for name: String in DirAccess.get_files_at(folder):
 			if name.get_extension() in ["tres", "tscn"] and not _files.has(folder.path_join(name)):
 				missing.append(name)
-	check(missing.is_empty(), "the level uses every example: %s" % ", ".join(missing))
+	check(missing.is_empty(), "the level uses all of the starter pack: %s" % ", ".join(missing))
 
 
 func _check_pickups() -> void:

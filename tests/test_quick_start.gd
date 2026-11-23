@@ -3,7 +3,7 @@ extends GutTest
 ## the rifle is drawn at start, a click hits the dummy for 10, and the fire patch burns.
 
 const MOVES: Array[StringName] = [&"left", &"right", &"forward", &"back"]
-const EX := "res://character_system/examples/"
+const EX := "res://character_system/starter_pack/"
 
 var added: Array[StringName] = []
 

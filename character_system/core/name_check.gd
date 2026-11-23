@@ -16,8 +16,10 @@ extends RefCounted
 ## [method ComponentManager.notify] or [method ComponentManager.send], and the ones the
 ## [CharacterMotor] sends for each mode and move with a [code]class_name[/code], such as
 ## [code]walk_mode_entered[/code],
+## [br]- names in [member StatusData.blocks] against the Blocked By lists of your saved
+## abilities, triggers and motors, and the other way round,
 ## [br]- tags in [member StatusData.immune_to], [member StatusData.removes_tags],
-## [member AbilityData.blocked_by_tags], [HasTagCondition] and [RemoveStatusEffect] against
+## [HasTagCondition] and [RemoveStatusEffect] against
 ## the tags your saved statuses have.
 ## [br]The editor shows the results above the Inspector (enable the Character System Warnings
 ## plugin) and as warnings on [Statuses], [Grants],
@@ -35,12 +37,17 @@ extends RefCounted
 ## its files change; otherwise at most every 30 seconds.
 
 const _RESCAN_MS := 30000  # How long scan results are reused if nothing says files changed.
+# The names the system's own scripts answer to. See StatusData.blocks.
+const _BUILT_IN_BLOCKS: Array[String] = ["everything", "movement", "abilities", "weapons",
+		"damage", "healing", "targeting"]
 
 static var _scanned_at: int = -_RESCAN_MS
 static var _stats := PackedStringArray()
 static var _events := PackedStringArray()
 static var _tags := PackedStringArray()
 static var _pools := PackedStringArray()
+static var _blockable := PackedStringArray()  # Names something answers to in a Blocked By list.
+static var _blocking := PackedStringArray()  # Names some status has in its Blocks.
 
 
 ## Problems in [param object] and the resources stored inside it, as messages.
@@ -117,16 +124,20 @@ static func _check(object: Object, out: PackedStringArray, is_root: bool) -> voi
 	if object.get(&"bonus_stat"):
 		_check_name(object.get(&"bonus_stat"), _stats, "stat",
 				"Bonus Stat: no component has a stat called '%s'.", out, true)
-	if object is Effect and &"pool" in object:
+	if &"pool" in object:
 		_check_name(object.get(&"pool"), _pools, "pool",
 				"No Pool in a saved scene is called '%s'.", out)
 	if object is Resource and &"costs" in object:
 		for pool_name in object.get(&"costs"):
 			_check_name(pool_name, _pools, "pool",
 					"Costs: no Pool in a saved scene is called '%s'.", out)
-	if object is Resource and &"blocked_by_tags" in object:
-		for tag in object.get(&"blocked_by_tags"):
-			_check_name(tag, _tags, "tag", "Blocked By Tags: no status has the tag '%s'.", out)
+	if object is Resource and &"blocked_by" in object:
+		for what in object.get(&"blocked_by"):
+			_check_name(what, _blocking, "name", "Blocked By: no status blocks '%s'.", out)
+	if object is StatusData:
+		for what in object.get(&"blocks"):
+			_check_name(what, _blockable, "name",
+					"Blocks: nothing answers to '%s' in its Blocked By list.", out)
 	if object is RemoveStatusEffect and object.get(&"tag"):
 		_check_name(object.get(&"tag"), _tags, "tag", "No status has the tag '%s'.", out)
 	if object is StatusTrigger:
@@ -206,6 +217,13 @@ static func _scan() -> void:
 	var pool_line := RegEx.create_from_string("(?m)^pool = &\"(\\w+)\"")
 	var send := RegEx.create_from_string("(?:send|notify)\\s*\\((?:[^,()]*,\\s*)?&?\"(\\w+)\"")
 	var tag_line := RegEx.create_from_string("(?m)^tags = Array\\[StringName\\]\\(\\[(.*)\\]\\)")
+	var blocks_line := RegEx.create_from_string(
+			"(?m)^(blocks|blocked_by) = Array\\[StringName\\]\\(\\[(.*)\\]\\)")
+	var blockable := {}
+	var blocking := {}
+	for built_in in _BUILT_IN_BLOCKS:
+		blockable[built_in] = true
+		blocking[built_in] = true
 	var name := RegEx.create_from_string("\"(\\w+)\"")
 	for path in _files("res://"):
 		var text: String = FileAccess.get_file_as_string(path)
@@ -219,10 +237,15 @@ static func _scan() -> void:
 			for block in listed.search_all(text):
 				for m in name.search_all(block.get_string(1)):
 					stats[m.get_string(1)] = true
+			for line in blocks_line.search_all(text):
+				for m in name.search_all(line.get_string(2)):
+					(blocking if line.get_string(1) == "blocks" else blockable)[m.get_string(1)] = true
 			for m in pool_line.search_all(text):
 				pools[m.get_string(1)] = true
 			if text.contains("/pool.gd\""):
 				pools["mana"] = true  # The default name isn't saved in the scene.
+			if text.contains("/health.gd\""):
+				pools["health"] = true  # Health is the pool with that name.
 	for pool_name in pools:
 		stats["max_" + pool_name] = true
 		stats[pool_name + "_regen"] = true
@@ -232,6 +255,8 @@ static func _scan() -> void:
 	_events = PackedStringArray(events.keys())
 	_tags = PackedStringArray(tags.keys())
 	_pools = PackedStringArray(pools.keys())
+	_blockable = PackedStringArray(blockable.keys())
+	_blocking = PackedStringArray(blocking.keys())
 
 
 # Stat names in the _stats() of every script that extends Component.

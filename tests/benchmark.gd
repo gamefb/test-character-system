@@ -5,7 +5,7 @@ extends SceneTree
 ## [/codeblock]
 ## Each character has ten components and an equipped rifle, and walks across a floor.
 
-const EX := "res://character_system/examples/"
+const EX := "res://character_system/starter_pack/"
 const HITS := 20000
 
 
@@ -93,7 +93,7 @@ func micro() -> void:
 			func() -> void: ComponentManager.stat_of(a, &"move_speed"))
 	for who: Node in [a, b]:
 		# So nobody dies during the timing.
-		(Component.of(who, Health) as Health).max_health = 1e9
+		(Component.of(who, Health) as Health).max_value = 1e9
 		(Component.of(who, Health) as Health).revive()
 	var hit := DamageEffect.new()
 	hit.amount = 0.001

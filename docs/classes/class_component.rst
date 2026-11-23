@@ -10,7 +10,7 @@ Component
 
 **Inherits:** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`Abilities<class_Abilities>`, :ref:`AttackNearest<class_AttackNearest>`, :ref:`Brain<class_Brain>`, :ref:`CharacterMotor<class_CharacterMotor>`, :ref:`Equipment<class_Equipment>`, :ref:`Faction<class_Faction>`, :ref:`Health<class_Health>`, :ref:`Inventory<class_Inventory>`, :ref:`ItemComponent<class_ItemComponent>`, :ref:`MouseLook<class_MouseLook>`, :ref:`Pool<class_Pool>`, :ref:`Stamina<class_Stamina>`, :ref:`Statuses<class_Statuses>`, :ref:`WeaponSwitch<class_WeaponSwitch>`
+**Inherited By:** :ref:`Abilities<class_Abilities>`, :ref:`AttackNearest<class_AttackNearest>`, :ref:`Brain<class_Brain>`, :ref:`CharacterMotor<class_CharacterMotor>`, :ref:`Equipment<class_Equipment>`, :ref:`Faction<class_Faction>`, :ref:`Inventory<class_Inventory>`, :ref:`ItemComponent<class_ItemComponent>`, :ref:`MouseLook<class_MouseLook>`, :ref:`Pool<class_Pool>`, :ref:`Sprint<class_Sprint>`, :ref:`Statuses<class_Statuses>`, :ref:`WeaponSwitch<class_WeaponSwitch>`
 
 Base class for every component: a child node that adds one feature to its parent, the host.
 
@@ -53,7 +53,7 @@ If a component can't start, the editor shows a warning on it and the Output pane
     if health:
         health.change(-10.0)
 
-\ **Writing your own.** Extend this class and override any of :ref:`_requires()<class_Component_private_method__requires>`, :ref:`_stats()<class_Component_private_method__stats>`, :ref:`_start()<class_Component_private_method__start>`, :ref:`_stop()<class_Component_private_method__stop>` and :ref:`_warnings()<class_Component_private_method__warnings>`. Do setup in :ref:`_start()<class_Component_private_method__start>`, not ``_ready()``: it runs once everything is in place, and never in the editor. This outline shows where each part goes; :ref:`Stamina<class_Stamina>` in ``examples/scripts/`` is a complete one to copy.
+\ **Writing your own.** Extend this class and override any of :ref:`_requires()<class_Component_private_method__requires>`, :ref:`_stats()<class_Component_private_method__stats>`, :ref:`_start()<class_Component_private_method__start>`, :ref:`_stop()<class_Component_private_method__stop>` and :ref:`_warnings()<class_Component_private_method__warnings>`. Do setup in :ref:`_start()<class_Component_private_method__start>`, not ``_ready()``: it runs once everything is in place, and never in the editor. This outline shows where each part goes; :ref:`Sprint<class_Sprint>` in ``starter_pack/scripts/`` is a complete one to copy.
 
 
 

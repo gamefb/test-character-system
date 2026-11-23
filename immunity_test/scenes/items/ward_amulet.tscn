@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_vepig"]
-[ext_resource type="Script" path="res://character_system/kit/items/grants.gd" id="2_gwy3j"]
+[ext_resource type="Script" path="res://character_system/character/items/grants.gd" id="2_gwy3j"]
 [ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="3_micgc"]
 [ext_resource type="Resource" path="res://immunity_test/data/statuses/warded.tres" id="4_ihmp4"]
 

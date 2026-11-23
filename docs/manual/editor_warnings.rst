@@ -10,7 +10,7 @@ Stats, events, tags and pools are typed as text, so a typo such as ``move_sped``
 - **Tags:** the ones saved statuses have.
 - **Pools:** the names of the Pools in saved scenes.
 
-Each name in your data is checked against them: the stat of a :ref:`StatModifier<class_StatModifier>`, :ref:`StatCondition<class_StatCondition>`, :ref:`StatAmount<class_StatAmount>` or :ref:`ChanceCondition<class_ChanceCondition>`, a trigger's event, the tags a status is immune to or removes, an ability's costs and Blocked By Tags, and the pool of a :ref:`ChangePoolEffect<class_ChangePoolEffect>`. An unknown one gets a warning with the closest match, such as "Did you mean 'move_speed'?".
+Each name in your data is checked against them: the stat of a :ref:`StatModifier<class_StatModifier>`, :ref:`StatCondition<class_StatCondition>`, :ref:`StatAmount<class_StatAmount>` or :ref:`ChanceCondition<class_ChanceCondition>`, a trigger's event, the tags a status is immune to or removes, an ability's costs and Blocked By names, a status's Blocks, and the pool of a :ref:`ChangePoolEffect<class_ChangePoolEffect>`. An unknown one gets a warning with the closest match, such as "Did you mean 'move_speed'?".
 
 The warnings show in two places. :ref:`Statuses<class_Statuses>`, :ref:`Grants<class_Grants>`, :ref:`Abilities<class_Abilities>`, :ref:`Trigger<class_Trigger>`, :ref:`Hitscan<class_Hitscan>` and :ref:`MeleeSweep<class_MeleeSweep>` list them as node warnings in the Scene dock. The Character System Warnings add-on, enabled in Project Settings > Plugins, shows them above the Inspector for the resource being edited. Your own components can do the same by returning ``NameCheck.problems_in(...)`` from ``_warnings()``.
 
