@@ -19,7 +19,7 @@ Description
 
 Stats, events and tags are typed as text, so ``move_sped`` or ``took_damgae`` would otherwise do nothing without any error. This checks: 
 
-- stat names in :ref:`StatModifier<class_StatModifier>`, :ref:`StatCondition<class_StatCondition>`, :ref:`StatAmount<class_StatAmount>` and :ref:`ChanceCondition<class_ChanceCondition>` against the stats components and movement modes and moves declare in ``_stats()``, the ones listed on :ref:`Attributes<class_Attributes>` components in your scenes, and the two each :ref:`Pool<class_Pool>` adds (\ ``resist_<type>`` and ``bonus_<type>`` are always allowed), 
+- stat names in :ref:`StatModifier<class_StatModifier>`, :ref:`StatCondition<class_StatCondition>`, :ref:`StatAmount<class_StatAmount>` and :ref:`ChanceCondition<class_ChanceCondition>` against the stats components and movement modes and moves declare in ``_stats()``, the ones listed in :ref:`ComponentManager.stats<class_ComponentManager_property_stats>` in your scenes, and the two each :ref:`Pool<class_Pool>` adds (\ ``resist_<type>`` and ``bonus_<type>`` are always allowed), 
 
 - pool names in :ref:`ChangePoolEffect<class_ChangePoolEffect>` and :ref:`AbilityData.costs<class_AbilityData_property_costs>` against the :ref:`Pool<class_Pool>`\ s in your scenes, 
 
@@ -27,7 +27,7 @@ Stats, events and tags are typed as text, so ``move_sped`` or ``took_damgae`` wo
 
 - tags in :ref:`StatusData.immune_to<class_StatusData_property_immune_to>`, :ref:`StatusData.removes_tags<class_StatusData_property_removes_tags>`, :ref:`AbilityData.blocked_by_tags<class_AbilityData_property_blocked_by_tags>`, :ref:`HasTagCondition<class_HasTagCondition>` and :ref:`RemoveStatusEffect<class_RemoveStatusEffect>` against the tags your saved statuses have. 
 
-The editor shows the results above the Inspector (enable the Character System Warnings plugin) and as warnings on :ref:`Statuses<class_Statuses>`, :ref:`GrantStatuses<class_GrantStatuses>`, :ref:`GrantModifiers<class_GrantModifiers>`, :ref:`GrantAbilities<class_GrantAbilities>`, :ref:`Abilities<class_Abilities>`, :ref:`Hitscan<class_Hitscan>`, :ref:`MeleeSweep<class_MeleeSweep>` and :ref:`Launcher<class_Launcher>`.
+The editor shows the results above the Inspector (enable the Character System Warnings plugin) and as warnings on :ref:`Statuses<class_Statuses>`, :ref:`Grants<class_Grants>`, :ref:`Abilities<class_Abilities>`, :ref:`Hitscan<class_Hitscan>` and :ref:`MeleeSweep<class_MeleeSweep>`.
 
 To check the resources your own component holds, return the results from its :ref:`Component._warnings()<class_Component_private_method__warnings>` (the script needs ``@tool``):
 

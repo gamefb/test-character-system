@@ -35,9 +35,8 @@ func test_chance_runs_from_never_to_always() -> void:
 
 
 func test_a_stat_adds_to_the_chance() -> void:
-	var luck := Attributes.new()
-	luck.stats = { &"crit_chance": 1.0 }
-	var lucky: Node3D = make_host([luck])
+	var lucky: Node3D = make_host()
+	ComponentManager.of(lucky).stats = { &"crit_chance": 1.0 }
 	var plain: Node3D = make_host()
 	var roll := ChanceCondition.new()
 	roll.chance = 0.0
@@ -67,10 +66,10 @@ func test_any_condition_needs_only_one() -> void:
 
 
 func test_hit_conditions_read_the_hit_inside_and_outside_a_trigger() -> void:
-	var fire := DamageTypeCondition.new()
+	var fire := HitCondition.new()
 	fire.types = [&"fire", &"lightning"]
-	var headshot := HitTagCondition.new()
-	headshot.tag = &"head"
+	var headshot := HitCondition.new()
+	headshot.tags = [&"head"]
 	var hit := EffectContext.new()
 	hit.damage_type = &"lightning"
 	hit.tags = [&"head"]

@@ -5,7 +5,7 @@ Overview
 
 Every character, weapon and hazard in the game is a plain node with small component children, and every gameplay change passes through one effect pipeline. A player, a hostile AI and a friendly AI are the same scene with different components and data. A rifle and a magic ring are built the same way.
 
-The document targets Godot 4.4 or later with GDScript, because the code uses typed dictionaries. It covers three systems that share one foundation:
+The document targets Godot 4.8 with GDScript; the code uses typed dictionaries and ``@abstract`` classes, so it needs 4.5 at the least. The scripts come in two halves: ``core/`` is the system and loads on its own, and ``kit/`` is a set of ready-made parts built on it, such as brains, movement modes, weapons and projectiles, which you can keep, change or replace with your own. It covers three systems that share one foundation:
 
 -  **Characters**: stats, health, pools such as mana and shields, movement, input or AI, inventory, weapon switching, abilities and faction as separate components.
 -  **Equipment**: items whose behavior comes from their components, such as fire rate, magazine, hit detection, projectiles, stat bonuses and granted abilities.

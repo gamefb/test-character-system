@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://character_system/world/effect_zone.gd" id="1_0shf8"]
+[ext_resource type="Script" path="res://character_system/kit/world/effect_zone.gd" id="1_0shf8"]
 [ext_resource type="Resource" path="res://immunity_test/data/statuses/regenerating.tres" id="2_v5h18"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_yhk30"]

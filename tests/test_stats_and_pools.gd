@@ -2,18 +2,15 @@ extends GutTest
 ## Stats you list yourself, percentages, conditional modifiers, breakdowns, and pools.
 
 
-func make_host(parts: Array = []) -> Node3D:
+func make_host(parts: Array = [], stats: Dictionary[StringName, float] = {}) -> Node3D:
 	var host := Node3D.new()
-	for node: Node in [ComponentManager.new(), Health.new(), Statuses.new()] + parts:
+	var hub := ComponentManager.new()
+	hub.stats = stats
+	for node: Node in [hub, Health.new(), Statuses.new()] + parts:
 		host.add_child(node)
 	add_child_autofree(host)
 	return host
 
-
-func attributes(stats: Dictionary[StringName, float]) -> Attributes:
-	var a := Attributes.new()
-	a.stats = stats
-	return a
 
 
 func modifier(stat_name: StringName, add := 0.0, percent := 0.0, mul := 1.0) -> StatModifier:
@@ -25,20 +22,20 @@ func modifier(stat_name: StringName, add := 0.0, percent := 0.0, mul := 1.0) -> 
 	return m
 
 
-func test_attributes_own_the_stats_listed_on_them() -> void:
-	var host: Node3D = make_host([attributes({ &"strength": 10.0, &"level": 1.0 })])
+func test_the_manager_owns_the_stats_listed_on_it() -> void:
+	var host: Node3D = make_host([], { &"strength": 10.0, &"level": 1.0 })
 	var manager := ComponentManager.of(host)
 	assert_eq(manager.stat(&"strength"), 10.0)
 	watch_signals(manager)
-	(Component.of(host, Attributes) as Attributes).add_base(&"level", 1.0)
+	manager.add_base(&"level", 1.0)
 	assert_eq(manager.stat(&"level"), 2.0)
 	assert_signal_emitted_with_parameters(manager, "stat_changed", [&"level"])
-	(Component.of(host, Attributes) as Attributes).set_base(&"luck", 3.0)
+	manager.set_base(&"luck", 3.0)
 	assert_eq(manager.stat(&"luck"), 3.0, "a stat can be added during play")
 
 
 func test_percentages_add_up_before_multipliers() -> void:
-	var host: Node3D = make_host([attributes({ &"power": 10.0 })])
+	var host: Node3D = make_host([], { &"power": 10.0 })
 	var manager := ComponentManager.of(host)
 	for m: StatModifier in [
 		modifier(&"power", 2.0),
@@ -52,7 +49,7 @@ func test_percentages_add_up_before_multipliers() -> void:
 
 
 func test_a_conditional_modifier_follows_its_condition() -> void:
-	var host: Node3D = make_host([attributes({ &"speed": 10.0 })])
+	var host: Node3D = make_host([], { &"speed": 10.0 })
 	var manager := ComponentManager.of(host)
 	var health := Component.of(host, Health) as Health
 	var hurt := HealthBelowCondition.new()
@@ -68,7 +65,7 @@ func test_a_conditional_modifier_follows_its_condition() -> void:
 
 
 func test_a_condition_on_a_stat_can_read_that_stat() -> void:
-	var host: Node3D = make_host([attributes({ &"power": 10.0 })])
+	var host: Node3D = make_host([], { &"power": 10.0 })
 	var manager := ComponentManager.of(host)
 	var strong := StatCondition.new()
 	strong.stat = &"power"
@@ -80,7 +77,7 @@ func test_a_condition_on_a_stat_can_read_that_stat() -> void:
 
 
 func test_modifiers_of_explains_a_number() -> void:
-	var host: Node3D = make_host([attributes({ &"speed": 10.0 })])
+	var host: Node3D = make_host([], { &"speed": 10.0 })
 	var manager := ComponentManager.of(host)
 	var haste := StatusData.new()
 	haste.display_name = "Haste"

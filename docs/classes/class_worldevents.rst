@@ -10,27 +10,27 @@ WorldEvents
 
 **Inherits:** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-Hears an event from every host in the game: any death, any kill, any ability used.
+Every host's events in one place: any death, any kill, any ability used.
 
 .. rst-class:: classref-introduction-group
 
 Description
 -----------
 
-Every event a :ref:`ComponentManager<class_ComponentManager>` sends also arrives here, with the host it was sent to. Use it for things that watch the whole level rather than one character: experience for kills, quest counters, a kill feed, achievements, a director that spawns more enemies.
+Each event a :ref:`ComponentManager<class_ComponentManager>` sends is also emitted here, with the host it was sent to. Use it for things that watch the whole level rather than one character: experience for kills, quest counters, a kill feed, achievements, a director that spawns more enemies.
 
 ::
 
     func _ready() -> void:
-        WorldEvents.on(&"died", _on_anything_died)
+        WorldEvents.event(&"died").connect(_on_anything_died)
 
     func _on_anything_died(who: Node, ctx: EffectContext) -> void:
         if who.is_in_group(&"enemy") and ctx and ctx.source == player:
             experience += 25
 
-Nothing needs adding to the scene or the project settings. A listener whose object has been freed is dropped by itself, so a level script that passes one of its own methods never has to call :ref:`off()<class_WorldEvents_method_off>`. Listeners outlive a change of scene for as long as their object does. 
+Nothing needs adding to the scene or the project settings: the signals live on the scene tree's root. As with any signal, a connection ends by itself when the listener is freed. 
 
-To hear one character's events only, subscribe on its manager instead: :ref:`ComponentManager.subscribe()<class_ComponentManager_method_subscribe>`, or :ref:`Component.on()<class_Component_method_on>` from a component.
+To hear one character's events only, use its own signals: :ref:`ComponentManager.event()<class_ComponentManager_method_event>`, or :ref:`Component.on()<class_Component_method_on>` from a component.
 
 .. rst-class:: classref-reftable-group
 
@@ -40,17 +40,11 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                  | :ref:`on<class_WorldEvents_method_on>`\ (\ event\: :ref:`StringName<class_StringName>`, method\: :ref:`Callable<class_Callable>`\ ) |static|                                            |
-   +-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                  | :ref:`off<class_WorldEvents_method_off>`\ (\ event\: :ref:`StringName<class_StringName>`, method\: :ref:`Callable<class_Callable>`\ ) |static|                                          |
-   +-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                  | :ref:`emit<class_WorldEvents_method_emit>`\ (\ host\: :ref:`Node<class_Node>`, event\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>`\ ) |static| |
-   +-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`int<class_int>`   | :ref:`owner_of<class_WorldEvents_method_owner_of>`\ (\ method\: :ref:`Callable<class_Callable>`\ ) |static|                                                                             |
-   +-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`is_alive<class_WorldEvents_method_is_alive>`\ (\ method\: :ref:`Callable<class_Callable>`, owner\: :ref:`int<class_int>`\ ) |static|                                              |
-   +-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   +-----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Signal<class_Signal>` | :ref:`event<class_WorldEvents_method_event>`\ (\ event_name\: :ref:`StringName<class_StringName>`\ ) |static|                                                                                |
+   +-----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                      | :ref:`emit<class_WorldEvents_method_emit>`\ (\ host\: :ref:`Node<class_Node>`, event_name\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>`\ ) |static| |
+   +-----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -61,27 +55,13 @@ Methods
 Method Descriptions
 -------------------
 
-.. _class_WorldEvents_method_on:
+.. _class_WorldEvents_method_event:
 
 .. rst-class:: classref-method
 
-|void| **on**\ (\ event\: :ref:`StringName<class_StringName>`, method\: :ref:`Callable<class_Callable>`\ ) |static| :ref:`🔗<class_WorldEvents_method_on>`
+:ref:`Signal<class_Signal>` **event**\ (\ event_name\: :ref:`StringName<class_StringName>`\ ) |static| :ref:`🔗<class_WorldEvents_method_event>`
 
-Calls ``method`` each time ``event`` is sent to any host. The method takes the host and the event's :ref:`EffectContext<class_EffectContext>`, which is null for events sent without one: ``func(host: Node, ctx: EffectContext)``. Subscribing the same method twice does nothing. 
-
-Pass a method of the listening object where you can. A lambda that uses the object it was written in is dropped with that object too, but one that doesn't is never dropped: remove it with :ref:`off()<class_WorldEvents_method_off>`.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_WorldEvents_method_off:
-
-.. rst-class:: classref-method
-
-|void| **off**\ (\ event\: :ref:`StringName<class_StringName>`, method\: :ref:`Callable<class_Callable>`\ ) |static| :ref:`🔗<class_WorldEvents_method_off>`
-
-Stops ``method`` hearing ``event``.
+The signal for one event from every host, e.g. ``WorldEvents.event(&"died")``. Connect a method that takes the host and the event's :ref:`EffectContext<class_EffectContext>`, which is null for events sent without one: ``func(host: Node, ctx: EffectContext)``.
 
 .. rst-class:: classref-item-separator
 
@@ -91,33 +71,9 @@ Stops ``method`` hearing ``event``.
 
 .. rst-class:: classref-method
 
-|void| **emit**\ (\ host\: :ref:`Node<class_Node>`, event\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>`\ ) |static| :ref:`🔗<class_WorldEvents_method_emit>`
+|void| **emit**\ (\ host\: :ref:`Node<class_Node>`, event_name\: :ref:`StringName<class_StringName>`, ctx\: :ref:`EffectContext<class_EffectContext>`\ ) |static| :ref:`🔗<class_WorldEvents_method_emit>`
 
-Passes an event on to its listeners. :ref:`ComponentManager.send()<class_ComponentManager_method_send>` calls this; you don't need to.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_WorldEvents_method_owner_of:
-
-.. rst-class:: classref-method
-
-:ref:`int<class_int>` **owner_of**\ (\ method\: :ref:`Callable<class_Callable>`\ ) |static| :ref:`🔗<class_WorldEvents_method_owner_of>`
-
-The id of the object ``method`` belongs to: for a lambda, the object it was written in. Taken when a listener subscribes, so :ref:`is_alive()<class_WorldEvents_method_is_alive>` can tell later whether that object is still there. 0 if it has none.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_WorldEvents_method_is_alive:
-
-.. rst-class:: classref-method
-
-:ref:`bool<class_bool>` **is_alive**\ (\ method\: :ref:`Callable<class_Callable>`, owner\: :ref:`int<class_int>`\ ) |static| :ref:`🔗<class_WorldEvents_method_is_alive>`
-
-True if a listener can still be called: the object recorded by :ref:`owner_of()<class_WorldEvents_method_owner_of>` hasn't been freed.
+Emits an event for its listeners. :ref:`ComponentManager.send()<class_ComponentManager_method_send>` calls this; you don't need to.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_vepig"]
-[ext_resource type="Script" path="res://character_system/items/components/grant_statuses.gd" id="2_gwy3j"]
-[ext_resource type="Script" path="res://character_system/resources/statuses/status_data.gd" id="3_micgc"]
+[ext_resource type="Script" path="res://character_system/kit/items/grants.gd" id="2_gwy3j"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="3_micgc"]
 [ext_resource type="Resource" path="res://immunity_test/data/statuses/warded.tres" id="4_ihmp4"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_28grl"]
@@ -20,6 +20,6 @@ mesh = SubResource("BoxMesh_i2wgl")
 [node name="@Node@4" type="Node" parent="."]
 script = ExtResource("1_vepig")
 
-[node name="GrantStatuses" type="Node" parent="."]
+[node name="Grants" type="Node" parent="."]
 script = ExtResource("2_gwy3j")
 statuses = Array[ExtResource("3_micgc")]([ExtResource("4_ihmp4")])

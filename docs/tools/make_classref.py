@@ -33,7 +33,7 @@ ENGINE_DOCS = "https://docs.godotengine.org/en/stable/classes/"
 
 # Documented private methods that are meant to be overridden. Shown as "virtual".
 VIRTUALS = {
-    "Component": {"_requires", "_stats", "_start", "_stop", "_on_event", "_warnings"},
+    "Component": {"_requires", "_stats", "_start", "_stop", "_warnings"},
     "Condition": {"_test"},
     "Effect": {"_execute"},
     "MotorNode": {"_stats", "_enter", "_exit", "_physics_update"},
@@ -47,14 +47,7 @@ HIDDEN = {
 # Sections of the index, by the folder the script is in. The first match wins.
 GROUPS = [
     ("Core", "character_system/core/"),
-    ("Movement", "character_system/characters/motor/"),
-    ("Character components", "character_system/characters/"),
-    ("Item components", "character_system/items/"),
-    ("World", "character_system/world/"),
-    ("Effects", "character_system/resources/effects/"),
-    ("Conditions", "character_system/resources/conditions/"),
-    ("Amounts", "character_system/resources/amounts/"),
-    ("Resources", "character_system/resources/"),
+    ("Kit", "character_system/kit/"),
     ("Examples", "character_system/examples/"),
 ]
 
@@ -81,6 +74,9 @@ def clean_xml(src: Path, dst: Path) -> None:
             continue
         for element in list(parent.findall(item)):
             member = element.get("name", "")
+            if element.get("qualifiers") == "abstract":
+                # GDScript's @abstract; the reference calls such a method "required".
+                element.set("qualifiers", "required")
             if not member.startswith("_"):
                 continue
             description = (element.findtext("description") or element.text or "").strip()

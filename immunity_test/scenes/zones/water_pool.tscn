@@ -1,10 +1,10 @@
 [gd_scene load_steps=11 format=3]
 
-[ext_resource type="Script" path="res://character_system/world/effect_zone.gd" id="1_lku1b"]
+[ext_resource type="Script" path="res://character_system/kit/world/effect_zone.gd" id="1_lku1b"]
 [ext_resource type="Resource" path="res://immunity_test/data/statuses/soaked.tres" id="2_v3c6q"]
-[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_hcfgq"]
-[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="4_hsaif"]
-[ext_resource type="Script" path="res://character_system/resources/effects/apply_status_effect.gd" id="5_f6n68"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_hcfgq"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="4_hsaif"]
+[ext_resource type="Script" path="res://character_system/core/effects/apply_status_effect.gd" id="5_f6n68"]
 [ext_resource type="Resource" path="res://immunity_test/data/statuses/dripping.tres" id="6_7l473"]
 
 [sub_resource type="Resource" id="Resource_tb8d5"]

@@ -39,7 +39,7 @@ Every class below is described the same way:
 
 Where a function is marked *virtual*, the base class leaves it empty and subclasses override
 it. Signatures use GDScript 2 syntax, and the code uses typed dictionaries, so you need
-Godot 4.4 or later. Write the scripts in the style of the
+Godot 4.8 (4.5 at the least, for ``@abstract``). Write the scripts in the style of the
 `GDScript style guide <https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html>`__:
 ``class_name`` and ``extends`` on their own lines, then signals, enums, constants, exports,
 variables, and functions, with static types wherever the type isn't obvious.
@@ -172,15 +172,22 @@ scene. It is the hub: registry, stats and events.
    * - ``_cache``, ``_bases``
      - var
      - ``Dictionary[StringName, float]`` of computed stats, and of their base values.
-   * - ``_subscribers``
+   * - ``stats``
+     - export
+     - ``Dictionary[StringName, float]``: the game's own stats, such as ``strength``, listed
+       in the Inspector with no script.
+   * - ``_events``
      - var
-     - Event name to a list of ``[priority, Callable, owner id]``, highest priority first.
+     - Event name to the ``Signal`` that ``event()`` made for it.
    * - ``_found``
      - var
      - ``Dictionary[Script, Component]`` of ``find()`` answers.
    * - ``stat_changed(stat_name)``
      - signal
      - Emitted when a stat may have a new value.
+   * - ``event_sent(event_name, ctx)``
+     - signal
+     - Emitted for every event, before the event's own signal.
    * - ``of(node)``
      - static
      - Tries the child named ``ComponentManager``, then searches ``node``'s children.
@@ -203,12 +210,15 @@ scene. It is the hub: registry, stats and events.
      - True if a registered component is that type.
    * - ``send(event, ctx)``
      - func
-     - Calls the subscribers with a priority above 0, then ``_on_event`` on every *running*
-       component, then the other subscribers, then ``WorldEvents.emit``.
-   * - ``subscribe(event, method, priority = 0)`` / ``unsubscribe(event, method)``
+     - Emits ``event_sent``, then the event's own signal if anyone asked for it, then calls
+       ``WorldEvents.emit``.
+   * - ``event(name)``
      - func
-     - Add or remove one listener for one event. A listener whose object was freed is
-       dropped when the event is next sent.
+     - The ``Signal`` for one event, made on first use with ``add_user_signal()``. Listeners
+       ``connect()`` to it, and the engine drops them when they are freed.
+   * - ``set_base(name, value)`` / ``add_base(name, amount)``
+     - func
+     - Change an entry of ``stats`` during play, such as ``level``.
    * - ``stat(name)``
      - func
      - ``(base + Σadd) × (1 + Σpercent) × Πmul``, cached unless one of the stat's modifiers
@@ -311,10 +321,9 @@ everything else is plumbing.
    * - ``listen(signal, callable)``
      - func
      - Connects and records it, so ``_halt()`` can undo it.
-   * - ``on(event, method, priority = 0, node = null)``
+   * - ``on(event, method, node = null)``
      - func
-     - Subscribes ``method`` to one event on this host's manager, or on ``node``'s, and
-       records it, so ``_halt()`` can undo it.
+     - ``listen()`` on one event's signal, from this host's manager or from ``node``'s.
    * - ``update_stats()``
      - func
      - Call after changing a value ``_stats()`` reads.
@@ -330,9 +339,6 @@ everything else is plumbing.
    * - ``_start()`` / ``_stop()``
      - virtual
      - Set up and tear down.
-   * - ``_on_event(event, ctx)``
-     - virtual
-     - Sees every event. Most components use ``on()`` for the one or two they want.
    * - ``_warnings()``
      - virtual
      - Extra editor warnings, e.g. an export that must be set.
@@ -355,16 +361,14 @@ death, any kill. Experience, quests and kill feeds listen here instead of to eac
    * - Member
      - Kind
      - Purpose
-   * - ``on(event, method)`` / ``off(event, method)``
+   * - ``event(name)``
      - static
-     - Add or remove a listener. It's called with the host and the context.
+     - The ``Signal`` for one event of every host, made on first use as a user signal on the
+       scene tree's root. Its listeners are called with the host and the context.
    * - ``emit(host, event, ctx)``
      - static
-     - Called at the end of ``ComponentManager.send()``.
-   * - ``owner_of(method)`` / ``is_alive(method, owner)``
-     - static
-     - The id of a listener's object, taken when it subscribes, and whether that object
-       still exists.
+     - Called at the end of ``ComponentManager.send()``. Does nothing for an event nobody
+       has asked for.
 
 Watch out for
 ~~~~~~~~~~~~~
@@ -383,12 +387,16 @@ Watch out for
 - **Remember lookups, and forget them when children change.** Components call ``find()`` every
   frame. Scanning the children each time costs a list copy per call; a dictionary that's
   cleared on ``child_order_changed`` costs one lookup.
+- **Let the engine's signals do the listening.** An event is a user signal, so connecting,
+  disconnecting, one-shot connections, ``await`` and dropping freed listeners all come free.
+  Prefix the signal's name (``event_died``), so an event can share its name with a signal a
+  ``Node`` already has, such as ``ready``.
 - **Keep global listeners on the scene tree's root, not in a static variable.** WorldEvents
-  stores them as metadata on the root window, so they are freed with the game. Callables left
-  in a static variable when the game quits can crash on exit.
-- **Record who owns a listener when it subscribes.** A lambda still looks valid after the
-  object it was written in is freed, so asking the Callable later isn't enough. Keep the
-  object's instance id beside it and check ``is_instance_id_valid()`` before each call.
+  adds its signals to the root window, so they are freed with the game. Callables left in a
+  static variable when the game quits can crash on exit.
+- **Mark base classes** ``@abstract``. ``Component``, and later ``Effect``, ``Condition`` and
+  the other base classes, can then not be added or created by mistake, and a subclass that
+  forgets a method marked ``@abstract`` is an error in the editor.
 - **A conditional stat can read itself.** A condition on a ``power`` modifier may test
   ``power``. Mark a stat as being worked out, and return its base value to any read that
   arrives meanwhile.
@@ -398,8 +406,8 @@ Test
 
 Make two dummy components where B requires A. Add A after B and check that B starts. Remove A
 and check that B stops. Add a modifier with ``add = 2, mul = 1.5`` to a base of 10 and check you
-get 18. Subscribe three methods to one event with priorities 10, 0 and -10 and check they hear
-it in that order.
+get 18. Connect a method to ``event(&"ping")``, send ``ping`` and check it was called; free the
+listener, send it again and check nothing breaks.
 
 Stage 2: First real components
 ------------------------------
@@ -421,10 +429,6 @@ stats of its own, and knows its team. All extend ``Component``.
        ``is_dead()``, ``change(amount, ctx)``, ``revive(amount)``; clamp ``current`` when
        ``max_health`` drops. On death, send ``died`` to the host and ``killed`` to
        ``ctx.source``; ``revive()`` sends ``revived``
-   * - ``Attributes``
-     - ``stats: Dictionary[StringName, float]``
-     - ``_stats()`` returns the dictionary, so a game's own stats need no script;
-       ``set_base(name, value)``, ``add_base(name, amount)``
    * - ``Pool``
      - ``pool`` (its name), ``max_value``, ``regen``, ``regen_delay``, ``starts_full``,
        ``absorbs_damage``, ``absorbed_types``, ``current``; signals
@@ -485,15 +489,15 @@ stats of its own, and knows its team. All extend ``Component``.
 
 How a brain remembers presses, modelled on Godot's ``Input``:
 
-.. literalinclude:: ../../character_system/characters/brains/_base/brain.gd
+.. literalinclude:: ../../character_system/core/characters/brain.gd
    :language: gdscript
-   :caption: character_system/characters/brains/_base/brain.gd (variables)
+   :caption: character_system/core/characters/brain.gd (variables)
    :start-at: var _pressed_on
    :end-at: var _held
 
-.. literalinclude:: ../../character_system/characters/brains/_base/brain.gd
+.. literalinclude:: ../../character_system/core/characters/brain.gd
    :language: gdscript
-   :caption: character_system/characters/brains/_base/brain.gd (functions)
+   :caption: character_system/core/characters/brain.gd (functions)
    :start-at: func press(
 
 Watch out for
@@ -508,7 +512,8 @@ Watch out for
   the motor, weapons and abilities all stop without knowing why. ``Statuses`` doesn't exist
   until stage 4; ``is_blocked()`` finds it with ``find()`` and copes with it being absent.
 - **A shield is a pool that listens.** ``Pool`` needs no special case in the damage code: it
-  subscribes to ``absorbing_damage`` with a low priority and lowers ``ctx.amount``.
+  listens to ``absorbing_damage`` with ``on()``, which hears it after the status triggers,
+  and lowers ``ctx.amount``.
 - **Brains are swappable.** The motor only knows ``Brain``, so the same body works for a
   player or an AI. That's why it requires the base class, not ``PlayerBrain``.
 - **One mode at a time, one use per press.** Only the current mode runs, and
@@ -578,9 +583,8 @@ Condition
 
 Subclasses to write: ``HasTagCondition(tag)``, ``HealthBelowCondition(fraction)``,
 ``StatCondition(stat, value)`` and ``ChanceCondition(chance, bonus_stat)`` override
-``_test()``. ``DamageTypeCondition(types)``, ``HitTagCondition(tag)`` and
-``AnyCondition(conditions)`` override ``check()``; the first two read ``ctx.hit()``, so they
-work inside status triggers.
+``_test()``. ``HitCondition(types, tags)`` and ``AnyCondition(conditions)`` override
+``check()``; the first reads ``ctx.hit()``, so it works inside status triggers.
 
 Amount
 ~~~~~~
@@ -723,8 +727,8 @@ Test
 ~~~~
 
 A key that applies ``DamageEffect(10, "fire")`` to a dummy. Give the dummy
-``resistances = {fire: 0.5}`` and check it loses 5. Give the attacker an ``Attributes`` with
-``strength`` 5 and the effect a ``StatAmount`` of 2 per point, and check the dummy loses 10.
+``resistances = {fire: 0.5}`` and check it loses 5. List ``strength`` 5 in the attacker's manager's
+``stats``, give the effect a ``StatAmount`` of 2 per point, and check the dummy loses 10.
 
 Stage 4: Statuses
 -----------------
@@ -838,7 +842,8 @@ class in the system.
        ``set_process``) while a status has a duration or a tick interval.
    * - ``_on_event(event, ctx)``
      - func
-     - On ``died``, ends timed statuses. Then, if ``ctx`` isn't null, runs the effects of each
+     - Connected to the manager's ``event_sent`` in ``_start()``. On ``died``, ends timed
+       statuses. Then, if ``ctx`` isn't null, runs the effects of each
        trigger whose event matches.
    * - ``_run(effects, data, s, target, cause, conditions)``
      - func
@@ -1036,11 +1041,11 @@ Brain.
      - Must implement
    * - ``Trigger``
      - ``action``, ``fire_rate``, ``automatic``, ``buffer_time``, ``blocked_by_tags``,
-       ``_buffered``, ``_cooldown``; signal ``fired``
+       ``user_effects``, ``_buffered``, ``_cooldown``; signal ``fired``
      - In ``_process``: buffer a press when ``brain.is_action_just_pressed(action)``; with
        ``automatic``, also want to fire while ``is_action_pressed``; when the cooldown is over
        and the wielder has none of ``blocked_by_tags``, take a round from a ``Magazine`` if
-       there is one, then emit ``fired``
+       there is one, run ``user_effects`` on the wielder, then emit ``fired``
    * - ``Magazine``
      - ``ammo: ItemData``, ``capacity``, ``reload_time``, ``auto_reload``, ``rounds`` (stored
        in ``item.state``); signals ``changed(rounds)``, ``reload_started``,
@@ -1053,22 +1058,12 @@ Brain.
      - ``_requires()`` returns ``[Trigger]``; ``_start()`` keeps ``Hurtbox.rids_of(wielder)``;
        on ``fired``, for each pellet raycast toward ``brain.aim_point`` excluding those RIDs,
        build the context with ``Hurtbox.hit()``, then ``Effect.apply_all``
-   * - ``Launcher``
-     - ``projectile: PackedScene``, ``effects``, ``count``, ``spread``
-     - ``_requires()`` returns ``[Trigger]``; on ``fired``, ``Projectile.launch()`` from the
-       item toward ``brain.aim_point``
-   * - ``GrantStatuses``
-     - ``statuses``, ``_granted``
-     - ``_start()``: add each status, keeping only those accepted; ``_stop()``: drop the hold
-       of only those
-   * - ``GrantModifiers``
-     - ``modifiers``, ``_applied``
-     - ``_start()``: add each modifier, and any in ``item.state[&"modifiers"]``, to the
-       wielder's manager; ``_stop()``: remove them
-   * - ``GrantAbilities``
-     - ``abilities: Dictionary[action, AbilityData]``, ``_previous``
-     - ``_start()``: put each in the wielder's ``Abilities.slots``, remembering what was
-       there; ``_stop()``: put it back
+   * - ``Grants``
+     - ``statuses``, ``modifiers``, ``abilities: Dictionary[action, AbilityData]``
+     - ``_start()``: add each status, keeping only those accepted; add each modifier, and
+       any in ``item.state[&"modifiers"]``, to the wielder's manager; put each ability in
+       the wielder's ``Abilities.slots``, remembering what was there. ``_stop()``: drop the
+       holds, remove the modifiers and put the slots back
 
 Projectile
 ~~~~~~~~~~
@@ -1114,7 +1109,7 @@ Watch out for
   the instance survives, so rounds loaded are remembered, even when switching weapons back and
   forth.
 - **Drop only the holds you added.** If a status was refused (blocked or immune),
-  ``GrantStatuses`` must not drop its hold, or it would drop a hold someone else owns.
+  ``Grants`` must not drop its hold, or it would drop a hold someone else owns.
 - **Draw after the change, not during it.** ``WeaponSwitch`` reacts to ``inventory_changed``
   with ``call_deferred``, so it never equips in the middle of the Inventory changing.
 - **Keep what a frame overshot the fire rate by.** Setting the cooldown to ``1 / fire_rate``
@@ -1171,7 +1166,8 @@ to pick targets, and a list of effects.
    * - ``LaunchProjectileEffect``
      - ``Effect``
      - ``projectile``, ``effects``, ``height``, ``forward``. Launches from the source toward
-       its Brain's ``aim_point``, for a fireball in ``user_effects``.
+       its Brain's ``aim_point``: a fireball in an ability's ``user_effects``, or a rocket in a
+       Trigger's.
 
 ``use(ability)`` in order:
 
@@ -1224,7 +1220,7 @@ Checklist
 ---------
 
 - Stage 1: B starts after A arrives and stops when A leaves; the stat math gives 18;
-  subscribers hear an event in priority order
+  a connected method hears an event until it is freed
 - Stage 2: the capsule walks and jumps; a speed modifier doubles and restores its speed; a
   mana pool refuses what it can't pay and refills
 - Stage 3: fire damage against 50% resistance takes 5 of 10; damage grows with a stat

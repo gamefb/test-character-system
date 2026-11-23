@@ -3,7 +3,7 @@
 Character System documentation
 ==============================
 
-A component-driven character system for Godot 4.4 and later: characters, equipment and
+A component-driven character system for Godot 4.8: characters, equipment and
 Baldur's Gate 3-style statuses built from small nodes and data you edit in the Inspector. A
 player, a hostile AI and a friendly AI are the same scene with different components and data.
 A rifle and a magic ring are built the same way.

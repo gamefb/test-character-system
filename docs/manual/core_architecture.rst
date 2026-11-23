@@ -5,7 +5,7 @@ Core architecture
 
 A host is any node with a :ref:`ComponentManager<class_ComponentManager>` child and :ref:`Component<class_Component>` children: a ``CharacterBody3D`` character, a ``Node3D`` weapon or a ``RigidBody3D`` barrel alike. Components never hold references to each other. They register with the manager, look each other up through it when they need them, read shared numbers from it and hear events through it.
 
-.. source-file:: ../../character_system/core/_base/component.gd
+.. source-file:: ../../character_system/core/component.gd
 
 How a component lives:
 
@@ -38,13 +38,13 @@ A component that can't start shows a yellow warning in the editor and reports it
      - ``on(event, method)`` in ``_start()``
      - :ref:`Equipment<class_Equipment>` unequips what was dropped on ``inventory_changed``
    * - Something that happened to another host
-     - ``on(event, method, 0, node)`` in ``_start()``
+     - ``on(event, method, node)`` in ``_start()``
      - An item component hearing its wielder's ``killed``
    * - Every event on the host
-     - ``_on_event(event, ctx)``
+     - ``listen(manager.event_sent, method)`` in ``_start()``
      - :ref:`Statuses<class_Statuses>` passing events on to status triggers
    * - Something that happened to anyone
-     - ``WorldEvents.on(event, method)``
+     - ``WorldEvents.event(name).connect(method)``
      - Experience for every enemy that dies
    * - Several components of one type
      - ``find_all(Type)``
@@ -53,13 +53,13 @@ A component that can't start shows a yellow warning in the editor and reports it
      - ``_stats()`` to own it, ``stat()`` to read it
      - :ref:`CharacterMotor<class_CharacterMotor>` owns ``move_speed``, and :ref:`WalkMode<class_WalkMode>` reads it
    * - A number of your game's own, with no script
-     - An :ref:`Attributes<class_Attributes>` component
+     - The manager's **Stats** in the Inspector
      - ``strength``, ``level``, ``crit_chance``
 
 The manager is the hub. You add one per host and never change it; a new kind of component needs nothing from it.
 
 .. source-file:: ../../character_system/core/component_manager.gd
 
-The manager's third job is events. ``send()`` passes an event to the methods subscribed to it and to every running component, in a fixed order by priority, and then to :ref:`WorldEvents<class_WorldEvents>`, which hears every host. :ref:`doc_events` lists the events and the ways to hear them.
+The manager's third job is events. Each event is a Godot signal that ``event()`` hands out, so listening is ``connect()`` and a freed listener is dropped by the engine. ``send()`` emits ``event_sent``, which carries every event, then the event's own signal, and then passes it to :ref:`WorldEvents<class_WorldEvents>`, which hears every host. :ref:`doc_events` lists the events and the ways to hear them.
 
 Lookups search the host's children, so ``find()`` and ``Component.of()`` also work on a scene that hasn't been added to the level yet. The manager remembers each answer until a child is added, removed or moved, so a lookup every frame costs about as much as reading a variable. ``Component.of()`` finds the manager by its name first, so keep the default name, ``ComponentManager``; a renamed one still works, it's just found by searching. Whether a component may start depends only on registered components, so one that is leaving no longer counts.

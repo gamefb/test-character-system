@@ -7,7 +7,7 @@ extends RefCounted
 ## [code]took_damgae[/code] would otherwise do nothing without any error. This checks:
 ## [br]- stat names in [StatModifier], [StatCondition], [StatAmount] and [ChanceCondition]
 ## against the stats components and movement modes and moves declare in
-## [code]_stats()[/code], the ones listed on [Attributes] components in your scenes, and the
+## [code]_stats()[/code], the ones listed in [member ComponentManager.stats] in your scenes, and the
 ## two each [Pool] adds ([code]resist_<type>[/code] and [code]bonus_<type>[/code] are always
 ## allowed),
 ## [br]- pool names in [ChangePoolEffect] and [member AbilityData.costs] against the [Pool]s
@@ -20,8 +20,8 @@ extends RefCounted
 ## [member AbilityData.blocked_by_tags], [HasTagCondition] and [RemoveStatusEffect] against
 ## the tags your saved statuses have.
 ## [br]The editor shows the results above the Inspector (enable the Character System Warnings
-## plugin) and as warnings on [Statuses], [GrantStatuses], [GrantModifiers], [GrantAbilities],
-## [Abilities], [Hitscan], [MeleeSweep] and [Launcher].
+## plugin) and as warnings on [Statuses], [Grants],
+## [Abilities], [Hitscan] and [MeleeSweep].
 ##
 ## To check the resources your own component holds, return the results from its
 ## [method Component._warnings] (the script needs [code]@tool[/code]):
@@ -109,13 +109,14 @@ static func _check(object: Object, out: PackedStringArray, is_root: bool) -> voi
 	if not is_root and res.resource_path and not res.resource_path.contains("::"):
 		# Saved in its own file: checked when that file is open.
 		return
-	if object is StatModifier or object is StatCondition or object is StatAmount:
+	# By property, not by class, so resources of your own are checked the same way.
+	if &"stat" in object:
 		_check_name(object.get(&"stat"), _stats, "stat",
 				"No component has a stat called '%s', so this does nothing.", out, true)
-	if object is ChanceCondition and object.get(&"bonus_stat"):
+	if object.get(&"bonus_stat"):
 		_check_name(object.get(&"bonus_stat"), _stats, "stat",
 				"Bonus Stat: no component has a stat called '%s'.", out, true)
-	if object is ChangePoolEffect:
+	if object is Effect and &"pool" in object:
 		_check_name(object.get(&"pool"), _pools, "pool",
 				"No Pool in a saved scene is called '%s'.", out)
 	if object is AbilityData:
@@ -197,7 +198,7 @@ static func _scan() -> void:
 	var events := {}
 	var tags := {}
 	var pools := {}
-	# An Attributes component's stats and a Pool's name, as saved in scenes.
+	# A ComponentManager's stats and a Pool's name, as saved in scenes.
 	var listed := RegEx.create_from_string(
 			"(?ms)^stats = Dictionary\\[StringName, float\\]\\(\\{(.*?)\\}\\)")
 	var pool_line := RegEx.create_from_string("(?m)^pool = &\"(\\w+)\"")
@@ -218,7 +219,7 @@ static func _scan() -> void:
 					stats[m.get_string(1)] = true
 			for m in pool_line.search_all(text):
 				pools[m.get_string(1)] = true
-			if text.contains("components/pool.gd"):
+			if text.contains("/pool.gd\""):
 				pools["mana"] = true  # The default name isn't saved in the scene.
 	for pool_name in pools:
 		stats["max_" + pool_name] = true

@@ -32,7 +32,7 @@ Every physics frame, the motor:
 3. calls ``move_and_slide()``, the only place in the system that does,
 4. asks the mode whether to hand over to another, e.g. WalkMode hands over to AirMode once the floor is gone. If it doesn't, any other mode may take over by itself.
 
-.. source-file:: ../../character_system/characters/motor/character_motor.gd
+.. source-file:: ../../character_system/core/motor/character_motor.gd
 
 Three rules keep features from getting in each other's way:
 
@@ -45,9 +45,9 @@ Three rules keep features from getting in each other's way:
 Walking, falling and double jumps
 ---------------------------------
 
-.. source-file:: ../../character_system/characters/motor/walk_mode.gd
+.. source-file:: ../../character_system/kit/motor/walk_mode.gd
 
-.. source-file:: ../../character_system/characters/motor/air_mode.gd
+.. source-file:: ../../character_system/kit/motor/air_mode.gd
 
 WalkMode and AirMode are written like Godot's own CharacterBody3D script template: gravity from ``get_gravity()``, so gravity zones work, ``velocity.x`` and ``velocity.z`` from the direction, and ``velocity.y`` for jumps. AirMode steers with ``move_toward()``, so the character keeps some of its speed in the air; lower ``air_acceleration`` keeps more.
 
@@ -60,7 +60,7 @@ Each mode hands over to the other: WalkMode to its ``air_mode`` and AirMode to i
 Dashing
 -------
 
-.. source-file:: ../../character_system/characters/motor/dash_move.gd
+.. source-file:: ../../character_system/kit/motor/dash_move.gd
 
 DashMove replaces the velocity while it runs, so it works the same on the floor and in the air, ignores gravity, and can't be steered. Its cooldown is the Cooldown every layered move has (see :ref:`doc_movement_statuses_events_cooldowns`). Afterwards the mode takes over again: walking stops at once, while the air keeps some of the speed. Add a ``dash`` action to the Input Map and to the :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions, as for any action of your own.
 
@@ -123,8 +123,8 @@ The base classes
 
 :ref:`MotorNode<class_MotorNode>` is what modes and moves share: ``motor``, ``body``, ``stat()``, stats of their own, and the ``_enter()``, ``_exit()`` and ``_physics_update()`` hooks. Extend :ref:`MovementMode<class_MovementMode>` or :ref:`LayeredMove<class_LayeredMove>` rather than this.
 
-.. source-file:: ../../character_system/characters/motor/_base/motor_node.gd
+.. source-file:: ../../character_system/core/motor/motor_node.gd
 
-.. source-file:: ../../character_system/characters/motor/_base/movement_mode.gd
+.. source-file:: ../../character_system/core/motor/movement_mode.gd
 
-.. source-file:: ../../character_system/characters/motor/_base/layered_move.gd
+.. source-file:: ../../character_system/core/motor/layered_move.gd

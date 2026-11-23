@@ -12,10 +12,9 @@ The three character kinds share one scene layout and differ in two components an
    ├── Model (Node3D)
    │   ├── HandSocket (BoneAttachment3D)
    │   └── HeadHurtbox (Hurtbox, optional)  <- multiplier 2.0 for headshots
-   ├── ComponentManager <- one per character; children can be in any order
+   ├── ComponentManager <- one per character; its Stats list strength, level and the like
    ├── Statuses
    ├── Health
-   ├── Attributes       <- optional: strength, level and other stats of your own
    ├── Pool             <- optional, one per kind: mana, stamina, a shield
    ├── Brain            <- PlayerBrain or AIBrain
    ├── CharacterMotor   <- with WalkMode and AirMode under it
@@ -58,8 +57,8 @@ The three character kinds share one scene layout and differ in two components an
      - Yes
      - Yes
      - Yes
-   * - :ref:`Attributes<class_Attributes>`, :ref:`Pool<class_Pool>`
-     - If the game has stats, mana or shields
+   * - :ref:`Pool<class_Pool>`
+     - If the game has mana, stamina or shields
      - The same; a boss might have a shield and a grunt none
      - The same
    * - WeaponSwitch
@@ -84,6 +83,6 @@ The three character kinds share one scene layout and differ in two components an
 - A flying enemy: add your own flying mode (the recipe "Write your own movement mode or move" has one) and set the motor's **Start Mode** to it.
 - An AI uses the same modes and moves as a player. :ref:`AIBrain<class_AIBrain>` fills ``move_dir`` from its path, and your decision logic jumps or dashes with ``brain.press(&"jump")`` and ``brain.release(&"jump")``, as :ref:`AttackNearest<class_AttackNearest>` does for firing.
 
-**Different classes.** A warrior and a mage are the same scene with different data: the numbers on their :ref:`Attributes<class_Attributes>`, the :ref:`Pool<class_Pool>`\ s they have, their innate passives and the abilities in their slots. ``examples/characters/mage.tscn`` is a small one: 80 health, ``spell_power`` and ``crit_chance``, a mana pool that refills, a shield that recharges after three seconds out of combat, and a Fireball on ``secondary``.
+**Different classes.** A warrior and a mage are the same scene with different data: the Stats on their :ref:`ComponentManager<class_ComponentManager>`, the :ref:`Pool<class_Pool>`\ s they have, their innate passives and the abilities in their slots. ``examples/characters/mage.tscn`` is a small one: 80 health, ``spell_power`` and ``crit_chance``, a mana pool that refills, a shield that recharges after three seconds out of combat, and a Fireball on ``secondary``.
 
 A stationary turret is a character without a :ref:`CharacterMotor<class_CharacterMotor>` and with a plain :ref:`Brain<class_Brain>`, driven by your own component. A destructible crate is a :ref:`ComponentManager<class_ComponentManager>` and a :ref:`Health<class_Health>` on a ``StaticBody3D``.

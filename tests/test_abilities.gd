@@ -257,7 +257,7 @@ func test_statuses_can_react_to_abilities() -> void:
 	statuses.add(battle_trance)
 	health.change(-50.0)
 	var seen: Array = []
-	ComponentManager.of(caster).subscribe(&"ability_used",
+	ComponentManager.of(caster).event(&"ability_used").connect(
 			func(ctx: EffectContext) -> void: seen.append(ctx.origin))
 	var spell: AbilityData = mend()
 	abilities.use(spell)

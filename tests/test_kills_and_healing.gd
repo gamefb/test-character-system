@@ -65,7 +65,7 @@ func test_a_dead_target_takes_no_more_hits() -> void:
 	var target: Node3D = make_host()
 	var events: Array[StringName] = []
 	for event: StringName in [&"taking_damage", &"took_damage", &"died"]:
-		ComponentManager.of(target).subscribe(event,
+		ComponentManager.of(target).event(event).connect(
 				func(_ctx: EffectContext) -> void: events.append(event))
 	hit(target, 500.0)
 	assert_eq(events, [&"taking_damage", &"died", &"took_damage"] as Array[StringName])
@@ -82,7 +82,7 @@ func test_the_killer_hears_killed() -> void:
 	heal.amount = 20.0
 	statuses_of(attacker).add(reacting(&"killed", [heal]))
 	var victims: Array = []
-	ComponentManager.of(attacker).subscribe(&"killed",
+	ComponentManager.of(attacker).event(&"killed").connect(
 			func(ctx: EffectContext) -> void: victims.append(ctx.target))
 	hit(target, 10.0, &"physical", attacker)
 	assert_eq(victims, [], "a hit that doesn't kill")
@@ -94,7 +94,7 @@ func test_the_killer_hears_killed() -> void:
 func test_killing_yourself_is_not_a_kill() -> void:
 	var who: Node3D = make_host()
 	var kills: Array = []
-	ComponentManager.of(who).subscribe(&"killed",
+	ComponentManager.of(who).event(&"killed").connect(
 			func(ctx: EffectContext) -> void: kills.append(ctx))
 	hit(who, 500.0, &"physical", who)
 	assert_true(health_of(who).is_dead())
@@ -104,7 +104,7 @@ func test_killing_yourself_is_not_a_kill() -> void:
 func test_revive_sends_revived() -> void:
 	var who: Node3D = make_host()
 	var revived: Array = [0]
-	ComponentManager.of(who).subscribe(&"revived",
+	ComponentManager.of(who).event(&"revived").connect(
 			func(_ctx: EffectContext) -> void: revived[0] += 1)
 	health_of(who).revive()
 	assert_eq(revived[0], 0, "nothing to revive")

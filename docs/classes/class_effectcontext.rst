@@ -233,7 +233,7 @@ Multiplies the total, e.g. 0.5 for a shield that halves everything, 2 for a crit
 
 :ref:`StringName<class_StringName>` **damage_type** :ref:`🔗<class_EffectContext_property_damage_type>`
 
-The kind of damage, e.g. &"fire". Set by :ref:`DamageEffect<class_DamageEffect>`; empty for anything else. :ref:`DamageTypeCondition<class_DamageTypeCondition>` tests it.
+The kind of damage, e.g. &"fire". Set by :ref:`DamageEffect<class_DamageEffect>`; empty for anything else. :ref:`HitCondition<class_HitCondition>` tests it.
 
 .. rst-class:: classref-item-separator
 
@@ -245,7 +245,7 @@ The kind of damage, e.g. &"fire". Set by :ref:`DamageEffect<class_DamageEffect>`
 
 :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] **tags** = ``[]`` :ref:`🔗<class_EffectContext_property_tags>`
 
-Labels on this hit, e.g. &"head" from a :ref:`Hurtbox<class_Hurtbox>`, &"melee" from a :ref:`DamageEffect<class_DamageEffect>` or &"crit" from a :ref:`ModifyAmountEffect<class_ModifyAmountEffect>`. :ref:`HitTagCondition<class_HitTagCondition>` tests them; your damage numbers can colour by them.
+Labels on this hit, e.g. &"head" from a :ref:`Hurtbox<class_Hurtbox>`, &"melee" from a :ref:`DamageEffect<class_DamageEffect>` or &"crit" from a :ref:`ModifyAmountEffect<class_ModifyAmountEffect>`. :ref:`HitCondition<class_HitCondition>` tests them; your damage numbers can colour by them.
 
 .. rst-class:: classref-item-separator
 

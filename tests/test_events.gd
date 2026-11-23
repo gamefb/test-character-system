@@ -1,6 +1,6 @@
 extends GutTest
-## Hearing events: a component's on(), priorities, subscribing from outside, and the whole
-## level through WorldEvents.
+## Hearing events: a component's on(), an event's signal from outside, every event at once, and
+## the whole level through WorldEvents.
 
 
 ## Remembers the events it heard, in order.
@@ -13,8 +13,9 @@ class Listener:
 
 	func _start() -> void:
 		on(&"ping", _on_ping)
+		listen(manager.event_sent, _on_any)
 		if other:
-			on(&"ping", _on_other_ping, 0, other)
+			on(&"ping", _on_other_ping, other)
 
 	func _on_ping(ctx: EffectContext) -> void:
 		heard.append(ctx)
@@ -25,20 +26,16 @@ class Listener:
 	func _on_world_ping(host: Node, _ctx: EffectContext) -> void:
 		heard.append(host)
 
-	## A lambda that uses this object, and one of its methods.
-	func callables() -> Array[Callable]:
-		return [func() -> void: heard.append(&"lambda"), _on_ping]
-
 	## Subscribes lambdas that use this object, the way a HUD script might.
 	func watch(host: Node) -> void:
-		ComponentManager.of(host).subscribe(&"ping",
+		ComponentManager.of(host).event(&"ping").connect(
 				func(_ctx: EffectContext) -> void: heard.append(&"lambda"))
-		WorldEvents.on(&"ping", func(_host: Node, _ctx: EffectContext) -> void:
+		WorldEvents.event(&"ping").connect(func(_host: Node, _ctx: EffectContext) -> void:
 			heard.append(&"world lambda"))
 
-	func _on_event(event: StringName, _ctx: EffectContext) -> void:
+	func _on_any(event: StringName, _ctx: EffectContext) -> void:
 		if event == &"ordered":
-			log.append(&"component")
+			log.append(&"every event")
 
 
 var world_heard: Array = []
@@ -95,35 +92,41 @@ func test_listening_to_a_host_that_is_freed_first_is_safe() -> void:
 	pass_test("no error when the other manager is gone")
 
 
-func test_priority_decides_who_hears_first() -> void:
+func test_listeners_hear_an_event_in_a_fixed_order() -> void:
 	var listener := Listener.new()
 	var host: Node3D = make_host([listener])
 	var manager := ComponentManager.of(host)
 	var log: Array = listener.log
-	manager.subscribe(&"ordered", func(_ctx: EffectContext) -> void: log.append(&"zero"))
-	manager.subscribe(&"ordered", func(_ctx: EffectContext) -> void: log.append(&"late"), -10)
-	manager.subscribe(&"ordered", func(_ctx: EffectContext) -> void: log.append(&"early"), 10)
-	manager.subscribe(&"ordered", func(_ctx: EffectContext) -> void: log.append(&"first"), 20)
+	var world := func(_host: Node, _ctx: EffectContext) -> void: log.append(&"world")
+	WorldEvents.event(&"ordered").connect(world)
+	manager.event(&"ordered").connect(func(_ctx: EffectContext) -> void: log.append(&"first"))
+	manager.event(&"ordered").connect(func(_ctx: EffectContext) -> void: log.append(&"second"))
 	ComponentManager.notify(host, &"ordered")
-	assert_eq(log, [&"first", &"early", &"component", &"zero", &"late"])
+	assert_eq(log, [&"every event", &"first", &"second", &"world"],
+			"event_sent, then the event's own signal in connection order, then the world")
+	WorldEvents.event(&"ordered").disconnect(world)
 
 
-func test_subscribe_and_unsubscribe_from_outside() -> void:
+func test_an_event_is_an_ordinary_signal() -> void:
 	var host: Node3D = make_host()
 	var manager := ComponentManager.of(host)
 	var count: Array = [0]
 	var method := func(_ctx: EffectContext) -> void: count[0] += 1
-	manager.subscribe(&"ping", method)
+	manager.event(&"ping").connect(method)
+	assert_eq(manager.event(&"ping"), manager.event(&"ping"), "the same signal each time")
 	ComponentManager.notify(host, &"ping")
-	manager.unsubscribe(&"ping", method)
+	manager.event(&"ping").disconnect(method)
 	ComponentManager.notify(host, &"ping")
 	assert_eq(count[0], 1)
+	manager.event(&"ready").connect(method)
+	ComponentManager.notify(host, &"ready")
+	assert_eq(count[0], 2, "an event may share its name with one of Node's own signals")
 
 
 func test_a_freed_subscriber_is_dropped() -> void:
 	var host: Node3D = make_host()
 	var hud := Listener.new()
-	ComponentManager.of(host).subscribe(&"ping", hud._on_ping)
+	ComponentManager.of(host).event(&"ping").connect(hud._on_ping)
 	hud.free()
 	ComponentManager.notify(host, &"ping")
 	ComponentManager.notify(host, &"ping")
@@ -144,32 +147,33 @@ func test_lambdas_of_a_freed_object_are_dropped_too() -> void:
 	pass_test("no error after the object that wrote them is gone")
 
 
-func test_a_listener_is_alive_only_while_its_object_is() -> void:
+func test_connections_end_when_the_listener_is_freed() -> void:
+	var host: Node3D = make_host()
 	var hud := Listener.new()
-	var listeners: Array[Callable] = hud.callables()
-	var owners: Array = listeners.map(WorldEvents.owner_of)
-	for i in listeners.size():
-		assert_true(WorldEvents.is_alive(listeners[i], owners[i]))
+	hud.watch(host)
+	ComponentManager.of(host).event(&"ping").connect(hud._on_ping)
+	WorldEvents.event(&"ping").connect(hud._on_world_ping)
+	assert_eq(ComponentManager.of(host).event(&"ping").get_connections().size(), 2)
+	assert_eq(WorldEvents.event(&"ping").get_connections().size(), 2)
 	hud.free()
-	for i in listeners.size():
-		assert_false(WorldEvents.is_alive(listeners[i], owners[i]), "the owner was recorded")
-	assert_eq(WorldEvents.owner_of(Callable()), 0, "a listener without an object")
+	assert_eq(ComponentManager.of(host).event(&"ping").get_connections().size(), 0,
+			"its method and its lambda")
+	assert_eq(WorldEvents.event(&"ping").get_connections().size(), 0)
 
 
 func test_world_events_hear_every_host() -> void:
 	world_heard.clear()
 	var first: Node3D = make_host()
 	var second: Node3D = make_host()
-	WorldEvents.on(&"ping", _on_world_ping)
-	WorldEvents.on(&"ping", _on_world_ping)
+	WorldEvents.event(&"ping").connect(_on_world_ping)
 	var ctx := EffectContext.new(null, second)
 	ComponentManager.notify(first, &"ping")
 	ComponentManager.notify(second, &"ping", ctx)
 	ComponentManager.notify(second, &"pong", ctx)
-	assert_eq(world_heard.size(), 2, "once each, however often it subscribed")
+	assert_eq(world_heard.size(), 2, "once for each host that sent it")
 	assert_eq(world_heard[0][0], first)
 	assert_eq(world_heard[1], [second, ctx])
-	WorldEvents.off(&"ping", _on_world_ping)
+	WorldEvents.event(&"ping").disconnect(_on_world_ping)
 	ComponentManager.notify(first, &"ping")
 	assert_eq(world_heard.size(), 2)
 
@@ -177,7 +181,7 @@ func test_world_events_hear_every_host() -> void:
 func test_world_events_drop_freed_listeners() -> void:
 	var host: Node3D = make_host()
 	var quest := Listener.new()
-	WorldEvents.on(&"ping", quest._on_world_ping)
+	WorldEvents.event(&"ping").connect(quest._on_world_ping)
 	ComponentManager.notify(host, &"ping")
 	assert_eq(quest.heard, [host])
 	quest.free()
@@ -188,10 +192,10 @@ func test_world_events_drop_freed_listeners() -> void:
 func test_any_death_can_be_counted_from_one_place() -> void:
 	var deaths: Array = []
 	var count := func(who: Node, _ctx: EffectContext) -> void: deaths.append(who)
-	WorldEvents.on(&"died", count)
+	WorldEvents.event(&"died").connect(count)
 	var grunt: Node3D = make_host([Health.new()])
 	var brute: Node3D = make_host([Health.new()])
 	(Component.of(brute, Health) as Health).change(-500.0)
 	(Component.of(grunt, Health) as Health).change(-500.0)
 	assert_eq(deaths, [brute, grunt])
-	WorldEvents.off(&"died", count)
+	WorldEvents.event(&"died").disconnect(count)

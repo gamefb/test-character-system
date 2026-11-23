@@ -115,8 +115,8 @@ Some examples:
        ``examples/abilities/fireball.tres``.
    * - Damage that grows with strength or level
      - Setting
-     - A :ref:`StatAmount<class_StatAmount>` in the effect's Scaling, and the stat on an
-       :ref:`Attributes<class_Attributes>` component. See :ref:`doc_amounts`.
+     - A :ref:`StatAmount<class_StatAmount>` in the effect's Scaling, and the stat in the
+       :ref:`ComponentManager<class_ComponentManager>`'s Stats. See :ref:`doc_amounts`.
    * - Critical hits
      - Status
      - A passive with a ``dealing_damage`` trigger and a
@@ -133,12 +133,13 @@ Some examples:
      - A :ref:`Pool<class_Pool>` for each.
    * - A ring with +25 health; loot with random numbers
      - Item
-     - :ref:`GrantModifiers<class_GrantModifiers>`. See
+     - :ref:`Grants<class_Grants>`. See
        :ref:`doc_stats_and_abilities_from_equipment`.
    * - A rocket launcher, a bow
      - Item
-     - A :ref:`Launcher<class_Launcher>` and a :ref:`Projectile<class_Projectile>` scene. See
-       :ref:`doc_projectiles`.
+     - A :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` in the
+       :ref:`Trigger<class_Trigger>`'s User Effects, and a :ref:`Projectile<class_Projectile>`
+       scene. See :ref:`doc_projectiles`.
    * - Experience for kills, a quest that counts deaths
      - Level script
      - One :ref:`WorldEvents<class_WorldEvents>` listener. See :ref:`doc_events`.
@@ -278,7 +279,7 @@ Item components extend :ref:`ItemComponent<class_ItemComponent>`, which adds ``w
 
 **One that acts when the item is used** listens to the item's :ref:`Trigger<class_Trigger>`, which decides when it fires. :ref:`MeleeSweep<class_MeleeSweep>` hits everything inside a shape in front of the item:
 
-.. source-file:: ../../character_system/items/components/melee_sweep.gd
+.. source-file:: ../../character_system/kit/items/melee_sweep.gd
 
 - ``_requires()`` returns ``[Trigger]``, and ``_start()`` listens to its ``fired`` signal.
 - The wielder's body and hurtboxes are collected once, in ``_start()``, so swings pass through
@@ -288,7 +289,7 @@ Item components extend :ref:`ItemComponent<class_ItemComponent>`, which adds ``w
 - The effects come from the Inspector, so the same component makes a sword, a burning axe or a
   healing touch.
 
-To make a sword, build an item scene with a :ref:`ComponentManager<class_ComponentManager>`, a Trigger and a MeleeSweep with a BoxShape3D about a metre across and a :ref:`DamageEffect<class_DamageEffect>` in its effects. A projectile weapon follows the same pattern: :ref:`Launcher<class_Launcher>` listens to ``fired`` and launches a :ref:`Projectile<class_Projectile>`, which applies the effects to what it touches; see :ref:`doc_projectiles`.
+To make a sword, build an item scene with a :ref:`ComponentManager<class_ComponentManager>`, a Trigger and a MeleeSweep with a BoxShape3D about a metre across and a :ref:`DamageEffect<class_DamageEffect>` in its effects. A projectile weapon needs no delivery component: a :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` in the Trigger's ``user_effects`` launches a :ref:`Projectile<class_Projectile>`, which applies the effects to what it touches; see :ref:`doc_projectiles`.
 
 **One that changes the wielder while equipped** finds what it needs in ``_start()`` and undoes everything in ``_stop()``, which runs on unequip. :ref:`Scope<class_Scope>` zooms the wielder's camera and slows it down while the aim button is held:
 
@@ -305,7 +306,7 @@ An item component hears its wielder's events by passing the wielder to ``on()``,
     ## Counts this copy's kills, e.g. for a weapon that names itself after ten.
 
     func _start() -> void:
-    	on(&"killed", _on_wielder_killed, 0, wielder)
+    	on(&"killed", _on_wielder_killed, wielder)
 
     func _on_wielder_killed(_ctx: EffectContext) -> void:
     	item.state[&"kills"] = item.state.get(&"kills", 0) + 1  # Kept between equips.
@@ -317,7 +318,7 @@ An effect
 
 An effect extends :ref:`Effect<class_Effect>` and overrides ``_execute(ctx)``. :ref:`SpawnSceneEffect<class_SpawnSceneEffect>` spawns a scene, such as a puddle or an explosion, where the target is:
 
-.. source-file:: ../../character_system/resources/effects/spawn_scene_effect.gd
+.. source-file:: ../../character_system/kit/effects/spawn_scene_effect.gd
 
 - Its numbers are ``@export`` variables, so each use is set up in the Inspector.
 - ``ctx.target`` is whoever it happens to, and may be anything: a character, a crate or null.
@@ -335,7 +336,7 @@ An amount
 
 An amount extends :ref:`Amount<class_Amount>` and overrides ``value(ctx)``. :ref:`StatAmount<class_StatAmount>` reads a stat from one side of the effect and multiplies it:
 
-.. source-file:: ../../character_system/resources/amounts/stat_amount.gd
+.. source-file:: ../../character_system/core/amounts/stat_amount.gd
 
 - ``ctx.source`` and ``ctx.target`` may be null or have no components.
   ``ComponentManager.stat_of()`` returns 0 for those, so the amount adds nothing.
@@ -353,7 +354,7 @@ A condition
 
 A condition extends :ref:`Condition<class_Condition>`. Most override ``_test(node)``, which checks one side; ``subject`` picks which side and ``negate`` flips the answer, with no code of your own. The :ref:`Condition<class_Condition>` reference shows one. A condition that compares both sides overrides ``check(ctx)`` instead, like :ref:`IsHostileCondition<class_IsHostileCondition>`:
 
-.. source-file:: ../../character_system/resources/conditions/is_hostile_condition.gd
+.. source-file:: ../../character_system/kit/conditions/is_hostile_condition.gd
 
 Put it in the ``conditions`` of a weapon's DamageEffect to turn friendly fire off: allies are still hit, but take no damage.
 
@@ -364,7 +365,7 @@ Ability targeting
 
 An ability's ``targeting`` decides who its effects reach. Left empty, it's the user. :ref:`RadiusTargeting<class_RadiusTargeting>` picks everything within a radius:
 
-.. source-file:: ../../character_system/resources/abilities/targeting/radius_targeting.gd
+.. source-file:: ../../character_system/kit/abilities/radius_targeting.gd
 
 - ``find(ctx)`` gets the user as ``ctx.source`` and returns the targets.
 - It asks the physics engine what's inside a sphere, through the user's world. A resource
@@ -417,7 +418,7 @@ None of these need a change to the system:
   :ref:`Health<class_Health>`'s resistances, or give it to a status as a modifier. Extra
   damage dealt with it is the ``bonus_lightning`` stat.
 - **A stat of your game's own**, such as ``strength``, doesn't even need a component of
-  yours: list it on an :ref:`Attributes<class_Attributes>` component in the Inspector.
+  yours: list it in the :ref:`ComponentManager<class_ComponentManager>`'s Stats in the Inspector.
 - **A pool** is a :ref:`Pool<class_Pool>` component with a name of your choosing, such as
   ``energy``. Abilities spend it through their costs, and its two stats are ``max_energy``
   and ``energy_regen``.
@@ -426,7 +427,7 @@ None of these need a change to the system:
   ``on(&"dodged", _on_dodged)``.
 - **A hit tag** is any name in a :ref:`Hurtbox<class_Hurtbox>`'s or a
   :ref:`DamageEffect<class_DamageEffect>`'s tags, such as ``head`` or ``melee``. A
-  :ref:`HitTagCondition<class_HitTagCondition>` tests it.
+  :ref:`HitCondition<class_HitCondition>` tests it.
 - **An input action** is added in the Input Map and to the
   :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions. Components then read it from the brain,
   and AI presses it with ``press()``.

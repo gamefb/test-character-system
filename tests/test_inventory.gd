@@ -20,7 +20,7 @@ func before_each() -> void:
 	fireproof = StatusData.new()
 	fireproof.tags = [&"fireproof"]
 	fireproof.immune_to = [&"fire"]
-	var grant := GrantStatuses.new()
+	var grant := Grants.new()
 	grant.statuses = [fireproof]
 	rifle = make_item(&"rifle", &"weapon")
 	pistol = make_item(&"pistol", &"weapon")

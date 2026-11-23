@@ -61,10 +61,10 @@ var percent: float = 0.0
 ## Multiplies the total, e.g. 0.5 for a shield that halves everything, 2 for a critical hit.
 var mul: float = 1.0
 ## The kind of damage, e.g. &"fire". Set by [DamageEffect]; empty for anything else.
-## [DamageTypeCondition] tests it.
+## [HitCondition] tests it.
 var damage_type: StringName
 ## Labels on this hit, e.g. &"head" from a [Hurtbox], &"melee" from a [DamageEffect] or
-## &"crit" from a [ModifyAmountEffect]. [HitTagCondition] tests them; your damage numbers can
+## &"crit" from a [ModifyAmountEffect]. [HitCondition] tests them; your damage numbers can
 ## colour by them.
 var tags: Array[StringName] = []
 ## Where the hit landed, in world space. [constant Vector3.INF] when nothing recorded it, e.g.

@@ -110,9 +110,7 @@ func test_sharpshooter_rewards_headshots() -> void:
 func test_lucky_strikes_follow_the_crit_chance_stat() -> void:
 	var target: CharacterBody3D = make_character()
 	var lucky: CharacterBody3D = make_character()
-	var certain := Attributes.new()
-	certain.stats = { &"crit_chance": 1.0 }
-	lucky.add_child(certain)
+	ComponentManager.of(lucky).set_base(&"crit_chance", 1.0)
 	statuses(lucky).add(ex("statuses/lucky_strikes.tres"))
 	var ctx: EffectContext = hit(target, 10.0, &"physical", lucky)
 	assert_eq(ctx.amount, 20.0, "always a crit")

@@ -1,6 +1,6 @@
 # Character System
 
-A component-driven character system for Godot 4.4 and later: characters, equipment, abilities
+A component-driven character system for Godot 4.8: characters, equipment, abilities
 and Baldur's Gate 3-style statuses built from small nodes and data you edit in the Inspector.
 Stats, mana and shields, damage that scales with a character, crits, costs and cast times,
 projectiles and gear with bonuses need no code.
@@ -13,9 +13,11 @@ New to it? Start with the Quick start page, which builds a small level in about 
 
 | Folder | What it is |
 | --- | --- |
-| `character_system/` | The system: core, components, items, resources and examples. Start with `RECIPES.md`. |
+| `character_system/core/` | The system itself. It loads on its own: copy this and build your game's parts on it. |
+| `character_system/kit/` | Ready-made parts built on the core: brains, movement modes, weapons, projectiles, zones and more. Keep what you use. |
+| `character_system/examples/` | Statuses, items, abilities and scripts to copy. Start with `character_system/RECIPES.md`. |
 | `addons/character_system_warnings/` | Editor plugin that warns about mistyped stat, event and tag names. |
-| `tests/` | GUT unit tests (212 tests). |
+| `tests/` | GUT unit tests (212 tests), and `benchmark.gd`. |
 | `immunity_test/` | A scripted scene that runs 43 checks on immunities, zones and items. |
 | `docs/` | The documentation site (Sphinx). |
 

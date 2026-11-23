@@ -1,16 +1,14 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
-[ext_resource type="Script" path="res://character_system/resources/items/item_data.gd" id="1_jbndm"]
-[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="2_sp2fg"]
-[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="3_0smyx"]
-[ext_resource type="Script" path="res://character_system/resources/amounts/_base/amount.gd" id="4_su1qe"]
-[ext_resource type="Script" path="res://character_system/resources/effects/heal_effect.gd" id="5_4kevx"]
+[ext_resource type="Script" path="res://character_system/core/items/item_data.gd" id="1_jbndm"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="2_sp2fg"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="3_0smyx"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="4_su1qe"]
+[ext_resource type="Script" path="res://character_system/core/effects/heal_effect.gd" id="5_4kevx"]
 
 [sub_resource type="Resource" id="Resource_pwat2"]
 script = ExtResource("5_4kevx")
 amount = 40.0
-scaling = Array[ExtResource("4_su1qe")]([])
-conditions = Array[ExtResource("3_0smyx")]([])
 
 [resource]
 script = ExtResource("1_jbndm")
@@ -18,6 +16,4 @@ id = &"health_potion"
 display_name = "Health potion"
 description = "Restores 40 health. Used with Inventory.use()."
 max_stack = 5
-slot = &""
 use_effects = Array[ExtResource("2_sp2fg")]([SubResource("Resource_pwat2")])
-consumed_on_use = true

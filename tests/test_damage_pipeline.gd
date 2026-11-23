@@ -143,7 +143,7 @@ func test_resistance_applies_after_the_modifiers() -> void:
 func test_a_ward_can_block_one_damage_type() -> void:
 	var target: Node3D = make_host()
 	var block: ModifyAmountEffect = modify(0.0, 0.0, 0.0)
-	var only_fire := DamageTypeCondition.new()
+	var only_fire := HitCondition.new()
 	only_fire.types = [&"fire"]
 	block.conditions = [only_fire]
 	statuses_of(target).add(reacting(&"taking_damage", [block]))
@@ -163,12 +163,12 @@ func test_hurtbox_tags_reach_triggers_and_crits_are_labelled() -> void:
 	var bonus: ModifyAmountEffect = modify(0.0, 1.0)
 	bonus.tag = &"crit"
 	var sharpshooter: StatusData = reacting(&"dealing_damage", [bonus])
-	var on_head := HitTagCondition.new()
-	on_head.tag = &"head"
+	var on_head := HitCondition.new()
+	on_head.tags = [&"head"]
 	sharpshooter.triggers[0].conditions = [on_head]
 	statuses_of(attacker).add(sharpshooter)
 	var seen: Array = []
-	ComponentManager.of(target).subscribe(&"took_damage",
+	ComponentManager.of(target).event(&"took_damage").connect(
 			func(ctx: EffectContext) -> void: seen.append(ctx.tags.duplicate()))
 	var swing: DamageEffect = damage()
 	swing.tags = [&"melee"]
@@ -223,7 +223,7 @@ func test_a_shield_can_be_limited_to_some_damage_types() -> void:
 
 func test_old_style_listeners_can_still_change_the_amount() -> void:
 	var target: Node3D = make_host()
-	ComponentManager.of(target).subscribe(&"taking_damage",
+	ComponentManager.of(target).event(&"taking_damage").connect(
 			func(ctx: EffectContext) -> void: ctx.amount *= 0.5)
 	hit(target)
 	assert_eq(health_of(target).current, 95.0)

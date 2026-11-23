@@ -12,8 +12,8 @@ system? The Quick start page of the documentation builds a whole level, step by 
 1. New scene with a **CharacterBody3D** root, a **CollisionShape3D** (capsule) and a mesh.
 2. Add a **ComponentManager**, then the components you want, in any order: `Statuses`,
    `Health`, a brain (`PlayerBrain` or `AIBrain`), `CharacterMotor`, `Faction`, `Inventory`,
-   `Equipment`, `WeaponSwitch`, `Abilities`, `Attributes`, and a `Pool` for each of mana,
-   stamina or a shield.
+   `Equipment`, `WeaponSwitch`, `Abilities`, and a `Pool` for each of mana, stamina or a
+   shield.
 3. Add a **WalkMode** and an **AirMode** as children of the `CharacterMotor`, so the character
    can walk, jump and fall.
 4. A player needs a **Camera3D** and an AI a **NavigationAgent3D** somewhere under the
@@ -26,15 +26,15 @@ pool, a shield and a Fireball.
 
 ### Give a character its own stats
 
-Strength, level, crit chance, spell power: add an **Attributes** component and list each
-stat and its value under **Stats**. No script is needed. A listed stat works everywhere stats
-do: statuses and gear change it with a StatModifier, effects scale with it (see "Make damage
-scale with a stat"), and code reads it with `stat(&"strength")` or
+Strength, level, crit chance, spell power: select the character's **ComponentManager** and list
+each stat and its value under **Stats**. No script and no extra node is needed. A listed stat
+works everywhere stats do: statuses and gear change it with a StatModifier, effects scale with
+it (see "Make damage scale with a stat"), and code reads it with `stat(&"strength")` or
 `ComponentManager.stat_of(node, &"strength")`.
 
 ```gdscript
-var attributes := Component.of(player, Attributes) as Attributes
-attributes.add_base(&"level", 1)  # Level up: everything that scales with level follows.
+var manager := ComponentManager.of(player)
+manager.add_base(&"level", 1)  # Level up: everything that scales with level follows.
 ```
 
 ### Add mana, stamina or a shield
@@ -164,10 +164,10 @@ before it lands. It has three numbers, and the hit lands for
 - **A bonus against some targets:** the damage buff, with **Affects Other** on and a
   HasTagCondition (`wet`) in the trigger's **Conditions**. Affects Other makes the condition
   look at the victim instead of the attacker.
-- **Only against one damage type:** a **DamageTypeCondition** in the trigger's Conditions.
-  See `statuses/fire_ward.tres`, which halves fire and nothing else.
+- **Only against one damage type:** a **HitCondition** with the type in **Types**, in the
+  trigger's Conditions. See `statuses/fire_ward.tres`, which halves fire and nothing else.
 - **A headshot bonus:** give the head Hurtbox the tag `head`, and the trigger a
-  **HitTagCondition** (`head`). See `statuses/sharpshooter.tres`.
+  **HitCondition** with `head` in **Tags**. See `statuses/sharpshooter.tres`.
 - **Critical hits:** a **ChanceCondition** in the trigger's Conditions, **Mul** 2 and **Tag**
   `crit` on the effect. Set the condition's **Bonus Stat** to `crit_chance` and gear can
   raise the odds. See `statuses/lucky_strikes.tres`.
@@ -187,8 +187,8 @@ list. Everything in the list is added to the amount each time the effect runs:
 | 0 to 6 extra, at random | **RandomAmount**: low 0, high 6 |
 | A share of the hit that set off a trigger | **HitAmount**: see the next recipe |
 
-The stat can be one a component owns (`max_health`) or one you listed on an **Attributes**
-component. A status tick's source is whoever applied the status, so a mage's burns grow with
+The stat can be one a component owns (`max_health`) or one you listed in the
+manager's Stats. A status tick's source is whoever applied the status, so a mage's burns grow with
 the mage's `spell_power`. `examples/projectiles/fireball.tscn` uses one.
 
 ### Make a status that reacts to hits, kills and heals
@@ -229,8 +229,8 @@ CollisionShape3D.
 
 ### Make gear that changes stats
 
-1. New scene: a **Node3D** root, a **ComponentManager**, a **GrantModifiers**. Add a
-   StatModifier for each bonus, e.g. `max_health` add 25, or `move_speed` percent 0.1.
+1. New scene: a **Node3D** root, a **ComponentManager**, a **Grants**. In **Modifiers**, add
+   a StatModifier for each bonus, e.g. `max_health` add 25, or `move_speed` percent 0.1.
 2. New Resource > **ItemData**: set `slot` (e.g. `ring`) and `scene` to that scene.
 3. On the character, add the slot to **Equipment > Sockets**, pointing at a Node3D.
 
@@ -246,13 +246,13 @@ ring.state[&"modifiers"] = [bonus]
 (Component.of(player, Inventory) as Inventory).add_instance(ring)
 ```
 
-Use GrantStatuses instead (the next recipe) when the bonus should show on a status bar,
-grant an immunity or react to hits.
+Grant a status instead (the next recipe) when the bonus should show on a status bar, grant
+an immunity or react to hits.
 
 ### Make an item that gives a passive
 
-1. New scene: a **Node3D** root, a **ComponentManager**, a **GrantStatuses**. Put the passive
-   in GrantStatuses > Statuses.
+1. New scene: a **Node3D** root, a **ComponentManager**, a **Grants**. Put the passive in
+   Grants > Statuses.
 2. New Resource > **ItemData**: set `slot` (e.g. `cloak`) and `scene` to that scene.
 3. On the character, add the slot to **Equipment > Sockets**, pointing at a Node3D.
 
@@ -284,15 +284,16 @@ See `items/rifle.tres` and `items/flare_gun.tres`. More to set in the Inspector:
    Set its `Speed`, and `Gravity Scale` for a shot that arcs. For a rocket, set
    `Blast Radius` and put a DamageEffect in `Blast Effects`; `Impact Scene` spawns an
    explosion where it lands.
-2. Build the weapon as above, with a **Launcher** in place of the Hitscan. Set its
-   **Projectile** to that scene and put the direct hit's DamageEffect in its **Effects**.
+2. Build the weapon as above, without the Hitscan. In the Trigger's **User Effects**, add a
+   **LaunchProjectileEffect**: set its **Projectile** to that scene and put the direct hit's
+   DamageEffect in its **Effects**.
 
 A projectile never hits whoever launched it directly, but its blast reaches everyone in
 range. Put an IsHostileCondition on the blast's DamageEffect to spare the shooter and allies.
 
 ### Make an item that grants an ability
 
-Add a **GrantAbilities** to the item's scene and fill in **Abilities**: an action name and an
+Add a **Grants** to the item's scene and fill in **Abilities**: an action name and an
 AbilityData, as in a character's Abilities slots. The wielder (who needs an Abilities
 component) has the ability while the item is equipped, and gets back whatever was in that
 slot when it's unequipped. See `items/fire_staff.tres`.
@@ -427,9 +428,11 @@ func _on_took_damage(ctx: EffectContext) -> void:
 	print("%s %s damage from %s" % [ctx.amount, ctx.damage_type, ctx.source])
 ```
 
-From a script that isn't a component, such as a HUD, subscribe on the character's manager:
-`ComponentManager.of(player).subscribe(&"took_damage", _on_player_hurt)`. An item component
-hears its wielder with `on(&"killed", _on_wielder_killed, 0, wielder)`.
+Each event is a Godot signal on the character's manager. A script that isn't a component,
+such as a HUD, connects to it:
+`ComponentManager.of(player).event(&"took_damage").connect(_on_player_hurt)`. An item
+component hears its wielder with `on(&"killed", _on_wielder_killed, wielder)`. To hear every
+event of a character, for a combat log, connect to the manager's `event_sent`.
 
 | Event | When | Status triggers |
 | --- | --- | --- |
@@ -452,8 +455,8 @@ Send your own with `ComponentManager.notify(node, &"my_event")`, and status trig
 it too. To say who caused it, pass a context as well:
 `ComponentManager.notify(node, &"my_event", EffectContext.new(who, node))`.
 
-A third argument to `on()` or `subscribe()` is a priority: higher hears the event first, and
-a negative one hears it after every status trigger has run.
+Status triggers react first, then listeners hear the event in the order they connected, so
+a listener always sees a hit after every status has changed it.
 
 ### Hear events from the whole level
 
@@ -462,18 +465,18 @@ kill feed or achievements. Nothing needs adding to the scene:
 
 ```gdscript
 func _ready() -> void:
-	WorldEvents.on(&"died", _on_anything_died)
+	WorldEvents.event(&"died").connect(_on_anything_died)
 
 func _on_anything_died(who: Node, ctx: EffectContext) -> void:
 	if who.is_in_group(&"enemy") and ctx and ctx.source == player:
-		(Component.of(player, Attributes) as Attributes).add_base(&"experience", 25)
+		ComponentManager.of(player).add_base(&"experience", 25)
 ```
 
-The listener is dropped by itself when its node is freed.
+The connection ends by itself when the listening node is freed.
 
 ### Add a stat or a damage type
 
-- **A stat:** list it on an **Attributes** component (see "Give a character its own stats").
+- **A stat:** list it in the ComponentManager's **Stats** (see "Give a character its own stats").
   For a number one of your own components uses, return it from the component's `_stats()`,
   e.g. `{ &"max_stamina": max_stamina }`, and read it with `stat(&"max_stamina")`. Either way,
   statuses change it with a StatModifier of that name.
@@ -619,9 +622,9 @@ these:
   was turned away, by an immunity or a failed `apply_conditions`.
 - **An ability won't fire?** Connect to `Abilities.failed`, or print
   `abilities.why_not(ability)`. See "Tell the player why an ability failed".
-- **A hit does the wrong damage?** Subscribe to `took_damage` with a negative priority and
-  print the context: `ctx.amount` is what landed, and `ctx.damage_type` and `ctx.tags` say
-  what kind of hit it was.
+- **A hit does the wrong damage?** Connect to the `took_damage` event and print the context:
+  `ctx.amount` is what landed, and `ctx.damage_type` and `ctx.tags` say what kind of hit it
+  was.
 - **A component does nothing?** Check the Output panel for "can't start: it needs …".
 - `ComponentManager.stat_of(node, &"move_speed")` prints any stat's current value.
 - **Which way is it moving?** In the Remote tab, click the **CharacterMotor**: its `mode` is

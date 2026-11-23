@@ -220,6 +220,7 @@ class Needy extends Component:
 	func _start() -> void:
 		starts += 1
 		listen((find(Needed) as Needed).ping, func() -> void: pings += 1)
+		listen(manager.event_sent, _on_event)
 
 	func _stop() -> void:
 		stops += 1

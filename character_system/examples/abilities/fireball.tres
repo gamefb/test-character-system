@@ -1,18 +1,14 @@
-[gd_resource type="Resource" script_class="AbilityData" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="AbilityData" format=3]
 
-[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="1_in6a7"]
-[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="2_gt7pq"]
-[ext_resource type="Script" path="res://character_system/resources/abilities/ability_data.gd" id="3_3e7y3"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_in6a7"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="2_gt7pq"]
+[ext_resource type="Script" path="res://character_system/core/abilities/ability_data.gd" id="3_3e7y3"]
 [ext_resource type="PackedScene" path="res://character_system/examples/projectiles/fireball.tscn" id="4_a0dtg"]
-[ext_resource type="Script" path="res://character_system/resources/effects/launch_projectile_effect.gd" id="5_h0mer"]
+[ext_resource type="Script" path="res://character_system/kit/effects/launch_projectile_effect.gd" id="5_h0mer"]
 
 [sub_resource type="Resource" id="Resource_1ugdr"]
 script = ExtResource("5_h0mer")
 projectile = ExtResource("4_a0dtg")
-effects = Array[ExtResource("2_gt7pq")]([])
-height = 1.2
-forward = 0.6
-conditions = Array[ExtResource("1_in6a7")]([])
 
 [resource]
 script = ExtResource("3_3e7y3")
@@ -20,14 +16,9 @@ id = &"fireball"
 display_name = "Fireball"
 description = "Costs 20 mana and takes half a second to cast. Bursts for fire damage that grows with spell_power, and sets what it hits alight."
 cooldown = 2.0
-charges = 1
 costs = Dictionary[StringName, float]({
 &"mana": 20.0
 })
-conditions = Array[ExtResource("1_in6a7")]([])
 blocked_by_tags = Array[StringName]([&"silenced"])
 cast_time = 0.5
-interrupted_by_damage = false
-needs_target = false
-effects = Array[ExtResource("2_gt7pq")]([])
 user_effects = Array[ExtResource("2_gt7pq")]([SubResource("Resource_1ugdr")])

@@ -1,9 +1,9 @@
 [gd_scene load_steps=10 format=3]
 
-[ext_resource type="Script" path="res://character_system/world/effect_zone.gd" id="1_vwqls"]
-[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="2_yxpfp"]
-[ext_resource type="Script" path="res://character_system/resources/conditions/_base/condition.gd" id="3_ryt2f"]
-[ext_resource type="Script" path="res://character_system/resources/effects/apply_status_effect.gd" id="4_jqjy7"]
+[ext_resource type="Script" path="res://character_system/kit/world/effect_zone.gd" id="1_vwqls"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="2_yxpfp"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="3_ryt2f"]
+[ext_resource type="Script" path="res://character_system/core/effects/apply_status_effect.gd" id="4_jqjy7"]
 [ext_resource type="Resource" path="res://immunity_test/data/statuses/poisoned.tres" id="5_vwxaf"]
 
 [sub_resource type="Resource" id="Resource_dtexm"]

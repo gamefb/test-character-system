@@ -1,16 +1,13 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3]
 
 [ext_resource type="PackedScene" path="res://character_system/examples/items/scenes/fire_staff.tscn" id="1_sgcls"]
-[ext_resource type="Script" path="res://character_system/resources/items/item_data.gd" id="2_7j5tn"]
-[ext_resource type="Script" path="res://character_system/resources/effects/_base/effect.gd" id="3_irxjo"]
+[ext_resource type="Script" path="res://character_system/core/items/item_data.gd" id="2_7j5tn"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_irxjo"]
 
 [resource]
 script = ExtResource("2_7j5tn")
 id = &"fire_staff"
 display_name = "Fire staff"
 description = "Casts Fireball on the secondary action, and adds 20% to fire damage."
-max_stack = 1
 slot = &"weapon"
 scene = ExtResource("1_sgcls")
-use_effects = Array[ExtResource("3_irxjo")]([])
-consumed_on_use = true

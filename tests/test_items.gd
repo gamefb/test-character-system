@@ -48,7 +48,7 @@ func heal(amount: float) -> HealEffect:
 func test_gear_changes_stats_while_equipped() -> void:
 	var who: Node3D = make_character()
 	var gear := Component.of(who, Equipment) as Equipment
-	var vigor := GrantModifiers.new()
+	var vigor := Grants.new()
 	vigor.modifiers = [modifier(&"max_health", 25.0)]
 	var ring: ItemData = item([vigor])
 	gear.equip(ItemInstance.new(ring))
@@ -63,7 +63,7 @@ func test_gear_changes_stats_while_equipped() -> void:
 func test_each_copy_can_carry_its_own_rolls() -> void:
 	var who: Node3D = make_character()
 	var gear := Component.of(who, Equipment) as Equipment
-	var ring: ItemData = item([GrantModifiers.new()])
+	var ring: ItemData = item([Grants.new()])
 	var lucky := ItemInstance.new(ring)
 	lucky.state[&"modifiers"] = [modifier(&"max_health", 40.0)]
 	var plain := ItemInstance.new(ring)
@@ -81,7 +81,7 @@ func test_gear_grants_abilities_while_equipped() -> void:
 	var punch := AbilityData.new()
 	var fireball := AbilityData.new()
 	abilities.slots = { &"secondary": punch }
-	var grant := GrantAbilities.new()
+	var grant := Grants.new()
 	grant.abilities = { &"secondary": fireball, &"ability_1": fireball }
 	var staff: ItemData = item([grant], &"weapon")
 	gear.equip(ItemInstance.new(staff))

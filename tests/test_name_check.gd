@@ -27,7 +27,7 @@ func test_finds_names_in_the_project() -> void:
 		&"jump_velocity",
 		&"air_jumps",
 		&"cooldown_speed",
-		# Listed on the Attributes of the example mage.
+		# Listed in the stats of the example mage.
 		&"spell_power",
 		&"crit_chance",
 		# From the example mage's two Pools.
@@ -197,7 +197,7 @@ func test_components_warn_about_their_resources() -> void:
 	var statuses := Statuses.new()
 	statuses.innate = [bad]
 	assert_eq(statuses._warnings().size(), 1)
-	var grant := GrantStatuses.new()
+	var grant := Grants.new()
 	grant.statuses = [bad]
 	assert_eq(grant._warnings().size(), 1)
 	var hitscan := Hitscan.new()
@@ -207,7 +207,10 @@ func test_components_warn_about_their_resources() -> void:
 	hit.conditions = [c]
 	hitscan.effects = [hit]
 	assert_eq(hitscan._warnings().size(), 1)
-	for node in [statuses, grant, hitscan]:
+	var trigger := Trigger.new()
+	trigger.user_effects = [hit]
+	assert_eq(trigger._warnings().size(), 1)
+	for node in [statuses, grant, hitscan, trigger]:
 		node.free()
 
 

@@ -244,17 +244,19 @@ func test_a_projectile_with_a_blast_goes_off_when_its_time_is_up() -> void:
 	assert_false(is_instance_valid(second), "one without a blast just disappears")
 
 
-func test_a_launcher_fires_projectiles_from_a_weapon() -> void:
+func test_a_weapon_fires_projectiles_through_its_triggers_effects() -> void:
 	var shooter: CharacterBody3D = make_character()
 	var target: CharacterBody3D = make_character(Vector3(0, 0, -8))
-	var launcher := Launcher.new()
-	launcher.projectile = projectile_scene()
-	launcher.effects = [damage(25.0)]
-	var bow: ItemData = item([Trigger.new(), launcher])
+	var loose := LaunchProjectileEffect.new()
+	loose.projectile = projectile_scene()
+	loose.effects = [damage(25.0)]
+	var string := Trigger.new()
+	string.user_effects = [loose]
+	var bow: ItemData = item([string])
 	(Component.of(shooter, Equipment) as Equipment).equip(ItemInstance.new(bow))
 	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP
 	var origins: Array = []
-	ComponentManager.of(target).subscribe(&"took_damage",
+	ComponentManager.of(target).event(&"took_damage").connect(
 			func(ctx: EffectContext) -> void: origins.append(ctx.origin))
 	await physics_frames()
 	await pull_trigger(shooter)

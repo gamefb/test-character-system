@@ -12,12 +12,13 @@ extends Node
 ## It does three jobs:
 ## [br]- [b]Lookup.[/b] [method find] returns a component by type. It remembers the answer
 ## until the host's children change, so it's cheap enough to call every frame.
-## [br]- [b]Stats.[/b] Components declare numbers in [method Component._stats]; [method stat]
-## returns them with every [StatModifier] applied, and [signal stat_changed] reports changes.
-## [method modifiers_of] lists what is changing a stat, for a character sheet.
-## [br]- [b]Events.[/b] [method send] passes an event to everything that asked for it with
-## [method subscribe] (or [method Component.on]) and to every running component's
-## [method Component._on_event]. [WorldEvents] hears the events of every host at once.
+## [br]- [b]Stats.[/b] Components declare numbers in [method Component._stats], and
+## [member stats] lists any others; [method stat] returns them with every [StatModifier]
+## applied, and [signal stat_changed] reports changes. [method modifiers_of] lists what is
+## changing a stat, for a character sheet.
+## [br]- [b]Events.[/b] Every event is a signal. [method event] returns the signal for one
+## event on this host, and [method send] emits it. [WorldEvents] has the same signals for
+## every host at once.
 ##
 ## From other code, use the static helpers [method of], [method notify] and [method stat_of].
 ## They take any node and do nothing (or return 0) if it has no manager, so they're safe on
@@ -26,7 +27,7 @@ extends Node
 ## var speed := ComponentManager.stat_of(player, &"move_speed")
 ## ComponentManager.notify(player, &"level_up")
 ## ComponentManager.of(player).stat_changed.connect(_on_player_stat_changed)
-## ComponentManager.of(player).subscribe(&"took_damage", _on_player_hurt)
+## ComponentManager.of(player).event(&"took_damage").connect(_on_player_hurt)
 ## [/codeblock]
 ## Keep this node's default name. [method of] looks for a child with that name first, and only
 ## searches all the children when there isn't one.
@@ -36,11 +37,18 @@ extends Node
 ## [method Component.update_stats]. Read the new value with [method stat]. Useful for UI, such as
 ## a health bar that follows max health.
 signal stat_changed(stat_name: StringName)
+## Emitted for every event sent to this host, before the event's own signal. [Statuses] uses
+## it to run status triggers. To hear one event, connect to [method event] instead.
+signal event_sent(event_name: StringName, ctx: EffectContext)
 
-const _NO_LISTENERS: Array = []
-
-# Script instance id -> whether that script or one it extends overrides _on_event().
-static var _overriding: Dictionary[int, bool] = {}
+## Stats of your game's own, and their values before statuses and items: strength, level,
+## crit_chance. A stat listed here works everywhere stats do, with no script: a [StatModifier]
+## changes it, a [StatAmount] scales an effect with it, and [method stat] reads it. A
+## component that returns the same name from [method Component._stats] wins.
+@export var stats: Dictionary[StringName, float] = {}:
+	set(value):
+		stats = value
+		refresh_stats()
 
 ## True once the host is ready and its components have had the chance to start. At that moment
 ## every running component also hears the [code]started[/code] event.
@@ -53,15 +61,13 @@ var host: Node:
 # True while the components first start, before [member started].
 var _starting := false
 var _components: Array[Component] = []
-var _hearing: Array[Component] = []  # The components that override _on_event(), in order.
 var _modifiers: Array[StatModifier] = []
 var _modifier_sources: Array[Object] = []  # What added each modifier, in the same order.
 var _cache: Dictionary[StringName, float] = {}  # Stat values, cleared whenever anything changes.
 var _bases: Dictionary[StringName, float] = {}  # Base values, cleared when a component changes.
 var _resolving: Dictionary[StringName, bool] = {}  # Stats being worked out right now.
 var _found: Dictionary[Script, Component] = {}  # find() answers, cleared when children change.
-# Event -> [priority, Callable, owner id] entries from subscribe(), highest priority first.
-var _subscribers: Dictionary[StringName, Array] = {}
+var _events: Dictionary[StringName, Signal] = {}  # The signals event() has handed out.
 
 
 ## Returns [param node]'s [ComponentManager] child, or null. Safe on null or freed nodes:
@@ -85,9 +91,9 @@ static func of(node: Variant) -> ComponentManager:
 ## Sends [param event] to [param node]'s components, if it has a [ComponentManager].
 ##
 ## Use it for your own events, e.g. [code]&"jumped"[/code] or [code]&"level_up"[/code]. Every
-## running component hears it in [method Component._on_event], and status triggers with that
-## [member StatusTrigger.event] fire. Leave out [param ctx] and a context with [param node] as
-## the target is made for you; pass your own to say who caused it.
+## listener connected with [method event] or [method Component.on] hears it, and status
+## triggers with that [member StatusTrigger.event] fire. Leave out [param ctx] and a context
+## with [param node] as the target is made for you; pass your own to say who caused it.
 static func notify(node: Variant, event: StringName, ctx: EffectContext = null) -> void:
 	var m: ComponentManager = of(node)
 	if m:
@@ -183,70 +189,51 @@ func has_registered(type: Script) -> bool:
 	return false
 
 
-## Sends [param event] to everything listening on this host. Components that are stopped, or
-## not yet started, miss it. From outside the host, use [method notify], which also copes with
-## a null node.
-##
-## Listeners hear it in this order:
-## [br]1. Methods subscribed with a priority above 0, highest first.
-## [br]2. Every running component's [method Component._on_event], in scene order. [Statuses]
-## runs its status triggers here.
-## [br]3. Methods subscribed with priority 0 or below, highest first.
-## [br]4. [WorldEvents] listeners, which hear the events of every host.
-func send(event: StringName, ctx: EffectContext) -> void:
-	var listeners: Array = _subscribers.get(event, _NO_LISTENERS)
-	if not listeners.is_empty():
-		listeners = listeners.duplicate()  # A listener may unsubscribe while it's called.
-	var next: int = 0
-	while next < listeners.size() and listeners[next][0] > 0:
-		_call_subscriber(event, listeners[next], ctx)
-		next += 1
-	# Only the components that override _on_event(), which is few: most use on().
-	if not _hearing.is_empty():
-		for c in _hearing.duplicate():
-			if c.running:
-				c._on_event(event, ctx)
-	while next < listeners.size():
-		_call_subscriber(event, listeners[next], ctx)
-		next += 1
-	WorldEvents.emit(host, event, ctx)
+## Sends [param event_name] to this host: emits [signal event_sent], then the event's own
+## signal if anything has asked for it with [method event], then the same event on
+## [WorldEvents]. From outside the host, use [method notify], which also copes with a null
+## node.
+func send(event_name: StringName, ctx: EffectContext) -> void:
+	event_sent.emit(event_name, ctx)
+	if _events.has(event_name):
+		_events[event_name].emit(ctx)
+	WorldEvents.emit(host, event_name, ctx)
 
 
-## Calls [param method] with the event's [EffectContext] each time [param event] is sent to
-## this host, until [method unsubscribe]. Use it from code that isn't a component, such as a
-## HUD; components use [method Component.on], which unsubscribes by itself.
-##
-## A higher [param priority] hears the event earlier; see [method send] for the order. The
-## method takes one argument, which is null for events sent without a context:
+## The signal for one event on this host, e.g. [code]event(&"took_damage")[/code]. It's an
+## ordinary signal: connect a method that takes the event's [EffectContext], which is null for
+## events sent without one. Components use [method Component.on], which also disconnects when
+## the component stops; everything else connects directly, such as a HUD:
 ## [codeblock]
 ## func _ready() -> void:
-## 	ComponentManager.of(player).subscribe(&"took_damage", _flash_red)
+## 	ComponentManager.of(player).event(&"took_damage").connect(_flash_red)
 ##
 ## func _flash_red(ctx: EffectContext) -> void:
 ## 	flash.modulate.a = clampf(ctx.amount / 20.0, 0.2, 1.0)
 ## [/codeblock]
-## A method whose object has been freed is dropped the next time the event is sent, and so is
-## a lambda that uses the object it was written in. A lambda that doesn't use its own object
-## is never dropped: remove it with [method unsubscribe].
-func subscribe(event: StringName, method: Callable, priority: int = 0) -> void:
-	var list: Array = _subscribers.get_or_add(event, [])
-	var at: int = list.size()
-	for i in list.size():
-		if priority > list[i][0]:
-			at = i
-			break
-	list.insert(at, [priority, method, WorldEvents.owner_of(method)])
+## As with any signal, a connection ends by itself when the listener is freed, and listeners
+## are called in the order they connected. [method Component._start] lists the built-in events.
+func event(event_name: StringName) -> Signal:
+	if not _events.has(event_name):
+		# Prefixed, so an event may share its name with one of Node's own signals.
+		var signal_name := StringName("event_" + event_name)
+		add_user_signal(signal_name, [{ "name": "ctx", "type": TYPE_OBJECT }])
+		_events[event_name] = Signal(self, signal_name)
+	return _events[event_name]
 
 
-## Undoes one [method subscribe] of [param method] to [param event].
-func unsubscribe(event: StringName, method: Callable) -> void:
-	var list: Array = _subscribers.get(event, [])
-	for i in list.size():
-		if list[i][1] == method:
-			list.remove_at(i)
-			break
-	if list.is_empty():
-		_subscribers.erase(event)
+## Sets the base value of a stat in [member stats], adding it if it isn't listed yet.
+func set_base(stat_name: StringName, value: float) -> void:
+	stats[stat_name] = value
+	_bases.erase(stat_name)
+	_cache.erase(stat_name)
+	stat_changed.emit(stat_name)
+
+
+## Adds [param amount] to the base value of a stat in [member stats], e.g. a level on level
+## up: [code]manager.add_base(&"level", 1)[/code]. Everything scaled by the stat follows.
+func add_base(stat_name: StringName, amount: float) -> void:
+	set_base(stat_name, stats.get(stat_name, 0.0) + amount)
 
 
 ## Current value of a stat: (base + all adds) × (1 + all percents) × all muls. The base comes
@@ -288,10 +275,10 @@ func stat(stat_name: StringName) -> float:
 
 
 ## A stat's value before any [StatModifier]: what the component that owns it returns from
-## [method Component._stats], or 0 if no component owns it.
+## [method Component._stats], else its value in [member stats], else 0.
 func base_of(stat_name: StringName) -> float:
 	if not _bases.has(stat_name):
-		var base: float = 0.0
+		var base: float = stats.get(stat_name, 0.0)
 		for c in _components:
 			var owned: Dictionary[StringName, float] = c._stats()
 			if owned.has(stat_name):
@@ -368,6 +355,9 @@ func refresh_stats() -> void:
 		for stat_name in c._stats():
 			if stat_name not in names:
 				names.append(stat_name)
+	for stat_name in stats:
+		if stat_name not in names:
+			names.append(stat_name)
 	for stat_name in names:
 		stat_changed.emit(stat_name)
 
@@ -380,8 +370,6 @@ func register(c: Component) -> void:
 	if c in _components:
 		return
 	_components.append(c)
-	if _hears_every_event(c):
-		_hearing.append(c)
 	c._manager = self
 	_stats_changed_by(c)
 	if started or _starting:
@@ -396,7 +384,6 @@ func unregister(c: Component) -> void:
 		return
 	c._halt()
 	_components.erase(c)
-	_hearing.erase(c)
 	c._manager = null
 	_stats_changed_by(c)
 	for other in _components.duplicate():
@@ -442,23 +429,6 @@ func _stats_changed_by(c: Component) -> void:
 		stat_changed.emit(stat_name)
 
 
-# True if c's script overrides _on_event(), so send() must call it for every event.
-func _hears_every_event(c: Component) -> bool:
-	var script: Script = c.get_script()
-	var id: int = script.get_instance_id()
-	if not _overriding.has(id):
-		var overrides := false
-		var base: Script = script
-		while base and base != Component and not overrides:
-			for method in base.get_script_method_list():
-				if method.name == "_on_event":
-					overrides = true
-					break
-			base = base.get_base_script()
-		_overriding[id] = overrides
-	return _overriding[id]
-
-
 func _found_clear() -> void:
 	_found.clear()
 
@@ -467,14 +437,6 @@ func _found_clear() -> void:
 func _conditions_pass(index: int) -> bool:
 	var ctx := EffectContext.new(host, host, _modifier_sources[index] as Resource)
 	return Condition.all_pass(_modifiers[index].conditions, ctx)
-
-
-# entry is one [priority, Callable, owner id] from _subscribers.
-func _call_subscriber(event: StringName, entry: Array, ctx: EffectContext) -> void:
-	if WorldEvents.is_alive(entry[1], entry[2]):
-		entry[1].call(ctx)
-	else:
-		unsubscribe(event, entry[1])  # Its object was freed.
 
 
 func _editor_notification(what: int) -> void:

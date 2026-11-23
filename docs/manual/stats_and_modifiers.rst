@@ -9,10 +9,10 @@ The three parts of a modifier do different jobs. ``add`` is a flat change, such 
 
 A stat no component owns has a base of 0. Modifiers on it still add up, which is how ``bonus_fire`` works with nothing to set up, but nothing reads ``move_speed`` on a turret without a :ref:`CharacterMotor<class_CharacterMotor>`, so a modifier on it does nothing there.
 
-.. source-file:: ../../character_system/resources/stats/stat_modifier.gd
+.. source-file:: ../../character_system/core/stats/stat_modifier.gd
 
 -  **Stats are open-ended.** A new component adds its own numbers by returning them from ``_stats()``; nothing else changes. :ref:`Health<class_Health>` turns each entry in its ``resistances`` into a ``resist_<type>`` stat, so ``resist_poison`` needs no code either.
--  **Your game's own stats need no script.** An :ref:`Attributes<class_Attributes>` component owns whatever you list on it in the Inspector: ``strength``, ``level``, ``crit_chance``. See :ref:`doc_attributes`.
+-  **Your game's own stats need no script and no node.** The :ref:`ComponentManager<class_ComponentManager>` owns whatever you list in its **Stats** in the Inspector: ``strength``, ``level``, ``crit_chance``. See :ref:`doc_attributes`.
 -  **Modifiers can be conditional.** A modifier with ``conditions`` only counts while they pass, checked on the character each time the stat is read: "+50% speed below half health" is a modifier with a :ref:`HealthBelowCondition<class_HealthBelowCondition>`. Such a stat isn't cached, and ``stat_changed`` isn't emitted when a condition flips, so UI that shows it should read it every frame.
 -  **A number can be explained.** ``base_of(stat)`` is the value before modifiers, and ``modifiers_of(stat)`` lists every modifier on it with what added it, such as the :ref:`StatusData<class_StatusData>` or the item. A character sheet can show "Move speed 4.5: base 5, Boots +1, Haste +50%, Aiming ×0.5".
 -  **Stacks are copies.** The same modifier resource can be added several times, once per status stack. ``remove_modifier`` removes one copy, so stacks unwind correctly.
@@ -51,7 +51,7 @@ A stat no component owns has a base of 0. Modifiers on it still add up, which is
      - The :ref:`Pool<class_Pool>` with that name
      - Max Value (100) and Regen (0)
    * - Any name you choose
-     - :ref:`Attributes<class_Attributes>`
+     - The :ref:`ComponentManager<class_ComponentManager>` itself
      - Stats, e.g. strength: 10
 
 Your own components add more: any name a component returns from ``_stats()`` is a stat. Movement modes and moves can own stats the same way; the motor adds theirs to its own. :ref:`doc_extending_names` shows how.
@@ -60,12 +60,18 @@ Your own components add more: any name a component returns from ``_stats()`` is 
 
 .. _doc_attributes:
 
-Attributes
-----------
+Stats of your own
+-----------------
 
-.. source-file:: ../../character_system/characters/components/attributes.gd
+Select the character's :ref:`ComponentManager<class_ComponentManager>` and add entries to **Stats**: a name and a base value each. Code changes a base with ``set_base()`` and ``add_base()`` on the manager:
 
-A stat listed here is like any other: statuses and gear change it, effects scale with it, conditions test it, and the :ref:`editor warnings <doc_editor_warnings_for_names>` know its name once a saved scene lists it. Levelling up is ``add_base(&"level", 1)``; everything scaled by ``level`` follows.
+.. code-block:: gdscript
+
+   var manager := ComponentManager.of(player)
+   manager.add_base(&"level", 1)       # Level up; everything scaled by level follows.
+   manager.set_base(&"strength", 14)
+
+A stat listed there is like any other: statuses and gear change it, effects scale with it, conditions test it, and the :ref:`editor warnings <doc_editor_warnings_for_names>` know its name once a saved scene lists it. If a component owns a stat with the same name, the component's value is used.
 
 .. _doc_pools:
 
@@ -74,7 +80,7 @@ Pools
 
 A :ref:`Pool<class_Pool>` is a number that's spent and regained: mana, stamina, energy, rage. A character has one per kind, each named in the Inspector.
 
-.. source-file:: ../../character_system/characters/components/pool.gd
+.. source-file:: ../../character_system/core/characters/pool.gd
 
 -  **Spending.** An ability's ``costs`` take from pools by name, a :ref:`ChangePoolEffect<class_ChangePoolEffect>` adds or takes from any effect list, and code calls ``spend()``, which takes nothing unless the pool has enough.
 -  **Two stats each.** ``max_<pool>`` and ``<pool>_regen`` go through the manager, so a status can raise the maximum or the refill rate. The current amount is cut down when the maximum drops.

@@ -12,7 +12,7 @@ Effects
 
 .. source-file:: ../../character_system/core/effect_context.gd
 
-.. source-file:: ../../character_system/resources/effects/_base/effect.gd
+.. source-file:: ../../character_system/core/effects/effect.gd
 
 To make a new effect, extend :ref:`Effect<class_Effect>`, add ``@export`` fields for its numbers, and write ``_execute()``. Conditions then work on it automatically. :ref:`doc_extending_effect` walks through one.
 
@@ -21,7 +21,7 @@ To make a new effect, extend :ref:`Effect<class_Effect>`, add ``@export`` fields
 How a hit is worked out
 -----------------------
 
-.. source-file:: ../../character_system/resources/effects/damage_effect.gd
+.. source-file:: ../../character_system/core/effects/damage_effect.gd
 
 Every hit goes through the same steps, in the same order:
 
@@ -62,9 +62,9 @@ Every hit goes through the same steps, in the same order:
 
 Because step 3 only collects changes and step 4 applies them, the result doesn't depend on which status was applied first: armour of -3 and a shield of ×0.5 turn a hit of 10 into 3.5 in either order. Resistance is capped at 1 and the final amount is never negative, so stacking resistances can block damage but never turn it into healing. A target that is already dead is left alone: no damage, and no events.
 
-The hit also says what kind it was. ``damage_type`` is the effect's type, ``tags`` are labels from the :ref:`Hurtbox<class_Hurtbox>` that was hit (``head``), from the effect (``melee``) and from statuses (``crit``), and ``position`` is where a ray or projectile landed. :ref:`DamageTypeCondition<class_DamageTypeCondition>` and :ref:`HitTagCondition<class_HitTagCondition>` test the first two, so a status can react to fire only, or to headshots only.
+The hit also says what kind it was. ``damage_type`` is the effect's type, ``tags`` are labels from the :ref:`Hurtbox<class_Hurtbox>` that was hit (``head``), from the effect (``melee``) and from statuses (``crit``), and ``position`` is where a ray or projectile landed. A :ref:`HitCondition<class_HitCondition>` tests the first two, so a status can react to fire only, or to headshots only.
 
-.. source-file:: ../../character_system/resources/effects/heal_effect.gd
+.. source-file:: ../../character_system/core/effects/heal_effect.gd
 
 Healing goes through steps 1, 3, 4, 7 and 8 with its own events: ``giving_healing`` and ``receiving_healing`` before, ``gave_healing`` and ``received_healing`` after. A curse that halves healing received is a trigger on ``receiving_healing``, built the same way as a shield.
 
@@ -75,15 +75,15 @@ Amounts
 
 An effect's plain number is the same for everyone. Its ``scaling`` list makes it depend on who is involved: each :ref:`Amount<class_Amount>` in it is worked out when the effect runs and added on. :ref:`DamageEffect<class_DamageEffect>`, :ref:`HealEffect<class_HealEffect>` and :ref:`ChangePoolEffect<class_ChangePoolEffect>` all have one.
 
-.. source-file:: ../../character_system/resources/amounts/_base/amount.gd
+.. source-file:: ../../character_system/core/amounts/amount.gd
 
-.. source-file:: ../../character_system/resources/amounts/stat_amount.gd
+.. source-file:: ../../character_system/core/amounts/stat_amount.gd
 
-.. source-file:: ../../character_system/resources/amounts/health_amount.gd
+.. source-file:: ../../character_system/kit/amounts/health_amount.gd
 
-.. source-file:: ../../character_system/resources/amounts/hit_amount.gd
+.. source-file:: ../../character_system/kit/amounts/hit_amount.gd
 
-.. source-file:: ../../character_system/resources/amounts/random_amount.gd
+.. source-file:: ../../character_system/kit/amounts/random_amount.gd
 
 .. list-table::
    :header-rows: 1
@@ -103,30 +103,30 @@ An effect's plain number is the same for everyone. Its ``scaling`` list makes it
    * - 8 to 12 damage
      - 8 + :ref:`RandomAmount<class_RandomAmount>` (0 to 4)
 
-The stats come from the component that owns them, or from an :ref:`Attributes<class_Attributes>` component for stats of your own; see :ref:`doc_attributes`. A status tick's source is whoever applied the status, so a burn grows with the caster's ``spell_power``, not the victim's.
+The stats come from the component that owns them, or from the :ref:`ComponentManager<class_ComponentManager>`'s Stats for stats of your own; see :ref:`doc_attributes`. A status tick's source is whoever applied the status, so a burn grows with the caster's ``spell_power``, not the victim's.
 
 Other effects
 -------------
 
-.. source-file:: ../../character_system/resources/effects/apply_status_effect.gd
+.. source-file:: ../../character_system/core/effects/apply_status_effect.gd
 
-.. source-file:: ../../character_system/resources/effects/remove_status_effect.gd
+.. source-file:: ../../character_system/core/effects/remove_status_effect.gd
 
-.. source-file:: ../../character_system/resources/effects/modify_amount_effect.gd
+.. source-file:: ../../character_system/core/effects/modify_amount_effect.gd
 
 :ref:`ModifyAmountEffect<class_ModifyAmountEffect>` is how statuses take part in step 3 of the pipeline. :ref:`DamageEffect<class_DamageEffect>` announces the hit before it lands, a status trigger reacts with this effect, and the effect adds to the totals of the pending hit through ``ctx.cause``. ``per_stack`` makes each stack of the status count, and ``tag`` labels the hit, such as ``crit``.
 
-.. source-file:: ../../character_system/resources/effects/change_pool_effect.gd
+.. source-file:: ../../character_system/kit/effects/change_pool_effect.gd
 
-.. source-file:: ../../character_system/resources/effects/knockback_effect.gd
+.. source-file:: ../../character_system/kit/effects/knockback_effect.gd
 
 :ref:`KnockbackEffect<class_KnockbackEffect>` shows the rule that every effect handles a target without the component it needs: a character is shoved through ``CharacterMotor.push()``, a physics prop gets an impulse, and a wall is left alone.
 
-.. source-file:: ../../character_system/resources/effects/spawn_scene_effect.gd
+.. source-file:: ../../character_system/kit/effects/spawn_scene_effect.gd
 
 :ref:`SpawnSceneEffect<class_SpawnSceneEffect>` spawns a scene where the target is, such as a puddle that is itself an :ref:`EffectZone<class_EffectZone>`, so a status or an ability can leave ground that applies further statuses. With ``at`` set to ``HIT_POINT`` it spawns where the shot landed, for sparks or blood, and with ``SOURCE`` around whoever caused it.
 
-.. source-file:: ../../character_system/resources/effects/launch_projectile_effect.gd
+.. source-file:: ../../character_system/kit/effects/launch_projectile_effect.gd
 
 :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` turns an ability into a fireball; :ref:`doc_projectiles` covers the projectile itself.
 
@@ -135,27 +135,25 @@ Other effects
 Conditions
 ----------
 
-.. source-file:: ../../character_system/resources/conditions/_base/condition.gd
+.. source-file:: ../../character_system/core/conditions/condition.gd
 
-.. source-file:: ../../character_system/resources/conditions/has_tag_condition.gd
+.. source-file:: ../../character_system/core/conditions/has_tag_condition.gd
 
-.. source-file:: ../../character_system/resources/conditions/health_below_condition.gd
+.. source-file:: ../../character_system/kit/conditions/health_below_condition.gd
 
-.. source-file:: ../../character_system/resources/conditions/stat_condition.gd
+.. source-file:: ../../character_system/kit/conditions/stat_condition.gd
 
 ``_test(node) != negate`` is a compact way to flip the result: when ``negate`` is true, true becomes false and false becomes true. ``Condition.all_pass()`` is shared by effects and by status apply conditions, described under Status data.
 
-.. source-file:: ../../character_system/resources/conditions/is_hostile_condition.gd
+.. source-file:: ../../character_system/kit/conditions/is_hostile_condition.gd
 
 :ref:`IsHostileCondition<class_IsHostileCondition>` compares both sides, so it overrides ``check(ctx)`` instead of ``_test(node)``. On a weapon's damage effect, it turns friendly fire off. :ref:`doc_extending_condition` shows how to write your own.
 
-.. source-file:: ../../character_system/resources/conditions/chance_condition.gd
+.. source-file:: ../../character_system/kit/conditions/chance_condition.gd
 
-.. source-file:: ../../character_system/resources/conditions/damage_type_condition.gd
+.. source-file:: ../../character_system/kit/conditions/hit_condition.gd
 
-.. source-file:: ../../character_system/resources/conditions/hit_tag_condition.gd
-
-.. source-file:: ../../character_system/resources/conditions/any_condition.gd
+.. source-file:: ../../character_system/kit/conditions/any_condition.gd
 
 .. list-table::
    :header-rows: 1
@@ -178,12 +176,9 @@ Conditions
    * - :ref:`ChanceCondition<class_ChanceCondition>`
      - A roll succeeds; a stat such as ``crit_chance`` can add to the odds
      - Critical hits, a 1 in 5 chance to set alight
-   * - :ref:`DamageTypeCondition<class_DamageTypeCondition>`
-     - The hit's damage type is one of those listed
-     - A ward against fire only
-   * - :ref:`HitTagCondition<class_HitTagCondition>`
-     - The hit has a tag
-     - Headshot bonuses, reacting to melee hits or to crits
+   * - :ref:`HitCondition<class_HitCondition>`
+     - The hit's damage type is one of those listed, and the hit has every tag listed
+     - A ward against fire only, headshot bonuses, reacting to melee hits or to crits
    * - :ref:`AnyCondition<class_AnyCondition>`
      - At least one of the conditions inside it passes
      - "Wet or below half health"
@@ -195,9 +190,9 @@ A list of conditions needs all of them to pass; put alternatives inside an AnyCo
 Status data
 -----------
 
-.. source-file:: ../../character_system/resources/statuses/status_trigger.gd
+.. source-file:: ../../character_system/core/statuses/status_trigger.gd
 
-.. source-file:: ../../character_system/resources/statuses/status_data.gd
+.. source-file:: ../../character_system/core/statuses/status_data.gd
 
 ``@export_group`` sorts the fields into collapsible sections in the inspector, so designers see Display, Rules and Effects separately.
 
@@ -237,7 +232,7 @@ Status data
 Events
 ------
 
-An event is a name and an :ref:`EffectContext<class_EffectContext>`, sent to one host. A component hears the events it asked for with ``on()``, :ref:`Statuses<class_Statuses>` passes every event on to status triggers, and code outside the host subscribes on its manager. The damage and healing events are built in, :ref:`Health<class_Health>` sends ``died``, ``killed`` and ``revived``, :ref:`Abilities<class_Abilities>` sends three, the manager sends ``started``, :ref:`Inventory<class_Inventory>` sends ``inventory_changed``, and the :ref:`CharacterMotor<class_CharacterMotor>` sends one each time a movement mode or move starts or ends. Status triggers only react to events that carry a context, so ``started``, ``revived`` and ``inventory_changed`` reach components but never triggers, and ``died`` reaches triggers only when something dealt the killing blow. Any system can add more with one line, such as ``ComponentManager.notify(host, &"jumped")``. ``notify()`` gives the event a context with the host as the target, so triggers react to it; pass your own :ref:`EffectContext<class_EffectContext>` as a third argument to say who caused it.
+An event is a name and an :ref:`EffectContext<class_EffectContext>`, sent to one host. Each event is an ordinary Godot signal on the host's manager: a component connects to the ones it wants with ``on()``, code outside the host connects with ``event()``, and :ref:`Statuses<class_Statuses>` passes every event on to status triggers. The damage and healing events are built in, :ref:`Health<class_Health>` sends ``died``, ``killed`` and ``revived``, :ref:`Abilities<class_Abilities>` sends three, the manager sends ``started``, :ref:`Inventory<class_Inventory>` sends ``inventory_changed``, and the :ref:`CharacterMotor<class_CharacterMotor>` sends one each time a movement mode or move starts or ends. Status triggers only react to events that carry a context, so ``started``, ``revived`` and ``inventory_changed`` reach components but never triggers, and ``died`` reaches triggers only when something dealt the killing blow. Any system can add more with one line, such as ``ComponentManager.notify(host, &"jumped")``. ``notify()`` gives the event a context with the host as the target, so triggers react to it; pass your own :ref:`EffectContext<class_EffectContext>` as a third argument to say who caused it.
 
 .. list-table::
    :header-rows: 1
@@ -323,16 +318,21 @@ An event is a name and an :ref:`EffectContext<class_EffectContext>`, sent to one
      - ``on(&"took_damage", _on_took_damage)`` in ``_start()``
      - When the component stops
    * - A component, for another host, such as an item for its wielder
-     - ``on(&"killed", _on_wielder_killed, 0, wielder)``
+     - ``on(&"killed", _on_wielder_killed, wielder)``
      - When the component stops
    * - Anything else, such as a HUD
-     - ``ComponentManager.of(player).subscribe(&"took_damage", _on_player_hurt)``
-     - With ``unsubscribe()``, or when the listener is freed
+     - ``ComponentManager.of(player).event(&"took_damage").connect(_on_player_hurt)``
+     - With ``disconnect()``, or when the listener is freed
    * - Something that watches the whole level
-     - ``WorldEvents.on(&"died", _on_anything_died)``
-     - With ``off()``, or when the listener is freed
+     - ``WorldEvents.event(&"died").connect(_on_anything_died)``
+     - With ``disconnect()``, or when the listener is freed
+   * - Something that wants every event of one host, such as a combat log
+     - ``manager.event_sent.connect(_on_event)``
+     - With ``disconnect()``, or when the listener is freed
 
-**Order.** Subscribers with a priority above 0 hear an event first, highest first. Then every running component's ``_on_event()`` runs, which is where :ref:`Statuses<class_Statuses>` runs its triggers. Then come subscribers with priority 0 or below, and last the :ref:`WorldEvents<class_WorldEvents>` listeners. A component that must see a hit after every status has changed it subscribes with a negative priority, as :ref:`Pool<class_Pool>` does.
+**Signals.** ``event()`` and ``WorldEvents.event()`` return a ``Signal``, so everything Godot's signals do works on events: ``connect()`` with ``CONNECT_ONE_SHOT``, ``await manager.event(&"died")``, ``bind()``, and no clean-up, because Godot drops a connection when the listener is freed. A method of the manager's own listeners takes the context; a world listener takes the host and the context.
+
+**Order.** ``event_sent`` goes first, which is where :ref:`Statuses<class_Statuses>` runs its triggers. Then the event's own signal calls its listeners in the order they connected, and last come the :ref:`WorldEvents<class_WorldEvents>` listeners. So a component that listens with ``on()`` sees a hit after every status has changed it, as :ref:`Pool<class_Pool>` does. There are no priorities: a listener that must come before the statuses connects to ``event_sent``.
 
 .. source-file:: ../../character_system/core/world_events.gd
 
@@ -414,12 +414,12 @@ These ship in ``character_system/examples/`` as ``.tres`` files with no code. Du
    * - Fire ward (passive)
      - ``statuses/fire_ward.tres``
      - ``triggers`` = on ``taking_damage``, ``react_to_statuses`` on, modify amount × 0.5 with
-       a :ref:`DamageTypeCondition<class_DamageTypeCondition>` for fire. Other damage gets
+       a :ref:`HitCondition<class_HitCondition>` for fire. Other damage gets
        through.
    * - Sharpshooter (passive)
      - ``statuses/sharpshooter.tres``
      - ``triggers`` = on ``dealing_damage`` with a
-       :ref:`HitTagCondition<class_HitTagCondition>` for ``head``: modify amount, percent 0.5,
+       :ref:`HitCondition<class_HitCondition>` for ``head``: modify amount, percent 0.5,
        tag ``crit``. Give the head :ref:`Hurtbox<class_Hurtbox>` the tag.
    * - Lucky strikes (passive)
      - ``statuses/lucky_strikes.tres``
@@ -489,7 +489,7 @@ A status can be refused in two ways, both checked by ``add()`` before anything e
    * - Wet characters can't burn, and water puts fire out
      - Wet: ``immune_to`` = ``fire``, ``removes_tags`` = ``fire``
    * - An item makes its wearer fireproof
-     - A Fireproof passive with ``immune_to`` = ``fire``, given by the item's :ref:`GrantStatuses<class_GrantStatuses>`
+     - A Fireproof passive with ``immune_to`` = ``fire``, given by the item's :ref:`Grants<class_Grants>`
    * - Targets with full fire resistance can't burn
      - Burning: ``apply_conditions`` = StatCondition: stat ``resist_fire``, value 1, negate on
    * - Only rangers can apply Hunter's mark
@@ -515,7 +515,7 @@ A passive is a status with ``duration`` 0. There is no separate passive system: 
    * - Character trait, in ``Statuses.innate``
      - The character's :ref:`Statuses<class_Statuses>` starts
      - Never, unless code removes it
-   * - Item, through :ref:`GrantStatuses<class_GrantStatuses>`
+   * - Item, through :ref:`Grants<class_Grants>`
      - The item is equipped
      - The item is unequipped
    * - Zone, through ``status_while_inside``
@@ -527,7 +527,7 @@ A passive is a status with ``duration`` 0. There is no separate passive system: 
 
 -  **Holds.** Each source that adds a passive is one hold, and ``drop_hold()`` drops one. The passive ends when no holds remain, so two rings of haste keep Haste until both come off.
 -  **Stacking.** With ``REFRESH``, a passive has one stack however many sources hold it. With ``STACK``, each hold adds a stack up to ``max_stacks``, so two rings of might give double the bonus.
--  **Refusals.** A passive is checked once, when it is added. Innate passives are checked when the character starts. An item passive that is refused is not retried until the item is equipped again, and :ref:`GrantStatuses<class_GrantStatuses>` only drops holds on the passives it was given.
+-  **Refusals.** A passive is checked once, when it is added. Innate passives are checked when the character starts. An item passive that is refused is not retried until the item is equipped again, and :ref:`Grants<class_Grants>` only drops holds on the passives it was given.
 -  **Death.** Passives survive death, because only timed statuses end when a character dies, so a revived character keeps its traits and item passives.
 
 **Traits are passives with tags.** Characters have no tag list of their own. A trait such as undead, construct or fire immune is an innate passive whose only job may be to carry a tag. That is how characters get immunities:
@@ -552,7 +552,7 @@ A trait gained during play, such as a curse that turns a character undead, does 
 Statuses component
 ------------------
 
-.. source-file:: ../../character_system/characters/components/statuses.gd
+.. source-file:: ../../character_system/core/statuses/statuses.gd
 
 The rules this component enforces:
 

@@ -3,18 +3,15 @@ extends GutTest
 ## the hit, and random ranges.
 
 
-func make_host(parts: Array = []) -> Node3D:
+func make_host(parts: Array = [], stats: Dictionary[StringName, float] = {}) -> Node3D:
 	var host := Node3D.new()
-	for node: Node in [ComponentManager.new(), Health.new(), Statuses.new()] + parts:
+	var hub := ComponentManager.new()
+	hub.stats = stats
+	for node: Node in [hub, Health.new(), Statuses.new()] + parts:
 		host.add_child(node)
 	add_child_autofree(host)
 	return host
 
-
-func attributes(stats: Dictionary[StringName, float]) -> Attributes:
-	var a := Attributes.new()
-	a.stats = stats
-	return a
 
 
 func health_of(node: Node) -> Health:
@@ -56,14 +53,14 @@ func test_total_adds_every_amount_to_the_base() -> void:
 
 
 func test_damage_scales_with_the_users_stat() -> void:
-	var attacker: Node3D = make_host([attributes({ &"strength": 5.0 })])
+	var attacker: Node3D = make_host([], { &"strength": 5.0 })
 	var target: Node3D = make_host()
 	var swing := DamageEffect.new()
 	swing.amount = 10.0
 	swing.scaling = [per_point(&"strength", 2.0)]
 	swing.apply(EffectContext.new(attacker, target))
 	assert_eq(health_of(target).current, 80.0, "10 + 2 per point of 5 strength")
-	(Component.of(attacker, Attributes) as Attributes).add_base(&"strength", 5.0)
+	ComponentManager.of(attacker).add_base(&"strength", 5.0)
 	swing.apply(EffectContext.new(attacker, target))
 	assert_eq(health_of(target).current, 50.0, "levelling up is felt at once")
 	swing.apply(EffectContext.new(null, target))
@@ -71,7 +68,7 @@ func test_damage_scales_with_the_users_stat() -> void:
 
 
 func test_stat_modifiers_are_included() -> void:
-	var attacker: Node3D = make_host([attributes({ &"strength": 5.0 })])
+	var attacker: Node3D = make_host([], { &"strength": 5.0 })
 	var target: Node3D = make_host()
 	var potion := StatModifier.new()
 	potion.stat = &"strength"
@@ -85,7 +82,7 @@ func test_stat_modifiers_are_included() -> void:
 
 
 func test_a_curve_gives_numbers_by_level() -> void:
-	var attacker: Node3D = make_host([attributes({ &"level": 30.0 })])
+	var attacker: Node3D = make_host([], { &"level": 30.0 })
 	var target: Node3D = make_host()
 	var by_level := Curve.new()
 	by_level.min_domain = 1.0
@@ -153,7 +150,7 @@ func test_thorns_return_a_share_of_the_hit() -> void:
 
 
 func test_a_status_tick_scales_with_whoever_applied_it() -> void:
-	var mage: Node3D = make_host([attributes({ &"spell_power": 4.0 })])
+	var mage: Node3D = make_host([], { &"spell_power": 4.0 })
 	var target: Node3D = make_host()
 	var burn := DamageEffect.new()
 	burn.amount = 1.0

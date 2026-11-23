@@ -388,6 +388,9 @@ func _tagged(tag: StringName) -> StatusData:
 class EventLog extends Component:
 	var events: Array[StringName] = []
 
+	func _start() -> void:
+		listen(manager.event_sent, _on_event)
+
 	func _on_event(event: StringName, ctx: EffectContext) -> void:
 		if (
 				event.ends_with("_entered") or event.ends_with("_exited")
