@@ -1,0 +1,121 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://character_system/core/characters/hurtbox.gd" id="1_isykd"]
+[ext_resource type="Script" path="res://immunity_test/scripts/nameplate.gd" id="2_1gcqd"]
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="3_dogse"]
+[ext_resource type="Script" path="res://character_system/core/statuses/statuses.gd" id="4_ir52o"]
+[ext_resource type="Script" path="res://character_system/core/characters/health.gd" id="5_t1k2k"]
+[ext_resource type="Script" path="res://character_system/kit/brains/ai_brain.gd" id="6_pm75p"]
+[ext_resource type="Script" path="res://character_system/core/motor/character_motor.gd" id="7_ec85d"]
+[ext_resource type="Script" path="res://character_system/kit/motor/walk_mode.gd" id="8_bwuec"]
+[ext_resource type="Script" path="res://character_system/kit/motor/air_mode.gd" id="9_ifcyy"]
+[ext_resource type="Script" path="res://character_system/kit/characters/faction.gd" id="10_tjhnc"]
+[ext_resource type="Script" path="res://character_system/core/items/inventory.gd" id="11_jt65s"]
+[ext_resource type="Script" path="res://character_system/core/items/item_instance.gd" id="12_xh7m7"]
+[ext_resource type="Resource" path="res://character_system/examples/items/soldier_rifle.tres" id="13_plq6f"]
+[ext_resource type="Script" path="res://character_system/core/items/equipment.gd" id="14_dfrtt"]
+[ext_resource type="Script" path="res://character_system/kit/characters/weapon_switch.gd" id="15_rmnr8"]
+[ext_resource type="Script" path="res://character_system/examples/scripts/attack_nearest.gd" id="16_g6hfy"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mcmo3"]
+radius = 0.35
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5vu2c"]
+albedo_color = Color(0.75, 0.25, 0.2, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_7pj03"]
+material = SubResource("StandardMaterial3D_5vu2c")
+radius = 0.35
+height = 1.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_wg12e"]
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nsni0"]
+albedo_color = Color(0.9, 0.8, 0.7, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_avb4i"]
+material = SubResource("StandardMaterial3D_nsni0")
+radius = 0.22
+height = 0.44
+
+[sub_resource type="Resource" id="Resource_ms86s"]
+script = ExtResource("12_xh7m7")
+data = ExtResource("13_plq6f")
+
+[node name="Soldier" type="CharacterBody3D" unique_id=1145935691 groups=["faces_aim", "respawns"]]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1880200905]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("CapsuleShape3D_mcmo3")
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=818277901]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+mesh = SubResource("CapsuleMesh_7pj03")
+
+[node name="HeadHurtbox" type="Area3D" parent="." unique_id=1499637156 node_paths=PackedStringArray("character")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.72, 0)
+script = ExtResource("1_isykd")
+character = NodePath("..")
+multiplier = 2.0
+tags = Array[StringName]([&"head"])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeadHurtbox" unique_id=1728212632]
+shape = SubResource("SphereShape3D_wg12e")
+
+[node name="Mesh" type="MeshInstance3D" parent="HeadHurtbox" unique_id=105680518]
+mesh = SubResource("SphereMesh_avb4i")
+
+[node name="Hand" type="Node3D" parent="." unique_id=779679146]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.1, -0.5)
+
+[node name="Nameplate" type="Label3D" parent="." unique_id=2120370684]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+billboard = 1
+font_size = 40
+script = ExtResource("2_1gcqd")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=970378603]
+
+[node name="ComponentManager" type="Node" parent="." unique_id=1613634849]
+script = ExtResource("3_dogse")
+
+[node name="Statuses" type="Node" parent="." unique_id=491344886]
+script = ExtResource("4_ir52o")
+
+[node name="Health" type="Node" parent="." unique_id=128001053]
+script = ExtResource("5_t1k2k")
+
+[node name="AIBrain" type="Node" parent="." unique_id=408403964]
+script = ExtResource("6_pm75p")
+
+[node name="CharacterMotor" type="Node" parent="." unique_id=2104973841]
+script = ExtResource("7_ec85d")
+
+[node name="WalkMode" type="Node" parent="CharacterMotor" unique_id=869036643]
+script = ExtResource("8_bwuec")
+
+[node name="AirMode" type="Node" parent="CharacterMotor" unique_id=1317659215]
+script = ExtResource("9_ifcyy")
+
+[node name="Faction" type="Node" parent="." unique_id=1864928156]
+script = ExtResource("10_tjhnc")
+team = &"enemy"
+hostile_to = Array[StringName]([&"player"])
+
+[node name="Inventory" type="Node" parent="." unique_id=1490943671]
+script = ExtResource("11_jt65s")
+items = Array[ExtResource("12_xh7m7")]([SubResource("Resource_ms86s")])
+
+[node name="Equipment" type="Node" parent="." unique_id=940018729]
+script = ExtResource("14_dfrtt")
+sockets = Dictionary[StringName, NodePath]({
+&"weapon": NodePath("../Hand")
+})
+
+[node name="WeaponSwitch" type="Node" parent="." unique_id=1964486762]
+script = ExtResource("15_rmnr8")
+
+[node name="AttackNearest" type="Node" parent="." unique_id=6668388]
+script = ExtResource("16_g6hfy")

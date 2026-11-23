@@ -1,0 +1,950 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://test_level/test_level.gd" id="1_hw15b"]
+[ext_resource type="Script" path="res://character_system/core/items/item_data.gd" id="2_u0tw4"]
+[ext_resource type="Resource" path="res://character_system/examples/items/health_potion.tres" id="3_kbrgk"]
+[ext_resource type="Resource" path="res://character_system/examples/items/mana_potion.tres" id="4_2kqin"]
+[ext_resource type="Resource" path="res://character_system/examples/items/grenade.tres" id="5_erpl3"]
+[ext_resource type="PackedScene" path="res://test_level/scenes/player.tscn" id="6_idryp"]
+[ext_resource type="PackedScene" path="res://immunity_test/scenes/item_pickup.tscn" id="7_t6fgi"]
+[ext_resource type="Resource" path="res://character_system/examples/items/rifle.tres" id="8_av0eh"]
+[ext_resource type="Resource" path="res://character_system/examples/items/rifle_ammo.tres" id="9_7dvid"]
+[ext_resource type="Resource" path="res://character_system/examples/items/shotgun.tres" id="10_e7epr"]
+[ext_resource type="Resource" path="res://character_system/examples/items/flare_gun.tres" id="11_fwios"]
+[ext_resource type="Resource" path="res://character_system/examples/items/marksman_rifle.tres" id="12_bmosn"]
+[ext_resource type="Resource" path="res://character_system/examples/items/rocket_launcher.tres" id="13_2u6jk"]
+[ext_resource type="Resource" path="res://character_system/examples/items/rockets.tres" id="14_08o1d"]
+[ext_resource type="Resource" path="res://character_system/examples/items/fire_staff.tres" id="15_pmoh5"]
+[ext_resource type="Resource" path="res://character_system/examples/items/sword.tres" id="16_c2s4r"]
+[ext_resource type="Resource" path="res://character_system/examples/items/ring_of_vigor.tres" id="17_7bafd"]
+[ext_resource type="Resource" path="res://character_system/examples/items/fireproof_cloak.tres" id="18_xxqj3"]
+[ext_resource type="Resource" path="res://character_system/examples/items/ward_amulet.tres" id="19_tg8yi"]
+[ext_resource type="Script" path="res://character_system/kit/world/effect_zone.gd" id="20_fuycp"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="21_rmwa1"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="22_klk5c"]
+[ext_resource type="Script" path="res://character_system/core/effects/apply_status_effect.gd" id="23_nhu86"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/sharpshooter.tres" id="24_i6t6s"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/lucky_strikes.tres" id="25_t75d2"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/vampiric.tres" id="26_5v685"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/bloodlust.tres" id="27_keqhd"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/thorns.tres" id="28_ftutv"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/fire_ward.tres" id="29_2ef8f"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/regenerating.tres" id="30_asgtx"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/haste.tres" id="31_grlh7"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/executioner.tres" id="32_nnsgv"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/berserk.tres" id="33_etem6"]
+[ext_resource type="Script" path="res://character_system/core/effects/remove_status_effect.gd" id="34_lje0q"]
+[ext_resource type="PackedScene" path="res://character_system/examples/zones/fire_patch.tscn" id="35_l37u8"]
+[ext_resource type="PackedScene" path="res://character_system/examples/zones/water_pool.tscn" id="36_7jkrr"]
+[ext_resource type="PackedScene" path="res://character_system/examples/zones/healing_pad.tscn" id="37_65y4q"]
+[ext_resource type="PackedScene" path="res://character_system/examples/zones/ward_circle.tscn" id="38_87nwl"]
+[ext_resource type="PackedScene" path="res://character_system/examples/zones/poison_bog.tscn" id="39_y4it4"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/stunned.tres" id="40_3bn4j"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/silenced.tres" id="41_2duo8"]
+[ext_resource type="Resource" path="res://character_system/examples/statuses/rooted.tres" id="42_d0ne2"]
+[ext_resource type="PackedScene" path="res://test_level/scenes/dummy.tscn" id="43_wwc75"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="44_pxq2o"]
+[ext_resource type="Resource" path="res://character_system/examples/traits/undead.tres" id="45_7x37j"]
+[ext_resource type="Resource" path="res://character_system/examples/traits/construct.tres" id="46_e8tx6"]
+[ext_resource type="PackedScene" path="res://character_system/examples/characters/mage.tscn" id="47_6mt3w"]
+[ext_resource type="Script" path="res://immunity_test/scripts/nameplate.gd" id="48_66tpx"]
+[ext_resource type="PackedScene" path="res://test_level/scenes/soldier.tscn" id="49_at2ch"]
+[ext_resource type="Script" path="res://character_system/examples/scripts/character_hud.gd" id="50_t0yw2"]
+
+[sub_resource type="Environment" id="Environment_ujfhy"]
+background_mode = 1
+background_color = Color(0.55, 0.7, 0.85, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.7, 0.7, 0.7, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hbd2v"]
+size = Vector3(120, 1, 120)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wrt5c"]
+albedo_color = Color(0.35, 0.4, 0.35, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bo3fx"]
+material = SubResource("StandardMaterial3D_wrt5c")
+size = Vector3(120, 1, 120)
+
+[sub_resource type="Resource" id="Resource_ttaqn"]
+script = ExtResource("23_nhu86")
+status = ExtResource("24_i6t6s")
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_v41gs"]
+radius = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s8t76"]
+albedo_color = Color(0.9, 0.8, 0.3, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_x3cx8"]
+material = SubResource("StandardMaterial3D_s8t76")
+top_radius = 0.9
+bottom_radius = 0.9
+height = 0.06
+
+[sub_resource type="Resource" id="Resource_vvt8r"]
+script = ExtResource("23_nhu86")
+status = ExtResource("25_t75d2")
+
+[sub_resource type="Resource" id="Resource_e2dlq"]
+script = ExtResource("23_nhu86")
+status = ExtResource("26_5v685")
+
+[sub_resource type="Resource" id="Resource_16yux"]
+script = ExtResource("23_nhu86")
+status = ExtResource("27_keqhd")
+
+[sub_resource type="Resource" id="Resource_xsa7d"]
+script = ExtResource("23_nhu86")
+status = ExtResource("28_ftutv")
+
+[sub_resource type="Resource" id="Resource_ky70p"]
+script = ExtResource("23_nhu86")
+status = ExtResource("29_2ef8f")
+
+[sub_resource type="Resource" id="Resource_irvol"]
+script = ExtResource("23_nhu86")
+status = ExtResource("30_asgtx")
+
+[sub_resource type="Resource" id="Resource_dqigl"]
+script = ExtResource("23_nhu86")
+status = ExtResource("31_grlh7")
+
+[sub_resource type="Resource" id="Resource_b5g8c"]
+script = ExtResource("23_nhu86")
+status = ExtResource("32_nnsgv")
+
+[sub_resource type="Resource" id="Resource_dhu1g"]
+script = ExtResource("23_nhu86")
+status = ExtResource("33_etem6")
+
+[sub_resource type="Resource" id="Resource_jra77"]
+script = ExtResource("34_lje0q")
+status = ExtResource("24_i6t6s")
+
+[sub_resource type="Resource" id="Resource_xfguu"]
+script = ExtResource("34_lje0q")
+status = ExtResource("25_t75d2")
+
+[sub_resource type="Resource" id="Resource_6q6yh"]
+script = ExtResource("34_lje0q")
+status = ExtResource("26_5v685")
+
+[sub_resource type="Resource" id="Resource_5pt34"]
+script = ExtResource("34_lje0q")
+status = ExtResource("27_keqhd")
+
+[sub_resource type="Resource" id="Resource_bfk0b"]
+script = ExtResource("34_lje0q")
+status = ExtResource("28_ftutv")
+
+[sub_resource type="Resource" id="Resource_eq4l4"]
+script = ExtResource("34_lje0q")
+status = ExtResource("29_2ef8f")
+
+[sub_resource type="Resource" id="Resource_qwqw2"]
+script = ExtResource("34_lje0q")
+status = ExtResource("30_asgtx")
+
+[sub_resource type="Resource" id="Resource_d7a0f"]
+script = ExtResource("34_lje0q")
+status = ExtResource("31_grlh7")
+
+[sub_resource type="Resource" id="Resource_ce34l"]
+script = ExtResource("34_lje0q")
+status = ExtResource("32_nnsgv")
+
+[sub_resource type="Resource" id="Resource_e5671"]
+script = ExtResource("34_lje0q")
+status = ExtResource("33_etem6")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_awe2n"]
+albedo_color = Color(0.9, 0.9, 0.9, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wloa4"]
+material = SubResource("StandardMaterial3D_awe2n")
+top_radius = 0.9
+bottom_radius = 0.9
+height = 0.06
+
+[sub_resource type="Resource" id="Resource_efg56"]
+script = ExtResource("23_nhu86")
+status = ExtResource("40_3bn4j")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5cbpx"]
+albedo_color = Color(0.7, 0.3, 0.7, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_c2xnr"]
+material = SubResource("StandardMaterial3D_5cbpx")
+top_radius = 0.9
+bottom_radius = 0.9
+height = 0.06
+
+[sub_resource type="Resource" id="Resource_4vgo8"]
+script = ExtResource("23_nhu86")
+status = ExtResource("41_2duo8")
+
+[sub_resource type="Resource" id="Resource_7innr"]
+script = ExtResource("23_nhu86")
+status = ExtResource("42_d0ne2")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fay7l"]
+albedo_color = Color(0.5, 0.3, 0.7, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_e2u4p"]
+material = SubResource("StandardMaterial3D_fay7l")
+radius = 0.35
+height = 1.5
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_ue1o6"]
+vertices = PackedVector3Array(-16, 0, -58, 16, 0, -58, 16, 0, -34, -16, 0, -34)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_trfg2"]
+size = Vector3(32, 0.04, 24)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vo5fb"]
+albedo_color = Color(0.5, 0.45, 0.35, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_t082y"]
+material = SubResource("StandardMaterial3D_vo5fb")
+size = Vector3(32, 0.04, 24)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_evc7t"]
+albedo_color = Color(0.2, 0.45, 0.8, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_benqs"]
+size = Vector3(0.6, 6, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qwqfj"]
+albedo_color = Color(0.5, 0.5, 0.6, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_r8js4"]
+material = SubResource("StandardMaterial3D_qwqfj")
+size = Vector3(0.6, 6, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r6qrt"]
+size = Vector3(3, 0.3, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_57psx"]
+albedo_color = Color(0.55, 0.5, 0.45, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lr7xb"]
+material = SubResource("StandardMaterial3D_57psx")
+size = Vector3(3, 0.3, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kxk8u"]
+size = Vector3(6, 0.5, 6.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jisfy"]
+albedo_color = Color(0.55, 0.5, 0.45, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ilp8r"]
+material = SubResource("StandardMaterial3D_jisfy")
+size = Vector3(6, 0.5, 6.5)
+
+[node name="TestLevel" type="Node3D" unique_id=260691263]
+script = ExtResource("1_hw15b")
+quick_items = Dictionary[StringName, ExtResource("2_u0tw4")]({
+&"throw_grenade": ExtResource("5_erpl3"),
+&"use_health_potion": ExtResource("3_kbrgk"),
+&"use_mana_potion": ExtResource("4_2kqin")
+})
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1504069883]
+environment = SubResource("Environment_ujfhy")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1238056961]
+transform = Transform3D(0.8660254, -0.40957603, 0.28678823, 0, 0.57357645, 0.81915206, -0.5, -0.7094065, 0.49673176, 0, 0, 0)
+
+[node name="Ground" type="StaticBody3D" parent="." unique_id=2097151482]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -10)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=1672356728]
+shape = SubResource("BoxShape3D_hbd2v")
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground" unique_id=717012805]
+mesh = SubResource("BoxMesh_bo3fx")
+
+[node name="Player" parent="." unique_id=1924993221 instance=ExtResource("6_idryp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 20)
+
+[node name="Armoury" type="Node3D" parent="." unique_id=1346872691]
+
+[node name="Sign" type="Label3D" parent="Armoury" unique_id=1920461408]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, -7)
+billboard = 1
+text = "ARMOURY
+Walk over an item to pick it up"
+font_size = 48
+
+[node name="Rifle" parent="Armoury" unique_id=390942987 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -6)
+item = ExtResource("8_av0eh")
+
+[node name="Label" type="Label3D" parent="Armoury/Rifle" unique_id=1580825078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Rifle"
+font_size = 28
+
+[node name="RifleAmmo" parent="Armoury" unique_id=1170628678 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0, -6)
+item = ExtResource("9_7dvid")
+count = 60
+
+[node name="Label" type="Label3D" parent="Armoury/RifleAmmo" unique_id=1756177681]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Rifle ammo ×60"
+font_size = 28
+
+[node name="Shotgun" parent="Armoury" unique_id=81565788 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -6)
+item = ExtResource("10_e7epr")
+
+[node name="Label" type="Label3D" parent="Armoury/Shotgun" unique_id=1064717350]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Shotgun"
+font_size = 28
+
+[node name="FlareGun" parent="Armoury" unique_id=1739497980 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, -6)
+item = ExtResource("11_fwios")
+
+[node name="Label" type="Label3D" parent="Armoury/FlareGun" unique_id=1326759358]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Flare gun"
+font_size = 28
+
+[node name="MarksmanRifle" parent="Armoury" unique_id=375597852 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+item = ExtResource("12_bmosn")
+
+[node name="Label" type="Label3D" parent="Armoury/MarksmanRifle" unique_id=1391356410]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Marksman rifle"
+font_size = 28
+
+[node name="RocketLauncher" parent="Armoury" unique_id=1208744223 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -6)
+item = ExtResource("13_2u6jk")
+
+[node name="Label" type="Label3D" parent="Armoury/RocketLauncher" unique_id=28014049]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Rocket launcher"
+font_size = 28
+
+[node name="Rockets" parent="Armoury" unique_id=2030381877 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -6)
+item = ExtResource("14_08o1d")
+count = 10
+
+[node name="Label" type="Label3D" parent="Armoury/Rockets" unique_id=1710814561]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Rockets ×10"
+font_size = 28
+
+[node name="FireStaff" parent="Armoury" unique_id=54318178 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, -6)
+item = ExtResource("15_pmoh5")
+
+[node name="Label" type="Label3D" parent="Armoury/FireStaff" unique_id=1765647532]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Fire staff"
+font_size = 28
+
+[node name="Sword" parent="Armoury" unique_id=713970262 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -6)
+item = ExtResource("16_c2s4r")
+
+[node name="Label" type="Label3D" parent="Armoury/Sword" unique_id=2055884907]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Sword"
+font_size = 28
+
+[node name="HealthPotion" parent="Armoury" unique_id=1629519537 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.25, 0, -9)
+item = ExtResource("3_kbrgk")
+count = 3
+
+[node name="Label" type="Label3D" parent="Armoury/HealthPotion" unique_id=1153332226]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Health potion ×3"
+font_size = 28
+
+[node name="ManaPotion" parent="Armoury" unique_id=1694524212 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.75, 0, -9)
+item = ExtResource("4_2kqin")
+count = 3
+
+[node name="Label" type="Label3D" parent="Armoury/ManaPotion" unique_id=481132997]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Mana potion ×3"
+font_size = 28
+
+[node name="Grenade" parent="Armoury" unique_id=1953885244 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 0, -9)
+item = ExtResource("5_erpl3")
+count = 5
+
+[node name="Label" type="Label3D" parent="Armoury/Grenade" unique_id=667885028]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Grenade ×5"
+font_size = 28
+
+[node name="RingOfVigor" parent="Armoury" unique_id=331601468 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 0, -9)
+item = ExtResource("17_7bafd")
+
+[node name="Label" type="Label3D" parent="Armoury/RingOfVigor" unique_id=623637992]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Ring of vigor"
+font_size = 28
+
+[node name="FireproofCloak" parent="Armoury" unique_id=602173413 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.75, 0, -9)
+item = ExtResource("18_xxqj3")
+
+[node name="Label" type="Label3D" parent="Armoury/FireproofCloak" unique_id=1589071926]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Fireproof cloak"
+font_size = 28
+
+[node name="WardAmulet" parent="Armoury" unique_id=690153897 instance=ExtResource("7_t6fgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.25, 0, -9)
+item = ExtResource("19_tg8yi")
+
+[node name="Label" type="Label3D" parent="Armoury/WardAmulet" unique_id=1311721874]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Ward amulet"
+font_size = 28
+
+[node name="Shrines" type="Node3D" parent="." unique_id=1050891893]
+
+[node name="Sign" type="Label3D" parent="Shrines" unique_id=45468501]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 3.2, 8)
+billboard = 1
+text = "SHRINES
+Step on one for its passive"
+font_size = 48
+
+[node name="Sharpshooter" type="Area3D" parent="Shrines" unique_id=378334696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 2)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_ttaqn")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/Sharpshooter" unique_id=502443129]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/Sharpshooter" unique_id=1031222084]
+mesh = SubResource("CylinderMesh_x3cx8")
+
+[node name="Label" type="Label3D" parent="Shrines/Sharpshooter" unique_id=1564869588]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Sharpshooter"
+font_size = 28
+
+[node name="LuckyStrikes" type="Area3D" parent="Shrines" unique_id=439573756]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 0, 2)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_vvt8r")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/LuckyStrikes" unique_id=1654262243]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/LuckyStrikes" unique_id=1639252450]
+mesh = SubResource("CylinderMesh_x3cx8")
+
+[node name="Label" type="Label3D" parent="Shrines/LuckyStrikes" unique_id=2023364131]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Lucky strikes"
+font_size = 28
+
+[node name="Vampiric" type="Area3D" parent="Shrines" unique_id=1029630510]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 4.5)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_e2dlq")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/Vampiric" unique_id=13065366]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/Vampiric" unique_id=41523203]
+mesh = SubResource("CylinderMesh_x3cx8")
+
+[node name="Label" type="Label3D" parent="Shrines/Vampiric" unique_id=1791729458]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Vampiric"
+font_size = 28
+
+[node name="Bloodlust" type="Area3D" parent="Shrines" unique_id=1058407011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 0, 4.5)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_16yux")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/Bloodlust" unique_id=1370975036]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/Bloodlust" unique_id=364407548]
+mesh = SubResource("CylinderMesh_x3cx8")
+
+[node name="Label" type="Label3D" parent="Shrines/Bloodlust" unique_id=1400992930]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Bloodlust"
+font_size = 28
+
+[node name="Thorns" type="Area3D" parent="Shrines" unique_id=1470726677]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 7)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_xsa7d")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/Thorns" unique_id=642995310]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/Thorns" unique_id=1165029147]
+mesh = SubResource("CylinderMesh_x3cx8")
+
+[node name="Label" type="Label3D" parent="Shrines/Thorns" unique_id=1164729360]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Thorns"
+font_size = 28
+
+[node name="FireWard" type="Area3D" parent="Shrines" unique_id=798025943]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 0, 7)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_ky70p")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/FireWard" unique_id=562243224]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/FireWard" unique_id=1266402118]
+mesh = SubResource("CylinderMesh_x3cx8")
+
+[node name="Label" type="Label3D" parent="Shrines/FireWard" unique_id=143102988]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Fire ward"
+font_size = 28
+
+[node name="Regenerating" type="Area3D" parent="Shrines" unique_id=1629566081]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 9.5)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_irvol")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/Regenerating" unique_id=1051459442]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/Regenerating" unique_id=1319271489]
+mesh = SubResource("CylinderMesh_x3cx8")
+
+[node name="Label" type="Label3D" parent="Shrines/Regenerating" unique_id=209336398]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Regenerating"
+font_size = 28
+
+[node name="Haste" type="Area3D" parent="Shrines" unique_id=1216296183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 0, 9.5)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_dqigl")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/Haste" unique_id=857732877]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/Haste" unique_id=659404126]
+mesh = SubResource("CylinderMesh_x3cx8")
+
+[node name="Label" type="Label3D" parent="Shrines/Haste" unique_id=931216287]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Haste"
+font_size = 28
+
+[node name="Executioner" type="Area3D" parent="Shrines" unique_id=2067338461]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, 12)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_b5g8c")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/Executioner" unique_id=181803021]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/Executioner" unique_id=1323407849]
+mesh = SubResource("CylinderMesh_x3cx8")
+
+[node name="Label" type="Label3D" parent="Shrines/Executioner" unique_id=2101013285]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Executioner"
+font_size = 28
+
+[node name="Berserk" type="Area3D" parent="Shrines" unique_id=909208168]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 0, 12)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_dhu1g")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/Berserk" unique_id=1772482881]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/Berserk" unique_id=1867195067]
+mesh = SubResource("CylinderMesh_x3cx8")
+
+[node name="Label" type="Label3D" parent="Shrines/Berserk" unique_id=1293825860]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Berserk"
+font_size = 28
+
+[node name="Cleanse" type="Area3D" parent="Shrines" unique_id=1491021044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.25, 0, 15)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_jra77"), SubResource("Resource_xfguu"), SubResource("Resource_6q6yh"), SubResource("Resource_5pt34"), SubResource("Resource_bfk0b"), SubResource("Resource_eq4l4"), SubResource("Resource_qwqw2"), SubResource("Resource_d7a0f"), SubResource("Resource_ce34l"), SubResource("Resource_e5671")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shrines/Cleanse" unique_id=52928713]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Shrines/Cleanse" unique_id=1102796137]
+mesh = SubResource("CylinderMesh_wloa4")
+
+[node name="Label" type="Label3D" parent="Shrines/Cleanse" unique_id=1131582825]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Cleanse"
+font_size = 28
+
+[node name="Hazards" type="Node3D" parent="." unique_id=747373804]
+
+[node name="Sign" type="Label3D" parent="Hazards" unique_id=311624241]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3.2, 8)
+billboard = 1
+text = "HAZARDS
+Zones and status pads"
+font_size = 48
+
+[node name="FirePatch" parent="Hazards" unique_id=868737628 instance=ExtResource("35_l37u8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 2)
+
+[node name="Label" type="Label3D" parent="Hazards/FirePatch" unique_id=654029952]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+billboard = 1
+text = "Fire Patch"
+font_size = 28
+
+[node name="WaterPool" parent="Hazards" unique_id=1907926169 instance=ExtResource("36_7jkrr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 5.5)
+
+[node name="Label" type="Label3D" parent="Hazards/WaterPool" unique_id=1576081631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+billboard = 1
+text = "Water Pool"
+font_size = 28
+
+[node name="HealingPad" parent="Hazards" unique_id=224277449 instance=ExtResource("37_65y4q")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 9)
+
+[node name="Label" type="Label3D" parent="Hazards/HealingPad" unique_id=1388761350]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+billboard = 1
+text = "Healing Pad"
+font_size = 28
+
+[node name="WardCircle" parent="Hazards" unique_id=1105900994 instance=ExtResource("38_87nwl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 12.5)
+
+[node name="Label" type="Label3D" parent="Hazards/WardCircle" unique_id=1973437078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+billboard = 1
+text = "Ward Circle"
+font_size = 28
+
+[node name="PoisonBog" parent="Hazards" unique_id=1612023443 instance=ExtResource("39_y4it4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 16)
+
+[node name="Label" type="Label3D" parent="Hazards/PoisonBog" unique_id=1638714894]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+billboard = 1
+text = "Poison Bog"
+font_size = 28
+
+[node name="Stunned" type="Area3D" parent="Hazards" unique_id=805219310]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 2)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_efg56")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hazards/Stunned" unique_id=75783840]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Hazards/Stunned" unique_id=719368512]
+mesh = SubResource("CylinderMesh_c2xnr")
+
+[node name="Label" type="Label3D" parent="Hazards/Stunned" unique_id=1470604846]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Stunned"
+font_size = 28
+
+[node name="Silenced" type="Area3D" parent="Hazards" unique_id=1501113496]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 5.5)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_4vgo8")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hazards/Silenced" unique_id=361311425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Hazards/Silenced" unique_id=1047107443]
+mesh = SubResource("CylinderMesh_c2xnr")
+
+[node name="Label" type="Label3D" parent="Hazards/Silenced" unique_id=1557636469]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Silenced"
+font_size = 28
+
+[node name="Rooted" type="Area3D" parent="Hazards" unique_id=1711100448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 9)
+script = ExtResource("20_fuycp")
+on_enter = Array[ExtResource("21_rmwa1")]([SubResource("Resource_7innr")])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hazards/Rooted" unique_id=467904064]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_v41gs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Hazards/Rooted" unique_id=582568197]
+mesh = SubResource("CylinderMesh_c2xnr")
+
+[node name="Label" type="Label3D" parent="Hazards/Rooted" unique_id=819480494]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+billboard = 1
+text = "Rooted"
+font_size = 28
+
+[node name="Targets" type="Node3D" parent="." unique_id=1976162498]
+
+[node name="Sign" type="Label3D" parent="Targets" unique_id=1722021426]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.6, -18)
+billboard = 1
+text = "TARGETS
+Aim for the head"
+font_size = 48
+
+[node name="Plain" parent="Targets" unique_id=1529800067 instance=ExtResource("43_wwc75")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0, -18)
+
+[node name="Undead" parent="Targets" unique_id=1583380283 instance=ExtResource("43_wwc75")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, -18)
+
+[node name="Statuses" parent="Targets/Undead" index="5" unique_id=1881609455]
+innate = Array[ExtResource("44_pxq2o")]([ExtResource("45_7x37j")])
+
+[node name="Construct" parent="Targets" unique_id=1379883088 instance=ExtResource("43_wwc75")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, -18)
+
+[node name="Statuses" parent="Targets/Construct" index="5" unique_id=1881609455]
+innate = Array[ExtResource("44_pxq2o")]([ExtResource("46_e8tx6")])
+
+[node name="Thorns" parent="Targets" unique_id=90762952 instance=ExtResource("43_wwc75")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, -18)
+
+[node name="Statuses" parent="Targets/Thorns" index="5" unique_id=1881609455]
+innate = Array[ExtResource("44_pxq2o")]([ExtResource("28_ftutv")])
+
+[node name="WeakToFire" parent="Targets" unique_id=1594702355 instance=ExtResource("43_wwc75")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, -18)
+
+[node name="Health" parent="Targets/WeakToFire" index="6" unique_id=1438737915]
+resistances = Dictionary[StringName, float]({
+&"fire": -0.5,
+&"physical": 0.5
+})
+
+[node name="Mage" parent="Targets" unique_id=701653118 groups=["respawns"] instance=ExtResource("47_6mt3w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 0, -18)
+
+[node name="Body" type="MeshInstance3D" parent="Targets/Mage" unique_id=760684737]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+mesh = SubResource("CapsuleMesh_e2u4p")
+
+[node name="Nameplate" type="Label3D" parent="Targets/Mage" unique_id=489237511]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+billboard = 1
+font_size = 40
+script = ExtResource("48_66tpx")
+
+[node name="Arena" type="Node3D" parent="." unique_id=2025291488]
+
+[node name="Sign" type="Label3D" parent="Arena" unique_id=1483669323]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -32)
+billboard = 1
+text = "ARENA
+Enemies attack when you come close"
+font_size = 48
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="Arena" unique_id=423264659]
+navigation_mesh = SubResource("NavigationMesh_ue1o6")
+
+[node name="Floor" type="StaticBody3D" parent="Arena" unique_id=1270415772]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, -46)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Arena/Floor" unique_id=1661290378]
+shape = SubResource("BoxShape3D_trfg2")
+
+[node name="Mesh" type="MeshInstance3D" parent="Arena/Floor" unique_id=147076408]
+mesh = SubResource("BoxMesh_t082y")
+
+[node name="Raider" parent="Arena" unique_id=1145935691 instance=ExtResource("49_at2ch")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.1, -54)
+
+[node name="Marauder" parent="Arena" unique_id=1143421752 instance=ExtResource("49_at2ch")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.1, -54)
+
+[node name="Ally" parent="Arena" unique_id=299575551 instance=ExtResource("49_at2ch")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -38)
+
+[node name="Body" parent="Arena/Ally" index="1" unique_id=818277901]
+surface_material_override/0 = SubResource("StandardMaterial3D_evc7t")
+
+[node name="Faction" parent="Arena/Ally" index="11" unique_id=1864928156]
+team = &"player"
+hostile_to = Array[StringName]([&"enemy"])
+
+[node name="Movement" type="Node3D" parent="." unique_id=1834015415]
+
+[node name="Sign" type="Label3D" parent="Movement" unique_id=1136020872]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 6.5, -4)
+billboard = 1
+text = "MOVEMENT
+Wall slide, double jump, glide, dash"
+font_size = 48
+
+[node name="Wall" type="StaticBody3D" parent="Movement" unique_id=2103053283]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 3, -4)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Movement/Wall" unique_id=1456896679]
+shape = SubResource("BoxShape3D_benqs")
+
+[node name="Mesh" type="MeshInstance3D" parent="Movement/Wall" unique_id=364544160]
+mesh = SubResource("BoxMesh_r8js4")
+
+[node name="Ramp" type="StaticBody3D" parent="Movement" unique_id=1056308117]
+transform = Transform3D(1, 0, 0, 0, 0.9135454, -0.40673664, 0, 0.40673664, 0.9135454, 30, 2, -6)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Movement/Ramp" unique_id=1773352281]
+shape = SubResource("BoxShape3D_r6qrt")
+
+[node name="Mesh" type="MeshInstance3D" parent="Movement/Ramp" unique_id=936451606]
+mesh = SubResource("BoxMesh_lr7xb")
+
+[node name="Ledge" type="StaticBody3D" parent="Movement" unique_id=962448162]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3.75, -13.75)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Movement/Ledge" unique_id=1642196498]
+shape = SubResource("BoxShape3D_kxk8u")
+
+[node name="Mesh" type="MeshInstance3D" parent="Movement/Ledge" unique_id=1504836415]
+mesh = SubResource("BoxMesh_ilp8r")
+
+[node name="Hud" type="CanvasLayer" parent="." unique_id=1163307695]
+
+[node name="CharacterHud" type="Control" parent="Hud" unique_id=170747964 node_paths=PackedStringArray("character")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("50_t0yw2")
+character = NodePath("../../Player")
+
+[node name="HealthBar" type="ProgressBar" parent="Hud/CharacterHud" unique_id=32772757]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 340.0
+offset_bottom = 47.0
+
+[node name="Statuses" type="Label" parent="Hud/CharacterHud" unique_id=2107028569]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 52.0
+offset_right = 20.0
+offset_bottom = 52.0
+
+[node name="Ammo" type="Label" parent="Hud/CharacterHud" unique_id=1041429576]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 76.0
+offset_right = 20.0
+offset_bottom = 76.0
+
+[node name="Cooldown" type="Label" parent="Hud/CharacterHud" unique_id=920243675]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 76.0
+offset_right = 140.0
+offset_bottom = 76.0
+
+[node name="Info" type="Label" parent="Hud/CharacterHud" unique_id=672056947]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 104.0
+offset_right = 20.0
+offset_bottom = 104.0
+
+[node name="Help" type="Label" parent="Hud/CharacterHud" unique_id=1740834902]
+layout_mode = 0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -43.0
+offset_right = 21.0
+offset_bottom = -20.0
+grow_vertical = 0
+
+[node name="Crosshair" type="Label" parent="Hud/CharacterHud" unique_id=1180360846]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -5.0
+offset_top = -11.5
+offset_right = 5.0
+offset_bottom = 11.5
+text = "+"
+
+[editable path="Targets/Plain"]
+[editable path="Targets/Undead"]
+[editable path="Targets/Construct"]
+[editable path="Targets/Thorns"]
+[editable path="Targets/WeakToFire"]
+[editable path="Arena/Ally"]

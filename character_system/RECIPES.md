@@ -3,7 +3,8 @@
 Short answers to "how do I…". Every resource named here has a working copy in
 `character_system/examples/`: duplicate it (right-click > Duplicate) and change the copy.
 For any class, press **F1** in Godot and search its name for the full reference. New to the
-system? The Quick start page of the documentation builds a whole level, step by step.
+system? The Quick start page of the documentation builds a whole level, step by step. To
+try everything here in play, open `test_level/test_level.tscn` and press F6.
 
 ## Characters
 
@@ -172,6 +173,11 @@ before it lands. It has three numbers, and the hit lands for
   `crit` on the effect. Set the condition's **Bonus Stat** to `crit_chance` and gear can
   raise the odds. See `statuses/lucky_strikes.tres`.
 - **Stronger with every stack:** turn on the effect's **Per Stack**.
+- **One of several conditions is enough:** put them inside an **AnyCondition**. See
+  `statuses/executioner.tres`: +50% against targets that are wet or below half health.
+
+A stat bonus can have a condition too: give the StatModifier its own **Conditions**. See
+`statuses/berserk.tres`, which adds speed only while strength is 5 or more.
 
 ### Make damage or healing scale with a stat
 
@@ -189,7 +195,8 @@ list. Everything in the list is added to the amount each time the effect runs:
 
 The stat can be one a component owns (`max_health`) or one you listed in the
 manager's Stats. A status tick's source is whoever applied the status, so a mage's burns grow with
-the mage's `spell_power`. `examples/projectiles/fireball.tscn` uses one.
+the mage's `spell_power`. `examples/projectiles/fireball.tscn` uses one, and
+`statuses/bleeding.tres` takes 2% of the victim's maximum health each second.
 
 ### Make a status that reacts to hits, kills and heals
 
@@ -227,12 +234,49 @@ CollisionShape3D.
 
 ## Items
 
+An item is up to two files:
+
+- An **ItemData** resource (New Resource > ItemData): its name, `max_stack`, the `slot` it is
+  worn in (empty for things that are only carried), and **Use Effects** for things that are
+  used up.
+- A **scene**, for an item that does something while worn or held: a **Node3D** root for the
+  model, a **ComponentManager**, and one item component for each thing it does. Set the
+  ItemData's `scene` to it. The character needs the slot in **Equipment > Sockets**, pointing
+  at a Node3D such as a hand; the path starts from the Equipment node, e.g. `../Hand`.
+
+The components combine freely, so a staff can shoot, grant a spell and add spell power.
+
+| Item | ItemData | Scene | Example in `items/` |
+| --- | --- | --- | --- |
+| Gun | slot `weapon` | Trigger, Magazine, Hitscan | `rifle.tres`, `flare_gun.tres` |
+| Shotgun | slot `weapon` | The same, with Pellets and Spread | `shotgun.tres` |
+| Scoped rifle | slot `weapon` | A gun plus your own item component | `marksman_rifle.tres` |
+| Rocket launcher, bow | slot `weapon` | Trigger with a LaunchProjectileEffect, Magazine | `rocket_launcher.tres` |
+| Sword, axe, fists | slot `weapon` | Trigger, MeleeSweep | `sword.tres` |
+| Staff that grants a spell | slot `weapon` | Grants (Abilities) | `fire_staff.tres` |
+| Ring or armour with numbers | a slot of its own | Grants (Modifiers) | `ring_of_vigor.tres` |
+| Cloak or amulet with a passive | a slot of its own | Grants (Statuses) | `fireproof_cloak.tres`, `ward_amulet.tres` |
+| Ammo | no slot, `max_stack` | none | `rifle_ammo.tres`, `rockets.tres` |
+| Potion, food, scroll | no slot, Use Effects | none | `health_potion.tres`, `mana_potion.tres` |
+| Grenade, throwing knife | no slot, Use Effects | none | `grenade.tres` |
+| A weapon for AI | slot `weapon` | A gun that reloads for free | `soldier_rifle.tres` |
+
 ### Make gear that changes stats
 
 1. New scene: a **Node3D** root, a **ComponentManager**, a **Grants**. In **Modifiers**, add
-   a StatModifier for each bonus, e.g. `max_health` add 25, or `move_speed` percent 0.1.
+   a StatModifier for each bonus.
 2. New Resource > **ItemData**: set `slot` (e.g. `ring`) and `scene` to that scene.
 3. On the character, add the slot to **Equipment > Sockets**, pointing at a Node3D.
+
+| Bonus | StatModifier |
+| --- | --- |
+| +25 health | `max_health`, add 25 |
+| 10% faster | `move_speed`, percent 0.1 |
+| Armour against one damage type | `resist_physical`, add 0.2 (1 is immune) |
+| 20% more fire damage | `bonus_fire`, add 0.2 |
+| More mana, faster mana | `max_mana`, `mana_regen` (any Pool: `max_<pool>`, `<pool>_regen`) |
+| Shorter cooldowns | `cooldown_speed`, percent 0.2 |
+| A stat of your own | `strength`, `crit_chance`, or whatever the manager's Stats list |
 
 See `items/ring_of_vigor.tres`. For loot with random numbers, put the modifiers on the copy
 instead of the scene, and each copy keeps its own:
@@ -256,27 +300,46 @@ an immunity or react to hits.
 2. New Resource > **ItemData**: set `slot` (e.g. `cloak`) and `scene` to that scene.
 3. On the character, add the slot to **Equipment > Sockets**, pointing at a Node3D.
 
-Equip it with `(Component.of(player, Equipment) as Equipment).equip(ItemInstance.new(cloak_data))`.
-The item goes into the Inventory too, and is unequipped if it ever leaves it.
-See `items/fireproof_cloak.tres`.
+Any status with duration 0 works: an immunity (`items/fireproof_cloak.tres`), a shield
+(`items/ward_amulet.tres`), life steal, thorns, crits. The wearer has it until the item comes
+off, and two items that give the same passive keep it until both are off.
 
 ### Make a weapon
 
 1. New scene: a **Node3D** root for the model, a **ComponentManager**, a **Trigger** (fire
    rate), a **Magazine** (capacity, ammo item) and a **Hitscan** (range, `effects`). Put a
-   DamageEffect in the effects. For bonus damage against wet targets, add a second
-   DamageEffect with a HasTagCondition (`wet`).
+   DamageEffect in the effects.
 2. New Resource > **ItemData**: set `slot` to `weapon` and `scene` to that scene.
 3. On the character, add `weapon` to **Equipment > Sockets**, pointing at a Node3D such as a
-   hand. The path starts from the Equipment node, e.g. `../Hand`.
+   hand.
 
-See `items/rifle.tres` and `items/flare_gun.tres`. More to set in the Inspector:
+See `items/rifle.tres`. More to set in the Inspector:
 
+- **Automatic fire:** the Trigger's **Automatic**. **Fire Rate** is shots per second.
 - **A reload that takes time:** the Magazine's **Reload Time**. **Auto Reload** reloads when
-  the trigger is pulled on an empty magazine. Leave **Ammo** empty and it reloads for free.
+  the trigger is pulled on an empty magazine. Leave **Ammo** empty and it reloads for free,
+  which suits AI: see `items/soldier_rifle.tres`.
 - **A shotgun:** the Hitscan's **Pellets** and **Spread**. See `items/shotgun.tres`.
+- **Set the target alight, slow it, poison it:** an ApplyStatusEffect in the effects. See
+  `items/flare_gun.tres`.
+- **More damage to some targets:** a second DamageEffect with a condition, such as a
+  HasTagCondition (`wet`), as the rifle has.
+- **A healing gun:** a HealEffect instead of the DamageEffect.
+- **Damage that grows with the wielder:** a StatAmount in the DamageEffect's Scaling. See
+  "Make damage or healing scale with a stat".
+- **No friendly fire:** an IsHostileCondition on the DamageEffect.
 - **Sparks where the shot lands:** a SpawnSceneEffect in the effects with **At** set to
-  HIT_POINT.
+  HIT_POINT. See `items/marksman_rifle.tres`.
+- **Headshots:** nothing on the weapon. Give the target a Hurtbox on its head with
+  **Multiplier** 2.
+- **Something for the shooter on each shot**, such as a status that slows them while
+  firing: the Trigger's **User Effects**.
+
+### Make ammo
+
+New Resource > **ItemData**: leave `slot` and `scene` empty and set `max_stack`, e.g. 60. Set
+the weapon's **Magazine > Ammo** to it. Reloading takes rounds from the wielder's Inventory,
+and each copy of a weapon remembers how many rounds are in it. See `items/rifle_ammo.tres`.
 
 ### Make a weapon that fires projectiles
 
@@ -290,6 +353,15 @@ See `items/rifle.tres` and `items/flare_gun.tres`. More to set in the Inspector:
 
 A projectile never hits whoever launched it directly, but its blast reaches everyone in
 range. Put an IsHostileCondition on the blast's DamageEffect to spare the shooter and allies.
+See `items/rocket_launcher.tres` and `projectiles/rocket.tscn`.
+
+### Make a melee weapon
+
+As for a weapon, but with a **MeleeSweep** instead of the Magazine and Hitscan. Set its
+**Shape** to a BoxShape3D about a metre across and put the DamageEffect in its effects. Each
+click swings once and hits everything in the box in front of the item. See
+`items/sword.tres`: its damage has a RandomAmount and a StatAmount of `strength`, and its
+other effects knock the target back and make it bleed.
 
 ### Make an item that grants an ability
 
@@ -301,20 +373,30 @@ slot when it's unequipped. See `items/fire_staff.tres`.
 ### Make a potion
 
 New Resource > **ItemData**: leave `slot` empty, set `max_stack`, and put what it does in
-**Use Effects**, e.g. a HealEffect, or an ApplyStatusEffect for an elixir. Then:
+**Use Effects**: a HealEffect (`items/health_potion.tres`), a ChangePoolEffect for mana
+(`items/mana_potion.tres`), or an ApplyStatusEffect for an elixir. Then:
 
 ```gdscript
 (Component.of(player, Inventory) as Inventory).use(potion_data)  # False if none is left.
 ```
 
-One is taken from the stack on each use, unless **Consumed On Use** is off. See
-`items/health_potion.tres`.
+One is taken from the stack on each use, unless **Consumed On Use** is off.
 
-### Make a melee weapon
+### Make a grenade
 
-As for a weapon, but with a **MeleeSweep** instead of the Magazine and Hitscan. Set its
-**Shape** to a BoxShape3D about a metre across and put the DamageEffect in its effects. Each
-click swings once and hits everything in the box in front of the item.
+A grenade is a potion whose effect throws something. Make a Projectile scene with
+`Gravity Scale` 1, a `Blast Radius` and a short `Lifetime`; it goes off when it hits or when
+the time runs out. Put a **LaunchProjectileEffect** with that scene in the ItemData's **Use
+Effects**. `Inventory.use()` then throws one where the character is aiming. See
+`items/grenade.tres`.
+
+### Give an item behaviour of your own
+
+When no built-in component does it, write one: a script that extends **ItemComponent**, added
+to the item's scene like the others. It has `wielder`, `item` and the wielder's `brain`, and
+runs only while the item is equipped. `examples/scripts/scope.gd` is one: while the secondary
+button is held it narrows the camera and slows the wielder. `items/marksman_rifle.tres` uses
+it. "Write your own effect, condition or component" below has the pattern.
 
 ### Carry several weapons
 
@@ -329,14 +411,23 @@ switch.select(0)  # The first weapon picked up.
 switch.holster()  # Put it away.
 ```
 
-### Pick up and drop items
+### Pick up, wear and drop items
 
 ```gdscript
 var bag := Component.of(player, Inventory) as Inventory
 bag.add(ammo_data, 30)  # Fills existing stacks first.
 bag.add_instance(dropped_rifle)  # Keeps that copy's rounds.
+var gear := Component.of(player, Equipment) as Equipment
+gear.equip(bag.first(ring_data))  # Put on something from the bag.
+gear.unequip(&"ring")  # Take it off; it stays in the bag.
 bag.remove_instance(bag.first(rifle_data))  # Drops it; it's unequipped automatically.
 ```
+
+Putting an item in the bag doesn't put it on: when to equip is your game's rule. Weapons are
+the exception with a WeaponSwitch, which draws the first one by itself. A pickup in the world
+is an Area3D that calls `bag.add()` for the body that enters it; `ItemPickup` in
+`immunity_test/scripts/item_pickup.gd` is one to copy, and `test_level/test_level.gd` puts on
+whatever has a free slot.
 
 ## Abilities
 
@@ -394,7 +485,7 @@ func _on_ability_failed(_ability: AbilityData, reason: StringName) -> void:
 Set the ability's **Targeting** to a new **RadiusTargeting** and choose its radius. With
 **Hostile Only** on, it only reaches what the user's Faction fights; for a party heal, turn it
 off and **Include User** on. A shockwave is a RadiusTargeting with a DamageEffect and a
-KnockbackEffect.
+KnockbackEffect: see `abilities/shockwave.tres`, which also has two charges.
 
 ## Your own code
 

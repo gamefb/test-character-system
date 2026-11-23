@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="PackedScene" path="res://character_system/examples/items/scenes/soldier_rifle.tscn" id="1_2ya2k"]
+[ext_resource type="Script" path="res://character_system/core/items/item_data.gd" id="2_b43t7"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_52m6a"]
+
+[resource]
+script = ExtResource("2_b43t7")
+id = &"soldier_rifle"
+display_name = "Soldier rifle"
+description = "For AI: needs no ammo, reloads by itself and spares its own side."
+slot = &"weapon"
+scene = ExtResource("1_2ya2k")

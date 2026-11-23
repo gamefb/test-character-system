@@ -89,6 +89,46 @@ GUT has no default test folder. In the GUT panel's settings, add ``res://tests/`
 
 The ``immunity_test/`` folder holds a scripted scene that runs 43 checks on immunities, zones and equipment together. Five characters walk their own track at once: a Knight who picks up a rifle, ammo, a flare gun and a fireproof cloak along the way and switches between the two guns, an Undead Ghoul, a Construct Golem, a Diver crossing water and fire, and a Cleric with a ward amulet. Press F6 on ``immunity_test.tscn`` to watch it, or run ``godot --headless --path . --fixed-fps 60 res://immunity_test/immunity_test.tscn``, which quits with exit code 0 when every check passes. Its README lists what each track shows.
 
+.. _doc_test_level:
+
+The test level
+--------------
+
+``test_level/test_level.tscn`` is a level to walk around in, with every part of the system in it. Open it and press F6. It is first person, and the keys are listed at the bottom of the screen.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Place
+     - What it holds
+   * - Armoury
+     - Every example item as a pickup: seven weapons with their ammo, potions, grenades, a ring, a cloak and an amulet
+   * - Targets
+     - Dummies that show each hit as a number: plain, undead, construct, thorns, weak to fire, and the example mage with her shield. Heads count double
+   * - Shrines
+     - A pad for each passive, such as Sharpshooter, Vampiric and Executioner, and one that takes them away
+   * - Hazards
+     - The five example zones, and pads that stun, silence and root
+   * - Arena
+     - Two enemy soldiers and an ally with :ref:`AIBrain<class_AIBrain>`, on a navigation mesh
+   * - Movement
+     - A wall for the example :ref:`WallSlideMode<class_WallSlideMode>`, and a ledge to glide from
+
+The characters, items and zones are set up in the Inspector from ``character_system/examples/``. The level's one script does what a game does around them: it adds the input actions, equips what the player picks up, uses potions and grenades, draws the text on screen and brings the dead back.
+
+Started with ``--self-test``, the level plays itself and prints 18 checks: the player is walked over every pickup, shrine and zone, then fires, casts, drinks and throws. The first two checks are that the level uses every class and every example in ``character_system/``, so a new part can't be left out unnoticed.
+
+.. code-block:: shell
+
+   godot --headless --fixed-fps 60 res://test_level/test_level.tscn -- --self-test
+
+.. _doc_ci:
+
+Continuous integration
+----------------------
+
+``.github/workflows/tests.yml`` runs on every pull request and on every push to ``main``. It downloads the Godot build and the GUT version named at the top of the file, and then runs, in order: ``gdlint``; the core-alone check, which copies the project without ``kit/`` and ``examples/`` and loads every remaining script with ``tests/check_scripts_load.gd``; the unit tests; the ``immunity_test`` scene; and the test level's self-test. A second workflow, ``docs.yml``, builds this documentation and fails on any warning.
+
 .. _doc_performance:
 
 Performance
@@ -139,9 +179,11 @@ All 212 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 an
    * - Check
      - Godot 4.8 beta 4
    * - GUT tests (23 files above, test_statuses.gd included)
-     - 212 of 212, 911 asserts
+     - 212 of 212, 953 asserts
    * - ``immunity_test`` scene
      - 43 of 43
+   * - Test level, ``--self-test``
+     - 18 of 18
    * - ``core/`` on its own, with ``kit/`` and ``examples/`` deleted
      - All 35 scripts load
    * - Code examples in ``RECIPES.md``

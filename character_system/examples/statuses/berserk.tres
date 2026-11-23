@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_f1tev"]
+[ext_resource type="Script" path="res://character_system/core/stats/stat_modifier.gd" id="2_4m6w5"]
+[ext_resource type="Script" path="res://character_system/kit/conditions/stat_condition.gd" id="3_fs008"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="4_akv30"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="5_vhb04"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_trigger.gd" id="6_0qh86"]
+
+[sub_resource type="Resource" id="Resource_ak0gs"]
+script = ExtResource("3_fs008")
+stat = &"strength"
+value = 5.0
+
+[sub_resource type="Resource" id="Resource_1dtbm"]
+script = ExtResource("2_4m6w5")
+stat = &"move_speed"
+percent = 0.3
+conditions = Array[ExtResource("1_f1tev")]([SubResource("Resource_ak0gs")])
+
+[resource]
+script = ExtResource("5_vhb04")
+id = &"berserk"
+display_name = "Berserk"
+description = "+30% move speed while strength is 5 or more."
+modifiers = Array[ExtResource("2_4m6w5")]([SubResource("Resource_1dtbm")])

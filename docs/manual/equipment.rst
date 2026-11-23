@@ -111,7 +111,7 @@ A :ref:`Projectile<class_Projectile>` is a shot that takes time to arrive: a roc
 -  **It outlives its launcher.** The projectile is added to the level, and its hits credit the launcher as ``source`` and the weapon or ability as ``origin``, so kills are attributed even if the weapon was put away meanwhile.
 -  **Time runs out.** After ``lifetime`` seconds a projectile with a blast goes off where it is, and one without disappears.
 
-``examples/projectiles/fireball.tscn`` is a projectile with a direct hit that grows with ``spell_power``, a burn and a blast.
+``examples/projectiles/fireball.tscn`` is a projectile with a direct hit that grows with ``spell_power``, a burn and a blast. ``rocket.tscn`` has a blast with knockback, and ``grenade.tscn`` arcs and goes off after two seconds; ``examples/items/rocket_launcher.tres`` and ``grenade.tres`` launch them.
 
 .. _doc_passives_from_equipment:
 .. _doc_stats_and_abilities_from_equipment:
@@ -177,6 +177,38 @@ These ship in ``character_system/examples/items/``, each an :ref:`ItemData<class
      - none
      - None: it has ``use_effects`` [heal 40], and ``Inventory.use()`` takes one from the
        stack of up to 5.
+   * - Mana potion (``mana_potion.tres``)
+     - none
+     - None: ``use_effects`` [a :ref:`ChangePoolEffect<class_ChangePoolEffect>` of 50 mana].
+   * - Grenade (``grenade.tres``)
+     - none
+     - None: ``use_effects`` [a :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>`
+       with ``projectiles/grenade.tscn``, which arcs and has a blast], so using one throws it.
+   * - Sword (``sword.tres``)
+     - ``weapon``
+     - :ref:`Trigger<class_Trigger>` (2 per second), :ref:`MeleeSweep<class_MeleeSweep>` [8
+       damage + 0 to 4 at random + 1 per point of ``strength``, tagged ``melee``; knockback;
+       apply Bleeding]
+   * - Rocket launcher (``rocket_launcher.tres``)
+     - ``weapon``
+     - :ref:`Trigger<class_Trigger>` [``user_effects`` = a
+       :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` with
+       ``projectiles/rocket.tscn``; 40 damage on a direct hit],
+       :ref:`Magazine<class_Magazine>` (1 rocket, 1.5 second reload, auto reload)
+   * - Rockets (``rockets.tres``)
+     - none
+     - None: ammo for the rocket launcher, up to 20 per stack.
+   * - Marksman rifle (``marksman_rifle.tres``)
+     - ``weapon``
+     - :ref:`Trigger<class_Trigger>` (1.5 per second), :ref:`Magazine<class_Magazine>` (5
+       rounds of rifle ammo, 1.5 second reload), :ref:`Hitscan<class_Hitscan>` [35 damage; a
+       :ref:`SpawnSceneEffect<class_SpawnSceneEffect>` of sparks at the hit point], and the
+       example :ref:`Scope<class_Scope>`
+   * - Soldier rifle (``soldier_rifle.tres``)
+     - ``weapon``
+     - For AI. :ref:`Trigger<class_Trigger>` (2 per second), :ref:`Magazine<class_Magazine>`
+       (8 rounds, no ammo item, auto reload), :ref:`Hitscan<class_Hitscan>` [8 damage with an
+       :ref:`IsHostileCondition<class_IsHostileCondition>`, so no friendly fire]
 
 More ideas, built from the same parts:
 
@@ -201,11 +233,6 @@ More ideas, built from the same parts:
    * - Ring of haste
      - :ref:`Grants<class_Grants>` [a Haste passive with duration 0]
      - No trigger at all, only a passive
-   * - Rocket launcher
-     - :ref:`Trigger<class_Trigger>` [``user_effects`` = a
-       :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` with a Projectile that has a
-       blast], :ref:`Magazine<class_Magazine>` (1 rocket, 2 second reload)
-     - Slow, heavy, and dangerous up close
    * - Bow
      - :ref:`Trigger<class_Trigger>` [``user_effects`` = a
        :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` with a Projectile with

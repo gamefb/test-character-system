@@ -69,8 +69,9 @@ func test_every_example_loads() -> void:
 		elif res is PackedScene:
 			var node: Node = (res as PackedScene).instantiate()
 			assert_true(
-					node is EffectZone or node is Projectile or ComponentManager.of(node) != null,
-					path + " is a zone, a projectile, an item scene or a character")
+					node is EffectZone or node is Projectile or ComponentManager.of(node) != null
+					or node.get_script() == null,
+					path + " is a zone, a projectile, an item scene, a character or a plain scene")
 			node.free()
 
 

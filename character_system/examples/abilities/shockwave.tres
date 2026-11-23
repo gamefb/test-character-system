@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_tb8rb"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="2_whwgx"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="3_njaau"]
+[ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="4_5kofi"]
+[ext_resource type="Script" path="res://character_system/kit/effects/knockback_effect.gd" id="5_1btl1"]
+[ext_resource type="Script" path="res://character_system/core/abilities/ability_data.gd" id="6_r1o2x"]
+[ext_resource type="Script" path="res://character_system/kit/abilities/radius_targeting.gd" id="7_a6d4r"]
+
+[sub_resource type="Resource" id="Resource_ldhw5"]
+script = ExtResource("4_5kofi")
+amount = 15.0
+
+[sub_resource type="Resource" id="Resource_457hn"]
+script = ExtResource("5_1btl1")
+strength = 10.0
+lift = 3.0
+
+[sub_resource type="Resource" id="Resource_y8kgl"]
+script = ExtResource("7_a6d4r")
+radius = 6.0
+hostile_only = false
+
+[resource]
+script = ExtResource("6_r1o2x")
+id = &"shockwave"
+display_name = "Shockwave"
+description = "Hits and throws back everyone within 6 metres. Two charges."
+cooldown = 6.0
+charges = 2
+costs = Dictionary[StringName, float]({
+&"mana": 15.0
+})
+targeting = SubResource("Resource_y8kgl")
+effects = Array[ExtResource("2_whwgx")]([SubResource("Resource_ldhw5"), SubResource("Resource_457hn")])

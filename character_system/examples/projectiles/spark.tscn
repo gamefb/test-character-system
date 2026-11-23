@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j5hua"]
+albedo_color = Color(1, 0.8, 0.3, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_iexpa"]
+material = SubResource("StandardMaterial3D_j5hua")
+radius = 0.25
+height = 0.5
+
+[node name="Spark" type="Node3D" unique_id=689481411]
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=150234352]
+mesh = SubResource("SphereMesh_iexpa")

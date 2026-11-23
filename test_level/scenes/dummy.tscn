@@ -1,0 +1,69 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://character_system/core/characters/hurtbox.gd" id="1_a5afc"]
+[ext_resource type="Script" path="res://immunity_test/scripts/nameplate.gd" id="2_d6dww"]
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="3_gpgxw"]
+[ext_resource type="Script" path="res://character_system/core/statuses/statuses.gd" id="4_jrn1p"]
+[ext_resource type="Script" path="res://character_system/core/characters/health.gd" id="5_6dbe3"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8lma1"]
+radius = 0.35
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_djgeo"]
+albedo_color = Color(0.6, 0.6, 0.65, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_vv2h4"]
+material = SubResource("StandardMaterial3D_djgeo")
+radius = 0.35
+height = 1.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_3tpdc"]
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ogy7t"]
+albedo_color = Color(0.9, 0.8, 0.7, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_cseqy"]
+material = SubResource("StandardMaterial3D_ogy7t")
+radius = 0.22
+height = 0.44
+
+[node name="Dummy" type="StaticBody3D" unique_id=1529800067 groups=["respawns"]]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1601586635]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("CapsuleShape3D_8lma1")
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=1571031621]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+mesh = SubResource("CapsuleMesh_vv2h4")
+
+[node name="HeadHurtbox" type="Area3D" parent="." unique_id=1205669745 node_paths=PackedStringArray("character")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.72, 0)
+script = ExtResource("1_a5afc")
+character = NodePath("..")
+multiplier = 2.0
+tags = Array[StringName]([&"head"])
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HeadHurtbox" unique_id=624799120]
+shape = SubResource("SphereShape3D_3tpdc")
+
+[node name="Mesh" type="MeshInstance3D" parent="HeadHurtbox" unique_id=1197735732]
+mesh = SubResource("SphereMesh_cseqy")
+
+[node name="Nameplate" type="Label3D" parent="." unique_id=923461034]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+billboard = 1
+font_size = 40
+script = ExtResource("2_d6dww")
+
+[node name="ComponentManager" type="Node" parent="." unique_id=644581940]
+script = ExtResource("3_gpgxw")
+
+[node name="Statuses" type="Node" parent="." unique_id=1881609455]
+script = ExtResource("4_jrn1p")
+
+[node name="Health" type="Node" parent="." unique_id=1438737915]
+script = ExtResource("5_6dbe3")
+max_health = 200.0

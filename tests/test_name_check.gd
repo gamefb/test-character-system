@@ -184,6 +184,16 @@ func test_every_example_is_clean() -> void:
 		"statuses/sharpshooter.tres",
 		"statuses/lucky_strikes.tres",
 		"items/health_potion.tres",
+		"statuses/executioner.tres",
+		"statuses/berserk.tres",
+		"statuses/bleeding.tres",
+		"abilities/shockwave.tres",
+		"items/sword.tres",
+		"items/rocket_launcher.tres",
+		"items/marksman_rifle.tres",
+		"items/soldier_rifle.tres",
+		"items/mana_potion.tres",
+		"items/grenade.tres",
 	]
 	for path in paths:
 		var example: Resource = load("res://character_system/examples/" + path)

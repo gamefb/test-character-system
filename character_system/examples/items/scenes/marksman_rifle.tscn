@@ -1,0 +1,56 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_0xkeu"]
+[ext_resource type="Script" path="res://character_system/kit/items/trigger.gd" id="2_ejgkf"]
+[ext_resource type="Script" path="res://character_system/kit/items/magazine.gd" id="3_a713i"]
+[ext_resource type="Resource" path="res://character_system/examples/items/rifle_ammo.tres" id="4_btsqi"]
+[ext_resource type="Script" path="res://character_system/kit/items/hitscan.gd" id="5_y5n1s"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="6_2785g"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="7_ckaxc"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="8_tcfux"]
+[ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="9_lnf40"]
+[ext_resource type="PackedScene" path="res://character_system/examples/projectiles/spark.tscn" id="10_qceso"]
+[ext_resource type="Script" path="res://character_system/kit/effects/spawn_scene_effect.gd" id="11_ts61q"]
+[ext_resource type="Script" path="res://character_system/examples/scripts/scope.gd" id="12_1je4k"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bmqjp"]
+albedo_color = Color(0.35, 0.25, 0.15, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rw2mc"]
+material = SubResource("StandardMaterial3D_bmqjp")
+size = Vector3(0.07, 0.1, 1.1)
+
+[sub_resource type="Resource" id="Resource_c1fve"]
+script = ExtResource("9_lnf40")
+amount = 35.0
+
+[sub_resource type="Resource" id="Resource_81vag"]
+script = ExtResource("11_ts61q")
+scene = ExtResource("10_qceso")
+at = 1
+lifetime = 0.2
+
+[node name="MarksmanRifle" type="Node3D" unique_id=1024493755]
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=1339172272]
+mesh = SubResource("BoxMesh_rw2mc")
+
+[node name="ComponentManager" type="Node" parent="." unique_id=729558873]
+script = ExtResource("1_0xkeu")
+
+[node name="Trigger" type="Node" parent="." unique_id=225278469]
+script = ExtResource("2_ejgkf")
+fire_rate = 1.5
+
+[node name="Magazine" type="Node" parent="." unique_id=651685122]
+script = ExtResource("3_a713i")
+ammo = ExtResource("4_btsqi")
+capacity = 5
+reload_time = 1.5
+
+[node name="Hitscan" type="Node" parent="." unique_id=1701912993]
+script = ExtResource("5_y5n1s")
+effects = Array[ExtResource("6_2785g")]([SubResource("Resource_c1fve"), SubResource("Resource_81vag")])
+
+[node name="Scope" type="Node" parent="." unique_id=785464041]
+script = ExtResource("12_1je4k")

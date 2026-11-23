@@ -426,6 +426,21 @@ These ship in ``character_system/examples/`` as ``.tres`` files with no code. Du
      - ``triggers`` = on ``dealing_damage`` with a
        :ref:`ChanceCondition<class_ChanceCondition>` (0.1, bonus stat ``crit_chance``): modify
        amount × 2, tag ``crit``.
+   * - Executioner (passive)
+     - ``statuses/executioner.tres``
+     - ``triggers`` = on ``dealing_damage``, ``affects_other`` on, with an
+       :ref:`AnyCondition<class_AnyCondition>` of "has the tag ``wet``" and "below half
+       health": modify amount, percent 0.5.
+   * - Berserk (passive)
+     - ``statuses/berserk.tres``
+     - ``modifiers`` = ``move_speed`` percent 0.3, with a
+       :ref:`StatCondition<class_StatCondition>` on the modifier: only while ``strength`` is 5
+       or more.
+   * - Bleeding
+     - ``statuses/bleeding.tres``
+     - ``tags`` = bleed. ``duration`` = 5, ``max_stacks`` = 3. ``on_tick`` every second = damage
+       0 with a :ref:`HealthAmount<class_HealthAmount>` of 2% of maximum health. The example
+       sword applies it.
 
 More ideas, built from the same fields. These aren't in ``examples/``:
 

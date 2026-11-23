@@ -1,0 +1,132 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_lhp02"]
+[ext_resource type="Script" path="res://character_system/core/statuses/statuses.gd" id="2_ltgxi"]
+[ext_resource type="Script" path="res://character_system/core/characters/health.gd" id="3_tr0cn"]
+[ext_resource type="Script" path="res://character_system/core/characters/pool.gd" id="4_u776f"]
+[ext_resource type="Script" path="res://character_system/examples/scripts/stamina.gd" id="5_pilji"]
+[ext_resource type="Script" path="res://character_system/kit/brains/player_brain.gd" id="6_ib3pt"]
+[ext_resource type="Script" path="res://character_system/kit/brains/mouse_look.gd" id="7_a4du5"]
+[ext_resource type="Script" path="res://character_system/core/motor/character_motor.gd" id="8_7j4a8"]
+[ext_resource type="Script" path="res://character_system/kit/motor/walk_mode.gd" id="9_562ej"]
+[ext_resource type="Script" path="res://character_system/kit/motor/air_mode.gd" id="10_24x18"]
+[ext_resource type="Script" path="res://character_system/examples/scripts/wall_slide_mode.gd" id="11_ihd4l"]
+[ext_resource type="Script" path="res://character_system/kit/motor/dash_move.gd" id="12_8w0is"]
+[ext_resource type="Script" path="res://character_system/examples/scripts/glide_move.gd" id="13_f465u"]
+[ext_resource type="Script" path="res://character_system/kit/characters/faction.gd" id="14_2wupg"]
+[ext_resource type="Script" path="res://character_system/core/items/inventory.gd" id="15_1d05w"]
+[ext_resource type="Script" path="res://character_system/core/items/equipment.gd" id="16_syp7k"]
+[ext_resource type="Script" path="res://character_system/kit/characters/weapon_switch.gd" id="17_5fjl4"]
+[ext_resource type="Script" path="res://character_system/core/abilities/abilities.gd" id="18_kvxmc"]
+[ext_resource type="Script" path="res://character_system/core/abilities/ability_data.gd" id="19_kyrl7"]
+[ext_resource type="Resource" path="res://character_system/examples/abilities/second_wind.tres" id="20_ch5ni"]
+[ext_resource type="Resource" path="res://character_system/examples/abilities/sprint.tres" id="21_slj3p"]
+[ext_resource type="Resource" path="res://character_system/examples/abilities/fireball.tres" id="22_j376a"]
+[ext_resource type="Resource" path="res://character_system/examples/abilities/shockwave.tres" id="23_8cnwh"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xj5o6"]
+radius = 0.4
+height = 1.8
+
+[node name="Player" type="CharacterBody3D" unique_id=1924993221 groups=["respawns"]]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=225962473]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_xj5o6")
+
+[node name="Head" type="Node3D" parent="." unique_id=341205992]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head" unique_id=1304941359]
+current = true
+
+[node name="Hand" type="Node3D" parent="Head/Camera3D" unique_id=1328178281]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, -0.15, -0.5)
+
+[node name="Worn" type="Node3D" parent="." unique_id=2042210559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="ComponentManager" type="Node" parent="." unique_id=1835668120]
+script = ExtResource("1_lhp02")
+stats = Dictionary[StringName, float]({
+&"crit_chance": 0.1,
+&"level": 1.0,
+&"spell_power": 5.0,
+&"strength": 5.0
+})
+
+[node name="Statuses" type="Node" parent="." unique_id=1382467793]
+script = ExtResource("2_ltgxi")
+
+[node name="Health" type="Node" parent="." unique_id=505306074]
+script = ExtResource("3_tr0cn")
+
+[node name="Mana" type="Node" parent="." unique_id=1652682067]
+script = ExtResource("4_u776f")
+regen = 5.0
+
+[node name="Shield" type="Node" parent="." unique_id=256280739]
+script = ExtResource("4_u776f")
+pool = &"shield"
+max_value = 30.0
+regen = 5.0
+regen_delay = 3.0
+absorbs_damage = true
+
+[node name="Stamina" type="Node" parent="." unique_id=563552099]
+script = ExtResource("5_pilji")
+
+[node name="PlayerBrain" type="Node" parent="." unique_id=771070244]
+script = ExtResource("6_ib3pt")
+extra_actions = Array[StringName]([&"dash", &"sprint", &"ability_1", &"ability_2", &"ability_3", &"ability_4", &"use_health_potion", &"use_mana_potion", &"throw_grenade"])
+
+[node name="MouseLook" type="Node" parent="." unique_id=1939944]
+script = ExtResource("7_a4du5")
+
+[node name="CharacterMotor" type="Node" parent="." unique_id=67858280]
+script = ExtResource("8_7j4a8")
+
+[node name="WalkMode" type="Node" parent="CharacterMotor" unique_id=1050638521]
+script = ExtResource("9_562ej")
+
+[node name="AirMode" type="Node" parent="CharacterMotor" unique_id=562595308]
+script = ExtResource("10_24x18")
+
+[node name="WallSlideMode" type="Node" parent="CharacterMotor" unique_id=655165241]
+script = ExtResource("11_ihd4l")
+
+[node name="DashMove" type="Node" parent="CharacterMotor" unique_id=1594668369]
+script = ExtResource("12_8w0is")
+cooldown = 0.6
+
+[node name="GlideMove" type="Node" parent="CharacterMotor" unique_id=961065028]
+script = ExtResource("13_f465u")
+
+[node name="Faction" type="Node" parent="." unique_id=104463098]
+script = ExtResource("14_2wupg")
+team = &"player"
+hostile_to = Array[StringName]([&"enemy"])
+
+[node name="Inventory" type="Node" parent="." unique_id=730305569]
+script = ExtResource("15_1d05w")
+
+[node name="Equipment" type="Node" parent="." unique_id=762905372]
+script = ExtResource("16_syp7k")
+sockets = Dictionary[StringName, NodePath]({
+&"cloak": NodePath("../Worn"),
+&"neck": NodePath("../Worn"),
+&"ring": NodePath("../Worn"),
+&"weapon": NodePath("../Head/Camera3D/Hand")
+})
+
+[node name="WeaponSwitch" type="Node" parent="." unique_id=1958597806]
+script = ExtResource("17_5fjl4")
+
+[node name="Abilities" type="Node" parent="." unique_id=1560119438]
+script = ExtResource("18_kvxmc")
+slots = Dictionary[StringName, ExtResource("19_kyrl7")]({
+&"ability_1": ExtResource("20_ch5ni"),
+&"ability_2": ExtResource("21_slj3p"),
+&"ability_3": ExtResource("22_j376a"),
+&"ability_4": ExtResource("23_8cnwh")
+})
