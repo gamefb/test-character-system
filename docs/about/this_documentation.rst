@@ -11,14 +11,15 @@ import anything in it.
 Where each part comes from
 --------------------------
 
-- **Code listings** in the manual are read from the project's files when the site is built, so
+- **Code listings** on the pages are read from the project's files when the site is built, so
   they always match the code.
 - **The class reference** is generated from the ``##`` comments in the scripts, with Godot's own
   converter. Change a comment, regenerate, and the page follows.
 - **The recipes** page is ``character_system/RECIPES.md``, the same file you can read inside the
   project.
-- **Everything else** is written in reStructuredText in ``docs/about/``, ``docs/getting_started/``
-  and ``docs/manual/``.
+- **Everything else** is written in reStructuredText, in one folder for each part of the site:
+  ``docs/about/``, ``docs/getting_started/``, ``docs/core/``, ``docs/character_framework/``,
+  ``docs/starter_pack/`` and ``docs/project/``.
 
 Building the site
 -----------------

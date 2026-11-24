@@ -145,7 +145,7 @@ static func _names_for(object: Object, field_name: StringName) -> PackedStringAr
 		&"pool":
 			# A Pool's own field is where the name is made up, not picked.
 			return PackedStringArray() if object is Pool else known_pools()
-		&"event":
+		&"event", &"animations":
 			return known_events()
 		&"tag", &"tags", &"immune_to", &"removes_tags":
 			return known_tags()

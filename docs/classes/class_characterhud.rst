@@ -10,14 +10,14 @@ CharacterHud
 
 **Inherits:** :ref:`Control<class_Control>` **<** :ref:`CanvasItem<class_CanvasItem>` **<** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-An example HUD to copy: shows a character's health, statuses, ammo and ability cooldowns.
+An example HUD to copy: shows a character's health, statuses, ammo, ability cooldowns and the charge of a weapon that charges.
 
 .. rst-class:: classref-introduction-group
 
 Description
 -----------
 
-Attach it to a Control with a ProgressBar named HealthBar and three Labels named Statuses, Ammo and Cooldown, then set Character. Health and statuses update when they change; ammo and the cooldown are read every frame, which is cheap.
+Attach it to a Control with a ProgressBar named HealthBar and three Labels named Statuses, Ammo and Cooldown, then set Character. Add a ProgressBar named ChargeBar for a bar that fills while a weapon is charging; without one the HUD works as before. Health and statuses update when they change; ammo, the cooldown and the charge are read every frame, which is cheap.
 
 .. rst-class:: classref-reftable-group
 

@@ -1,9 +1,9 @@
 .. _doc_character_archetypes:
 
-Character archetypes
-====================
+Characters
+==========
 
-The three character kinds share one scene layout and differ in two components and their data.
+Who is in the level. The three character kinds share one scene layout and differ in two components and their data.
 
 .. code:: text
 
@@ -86,3 +86,36 @@ The three character kinds share one scene layout and differ in two components an
 **Different classes.** A warrior and a mage are the same scene with different data: the Stats on their :ref:`ComponentManager<class_ComponentManager>`, the :ref:`Pool<class_Pool>`\ s they have, their innate passives and the abilities in their slots. ``starter_pack/characters/mage.tscn`` is a small one: 80 health, ``spell_power`` and ``crit_chance``, a mana pool that refills, a shield that recharges after three seconds out of combat, and a Fireball on ``secondary``.
 
 A stationary turret is a character without a :ref:`CharacterMotor<class_CharacterMotor>` and with a plain :ref:`Brain<class_Brain>`, driven by your own component. A destructible crate is a :ref:`ComponentManager<class_ComponentManager>` and a :ref:`Health<class_Health>` on a ``StaticBody3D``.
+
+.. _doc_example_scripts:
+
+Example scripts
+---------------
+
+``character_system/starter_pack/scripts/`` holds the scripts a player meets through one particular character, as opposed to the framework every character is built on. Each is short and written to be copied.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Script
+     - What it adds
+     - Walked through in
+   * - :ref:`WalkMode<class_WalkMode>`, :ref:`AirMode<class_AirMode>`, :ref:`DashMove<class_DashMove>`
+     - Walking, jumping, falling and dashing
+     - :ref:`doc_example_movements`
+   * - :ref:`GlideMove<class_GlideMove>`, :ref:`WallSlideMode<class_WallSlideMode>`
+     - Gliding and wall sliding
+     - :ref:`doc_extending_movement`
+   * - :ref:`Sprint<class_Sprint>`
+     - Running while a button is held, paid for from a stamina pool
+     - :ref:`doc_extending_component`
+   * - :ref:`Scope<class_Scope>`
+     - Zooming in while a button is held, on the marksman rifle
+     - :ref:`doc_extending_item_component`
+   * - :ref:`AttackNearest<class_AttackNearest>`
+     - An AI that walks to its nearest enemy and attacks it, holding the button for a time
+       if its weapon charges
+     - :ref:`doc_extending_ai`
+   * - :ref:`CharacterHud<class_CharacterHud>`
+     - Health, statuses, ammo and a weapon's charge on screen
+     - :ref:`doc_extending_hud`

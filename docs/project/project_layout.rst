@@ -6,8 +6,8 @@ Project layout and pitfalls
 Everything lives in ``character_system/``, in three layers. Each one needs only the ones before it:
 
 - ``core/`` is the rules everything shares: components, stats, events, effects, pools, health and statuses. It loads on its own.
-- ``character/`` is what a character and its gear are assembled from, built on the core the same way your own scripts will be: brains, movement, abilities, inventory and equipment, weapon parts, zones and projectiles. Use them, change them, or delete the ones your game doesn't need.
-- ``starter_pack/`` is ready-made content made with the two layers above: statuses, items, abilities, zones, projectiles and a character, plus a few scripts that show how to write your own parts. Duplicate what you want and delete the rest; nothing in ``core/`` or ``character/`` needs it.
+- ``character/`` is the character framework: the scaffold a character and its gear are assembled on, built on the core the same way your own scripts will be. It has brains, the motor, abilities, inventory and equipment, weapon parts, zones, projectiles and the animation bridge. It decides how things work, not what is in the game. Use its parts, change them, or delete the ones your game doesn't need.
+- ``starter_pack/`` is what a player sees and uses, made with the two layers above: statuses, items, abilities, zones, projectiles and a character, and the scripts for particular features, such as walking, dashing and sprinting. Duplicate what you want and delete the rest; nothing in ``core/`` or ``character/`` needs it.
 
 Your own data and scenes stay outside all three, so the system can be copied to another project as one folder. Each script file holds one ``class_name``.
 
@@ -33,25 +33,27 @@ Your own data and scenes stay outside all three, so the system can be copied to 
    │   │   ├── conditions/           condition (base), has_tag
    │   │   ├── amounts/              amount (base), stat_amount
    │   │   └── statuses/             statuses, status_data, status_trigger, dead.tres
-   │   ├── character/                the scaffold: 44 scripts, keep what you use
+   │   ├── character/                the framework: 44 scripts, keep what you use
    │   │   ├── brains/               brain, player_brain, ai_brain, mouse_look
-   │   │   ├── motor/                character_motor, motor_node, movement_mode,
-   │   │   │                         layered_move, walk_mode, air_mode, dash_move
+   │   │   ├── motor/                character_motor, motor_node, movement_mode (base),
+   │   │   │                         layered_move (base)
    │   │   ├── combat/               hurtbox, faction
    │   │   ├── abilities/            abilities, ability_data, targeting, radius_targeting
    │   │   ├── items/                item_data, item_instance, item_component, inventory,
    │   │   │                         equipment, weapon_switch, trigger, magazine,
    │   │   │                         weapon_delivery (base), hitscan, melee_sweep, grants
    │   │   ├── world/                effect_zone, projectile
+   │   │   ├── animation/            animator
    │   │   ├── effects/              knockback, spawn_scene, launch_projectile, change_pool
-   │   │   ├── conditions/           pool_below, stat, is_hostile, chance, hit, any
-   │   │   └── amounts/              pool, hit, random
-   │   └── starter_pack/             ready-made content: copy what you want
+   │   │   ├── conditions/           pool_below, stat, is_hostile, chance, hit, any, charge
+   │   │   └── amounts/              pool, hit, random, charge
+   │   └── starter_pack/             what a player sees and uses: copy what you want
    │       ├── statuses/, traits/    Burning, Stunned, Vampiric, Undead and the rest
    │       ├── items/                item data, with their scenes in items/scenes/
    │       ├── abilities/, zones/, projectiles/, characters/
-   │       └── scripts/              sprint, scope, attack_nearest, character_hud,
-   │                                 glide_move, wall_slide_mode
+   │       └── scripts/              9 scripts: walk_mode, air_mode, dash_move, glide_move,
+   │                                 wall_slide_mode, sprint, scope, attack_nearest,
+   │                                 character_hud
    ├── data/                         your .tres files
    ├── scenes/                       your characters, items and levels
    ├── tests/                        test_*.gd, run with GUT; benchmark.gd
@@ -68,7 +70,7 @@ Your own data and scenes stay outside all three, so the system can be copied to 
    * - ``brains/``
      - ``combat/`` (the player's aim ignores its own :ref:`Hurtbox<class_Hurtbox>`\ es)
    * - ``motor/``
-     - ``brains/``
+     - ``brains/``. It has no modes of its own: add the starter pack's, or yours
    * - ``combat/``
      - Nothing
    * - ``abilities/``
@@ -77,6 +79,8 @@ Your own data and scenes stay outside all three, so the system can be copied to 
      - ``brains/`` and ``combat/``; :ref:`Grants<class_Grants>` needs ``abilities/``, and :ref:`Hitscan<class_Hitscan>` needs ``world/``
    * - ``world/``
      - ``combat/``
+   * - ``animation/``
+     - Nothing
    * - ``effects/``, ``conditions/``, ``amounts/``
      - One thing each at most: knockback needs ``motor/``, launching a projectile needs ``brains/`` and ``world/``, and the hostility check needs ``combat/``
 
@@ -84,7 +88,7 @@ So a game with its own movement deletes ``motor/`` and the knockback effect, and
 
 **Base classes are abstract.** :ref:`Component<class_Component>`, :ref:`Effect<class_Effect>`, :ref:`Condition<class_Condition>`, :ref:`Amount<class_Amount>`, :ref:`Targeting<class_Targeting>`, :ref:`ItemComponent<class_ItemComponent>`, :ref:`MotorNode<class_MotorNode>`, :ref:`MovementMode<class_MovementMode>` and :ref:`LayeredMove<class_LayeredMove>` are marked ``@abstract``, so nobody adds one as a node or creates one as a resource by mistake, and Godot reports an effect, amount or targeting script that forgot the one method it must write. This needs Godot 4.5 or newer; the project is developed on 4.8.
 
-**The starter pack and the recipes.** ``starter_pack/`` holds working resources to duplicate and change: statuses (Burning, Poisoned, Wet, Regenerating, Warded, Haste, Rooted, Thorns, Fireproof, Stunned, Silenced, Vampiric, Bloodlust, Fire ward, Sharpshooter, Lucky strikes, Executioner, Berserk, Bleeding; the Dead status itself is in ``core/statuses/``), traits (Undead, Construct), items with their scenes (rifle, rifle ammo, flare gun, shotgun, marksman rifle, soldier rifle, rocket launcher, rockets, sword, fire staff, fireproof cloak, ward amulet, ring of vigor, health potion, mana potion, grenade), zones (fire patch, water pool, healing pad, ward circle, poison bog), abilities (Second Wind, Sprint, Fireball, Shockwave), projectiles (the fireball, a rocket, a grenade) and a character (a mage with stats of her own, mana and a shield). ``starter_pack/scripts/`` holds scripts to copy: a :ref:`Sprint<class_Sprint>` component that spends from a pool, a :ref:`Scope<class_Scope>` item component, :ref:`AttackNearest<class_AttackNearest>` AI decision logic, a :ref:`CharacterHud<class_CharacterHud>`, a :ref:`WallSlideMode<class_WallSlideMode>` movement mode and a :ref:`GlideMove<class_GlideMove>` layered move, all explained in :ref:`doc_extending`. ``RECIPES.md`` answers the common jobs on one page, from making a character, status, weapon or zone to reading buttons and showing health on screen, and points at the matching example. ``test_level/test_level.tscn`` puts all of it in one level to walk around in; see :ref:`doc_test_level`.
+**The starter pack and the recipes.** ``starter_pack/`` holds working resources to duplicate and change: statuses (Burning, Poisoned, Wet, Regenerating, Warded, Haste, Rooted, Thorns, Fireproof, Stunned, Silenced, Vampiric, Bloodlust, Fire ward, Sharpshooter, Lucky strikes, Executioner, Berserk, Bleeding, Drawing; the Dead status itself is in ``core/statuses/``), traits (Undead, Construct), items with their scenes (rifle, rifle ammo, flare gun, shotgun, marksman rifle, soldier rifle, rocket launcher, rockets, longbow, sword, fire staff, fireproof cloak, ward amulet, ring of vigor, health potion, mana potion, grenade), zones (fire patch, water pool, healing pad, ward circle, poison bog), abilities (Second Wind, Sprint, Fireball, Shockwave), projectiles (the fireball, a rocket, a grenade, an arrow) and a character (a mage with stats of her own, mana and a shield). ``starter_pack/scripts/`` holds scripts to copy: a :ref:`Sprint<class_Sprint>` component that spends from a pool, a :ref:`Scope<class_Scope>` item component, :ref:`AttackNearest<class_AttackNearest>` AI decision logic, a :ref:`CharacterHud<class_CharacterHud>`, a :ref:`WallSlideMode<class_WallSlideMode>` movement mode and a :ref:`GlideMove<class_GlideMove>` layered move, all explained in :ref:`doc_extending`. ``RECIPES.md`` answers the common jobs on one page, from making a character, status, weapon or zone to reading buttons and showing health on screen, and points at the matching example. ``test_level/test_level.tscn`` puts all of it in one level to walk around in; see :ref:`doc_test_level`.
 
 **Editor icons.** Every node type has its own icon file in ``icons/``, set by an ``@icon(...)`` line above its ``class_name``. Most are still the same plain square; the motor, its modes and moves, and :ref:`WeaponSwitch<class_WeaponSwitch>` have a symbol of their own. To give a node type its own icon, replace its SVG; the ``@icon`` line doesn't change. A script without its own ``@icon`` shows its base class's icon, so your own components look like components, and effects, conditions and targeting resources keep their base class's icon in the Inspector.
 

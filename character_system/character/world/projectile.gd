@@ -47,6 +47,8 @@ signal impacted(ctx: EffectContext)
 var source: Node
 ## The item or ability behind it, for [member EffectContext.origin].
 var origin: Resource
+## How far its launcher was charged, for the [member EffectContext.charge] of what it hits.
+var charge: float = 0.0
 ## Where it's heading, in metres per second. Set by [method launch] from [member speed].
 var velocity := Vector3.ZERO
 
@@ -57,10 +59,12 @@ var _excluded: Array[RID] = []
 ## Spawns [param scene] at [param from], flying toward [param toward], and returns it.
 ## [param p_source] is who launched it. [param extra_effects] run on what it hits, before the
 ## scene's own [member effects], so one projectile scene can serve several weapons.
-## [param p_origin] is the item or ability behind it. The projectile is added to the level, so
-## it keeps flying if its launcher is freed.
+## [param p_origin] is the item or ability behind it. [param p_charge] is how far the launcher
+## was charged, and [param extra_speed] is added to the scene's [member speed]. The projectile
+## is added to the level, so it keeps flying if its launcher is freed.
 static func launch(scene: PackedScene, p_source: Node, from: Vector3, toward: Vector3,
-		extra_effects: Array[Effect] = [], p_origin: Resource = null) -> Projectile:
+		extra_effects: Array[Effect] = [], p_origin: Resource = null, p_charge: float = 0.0,
+		extra_speed: float = 0.0) -> Projectile:
 	var tree: SceneTree = p_source.get_tree() if is_instance_valid(p_source) else null
 	if not scene or not tree:
 		return null
@@ -70,6 +74,8 @@ static func launch(scene: PackedScene, p_source: Node, from: Vector3, toward: Ve
 		return null
 	shot.source = p_source
 	shot.origin = p_origin
+	shot.charge = p_charge
+	shot.speed += extra_speed
 	var all: Array[Effect] = []
 	all.append_array(extra_effects)
 	all.append_array(shot.effects)
@@ -106,7 +112,9 @@ func _physics_process(delta: float) -> void:
 	var hit: Dictionary = Hurtbox.raycast(get_world_3d().direct_space_state, query)
 	if hit:
 		global_position = hit.position
-		_impact(Hurtbox.hit(source, hit.collider, origin, hit.position, hit.normal))
+		var ctx: EffectContext = Hurtbox.hit(source, hit.collider, origin, hit.position, hit.normal)
+		ctx.charge = charge
+		_impact(ctx)
 		return
 	global_position = to
 	if not velocity.is_zero_approx():
@@ -159,6 +167,7 @@ func _blast(where: Vector3) -> void:
 		if hits.has(target) or not is_instance_valid(target):
 			continue
 		var ctx := EffectContext.new(source, target, origin)
+		ctx.charge = charge
 		ctx.position = where
 		var node := target as Node3D
 		if node and blast_edge_strength < 1.0:

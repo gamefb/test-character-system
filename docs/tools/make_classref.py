@@ -47,7 +47,7 @@ HIDDEN = {
 # Sections of the index, by the folder the script is in. The first match wins.
 GROUPS = [
     ("Core", "character_system/core/"),
-    ("Character", "character_system/character/"),
+    ("Character framework", "character_system/character/"),
     ("Starter pack", "character_system/starter_pack/"),
 ]
 

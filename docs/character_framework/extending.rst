@@ -164,6 +164,18 @@ Some examples:
      - Layered move
      - Changes the fall on top of the air mode while a button is held. See
        :ref:`doc_extending_movement`.
+   * - A heavy swing that winds up
+     - Data
+     - **Wind Up** on the weapon's :ref:`Trigger<class_Trigger>`, and **Active** on its
+       :ref:`MeleeSweep<class_MeleeSweep>` for a swing that follows the blade. See
+       :ref:`doc_timing_and_animation`.
+   * - A bow that is drawn, a charged shot
+     - Data
+     - **Charge Time** on the weapon's Trigger, and a :ref:`ChargeAmount<class_ChargeAmount>`
+       wherever the charge should count. See :ref:`doc_charging`.
+   * - An animation for an attack, a cast or a death
+     - Data
+     - A row in the character's :ref:`Animator<class_Animator>`. See :ref:`doc_animator`.
 
 When new behaviour needs code, prefer a new :ref:`Effect<class_Effect>` over a new component where you can: one effect works in abilities, statuses, weapons and zones at once. Most of the grey area comes from the ability limits above. A spell that charges up while its button is held, or channels until it's let go, can't be an ability, so it would be a component of its own that reads the held button.
 

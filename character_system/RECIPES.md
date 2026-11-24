@@ -124,6 +124,7 @@ The character needs a **Statuses** component for any of this.
    0.5, the height of a default bake.
 
 AttackNearest picks the nearest `player` every half second and fires while it's within 15 m.
+For a weapon that charges, set its **Hold Time** to how long it should hold the button.
 
 ### Change the double jump
 
@@ -290,7 +291,8 @@ The components combine freely, so a staff can shoot, grant a spell and add spell
 | Gun | slot `weapon` | Trigger, Magazine, Hitscan | `rifle.tres`, `flare_gun.tres` |
 | Shotgun | slot `weapon` | The same, with Pellets and Spread | `shotgun.tres` |
 | Scoped rifle | slot `weapon` | A gun plus your own item component | `marksman_rifle.tres` |
-| Rocket launcher, bow | slot `weapon` | Trigger with a LaunchProjectileEffect, Magazine | `rocket_launcher.tres` |
+| Rocket launcher | slot `weapon` | Trigger with a LaunchProjectileEffect, Magazine | `rocket_launcher.tres` |
+| Bow, charged shot | slot `weapon` | Trigger with a Charge Time and a LaunchProjectileEffect | `longbow.tres` |
 | Sword, axe, fists | slot `weapon` | Trigger, MeleeSweep | `sword.tres` |
 | Staff that grants a spell | slot `weapon` | Grants (Abilities) | `fire_staff.tres` |
 | Ring or armour with numbers | a slot of its own | Grants (Modifiers) | `ring_of_vigor.tres` |
@@ -405,6 +407,52 @@ As for a weapon, but with a **MeleeSweep** instead of the Magazine and Hitscan. 
 click swings once and hits everything in the box in front of the item. See
 `items/sword.tres`: its damage has a RandomAmount and a StatAmount of `strength`, and its
 other effects knock the target back and make it bleed.
+
+### Give a weapon a wind-up
+
+Set **Wind Up** on its Trigger: the seconds between the click and the shot. It works on any
+weapon, so a sword's backswing, a bow's draw and a rocket launcher's spin-up are the same
+number. Being stunned or disarmed during the wind-up cancels the shot, and the round goes
+back in the magazine. With Wind Up at 0 the weapon fires in the frame of the click.
+`items/sword.tres` winds up for a quarter of a second.
+
+### Make a swing follow the blade
+
+Set **Active** on the MeleeSweep: the seconds the swing stays dangerous. For that long the
+Shape is checked wherever the weapon is, along the path it took, and each character is hit
+once. Put the weapon in a socket that an animation moves, such as a BoneAttachment3D on the
+hand bone, and the swing hits what the blade passes through. With Active at 0 the shape is
+checked once, at the shot.
+
+### Make a weapon that charges
+
+Set **Charge Time** on its Trigger: the seconds of holding for a full charge. The click then
+starts the charge, and letting go fires. The rest is in the Trigger's **Charge** group:
+
+- **Min Charge** is the share of a full charge the shot needs. Let go sooner and nothing
+  fires, and the round goes back. 0 fires on any tap; 1 only fires fully charged.
+- **Status While Charging** is a status the wielder has for as long as the button is held,
+  such as one that slows it. Use a status with duration 0.
+
+A stun, a disarm or putting the weapon away cancels the charge. See `items/longbow.tres`: 0.8
+seconds to draw, a quarter of that to loose, and half speed while drawing.
+
+### Decide what a charge is worth
+
+Charging does nothing by itself: the Trigger only measures how far the charge got, from 0 to 1.
+You say what it is worth, effect by effect:
+
+| Want | Add |
+| --- | --- |
+| A harder hit | A **ChargeAmount** in the DamageEffect's **Scaling**: 8 damage, and 22 more at full |
+| A faster arrow | A ChargeAmount in the LaunchProjectileEffect's **Speed Scaling** |
+| A bigger shove | A ChargeAmount in a KnockbackEffect's **Scaling** |
+| Something only a full charge does | A **ChargeCondition** in that effect's **Conditions** |
+| A reward that comes late in the draw | A **Curve** on the ChargeAmount that stays low and rises at the end |
+
+They work on the weapon's own effects and on the effects of the projectile it launches.
+`projectiles/arrow.tscn` has both: its damage grows with the draw, and it makes the target
+bleed only at a full one.
 
 ### Make an item that grants an ability
 
@@ -530,6 +578,59 @@ Set the ability's **Targeting** to a new **RadiusTargeting** and choose its radi
 **Hostile Only** on, it only reaches what the user's Faction fights; for a party heal, turn it
 off and **Include User** on. A shockwave is a RadiusTargeting with a DamageEffect and a
 KnockbackEffect: see `abilities/shockwave.tres`, which also has two charges.
+
+## Animations
+
+Animations are optional. Timing lives in the Inspector as numbers (**Wind Up**, **Active**,
+**Cast Time**), and a game with no animations plays the same as one with them.
+
+### Play an animation when a character attacks, casts or dies
+
+Add an **Animator** to the character and set **Player** to its AnimationPlayer. Then add rows
+to **Animations**: an event on the left, picked from the list, and a clip on the right.
+
+| Event | Plays when |
+| --- | --- |
+| `weapon_started` | A weapon is used, at the click and before any wind-up |
+| `weapon_started:sword` | The same, but only for the item whose id is `sword` |
+| `weapon_fired` | The shot itself, after the wind-up |
+| `weapon_interrupted` | A wind-up is cut short by a stun |
+| `ability_cast_started` | A cast begins |
+| `ability_used` | An ability goes off |
+| `took_damage` | The character is hurt |
+| `died` | The character dies |
+| `air_mode_entered` | The character leaves the ground |
+
+A row with an id wins over the plain one, and a row whose clip the player doesn't have is
+skipped. See the player in `test_level/scenes/player.tscn`.
+
+### Keep a swing animation in step with its hit
+
+Add a marker named `hit` to the clip, at the moment the blade connects or the spell leaves the
+hand. The Animator plays the clip faster or slower so the marker lands on the shot: a clip
+whose marker is at 0.5 seconds, on a weapon with a Wind Up of 0.25, plays at double speed.
+Change the Wind Up and the animation follows. A clip without the marker plays at its own
+speed.
+
+### Use an AnimationTree
+
+The Animator drives an AnimationPlayer. With a tree, leave it out and listen to the same
+events from the script that drives the tree:
+
+```gdscript
+class_name SwingAnimations
+extends Node
+
+@export var tree: AnimationTree
+
+
+func _ready() -> void:
+	ComponentManager.of(owner).event(&"weapon_started").connect(_on_weapon_started)
+
+
+func _on_weapon_started(_ctx: EffectContext) -> void:
+	tree.set("parameters/Swing/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+```
 
 ## Your own code
 
@@ -738,7 +839,8 @@ layered move, see `starter_pack/scripts/glide_move.gd`.
 
 ### Show health, statuses, ammo and cooldowns
 
-`starter_pack/scripts/character_hud.gd` (**CharacterHud**) does all four. Attach it to a Control,
+`starter_pack/scripts/character_hud.gd` (**CharacterHud**) does all four, and fills a
+ProgressBar named ChargeBar while a weapon charges, if you add one. Attach it to a Control,
 add a ProgressBar named HealthBar and Labels named Statuses, Ammo and Cooldown under it, and set
 **Character** to the player and **Ability** to one of its abilities. To build your own, read
 these:
@@ -750,6 +852,7 @@ these:
 | Ammo | `Component.of(gear.node_in(&"weapon"), Magazine)`, then its `rounds` and `capacity` |
 | Cooldown | `Abilities.cooldown_left(ability)`, and `charges_left(ability)` for one with charges |
 | Cast bar | `Abilities.cast_started` and `used`, then `cast_progress()` every frame |
+| Charge bar | `Trigger.find_on(gear.node_in(&"weapon"))`, then `is_charging()` and `charge`, from 0 to 1 |
 | Health, mana, stamina, shield | `Pool.named(player, &"mana")`, then its `changed(current, maximum)`. Health is the pool named `health`. |
 | Damage numbers | Subscribe to `took_damage` (see "React to an event"): `ctx.amount`, `ctx.hit_position()`, and `ctx.has_tag(&"crit")` to colour it |
 | Why a stat has its value | `manager.base_of(&"move_speed")` and `manager.modifiers_of(&"move_speed")`: each modifier and the status or item behind it |

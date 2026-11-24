@@ -57,6 +57,8 @@ Properties
    +----------------------------------------------------------+---------------------------------------------------------------------------+----------------------+
    | :ref:`Resource<class_Resource>`                          | :ref:`origin<class_Projectile_property_origin>`                           |                      |
    +----------------------------------------------------------+---------------------------------------------------------------------------+----------------------+
+   | :ref:`float<class_float>`                                | :ref:`charge<class_Projectile_property_charge>`                           | ``0.0``              |
+   +----------------------------------------------------------+---------------------------------------------------------------------------+----------------------+
    | :ref:`Vector3<class_Vector3>`                            | :ref:`velocity<class_Projectile_property_velocity>`                       | ``Vector3(0, 0, 0)`` |
    +----------------------------------------------------------+---------------------------------------------------------------------------+----------------------+
 
@@ -68,11 +70,11 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Projectile<class_Projectile>` | :ref:`launch<class_Projectile_method_launch>`\ (\ scene\: :ref:`PackedScene<class_PackedScene>`, p_source\: :ref:`Node<class_Node>`, from\: :ref:`Vector3<class_Vector3>`, toward\: :ref:`Vector3<class_Vector3>`, extra_effects\: :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] = [], p_origin\: :ref:`Resource<class_Resource>` = null\ ) |static| |
-   +-------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Vector3<class_Vector3>`       | :ref:`spread_direction<class_Projectile_method_spread_direction>`\ (\ direction\: :ref:`Vector3<class_Vector3>`, degrees\: :ref:`float<class_float>`\ ) |static|                                                                                                                                                                                                |
-   +-------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   +-------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Projectile<class_Projectile>` | :ref:`launch<class_Projectile_method_launch>`\ (\ scene\: :ref:`PackedScene<class_PackedScene>`, p_source\: :ref:`Node<class_Node>`, from\: :ref:`Vector3<class_Vector3>`, toward\: :ref:`Vector3<class_Vector3>`, extra_effects\: :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] = [], p_origin\: :ref:`Resource<class_Resource>` = null, p_charge\: :ref:`float<class_float>` = 0.0, extra_speed\: :ref:`float<class_float>` = 0.0\ ) |static| |
+   +-------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Vector3<class_Vector3>`       | :ref:`spread_direction<class_Projectile_method_spread_direction>`\ (\ direction\: :ref:`Vector3<class_Vector3>`, degrees\: :ref:`float<class_float>`\ ) |static|                                                                                                                                                                                                                                                                                           |
+   +-------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -232,6 +234,18 @@ The item or ability behind it, for :ref:`EffectContext.origin<class_EffectContex
 
 ----
 
+.. _class_Projectile_property_charge:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **charge** = ``0.0`` :ref:`🔗<class_Projectile_property_charge>`
+
+How far its launcher was charged, for the :ref:`EffectContext.charge<class_EffectContext_property_charge>` of what it hits.
+
+.. rst-class:: classref-item-separator
+
+----
+
 .. _class_Projectile_property_velocity:
 
 .. rst-class:: classref-property
@@ -253,9 +267,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Projectile<class_Projectile>` **launch**\ (\ scene\: :ref:`PackedScene<class_PackedScene>`, p_source\: :ref:`Node<class_Node>`, from\: :ref:`Vector3<class_Vector3>`, toward\: :ref:`Vector3<class_Vector3>`, extra_effects\: :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] = [], p_origin\: :ref:`Resource<class_Resource>` = null\ ) |static| :ref:`🔗<class_Projectile_method_launch>`
+:ref:`Projectile<class_Projectile>` **launch**\ (\ scene\: :ref:`PackedScene<class_PackedScene>`, p_source\: :ref:`Node<class_Node>`, from\: :ref:`Vector3<class_Vector3>`, toward\: :ref:`Vector3<class_Vector3>`, extra_effects\: :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] = [], p_origin\: :ref:`Resource<class_Resource>` = null, p_charge\: :ref:`float<class_float>` = 0.0, extra_speed\: :ref:`float<class_float>` = 0.0\ ) |static| :ref:`🔗<class_Projectile_method_launch>`
 
-Spawns ``scene`` at ``from``, flying toward ``toward``, and returns it. ``p_source`` is who launched it. ``extra_effects`` run on what it hits, before the scene's own :ref:`effects<class_Projectile_property_effects>`, so one projectile scene can serve several weapons. ``p_origin`` is the item or ability behind it. The projectile is added to the level, so it keeps flying if its launcher is freed.
+Spawns ``scene`` at ``from``, flying toward ``toward``, and returns it. ``p_source`` is who launched it. ``extra_effects`` run on what it hits, before the scene's own :ref:`effects<class_Projectile_property_effects>`, so one projectile scene can serve several weapons. ``p_origin`` is the item or ability behind it. ``p_charge`` is how far the launcher was charged, and ``extra_speed`` is added to the scene's :ref:`speed<class_Projectile_property_speed>`. The projectile is added to the level, so it keeps flying if its launcher is freed.
 
 .. rst-class:: classref-item-separator
 

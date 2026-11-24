@@ -4,6 +4,9 @@ extends Effect
 
 ## Sideways speed of the push, in metres per second.
 @export var strength: float = 8.0
+## Added to the strength, as an [AmountEffect]'s scaling is: a [StatAmount] for a shove that
+## grows with a stat, a [ChargeAmount] for one that grows with the charge.
+@export var scaling: Array[Amount] = []
 ## Upward speed added, so the target lifts off the ground a little.
 @export var lift: float = 2.0
 
@@ -15,7 +18,8 @@ func _execute(ctx: EffectContext) -> void:
 		return
 	var away: Vector3 = from.global_position.direction_to(target.global_position)
 	away = away.slide(Vector3.UP).normalized()
-	var push: Vector3 = away * strength * ctx.magnitude + Vector3.UP * lift
+	var sideways: float = Amount.total(strength, scaling, ctx) * ctx.magnitude
+	var push: Vector3 = away * sideways + Vector3.UP * lift
 	var motor := CharacterMotor.find_on(target)
 	if motor:
 		motor.push(push)

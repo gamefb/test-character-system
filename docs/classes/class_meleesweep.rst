@@ -17,7 +17,9 @@ Hits everything inside :ref:`shape<class_MeleeSweep_property_shape>` on each :re
 Description
 -----------
 
-The shape sits :ref:`offset<class_MeleeSweep_property_offset>` in front of the item and turns with it. Each character is hit once per swing, through the most vulnerable part inside the shape, so a :ref:`Hurtbox<class_Hurtbox>` head inside the swing scales the effects by its multiplier. The wielder is never hit.
+The shape sits :ref:`offset<class_MeleeSweep_property_offset>` in front of the item and turns with it. Each character is hit once per swing, through the most vulnerable part inside the shape, so a :ref:`Hurtbox<class_Hurtbox>` head inside the swing scales the effects by its multiplier. The wielder is never hit. 
+
+With an :ref:`active<class_MeleeSweep_property_active>` time the swing stays dangerous for that long and the shape is checked along the path the item takes, so in an animated hand it follows the blade. The swing ends early if the wielder is stunned.
 
 .. rst-class:: classref-reftable-group
 
@@ -32,6 +34,25 @@ Properties
    +-------------------------------+-------------------------------------------------+-----------------------+
    | :ref:`Vector3<class_Vector3>` | :ref:`offset<class_MeleeSweep_property_offset>` | ``Vector3(0, 0, -1)`` |
    +-------------------------------+-------------------------------------------------+-----------------------+
+   | :ref:`float<class_float>`     | :ref:`active<class_MeleeSweep_property_active>` | ``0.0``               |
+   +-------------------------------+-------------------------------------------------+-----------------------+
+
+.. rst-class:: classref-section-separator
+
+----
+
+.. rst-class:: classref-descriptions-group
+
+Constants
+---------
+
+.. _class_MeleeSweep_constant_MAX_GAP:
+
+.. rst-class:: classref-constant
+
+**MAX_GAP** = ``0.25`` :ref:`🔗<class_MeleeSweep_constant_MAX_GAP>`
+
+How far the shape may move between two checks before another is made in between, so a fast blade can't pass through a thin target.
 
 .. rst-class:: classref-section-separator
 
@@ -65,6 +86,18 @@ The space a swing covers, e.g. a box about a metre across.
 :ref:`Vector3<class_Vector3>` **offset** = ``Vector3(0, 0, -1)`` :ref:`🔗<class_MeleeSweep_property_offset>`
 
 Where the shape's centre sits, relative to the item. The item's forward is -Z.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_MeleeSweep_property_active:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **active** = ``0.0`` :ref:`🔗<class_MeleeSweep_property_active>`
+
+Seconds the swing stays dangerous after the shot. The shape moves with the item, so in an animated hand it follows the blade. 0 checks once, in the frame of the shot.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

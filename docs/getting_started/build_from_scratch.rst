@@ -484,7 +484,8 @@ stats of its own, and knows its team. All extend ``Component``.
        ``stat()``, ``is_blocked()``; a mode's ``_can_enter()`` and ``_get_next_mode()``; a
        move's ``_can_start()`` and ``cooldown_left()``. Setting ``active`` starts the
        cooldown timer and sends ``<event_prefix>_started`` or ``_finished``
-   * - ``WalkMode``, ``AirMode``
+   * - ``WalkMode``, ``AirMode`` (in ``starter_pack/scripts/``: the motor has no modes of
+       its own)
      - ``jump_action``; ``air_mode`` or ``walk_mode`` (empty: the other one); AirMode's
        ``air_jumps``, ``air_acceleration`` and ``jumps_left``
      - Set velocity as Godot's CharacterBody3D template does; jump on
@@ -1066,13 +1067,18 @@ Brain.
      - Data
      - Must implement
    * - ``Trigger``
-     - ``action``, ``fire_rate``, ``automatic``, ``buffer_time``, ``blocked_by``,
-       ``user_effects``, ``_buffered``, ``_cooldown``; signal ``fired``
+     - ``action``, ``fire_rate``, ``automatic``, ``wind_up``, ``buffer_time``, ``blocked_by``,
+       ``user_effects``, ``_buffered``, ``_cooldown``, ``_winding``; signal ``fired``
      - In ``_process``: buffer a press when ``brain.is_action_just_pressed(action)``; with
        ``automatic``, also want to fire while ``is_action_pressed``; when the cooldown is over
        and nothing on the wielder blocks one of ``blocked_by``, take a round from a ``Magazine`` if
-       there is one, run ``user_effects`` on the wielder with the item's position in the
-       context, then emit ``fired``
+       there is one and send ``weapon_started`` to the wielder. Then shoot, at once or after
+       ``wind_up``: run ``user_effects`` on the wielder with the item's position in the
+       context, emit ``fired`` and send ``weapon_fired``. A wielder blocked during the
+       wind-up gets the round back and hears ``weapon_interrupted`` instead. With a
+       ``charge_time``, the press starts a charge instead: ``charge`` rises to 1 while the
+       button is held, the wielder has ``status_while_charging``, and letting go shoots, or
+       interrupts if the charge is under ``min_charge``
    * - ``Magazine``
      - ``ammo: ItemData``, ``capacity``, ``reload_time``, ``auto_reload``, ``rounds`` (stored
        in ``item.state``); signals ``changed(rounds)``, ``reload_started``,
@@ -1240,6 +1246,8 @@ These were added late in the reference build and are easier once everything else
 
 - **The extras on abilities and weapons:** charges, cast time, reload time, spread and
   projectiles. A cooldown, a ray and an instant reload are enough to play with.
+- **Timing and animation:** a trigger's wind-up and charge, a swing that stays live, and the
+  Animator that plays clips from the events; see :ref:`doc_timing_and_animation`.
 
 Get stages 1–3 running with plain ``print`` debugging first. When you're done,
 ``character_system/starter_pack/`` and the :ref:`recipes <doc_recipes>` show finished statuses,

@@ -41,24 +41,25 @@ Core
     class_statuses
     class_worldevents
 
-Character
-=========
+Character framework
+===================
 
 .. toctree::
     :maxdepth: 1
-    :name: toc-class-ref-character
+    :name: toc-class-ref-character-framework
 
     class_aibrain
     class_abilities.state
     class_abilities
     class_abilitydata
-    class_airmode
+    class_animator
     class_anycondition
     class_brain
     class_chancecondition
     class_changepooleffect
     class_charactermotor
-    class_dashmove
+    class_chargeamount
+    class_chargecondition
     class_effectzone
     class_equipment
     class_faction
@@ -90,7 +91,6 @@ Character
     class_statcondition
     class_targeting
     class_trigger
-    class_walkmode
     class_weapondelivery
     class_weaponswitch
 
@@ -101,9 +101,12 @@ Starter pack
     :maxdepth: 1
     :name: toc-class-ref-starter-pack
 
+    class_airmode
     class_attacknearest
     class_characterhud
+    class_dashmove
     class_glidemove
     class_scope
     class_sprint
+    class_walkmode
     class_wallslidemode

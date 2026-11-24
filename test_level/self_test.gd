@@ -27,6 +27,8 @@ func _ready() -> void:
 	await _check_pickups()
 	await _check_shrines_and_hazards()
 	await _check_combat()
+	await _check_swing()
+	await _check_bow()
 	print("%d passed, %d failed" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
 
@@ -143,6 +145,58 @@ func _check_combat() -> void:
 			"the soldiers in the arena fight each other")
 
 
+func _check_swing() -> void:
+	var target: Node3D = _level.get_node(^"Targets/Plain")
+	Health.find_on(target).revive()
+	var switch := WeaponSwitch.find_on(_player)
+	var sword: ItemData = load(SYSTEM + "starter_pack/items/sword.tres")
+	for index in switch.weapons().size():
+		if switch.weapons()[index].data == sword:
+			switch.select(index)
+	_player.global_position = target.global_position + Vector3(0, 0.1, 1.8)
+	(_player.get_node(^"Head/Camera3D") as Camera3D).rotation.x = 0.0
+	await _frames(10)
+	await _tap(&"primary")
+	var clip: String = (_player.get_node(^"AnimationPlayer") as AnimationPlayer).current_animation
+	check(clip == "swing" and not _is_hurt(target),
+			"a sword swing starts its animation at the press and winds up before it lands")
+	await _frames(30)
+	check(_is_hurt(target), "then hits what the blade sweeps across as the hand turns")
+	switch.select(0)
+
+
+func _check_bow() -> void:
+	var target: Node3D = _level.get_node(^"Targets/Plain")
+	var health := Health.find_on(target)
+	# The sword left it bleeding: start clean, so only the arrow can hurt it.
+	Statuses.find_on(target).remove_tagged(&"bleed")
+	health.revive()
+	var switch := WeaponSwitch.find_on(_player)
+	var bow: ItemData = load(SYSTEM + "starter_pack/items/longbow.tres")
+	for index in switch.weapons().size():
+		if switch.weapons()[index].data == bow:
+			switch.select(index)
+	_player.global_position = target.global_position + Vector3(0, 0.1, 8)
+	var bar: ProgressBar = _level.get_node(^"Hud/CharacterHud/ChargeBar")
+	await _frames(10)
+	# Let go after a tenth of a second: too little draw, so the bow is lowered.
+	await _hold(&"primary", 6)
+	await _frames(30)
+	check(not _is_hurt(target) and not bar.visible, "letting go of the bow too soon looses nothing")
+	_set_action(&"primary", true)
+	await _frames(24)
+	check(bar.visible and bar.value > 0.3 and bar.value < 0.7
+			and Statuses.find_on(_player).has_tag(&"drawing") and not _is_hurt(target),
+			"drawing the bow fills the charge bar and slows the player, and nothing flies yet")
+	await _frames(40)
+	_set_action(&"primary", false)
+	await _frames(40)
+	check(health.maximum() - health.current >= 30.0
+			and Statuses.find_on(target).has_tag(&"bleed") and not bar.visible,
+			"a full draw hits for 30, not the 8 of an undrawn arrow, and makes the target bleed")
+	switch.select(0)
+
+
 func _is_hurt(who: Node) -> bool:
 	var health := Health.find_on(who)
 	return health.current < health.maximum()
@@ -160,12 +214,21 @@ func _stand_on(place: Node3D) -> void:
 
 
 func _tap(action: StringName) -> void:
-	for pressed: bool in [true, false]:
-		var event := InputEventAction.new()
-		event.action = action
-		event.pressed = pressed
-		Input.parse_input_event(event)
-		await _frames(3)
+	await _hold(action, 3)
+	await _frames(3)
+
+
+func _hold(action: StringName, frames: int) -> void:
+	_set_action(action, true)
+	await _frames(frames)
+	_set_action(action, false)
+
+
+func _set_action(action: StringName, pressed: bool) -> void:
+	var event := InputEventAction.new()
+	event.action = action
+	event.pressed = pressed
+	Input.parse_input_event(event)
 
 
 # Notes the script classes and resource files a node and everything under it uses.

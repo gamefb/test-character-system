@@ -10,7 +10,7 @@ Condition
 
 **Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`AnyCondition<class_AnyCondition>`, :ref:`ChanceCondition<class_ChanceCondition>`, :ref:`HasTagCondition<class_HasTagCondition>`, :ref:`HitCondition<class_HitCondition>`, :ref:`IsHostileCondition<class_IsHostileCondition>`, :ref:`PoolBelowCondition<class_PoolBelowCondition>`, :ref:`StatCondition<class_StatCondition>`
+**Inherited By:** :ref:`AnyCondition<class_AnyCondition>`, :ref:`ChanceCondition<class_ChanceCondition>`, :ref:`ChargeCondition<class_ChargeCondition>`, :ref:`HasTagCondition<class_HasTagCondition>`, :ref:`HitCondition<class_HitCondition>`, :ref:`IsHostileCondition<class_IsHostileCondition>`, :ref:`PoolBelowCondition<class_PoolBelowCondition>`, :ref:`StatCondition<class_StatCondition>`
 
 A yes/no check on a node, used to gate effects and statuses.
 

@@ -107,7 +107,9 @@ func use(ability: AbilityData) -> bool:
 	if ability.status_while_casting and statuses:
 		statuses.add(ability.status_while_casting, host)
 	cast_started.emit(ability)
-	manager.send(&"ability_cast_started", EffectContext.new(host, host, ability))
+	var ctx := EffectContext.new(host, host, ability)
+	ctx.duration = ability.cast_time
+	manager.send(&"ability_cast_started", ctx)
 	return true
 
 
