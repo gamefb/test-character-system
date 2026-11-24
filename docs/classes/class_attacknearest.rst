@@ -17,7 +17,7 @@ An example of AI decision logic to copy: chase the nearest character this one's 
 Description
 -----------
 
-Decisions live in their own component beside an :ref:`AIBrain<class_AIBrain>`. This one only sets :ref:`AIBrain.target<class_AIBrain_property_target>` and taps a button, exactly as a player would click, so every weapon and ability works with it. Grow it into a state machine or behaviour tree as your AI needs.
+Decisions live in their own component beside an :ref:`AIBrain<class_AIBrain>`. This one only sets :ref:`AIBrain.target<class_AIBrain_property_target>` and presses a button, exactly as a player would, so every weapon and ability works with it. Grow it into a state machine or behaviour tree as your AI needs.
 
 .. rst-class:: classref-reftable-group
 
@@ -33,6 +33,8 @@ Properties
    | :ref:`float<class_float>`           | :ref:`attack_range<class_AttackNearest_property_attack_range>`     | ``15.0``       |
    +-------------------------------------+--------------------------------------------------------------------+----------------+
    | :ref:`StringName<class_StringName>` | :ref:`action<class_AttackNearest_property_action>`                 | ``&"primary"`` |
+   +-------------------------------------+--------------------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`           | :ref:`hold_time<class_AttackNearest_property_hold_time>`           | ``0.0``        |
    +-------------------------------------+--------------------------------------------------------------------+----------------+
 
 .. rst-class:: classref-section-separator
@@ -74,7 +76,19 @@ How close, in metres, the target must be to attack it.
 
 :ref:`StringName<class_StringName>` **action** = ``&"primary"`` :ref:`🔗<class_AttackNearest_property_action>`
 
-Tapped once per decision while the target is in range.
+Pressed once per decision while the target is in range.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_AttackNearest_property_hold_time:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **hold_time** = ``0.0`` :ref:`🔗<class_AttackNearest_property_hold_time>`
+
+Seconds the button is held before it is let go. 0 taps it. For a weapon that charges, the time the AI should charge it for.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

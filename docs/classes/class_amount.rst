@@ -10,7 +10,7 @@ Amount
 
 **Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`HitAmount<class_HitAmount>`, :ref:`PoolAmount<class_PoolAmount>`, :ref:`RandomAmount<class_RandomAmount>`, :ref:`StatAmount<class_StatAmount>`
+**Inherited By:** :ref:`ChargeAmount<class_ChargeAmount>`, :ref:`HitAmount<class_HitAmount>`, :ref:`PoolAmount<class_PoolAmount>`, :ref:`RandomAmount<class_RandomAmount>`, :ref:`StatAmount<class_StatAmount>`
 
 A number worked out when an effect runs, instead of typed in: "2 per point of strength", "5% of the target's health", "a third of the hit".
 

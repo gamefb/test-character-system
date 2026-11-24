@@ -124,6 +124,7 @@ The character needs a **Statuses** component for any of this.
    0.5, the height of a default bake.
 
 AttackNearest picks the nearest `player` every half second and fires while it's within 15 m.
+For a weapon that charges, set its **Hold Time** to how long it should hold the button.
 
 ### Change the double jump
 
@@ -290,7 +291,8 @@ The components combine freely, so a staff can shoot, grant a spell and add spell
 | Gun | slot `weapon` | Trigger, Magazine, Hitscan | `rifle.tres`, `flare_gun.tres` |
 | Shotgun | slot `weapon` | The same, with Pellets and Spread | `shotgun.tres` |
 | Scoped rifle | slot `weapon` | A gun plus your own item component | `marksman_rifle.tres` |
-| Rocket launcher, bow | slot `weapon` | Trigger with a LaunchProjectileEffect, Magazine | `rocket_launcher.tres` |
+| Rocket launcher | slot `weapon` | Trigger with a LaunchProjectileEffect, Magazine | `rocket_launcher.tres` |
+| Bow, charged shot | slot `weapon` | Trigger with a Charge Time and a LaunchProjectileEffect | `longbow.tres` |
 | Sword, axe, fists | slot `weapon` | Trigger, MeleeSweep | `sword.tres` |
 | Staff that grants a spell | slot `weapon` | Grants (Abilities) | `fire_staff.tres` |
 | Ring or armour with numbers | a slot of its own | Grants (Modifiers) | `ring_of_vigor.tres` |
@@ -421,6 +423,36 @@ Shape is checked wherever the weapon is, along the path it took, and each charac
 once. Put the weapon in a socket that an animation moves, such as a BoneAttachment3D on the
 hand bone, and the swing hits what the blade passes through. With Active at 0 the shape is
 checked once, at the shot.
+
+### Make a weapon that charges
+
+Set **Charge Time** on its Trigger: the seconds of holding for a full charge. The click then
+starts the charge, and letting go fires. The rest is in the Trigger's **Charge** group:
+
+- **Min Charge** is the share of a full charge the shot needs. Let go sooner and nothing
+  fires, and the round goes back. 0 fires on any tap; 1 only fires fully charged.
+- **Status While Charging** is a status the wielder has for as long as the button is held,
+  such as one that slows it. Use a status with duration 0.
+
+A stun, a disarm or putting the weapon away cancels the charge. See `items/longbow.tres`: 0.8
+seconds to draw, a quarter of that to loose, and half speed while drawing.
+
+### Decide what a charge is worth
+
+Charging does nothing by itself: the Trigger only measures how far the charge got, from 0 to 1.
+You say what it is worth, effect by effect:
+
+| Want | Add |
+| --- | --- |
+| A harder hit | A **ChargeAmount** in the DamageEffect's **Scaling**: 8 damage, and 22 more at full |
+| A faster arrow | A ChargeAmount in the LaunchProjectileEffect's **Speed Scaling** |
+| A bigger shove | A ChargeAmount in a KnockbackEffect's **Scaling** |
+| Something only a full charge does | A **ChargeCondition** in that effect's **Conditions** |
+| A reward that comes late in the draw | A **Curve** on the ChargeAmount that stays low and rises at the end |
+
+They work on the weapon's own effects and on the effects of the projectile it launches.
+`projectiles/arrow.tscn` has both: its damage grows with the draw, and it makes the target
+bleed only at a full one.
 
 ### Make an item that grants an ability
 
@@ -807,7 +839,8 @@ layered move, see `starter_pack/scripts/glide_move.gd`.
 
 ### Show health, statuses, ammo and cooldowns
 
-`starter_pack/scripts/character_hud.gd` (**CharacterHud**) does all four. Attach it to a Control,
+`starter_pack/scripts/character_hud.gd` (**CharacterHud**) does all four, and fills a
+ProgressBar named ChargeBar while a weapon charges, if you add one. Attach it to a Control,
 add a ProgressBar named HealthBar and Labels named Statuses, Ammo and Cooldown under it, and set
 **Character** to the player and **Ability** to one of its abilities. To build your own, read
 these:
@@ -819,6 +852,7 @@ these:
 | Ammo | `Component.of(gear.node_in(&"weapon"), Magazine)`, then its `rounds` and `capacity` |
 | Cooldown | `Abilities.cooldown_left(ability)`, and `charges_left(ability)` for one with charges |
 | Cast bar | `Abilities.cast_started` and `used`, then `cast_progress()` every frame |
+| Charge bar | `Trigger.find_on(gear.node_in(&"weapon"))`, then `is_charging()` and `charge`, from 0 to 1 |
 | Health, mana, stamina, shield | `Pool.named(player, &"mana")`, then its `changed(current, maximum)`. Health is the pool named `health`. |
 | Damage numbers | Subscribe to `took_damage` (see "React to an event"): `ctx.amount`, `ctx.hit_position()`, and `ctx.has_tag(&"crit")` to colour it |
 | Why a stat has its value | `manager.base_of(&"move_speed")` and `manager.modifiers_of(&"move_speed")`: each modifier and the status or item behind it |

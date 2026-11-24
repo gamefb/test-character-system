@@ -48,6 +48,10 @@ These ship in ``character_system/starter_pack/`` as ``.tres`` files with no code
      - ``statuses/rooted.tres``
      - ``tags`` = rooted. ``duration`` = 3. ``blocks`` = movement, so the
        :ref:`CharacterMotor<class_CharacterMotor>` stops steering, jumping and moves.
+   * - Drawing
+     - ``statuses/drawing.tres``
+     - ``tags`` = drawing. ``duration`` = 0. ``modifiers`` = ``move_speed`` mul 0.5. The longbow's
+       trigger holds it while the bow is drawn.
    * - Thorns (passive)
      - ``statuses/thorns.tres``
      - ``tags`` = thorns. ``duration`` = 0. ``triggers`` = on ``took_damage``, affect other,

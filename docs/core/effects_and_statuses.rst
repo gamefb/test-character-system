@@ -95,7 +95,7 @@ An effect's plain number is the same for everyone. Its ``scaling`` list makes it
 
 The stats come from the component that owns them, or from the :ref:`ComponentManager<class_ComponentManager>`'s Stats for stats of your own; see :ref:`doc_attributes`. A status tick's source is whoever applied the status, so a burn grows with the caster's ``spell_power``, not the victim's.
 
-The character framework adds amounts that read a pool, the hit being worked out, or dice: see :ref:`doc_more_amounts`.
+The character framework adds amounts that read a pool, the hit being worked out, dice, or how far a weapon was charged: see :ref:`doc_more_amounts`.
 
 Other effects
 -------------
@@ -278,8 +278,8 @@ An event is a name and an :ref:`EffectContext<class_EffectContext>`, sent to one
      - "After each spell, your next shot burns"
    * - ``weapon_started``, ``weapon_fired``, ``weapon_interrupted``
      - The character using the weapon
-     - A press is accepted, the shot happens, a wind-up is cut short; ``origin`` is the
-       :ref:`ItemData<class_ItemData>`. See :ref:`doc_weapon_events`
+     - A press is accepted, the shot happens, a wind-up or a charge is cut short; ``origin``
+       is the :ref:`ItemData<class_ItemData>`. See :ref:`doc_weapon_events`
      - Playing a swing, a passive that heals on every shot
    * - ``started``
      - Every component on the host; no context

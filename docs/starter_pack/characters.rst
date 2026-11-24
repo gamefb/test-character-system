@@ -113,8 +113,9 @@ Example scripts
      - Zooming in while a button is held, on the marksman rifle
      - :ref:`doc_extending_item_component`
    * - :ref:`AttackNearest<class_AttackNearest>`
-     - An AI that walks to its nearest enemy and attacks it
+     - An AI that walks to its nearest enemy and attacks it, holding the button for a time
+       if its weapon charges
      - :ref:`doc_extending_ai`
    * - :ref:`CharacterHud<class_CharacterHud>`
-     - Health, statuses and ammo on screen
+     - Health, statuses, ammo and a weapon's charge on screen
      - :ref:`doc_extending_hud`

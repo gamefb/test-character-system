@@ -63,6 +63,13 @@ These ship in ``character_system/starter_pack/items/``, each an :ref:`ItemData<c
      - :ref:`Trigger<class_Trigger>` (2 per second), :ref:`MeleeSweep<class_MeleeSweep>` [8
        damage + 0 to 4 at random + 1 per point of ``strength``, tagged ``melee``; knockback;
        apply Bleeding]
+   * - Longbow (``longbow.tres``)
+     - ``weapon``
+     - :ref:`Trigger<class_Trigger>` [**Charge Time** 0.8, **Min Charge** 0.25, **Status While
+       Charging** = Drawing; ``user_effects`` = a
+       :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` with
+       ``projectiles/arrow.tscn`` and a :ref:`ChargeAmount<class_ChargeAmount>` of 30 in its
+       speed scaling]. Hold to draw, let go to loose; see :ref:`doc_charging`
    * - Rocket launcher (``rocket_launcher.tres``)
      - ``weapon``
      - :ref:`Trigger<class_Trigger>` [``user_effects`` = a
@@ -142,6 +149,10 @@ These ship in ``character_system/starter_pack/projectiles/`` as scenes with a :r
    * - Rocket (``rocket.tscn``)
      - Flies straight and bursts over 4 metres.
      - The rocket launcher
+   * - Arrow (``arrow.tscn``)
+     - Does 8 damage and up to 22 more with the charge it was loosed at, and makes the target
+       bleed if that charge was full.
+     - The longbow
    * - Grenade (``grenade.tscn``)
      - Thrown in an arc, and bursts over 4 metres after 2 seconds.
      - The grenade, a consumable

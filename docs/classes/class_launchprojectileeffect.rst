@@ -27,15 +27,17 @@ Properties
 .. table::
    :widths: auto
 
-   +----------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`PackedScene<class_PackedScene>`                    | :ref:`projectile<class_LaunchProjectileEffect_property_projectile>` |         |
-   +----------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] | :ref:`effects<class_LaunchProjectileEffect_property_effects>`       | ``[]``  |
-   +----------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`float<class_float>`                                | :ref:`height<class_LaunchProjectileEffect_property_height>`         | ``1.2`` |
-   +----------------------------------------------------------+---------------------------------------------------------------------+---------+
-   | :ref:`float<class_float>`                                | :ref:`forward<class_LaunchProjectileEffect_property_forward>`       | ``0.6`` |
-   +----------------------------------------------------------+---------------------------------------------------------------------+---------+
+   +----------------------------------------------------------+---------------------------------------------------------------------------+---------+
+   | :ref:`PackedScene<class_PackedScene>`                    | :ref:`projectile<class_LaunchProjectileEffect_property_projectile>`       |         |
+   +----------------------------------------------------------+---------------------------------------------------------------------------+---------+
+   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] | :ref:`effects<class_LaunchProjectileEffect_property_effects>`             | ``[]``  |
+   +----------------------------------------------------------+---------------------------------------------------------------------------+---------+
+   | :ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] | :ref:`speed_scaling<class_LaunchProjectileEffect_property_speed_scaling>` | ``[]``  |
+   +----------------------------------------------------------+---------------------------------------------------------------------------+---------+
+   | :ref:`float<class_float>`                                | :ref:`height<class_LaunchProjectileEffect_property_height>`               | ``1.2`` |
+   +----------------------------------------------------------+---------------------------------------------------------------------------+---------+
+   | :ref:`float<class_float>`                                | :ref:`forward<class_LaunchProjectileEffect_property_forward>`             | ``0.6`` |
+   +----------------------------------------------------------+---------------------------------------------------------------------------+---------+
 
 .. rst-class:: classref-section-separator
 
@@ -65,6 +67,18 @@ The scene to launch. Its root needs the :ref:`Projectile<class_Projectile>` scri
 :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\] **effects** = ``[]`` :ref:`🔗<class_LaunchProjectileEffect_property_effects>`
 
 Applied in order to what the projectile hits directly, before the projectile's own effects.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_LaunchProjectileEffect_property_speed_scaling:
+
+.. rst-class:: classref-property
+
+:ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] **speed_scaling** = ``[]`` :ref:`🔗<class_LaunchProjectileEffect_property_speed_scaling>`
+
+Added to the projectile's own speed, in metres per second: a :ref:`ChargeAmount<class_ChargeAmount>` for a bow whose arrow flies faster the further it is drawn, a :ref:`StatAmount<class_StatAmount>` for a stronger arm.
 
 .. rst-class:: classref-item-separator
 

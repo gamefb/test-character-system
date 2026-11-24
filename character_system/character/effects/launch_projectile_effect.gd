@@ -12,6 +12,9 @@ extends Effect
 @export var projectile: PackedScene
 ## Applied in order to what the projectile hits directly, before the projectile's own effects.
 @export var effects: Array[Effect] = []
+## Added to the projectile's own speed, in metres per second: a [ChargeAmount] for a bow whose
+## arrow flies faster the further it is drawn, a [StatAmount] for a stronger arm.
+@export var speed_scaling: Array[Amount] = []
 ## How high above the user's origin it starts, in metres. About chest height for a character
 ## whose origin is at its feet.
 @export var height: float = 1.2
@@ -36,4 +39,5 @@ func _execute(ctx: EffectContext) -> void:
 	if not from_weapon:
 		from += from.direction_to(toward) * forward
 	# Effects can run inside physics callbacks, where the projectile can't be added yet.
-	Projectile.launch.call_deferred(projectile, user, from, toward, effects, ctx.origin)
+	Projectile.launch.call_deferred(projectile, user, from, toward, effects, ctx.origin,
+			ctx.charge, Amount.total(0.0, speed_scaling, ctx))

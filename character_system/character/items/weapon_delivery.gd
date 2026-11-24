@@ -47,7 +47,9 @@ func _start() -> void:
 ## it has a point.
 func context_for(collider: Object, position := Vector3.INF,
 		normal := Vector3.ZERO) -> EffectContext:
-	return Hurtbox.hit(wielder, collider, item.data if item else null, position, normal)
+	var ctx := Hurtbox.hit(wielder, collider, item.data if item else null, position, normal)
+	ctx.charge = (find(Trigger) as Trigger).charge
+	return ctx
 
 
 ## Called each time the [Trigger] fires. Find what is hit and apply [member effects] to it.

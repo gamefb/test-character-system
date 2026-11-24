@@ -72,6 +72,9 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
    * - ``test_animation.gd``
      - 13
      - A rifle and an instant swing still landing in the frame of the press; a wind-up delaying the hit by its length, and being cancelled by a stun or by putting the weapon away, with the round returned; a live swing following the hand, hitting each character once, catching a target a fast blade would skip, and ending on a stun; the Animator starting a clip at the press and playing it so its marker lands on the hit, an item's own row winning, casts and deaths playing too, missing players and clips being skipped, and its editor warnings and event list
+   * - ``test_charge.gd``
+     - 15
+     - A charge being worth what the effects say and nothing by itself; nothing firing until the button is let go; a button held through the cooldown starting the next charge; letting go under the minimum cancelling the shot and returning the round, and a weapon that needs a full charge; the status held while charging; a stun or putting the weapon away cancelling the charge; a condition switching an effect on from some charge; a status reacting to a hit seeing its charge; knockback and a curve; the starter longbow from an early release to a full draw; the HUD's charge bar; an AI holding the button; and a draw clip kept in step with the charge
    * - ``test_items.gd``
      - 5
      - Gear changing stats while equipped and naming itself as the source; each copy carrying its own rolls; gear granting abilities and giving the slot back; a potion being used up; items that aren't used up, and ones that can't be used
@@ -119,7 +122,7 @@ The test level
 
 The characters, items and zones are set up in the Inspector from ``character_system/starter_pack/``. The level's one script does what a game does around them: it adds the input actions, equips what the player picks up, uses potions and grenades, draws the text on screen and brings the dead back.
 
-Started with ``--self-test``, the level plays itself and prints 20 checks: the player is walked over every pickup, shrine and zone, then fires, casts, drinks and throws, and swings the sword, whose clip must start at the press and whose hit must land after the wind-up as the hand turns. One check is that a rifle held at the hip hits the head the crosshair is on. The first two checks are that the level uses every class and every example in ``character_system/``, so a new part can't be left out unnoticed.
+Started with ``--self-test``, the level plays itself and prints 23 checks: the player is walked over every pickup, shrine and zone, then fires, casts, drinks and throws, swings the sword, whose clip must start at the press and whose hit must land after the wind-up as the hand turns, and draws the longbow: let go too soon it looses nothing, held it fills the charge bar and slows the player, and at a full draw the arrow hits for 30 and makes the target bleed. One check is that a rifle held at the hip hits the head the crosshair is on. The first two checks are that the level uses every class and every example in ``character_system/``, so a new part can't be left out unnoticed.
 
 .. code-block:: shell
 
@@ -161,36 +164,36 @@ Performance
    * - Freeing one character
      - about 100 µs
 
-The base classes for effects with a number and for weapon parts, the typed ``find_on()`` lookups, and the wind-up, live swings and weapon events changed none of these beyond the difference between two runs of the same code. A weapon event that nothing listens to costs about 1.3 µs, and a shot sends two. A swing with an **Active** time costs about 14 µs for each check while it is live, and nothing the rest of the time. Against the version before health became a pool and statuses listed their blocks, measured in the same session, walking costs the same (within 1%) and a hit about 6% more: it passes through two more function calls on its way into the pool. Asking whether something is blocked is one dictionary look on the manager, which is why the brain and the motor can ask many times a frame, and an event nobody listens to costs about 0.3 µs.
+The base classes for effects with a number and for weapon parts, the typed ``find_on()`` lookups, and the wind-up, live swings, weapon events and charging changed none of these beyond the difference between two runs of the same code. A weapon event that nothing listens to costs about 1.3 µs, and a shot sends two. A swing with an **Active** time costs about 14 µs for each check while it is live, and nothing the rest of the time. Against the version before health became a pool and statuses listed their blocks, measured in the same session, walking costs the same (within 1%) and a hit about 6% more: it passes through two more function calls on its way into the pool. Asking whether something is blocked is one dictionary look on the manager, which is why the brain and the motor can ask many times a frame, and an event nobody listens to costs about 0.3 µs.
 
 .. _doc_verification_status:
 
 Verification status
 -------------------
 
-All 239 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
+All 254 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
 
 .. list-table::
    :header-rows: 1
 
    * - Check
      - Godot 4.8 beta 4
-   * - GUT tests (24 files above, test_statuses.gd included)
-     - 239 of 239, 1106 asserts
+   * - GUT tests (25 files above, test_statuses.gd included)
+     - 254 of 254, 1165 asserts
    * - ``immunity_test`` scene
      - 43 of 43
    * - Test level, ``--self-test``
-     - 20 of 20
+     - 23 of 23
    * - ``core/`` on its own, with ``character/`` and ``starter_pack/`` deleted
      - All 22 scripts load
    * - ``core/`` and ``character/``, with ``starter_pack/`` deleted
-     - All 64 scripts load
+     - All 66 scripts load
    * - Code examples in ``RECIPES.md``
      - All compile
 
 Breaking the system on purpose makes the tests fail. Six changes were tried on the November 22 additions, and each failed at least one test: a :ref:`ModifyAmountEffect<class_ModifyAmountEffect>` that edits the amount in sequence, a Brain that is never blocked, a ``Statuses._stop()`` that runs ``on_remove``, a Trigger that throws away what a frame overshot the fire rate by, an ability that pays when its cast starts, and dead targets that still take hits. Each part of the input design fails its own test when undone: counting a press from code in the current frame, skipping the release check, forgetting a press when it's released, and dropping the extra physics frame. Earlier, with the 38-check version of the scene, ignoring ``immune_to`` failed 6 checks, ignoring ``removes_tags`` 1, ignoring ``react_to_statuses`` 1, and items that never drop their holds 3. Letting the motor's ``consume_action()`` hand out a press twice, or running every movement mode each frame instead of only the current one, makes ``test_motor.gd`` fail.
 
-Timing was measured at a fixed 60 frames a second. A rifle and an instant swing land in the frame of the press, as before the wind-up was added; a wind-up of 0.2 seconds lands 12 frames after the press; and the Animator starts its clip in the frame of the press. The tests for this pass at real speed and at the fixed rate, and eleven deliberate breakages each failed one of them: checking a fast blade once a frame, hitting on every check, a swing that never stays live or doesn't end on a stun, a wind-up that is ignored, isn't cancelled by a stun or by putting the weapon away, or keeps the round, and an Animator that doesn't keep a clip in step, ignores an item's own row, or isn't told how long the wind-up is. The hand in these tests is a plain node turned by code or by an animation track. A skeleton with a ``BoneAttachment3D``, an ``AnimationTree``, and the Animator's table in the editor have not been tried.
+Timing was measured at a fixed 60 frames a second. A rifle and an instant swing land in the frame of the press, as before the wind-up was added; a wind-up of 0.2 seconds lands 12 frames after the press; and the Animator starts its clip in the frame of the press. The tests for this pass at real speed and at the fixed rate, and eleven deliberate breakages each failed one of them: checking a fast blade once a frame, hitting on every check, a swing that never stays live or doesn't end on a stun, a wind-up that is ignored, isn't cancelled by a stun or by putting the weapon away, or keeps the round, and an Animator that doesn't keep a clip in step, ignores an item's own row, or isn't told how long the wind-up is. Charging was checked the same way: sixteen deliberate breakages each failed a test, among them firing at the press, ignoring the minimum charge, a stun that doesn't cancel, a status that is never held or never dropped, hits, shots or projectiles that lose the charge, speed or knockback scaling that is ignored, and a button held through the cooldown being forgotten. The first run of that last one failed no test, so a test was added for it. The hand in these tests is a plain node turned by code or by an animation track. A skeleton with a ``BoneAttachment3D``, an ``AnimationTree``, and the Animator's table in the editor have not been tried.
 
 The Inspector was looked at once, on November 23, by running the editor under a software renderer and taking screenshots: a status's Tags and Blocks, an ability's Costs and Blocked By and a modifier's Stat each showed a list of the project's names, and a :ref:`Health<class_Health>` node showed Death Status, Resistances, Max Value, Regen and Regen Delay with the other pool fields hidden. One list, a status's Blocks, was opened by a script and is the picture on :ref:`doc_name_lists`; for the others, a script run in editor mode printed what each list holds. Nobody has clicked through the Inspector by hand.
 

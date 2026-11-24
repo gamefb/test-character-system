@@ -1,10 +1,13 @@
 class_name CharacterHud
 extends Control
-## An example HUD to copy: shows a character's health, statuses, ammo and ability cooldowns.
+## An example HUD to copy: shows a character's health, statuses, ammo, ability cooldowns and
+## the charge of a weapon that charges.
 ##
 ## Attach it to a Control with a ProgressBar named HealthBar and three Labels named Statuses,
-## Ammo and Cooldown, then set Character. Health and statuses update when they change;
-## ammo and the cooldown are read every frame, which is cheap.
+## Ammo and Cooldown, then set Character. Add a ProgressBar named ChargeBar for a bar that
+## fills while a weapon is charging; without one the HUD works as before. Health and statuses
+## update when they change; ammo, the cooldown and the charge are read every frame, which is
+## cheap.
 
 ## The character to follow, e.g. the player.
 @export var character: Node
@@ -15,6 +18,7 @@ extends Control
 @onready var _statuses: Label = $Statuses
 @onready var _ammo: Label = $Ammo
 @onready var _cooldown: Label = $Cooldown
+@onready var _charge_bar: ProgressBar = get_node_or_null(^"ChargeBar")
 
 
 func _ready() -> void:
@@ -23,15 +27,21 @@ func _ready() -> void:
 	_on_health_changed(health.current, health.maximum())
 	Statuses.find_on(character).changed.connect(_on_statuses_changed)
 	_on_statuses_changed()
+	if _charge_bar:
+		_charge_bar.hide()
 
 
 func _process(_delta: float) -> void:
 	_ammo.text = ""
 	var gear := Equipment.find_on(character)
-	if gear:
-		var magazine := Magazine.find_on(gear.node_in(&"weapon"))
-		if magazine:
-			_ammo.text = "Ammo: %d" % magazine.rounds
+	var weapon: Node = gear.node_in(&"weapon") if gear else null
+	var magazine := Magazine.find_on(weapon)
+	if magazine:
+		_ammo.text = "Ammo: %d" % magazine.rounds
+	if _charge_bar:
+		var trigger := Trigger.find_on(weapon)
+		_charge_bar.visible = trigger != null and trigger.is_charging()
+		_charge_bar.value = trigger.charge * _charge_bar.max_value if trigger else 0.0
 	_cooldown.text = ""
 	var abilities := Abilities.find_on(character)
 	if abilities and ability:

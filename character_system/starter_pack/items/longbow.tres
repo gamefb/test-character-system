@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="PackedScene" path="res://character_system/starter_pack/items/scenes/longbow.tscn" id="1_nv4ol"]
+[ext_resource type="Script" path="res://character_system/character/items/item_data.gd" id="2_ujfxm"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_xb8in"]
+
+[resource]
+script = ExtResource("2_ujfxm")
+id = &"longbow"
+display_name = "Longbow"
+description = "Hold to draw, let go to loose. A fuller draw flies faster and hits harder, and a full one makes the target bleed. Let go too soon and the bow is lowered. Drawing halves your speed."
+slot = &"weapon"
+scene = ExtResource("1_nv4ol")

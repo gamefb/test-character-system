@@ -20,11 +20,13 @@ Properties
 .. table::
    :widths: auto
 
-   +---------------------------+----------------------------------------------------------+---------+
-   | :ref:`float<class_float>` | :ref:`strength<class_KnockbackEffect_property_strength>` | ``8.0`` |
-   +---------------------------+----------------------------------------------------------+---------+
-   | :ref:`float<class_float>` | :ref:`lift<class_KnockbackEffect_property_lift>`         | ``2.0`` |
-   +---------------------------+----------------------------------------------------------+---------+
+   +----------------------------------------------------------+----------------------------------------------------------+---------+
+   | :ref:`float<class_float>`                                | :ref:`strength<class_KnockbackEffect_property_strength>` | ``8.0`` |
+   +----------------------------------------------------------+----------------------------------------------------------+---------+
+   | :ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] | :ref:`scaling<class_KnockbackEffect_property_scaling>`   | ``[]``  |
+   +----------------------------------------------------------+----------------------------------------------------------+---------+
+   | :ref:`float<class_float>`                                | :ref:`lift<class_KnockbackEffect_property_lift>`         | ``2.0`` |
+   +----------------------------------------------------------+----------------------------------------------------------+---------+
 
 .. rst-class:: classref-section-separator
 
@@ -42,6 +44,18 @@ Property Descriptions
 :ref:`float<class_float>` **strength** = ``8.0`` :ref:`🔗<class_KnockbackEffect_property_strength>`
 
 Sideways speed of the push, in metres per second.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_KnockbackEffect_property_scaling:
+
+.. rst-class:: classref-property
+
+:ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] **scaling** = ``[]`` :ref:`🔗<class_KnockbackEffect_property_scaling>`
+
+Added to the strength, as an :ref:`AmountEffect<class_AmountEffect>`'s scaling is: a :ref:`StatAmount<class_StatAmount>` for a shove that grows with a stat, a :ref:`ChargeAmount<class_ChargeAmount>` for one that grows with the charge.
 
 .. rst-class:: classref-item-separator
 

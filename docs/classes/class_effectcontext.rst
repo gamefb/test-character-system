@@ -84,6 +84,8 @@ Properties
    +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
    | :ref:`float<class_float>`                                        | :ref:`duration<class_EffectContext_property_duration>`       | ``0.0``                    |
    +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
+   | :ref:`float<class_float>`                                        | :ref:`charge<class_EffectContext_property_charge>`           | ``0.0``                    |
+   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
 
 .. rst-class:: classref-reftable-group
 
@@ -320,6 +322,18 @@ How many status triggers led to this one. See :ref:`MAX_DEPTH<class_EffectContex
 :ref:`float<class_float>` **duration** = ``0.0`` :ref:`🔗<class_EffectContext_property_duration>`
 
 For events that start something timed, such as ``weapon_started`` and ``ability_cast_started``: the seconds until it goes off. 0 when it is instant.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_property_charge:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **charge** = ``0.0`` :ref:`🔗<class_EffectContext_property_charge>`
+
+How far what caused this was charged, from 0 to 1. 0 for anything that doesn't charge. A :ref:`Trigger<class_Trigger>` with a :ref:`Trigger.charge_time<class_Trigger_property_charge_time>` sets it, and it does nothing by itself: a :ref:`ChargeAmount<class_ChargeAmount>` or a :ref:`ChargeCondition<class_ChargeCondition>` on an effect decides what a charge is worth.
 
 .. rst-class:: classref-section-separator
 

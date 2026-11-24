@@ -16,6 +16,8 @@ Amounts
 
 .. source-file:: ../../character_system/character/amounts/random_amount.gd
 
+:ref:`ChargeAmount<class_ChargeAmount>`, for weapons that are charged by holding the button, is shown with them in :ref:`doc_charging`.
+
 .. list-table::
    :header-rows: 1
 
@@ -29,6 +31,8 @@ Amounts
      - A heal of 0 + :ref:`HitAmount<class_HitAmount>` (0.25), in a ``dealt_damage`` trigger
    * - 8 to 12 damage
      - 8 + :ref:`RandomAmount<class_RandomAmount>` (0 to 4)
+   * - An arrow that hits harder the further the bow is drawn
+     - 8 + :ref:`ChargeAmount<class_ChargeAmount>` (22 at full)
 
 .. _doc_more_effects:
 
@@ -39,7 +43,7 @@ Effects
 
 .. source-file:: ../../character_system/character/effects/knockback_effect.gd
 
-:ref:`KnockbackEffect<class_KnockbackEffect>` shows the rule that every effect handles a target without the component it needs: a character is shoved through ``CharacterMotor.push()``, a physics prop gets an impulse, and a wall is left alone.
+The strength of a :ref:`KnockbackEffect<class_KnockbackEffect>` has a **Scaling** list too. :ref:`KnockbackEffect<class_KnockbackEffect>` shows the rule that every effect handles a target without the component it needs: a character is shoved through ``CharacterMotor.push()``, a physics prop gets an impulse, and a wall is left alone.
 
 .. source-file:: ../../character_system/character/effects/spawn_scene_effect.gd
 
@@ -47,7 +51,7 @@ Effects
 
 .. source-file:: ../../character_system/character/effects/launch_projectile_effect.gd
 
-:ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` turns an ability into a fireball; :ref:`doc_projectiles` covers the projectile itself.
+:ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` turns an ability into a fireball; :ref:`doc_projectiles` covers the projectile itself. Its **Speed Scaling** adds to the projectile's speed the way an effect's scaling adds to its number, so a stat or a charge can make it fly faster.
 
 .. _doc_more_conditions:
 
@@ -92,5 +96,8 @@ Conditions
    * - :ref:`AnyCondition<class_AnyCondition>`
      - At least one of the conditions inside it passes
      - "Wet or below half health"
+   * - :ref:`ChargeCondition<class_ChargeCondition>`
+     - The weapon was charged at least so far (see :ref:`doc_charging`)
+     - Bleeding only from a fully drawn bow
 
 A list of conditions needs all of them to pass; put alternatives inside an :ref:`AnyCondition<class_AnyCondition>`.

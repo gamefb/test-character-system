@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://character_system/character/world/projectile.gd" id="1_3igky"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="2_f6lx5"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="3_eqhgt"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="4_l1lbs"]
+[ext_resource type="Script" path="res://character_system/character/amounts/charge_amount.gd" id="5_ypg11"]
+[ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="6_m3gio"]
+[ext_resource type="Script" path="res://character_system/character/conditions/charge_condition.gd" id="7_hh55c"]
+[ext_resource type="Script" path="res://character_system/core/effects/apply_status_effect.gd" id="8_akqbb"]
+[ext_resource type="Resource" path="res://character_system/starter_pack/statuses/bleeding.tres" id="9_0jqgi"]
+
+[sub_resource type="Resource" id="Resource_fwxho"]
+script = ExtResource("5_ypg11")
+at_full = 22.0
+
+[sub_resource type="Resource" id="Resource_70b55"]
+script = ExtResource("6_m3gio")
+amount = 8.0
+scaling = Array[ExtResource("4_l1lbs")]([SubResource("Resource_fwxho")])
+
+[sub_resource type="Resource" id="Resource_ocmeh"]
+script = ExtResource("7_hh55c")
+
+[sub_resource type="Resource" id="Resource_3eysv"]
+script = ExtResource("8_akqbb")
+status = ExtResource("9_0jqgi")
+conditions = Array[ExtResource("3_eqhgt")]([SubResource("Resource_ocmeh")])
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1yc3x"]
+albedo_color = Color(0.55, 0.4, 0.25, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_u13m4"]
+material = SubResource("StandardMaterial3D_1yc3x")
+size = Vector3(0.03, 0.03, 0.7)
+
+[node name="Arrow" type="Node3D" unique_id=648750513]
+script = ExtResource("1_3igky")
+speed = 20.0
+effects = Array[ExtResource("2_f6lx5")]([SubResource("Resource_70b55"), SubResource("Resource_3eysv")])
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=813189752]
+mesh = SubResource("BoxMesh_u13m4")

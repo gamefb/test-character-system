@@ -19,9 +19,11 @@ Description
 
 Each press of :ref:`action<class_Trigger_property_action>` on the wielder's :ref:`Brain<class_Brain>` fires once, and an automatic item keeps firing while it's held. If a :ref:`Magazine<class_Magazine>` is beside it, each shot takes a round. Delivery components such as :ref:`Hitscan<class_Hitscan>` and :ref:`MeleeSweep<class_MeleeSweep>` listen to :ref:`fired<class_Trigger_signal_fired>`, and :ref:`user_effects<class_Trigger_property_user_effects>` run on the wielder. 
 
-With a :ref:`wind_up<class_Trigger_property_wind_up>` the shot comes that long after the press: a sword's backswing, a bow's draw. Being stunned in between cancels it, and the round goes back. 
+With a :ref:`wind_up<class_Trigger_property_wind_up>` the shot comes that long after the press: a sword's backswing, a rocket launcher's spin-up. Being stunned in between cancels it, and the round goes back. 
 
-The wielder hears each use as events, with the item's data as the origin: ``weapon_started`` in the frame of the press, with the wind-up as its :ref:`EffectContext.duration<class_EffectContext_property_duration>`; ``weapon_fired`` at the shot; and ``weapon_interrupted`` if the wind-up was cut short. An :ref:`Animator<class_Animator>` plays clips from them, and statuses can react to them. 
+With a :ref:`charge_time<class_Trigger_property_charge_time>` the press starts a charge and letting go fires. How far it got is the shot's :ref:`charge<class_Trigger_property_charge>`, from 0 to 1, which goes into the :ref:`EffectContext.charge<class_EffectContext_property_charge>` of everything the shot does. The trigger doesn't decide what a charge is worth: a :ref:`ChargeAmount<class_ChargeAmount>` in an effect's scaling makes it hit harder or fly faster, and a :ref:`ChargeCondition<class_ChargeCondition>` switches an effect on from some charge up. 
+
+The wielder hears each use as events, with the item's data as the origin: ``weapon_started`` in the frame of the press, with the wind-up or the charge time as its :ref:`EffectContext.duration<class_EffectContext_property_duration>`; ``weapon_fired`` at the shot, with its :ref:`EffectContext.charge<class_EffectContext_property_charge>`; and ``weapon_interrupted`` if the wind-up or the charge was cut short. An :ref:`Animator<class_Animator>` plays clips from them, and statuses can react to them. 
 
 A stunned or dead wielder can't fire, because its :ref:`Brain<class_Brain>` reports no presses. A status that should stop weapons only, such as Disarmed, blocks ``weapons``, which every trigger answers to through :ref:`blocked_by<class_Trigger_property_blocked_by>`.
 
@@ -33,21 +35,29 @@ Properties
 .. table::
    :widths: auto
 
-   +------------------------------------------------------------------+----------------------------------------------------------+----------------+
-   | :ref:`StringName<class_StringName>`                              | :ref:`action<class_Trigger_property_action>`             | ``&"primary"`` |
-   +------------------------------------------------------------------+----------------------------------------------------------+----------------+
-   | :ref:`float<class_float>`                                        | :ref:`fire_rate<class_Trigger_property_fire_rate>`       | ``5.0``        |
-   +------------------------------------------------------------------+----------------------------------------------------------+----------------+
-   | :ref:`bool<class_bool>`                                          | :ref:`automatic<class_Trigger_property_automatic>`       | ``false``      |
-   +------------------------------------------------------------------+----------------------------------------------------------+----------------+
-   | :ref:`float<class_float>`                                        | :ref:`wind_up<class_Trigger_property_wind_up>`           | ``0.0``        |
-   +------------------------------------------------------------------+----------------------------------------------------------+----------------+
-   | :ref:`float<class_float>`                                        | :ref:`buffer_time<class_Trigger_property_buffer_time>`   | ``0.15``       |
-   +------------------------------------------------------------------+----------------------------------------------------------+----------------+
-   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`blocked_by<class_Trigger_property_blocked_by>`     | ``[...]``      |
-   +------------------------------------------------------------------+----------------------------------------------------------+----------------+
-   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\]         | :ref:`user_effects<class_Trigger_property_user_effects>` | ``[]``         |
-   +------------------------------------------------------------------+----------------------------------------------------------+----------------+
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`StringName<class_StringName>`                              | :ref:`action<class_Trigger_property_action>`                               | ``&"primary"`` |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`                                        | :ref:`fire_rate<class_Trigger_property_fire_rate>`                         | ``5.0``        |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`bool<class_bool>`                                          | :ref:`automatic<class_Trigger_property_automatic>`                         | ``false``      |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`                                        | :ref:`wind_up<class_Trigger_property_wind_up>`                             | ``0.0``        |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`                                        | :ref:`buffer_time<class_Trigger_property_buffer_time>`                     | ``0.15``       |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`blocked_by<class_Trigger_property_blocked_by>`                       | ``[...]``      |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`Array<class_Array>`\[:ref:`Effect<class_Effect>`\]         | :ref:`user_effects<class_Trigger_property_user_effects>`                   | ``[]``         |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`                                        | :ref:`charge_time<class_Trigger_property_charge_time>`                     | ``0.0``        |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`                                        | :ref:`min_charge<class_Trigger_property_min_charge>`                       | ``0.0``        |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`StatusData<class_StatusData>`                              | :ref:`status_while_charging<class_Trigger_property_status_while_charging>` |                |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`                                        | :ref:`charge<class_Trigger_property_charge>`                               | ``0.0``        |
+   +------------------------------------------------------------------+----------------------------------------------------------------------------+----------------+
 
 .. rst-class:: classref-reftable-group
 
@@ -59,6 +69,8 @@ Methods
 
    +-------------------------------+---------------------------------------------------------------------------------------------------+
    | :ref:`Trigger<class_Trigger>` | :ref:`find_on<class_Trigger_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| |
+   +-------------------------------+---------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`       | :ref:`is_charging<class_Trigger_method_is_charging>`\ (\ )                                        |
    +-------------------------------+---------------------------------------------------------------------------------------------------+
    | :ref:`bool<class_bool>`       | :ref:`is_blocked<class_Trigger_method_is_blocked>`\ (\ )                                          |
    +-------------------------------+---------------------------------------------------------------------------------------------------+
@@ -131,7 +143,7 @@ On: fire while held. Off: one shot per press.
 
 :ref:`float<class_float>` **wind_up** = ``0.0`` :ref:`🔗<class_Trigger_property_wind_up>`
 
-Seconds between the press and the shot: a sword's backswing, a bow's draw. 0 fires in the frame of the press. Being stunned or disarmed in between cancels the shot.
+Seconds between the press and the shot: a sword's backswing, a rocket launcher's spin-up. 0 fires in the frame of the press. Being stunned or disarmed in between cancels the shot. Not used with a :ref:`charge_time<class_Trigger_property_charge_time>`: there the hold is the wind-up.
 
 .. rst-class:: classref-item-separator
 
@@ -169,6 +181,54 @@ The names this item answers to. It doesn't fire while the wielder has a status t
 
 Run in order on the wielder each time the item fires, e.g. a :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` for a rocket launcher or a bow, a :ref:`KnockbackEffect<class_KnockbackEffect>` for recoil, or a cost paid from a :ref:`Pool<class_Pool>`. Their :ref:`EffectContext.position<class_EffectContext_property_position>` is where the item is, so what they launch or spawn leaves from the weapon.
 
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Trigger_property_charge_time:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **charge_time** = ``0.0`` :ref:`🔗<class_Trigger_property_charge_time>`
+
+Seconds of holding for a full charge: a bow's draw. The press starts the charge and letting go fires. 0: the item doesn't charge, and fires at the press.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Trigger_property_min_charge:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **min_charge** = ``0.0`` :ref:`🔗<class_Trigger_property_min_charge>`
+
+The share of a full charge the shot needs. Letting go sooner cancels it, and the round goes back. 0 fires on any tap, and 1 only fires fully charged.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Trigger_property_status_while_charging:
+
+.. rst-class:: classref-property
+
+:ref:`StatusData<class_StatusData>` **status_while_charging** :ref:`🔗<class_Trigger_property_status_while_charging>`
+
+The wielder has this status for as long as it is charging, e.g. one that slows it or drains stamina. Use a status with duration 0.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Trigger_property_charge:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **charge** = ``0.0`` :ref:`🔗<class_Trigger_property_charge>`
+
+How far the shot is charged, from 0 to 1: rising while the button is held, then kept for the shot it fires. Always 0 without a :ref:`charge_time<class_Trigger_property_charge_time>`.
+
 .. rst-class:: classref-section-separator
 
 ----
@@ -185,6 +245,18 @@ Method Descriptions
 :ref:`Trigger<class_Trigger>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Trigger_method_find_on>`
 
 The **Trigger** on the item scene ``node``, or null if there is none. Safe on a freed node.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Trigger_method_is_charging:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **is_charging**\ (\ ) :ref:`🔗<class_Trigger_method_is_charging>`
+
+True while the button is held and the charge is building, e.g. to show a charge bar.
 
 .. rst-class:: classref-item-separator
 

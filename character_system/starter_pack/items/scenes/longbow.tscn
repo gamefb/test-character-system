@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_8vbo8"]
+[ext_resource type="Script" path="res://character_system/character/items/trigger.gd" id="2_cmtg7"]
+[ext_resource type="Resource" path="res://character_system/starter_pack/statuses/drawing.tres" id="3_1lpr2"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="4_ugssd"]
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="5_e1bd0"]
+[ext_resource type="PackedScene" path="res://character_system/starter_pack/projectiles/arrow.tscn" id="6_tsbdt"]
+[ext_resource type="Script" path="res://character_system/character/effects/launch_projectile_effect.gd" id="7_jhgha"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="8_pujes"]
+[ext_resource type="Script" path="res://character_system/character/amounts/charge_amount.gd" id="9_hibtf"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sktow"]
+albedo_color = Color(0.4, 0.28, 0.15, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wqmfl"]
+material = SubResource("StandardMaterial3D_sktow")
+size = Vector3(0.05, 1.2, 0.05)
+
+[sub_resource type="Resource" id="Resource_ex6h2"]
+script = ExtResource("9_hibtf")
+at_full = 30.0
+
+[sub_resource type="Resource" id="Resource_cuoxc"]
+script = ExtResource("7_jhgha")
+projectile = ExtResource("6_tsbdt")
+speed_scaling = Array[ExtResource("8_pujes")]([SubResource("Resource_ex6h2")])
+
+[node name="Longbow" type="Node3D" unique_id=2031021488]
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=950630151]
+mesh = SubResource("BoxMesh_wqmfl")
+
+[node name="ComponentManager" type="Node" parent="." unique_id=1580963171]
+script = ExtResource("1_8vbo8")
+
+[node name="Trigger" type="Node" parent="." unique_id=1014454144]
+script = ExtResource("2_cmtg7")
+fire_rate = 1.5
+charge_time = 0.8
+min_charge = 0.25
+status_while_charging = ExtResource("3_1lpr2")
+user_effects = Array[ExtResource("4_ugssd")]([SubResource("Resource_cuoxc")])

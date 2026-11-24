@@ -82,6 +82,10 @@ var depth: int = 0
 ## For events that start something timed, such as [code]weapon_started[/code] and
 ## [code]ability_cast_started[/code]: the seconds until it goes off. 0 when it is instant.
 var duration: float = 0.0
+## How far what caused this was charged, from 0 to 1. 0 for anything that doesn't charge. A
+## [Trigger] with a [member Trigger.charge_time] sets it, and it does nothing by itself: a
+## [ChargeAmount] or a [ChargeCondition] on an effect decides what a charge is worth.
+var charge: float = 0.0
 
 
 ## [param p_source] caused it, [param p_target] receives it, and [param p_origin] is the

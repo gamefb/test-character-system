@@ -43,7 +43,8 @@ Item components
    * - :ref:`Trigger<class_Trigger>`
      - When the item activates
      - ``action``, ``fire_rate``, ``automatic``, ``wind_up``, ``buffer_time``,
-       ``blocked_by``, ``user_effects``
+       ``blocked_by``, ``user_effects``; ``charge_time``, ``min_charge`` and
+       ``status_while_charging`` for a weapon that charges
    * - :ref:`Magazine<class_Magazine>`
      - Whether it may activate, and what it consumes
      - ``ammo``, ``capacity``, ``reload_time``, ``auto_reload``
@@ -60,7 +61,7 @@ Item components
 
 The flow inside an item is a short signal chain: :ref:`Trigger<class_Trigger>` asks :ref:`Magazine<class_Magazine>` (if present) for a round, then emits ``fired``; every :ref:`WeaponDelivery<class_WeaponDelivery>` (:ref:`Hitscan<class_Hitscan>`, :ref:`MeleeSweep<class_MeleeSweep>`, or one of your own) listens for ``fired`` and applies its ``effects`` to what it hits. Each hit's context records the item's :ref:`ItemData<class_ItemData>` as ``origin``, so a kill feed can say "killed by Rifle".
 
-A trigger with a **Wind Up** waits that long between the press and the shot, and the wielder hears each stage as an event, which is what animations play from. :ref:`doc_timing_and_animation` covers both.
+A trigger with a **Wind Up** waits that long between the press and the shot. One with a **Charge Time** starts a charge at the press and fires when the button is let go. The wielder hears each stage as an event, which is what animations play from. :ref:`doc_timing_and_animation` covers all three.
 
 .. source-file:: ../../character_system/character/items/trigger.gd
 

@@ -58,6 +58,8 @@ Character framework
     class_chancecondition
     class_changepooleffect
     class_charactermotor
+    class_chargeamount
+    class_chargecondition
     class_effectzone
     class_equipment
     class_faction
