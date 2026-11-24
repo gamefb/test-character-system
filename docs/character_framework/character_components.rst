@@ -3,7 +3,7 @@
 Character components
 ====================
 
-Each component owns one concern and is optional. The table lists the standard set; the code for each follows.
+Each component owns one concern and is optional. The table lists the standard set. The first three belong to the core and are covered there: :ref:`Statuses<doc_statuses_component>`, :ref:`Pool<doc_pools>` and :ref:`Health<doc_health>`. The code for the others follows.
 
 .. list-table::
    :header-rows: 1
@@ -71,25 +71,14 @@ Each component owns one concern and is optional. The table lists the standard se
      - Brain, Inventory, Equipment
      - none
      - none
+   * - :ref:`Animator<class_Animator>`
+     - Which animation plays when the character uses a weapon, casts or dies (see
+       :ref:`doc_animator`)
+     - none
+     - none
+     - none
 
 Every host also needs one :ref:`ComponentManager<class_ComponentManager>`. A component whose requirement is missing waits instead of failing: it starts as soon as the requirement is added.
-
-.. _doc_health:
-
-Health
-------
-
-.. source-file:: ../../character_system/core/health.gd
-
-**Health is a pool.** It is the :ref:`Pool<class_Pool>` named ``health``, so everything that works on pools works on health: ``max_health`` and ``health_regen`` are stats, an ability can list ``health`` in its costs, a :ref:`PoolAmount<class_PoolAmount>` or :ref:`PoolBelowCondition<class_PoolBelowCondition>` reads it, and a bar that shows a pool shows health. What it adds is resistances and death.
-
-**Death is a status.** At zero the character gets the status in **Death Status**, and keeps it until ``revive()``. Health itself only stops changing while dead. Everything else a dead character can't do is written on that status, in its ``blocks`` (see :ref:`what a status blocks <doc_stuns>`). The default, ``core/statuses/dead.tres``, blocks ``everything``, ``healing`` and ``targeting`` and ends timed statuses: the dead can't act or be healed, shots pass through them, and AI leaves them alone. Give a boss a status that blocks less for a last stand, make a "Downed" status for a game with revives, or clear the field for a game in which nothing dies.
-
-What death means for the game (ragdoll, loot drop, game over) is decided by whatever connects to ``died``; every component on the character also hears it as the ``died`` event, and whoever dealt the killing blow hears ``killed``. ``revive()`` sends ``revived``.
-
-For a shield that takes damage before health does, add a :ref:`Pool<class_Pool>` with Absorbs Damage on; see :ref:`doc_pools`.
-
-Health stays full until the manager sends ``started``, the moment every component has had its chance to start. Innate passives such as "+20 max health" are applied by then, so a character starts at its buffed maximum whatever the node order. After that, raising the maximum doesn't heal.
 
 .. _doc_brain_the_only_difference_between_a_player_and_an_ai:
 
@@ -112,36 +101,7 @@ Input actions are created in Project > Project Settings > Input Map. Leave Camer
 
 Because AI presses the same "buttons" as the player, with ``press()`` and ``release()``, every weapon and ability works for AI with no extra code.
 
-.. _doc_stuns:
-
-**A status says what it blocks.** Everything that can be stopped answers to one or more names, listed in its **Blocked By**, and a status stops it by listing one of those names in its **Blocks**. Nothing that gets stopped knows about stuns, roots or death; it only knows its own names. A new status therefore needs no changes anywhere else.
-
-.. list-table::
-   :header-rows: 1
-
-   * - Name
-     - What answers to it
-     - A status that blocks it
-   * - ``everything``
-     - The :ref:`Brain<class_Brain>`: ``move_dir`` reads as zero and no action counts as pressed. The motor, weapons, weapon switching and abilities all read the brain, so this one name stops all of them, for a player and an AI alike
-     - Stunned, frozen, asleep, Dead
-   * - ``movement``
-     - The :ref:`CharacterMotor<class_CharacterMotor>`: no steering, jumping or moves; see :ref:`doc_movement_statuses_events_cooldowns`
-     - Rooted
-   * - ``weapons``
-     - Every :ref:`Trigger<class_Trigger>`
-     - Disarmed
-   * - ``abilities``
-     - Every :ref:`AbilityData<class_AbilityData>`
-     - Dazed
-   * - ``damage``, ``healing``
-     - :ref:`DamageEffect<class_DamageEffect>` and :ref:`HealEffect<class_HealEffect>` on this character
-     - Invulnerable; Dead blocks healing
-   * - ``targeting``
-     - Shots, the player's crosshair, :ref:`RadiusTargeting<class_RadiusTargeting>` and the example AI
-     - Dead, or a stealth status
-
-Add names of your own to sort things into kinds. The example Fireball answers to ``abilities`` and ``spells``, and Silenced blocks ``spells``, so it stops the Fireball and leaves Sprint alone. The blocks are counted on the :ref:`ComponentManager<class_ComponentManager>`: ``block()`` and ``unblock()`` do from code what a status does, for a cutscene, and ``manager.blocks`` shows what is blocked right now.
+A stunned or dead character presses nothing: those statuses block ``everything``, which every brain answers to through its **Blocked By**. :ref:`doc_stuns` lists what else a status can block.
 
 Leave Agent empty and :ref:`AIBrain<class_AIBrain>` uses the first ``NavigationAgent3D`` under the character. Finding a path is the expensive part of steering, so a new one is only asked for once the target has moved ``repath_distance`` metres (1 by default). In a test with 50 enemies chasing a running player, asking every physics frame cost about seven times as much frame time. Lower the distance for a target that moves fast and turns sharply.
 

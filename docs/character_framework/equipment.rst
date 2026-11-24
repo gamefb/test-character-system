@@ -42,8 +42,8 @@ Item components
      - Key properties
    * - :ref:`Trigger<class_Trigger>`
      - When the item activates
-     - ``action``, ``fire_rate``, ``automatic``, ``buffer_time``, ``blocked_by``,
-       ``user_effects``
+     - ``action``, ``fire_rate``, ``automatic``, ``wind_up``, ``buffer_time``,
+       ``blocked_by``, ``user_effects``
    * - :ref:`Magazine<class_Magazine>`
      - Whether it may activate, and what it consumes
      - ``ammo``, ``capacity``, ``reload_time``, ``auto_reload``
@@ -51,13 +51,16 @@ Item components
      - What an instant shot hits and what happens to it
      - ``max_distance``, ``pellets``, ``spread``, ``effects``
    * - :ref:`MeleeSweep<class_MeleeSweep>`
-     - What a swing hits: everything inside a shape in front of the item
-     - ``shape``, ``offset``, ``effects``
+     - What a swing hits: everything inside a shape in front of the item, at one instant or
+       for as long as the swing stays live
+     - ``shape``, ``offset``, ``active``, ``effects``
    * - :ref:`Grants<class_Grants>`
      - What the wielder has while the item is equipped: passives, stat changes and abilities
      - ``statuses``, ``modifiers``, ``abilities``
 
 The flow inside an item is a short signal chain: :ref:`Trigger<class_Trigger>` asks :ref:`Magazine<class_Magazine>` (if present) for a round, then emits ``fired``; every :ref:`WeaponDelivery<class_WeaponDelivery>` (:ref:`Hitscan<class_Hitscan>`, :ref:`MeleeSweep<class_MeleeSweep>`, or one of your own) listens for ``fired`` and applies its ``effects`` to what it hits. Each hit's context records the item's :ref:`ItemData<class_ItemData>` as ``origin``, so a kill feed can say "killed by Rifle".
+
+A trigger with a **Wind Up** waits that long between the press and the shot, and the wielder hears each stage as an event, which is what animations play from. :ref:`doc_timing_and_animation` covers both.
 
 .. source-file:: ../../character_system/character/items/trigger.gd
 
@@ -139,121 +142,3 @@ One :ref:`Grants<class_Grants>` component gives the wielder everything an item g
 Modifiers in the copy's ``state`` under ``modifiers`` are applied as well, which is how loot with random numbers works: the item scene is the same for every copy, and each :ref:`ItemInstance<class_ItemInstance>` carries its own rolls.
 
 **Abilities** go in the wielder's :ref:`Abilities<class_Abilities>` slots while the item is equipped, and what was there before is restored afterwards. Cooldowns belong to the wielder, so swapping the item out and back in doesn't reset them.
-
-.. _doc_example_items:
-
-Example items
--------------
-
-These ship in ``character_system/starter_pack/items/``, each an :ref:`ItemData<class_ItemData>` ``.tres`` with its scene in ``scenes/``.
-
-.. list-table::
-   :header-rows: 1
-
-   * - Item
-     - Slot
-     - Components
-   * - Rifle (``rifle.tres``)
-     - ``weapon``
-     - :ref:`Trigger<class_Trigger>` (5 per second), :ref:`Magazine<class_Magazine>` (12 rounds,
-       rifle ammo), :ref:`Hitscan<class_Hitscan>` [10 physical damage; 5 more if the target is
-       wet]
-   * - Flare gun (``flare_gun.tres``)
-     - ``weapon``
-     - :ref:`Trigger<class_Trigger>` (2 per second), :ref:`Magazine<class_Magazine>` (2 rounds),
-       :ref:`Hitscan<class_Hitscan>` [2 fire damage, apply Burning]
-   * - Fireproof cloak (``fireproof_cloak.tres``)
-     - ``cloak``
-     - :ref:`Grants<class_Grants>` [Fireproof]
-   * - Ward amulet (``ward_amulet.tres``)
-     - ``neck``
-     - :ref:`Grants<class_Grants>` [Warded]
-   * - Rifle ammo (``rifle_ammo.tres``)
-     - none
-     - None: it's only carried, up to 60 per stack, and the rifle's Magazine reloads from it.
-   * - Shotgun (``shotgun.tres``)
-     - ``weapon``
-     - :ref:`Trigger<class_Trigger>` (1.5 per second), :ref:`Magazine<class_Magazine>` (6
-       shells, no ammo item, 1.2 second reload, auto reload), :ref:`Hitscan<class_Hitscan>` [8
-       pellets in a 4 degree cone, 3 physical damage each]
-   * - Fire staff (``fire_staff.tres``)
-     - ``weapon``
-     - :ref:`Grants<class_Grants>` [Fireball on ``secondary``, ``bonus_fire`` +0.2]
-   * - Ring of vigor (``ring_of_vigor.tres``)
-     - ``ring``
-     - :ref:`Grants<class_Grants>` [``max_health`` +25]
-   * - Health potion (``health_potion.tres``)
-     - none
-     - None: it has ``use_effects`` [heal 40], and ``Inventory.use()`` takes one from the
-       stack of up to 5.
-   * - Mana potion (``mana_potion.tres``)
-     - none
-     - None: ``use_effects`` [a :ref:`ChangePoolEffect<class_ChangePoolEffect>` of 50 mana].
-   * - Grenade (``grenade.tres``)
-     - none
-     - None: ``use_effects`` [a :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>`
-       with ``projectiles/grenade.tscn``, which arcs and has a blast], so using one throws it.
-   * - Sword (``sword.tres``)
-     - ``weapon``
-     - :ref:`Trigger<class_Trigger>` (2 per second), :ref:`MeleeSweep<class_MeleeSweep>` [8
-       damage + 0 to 4 at random + 1 per point of ``strength``, tagged ``melee``; knockback;
-       apply Bleeding]
-   * - Rocket launcher (``rocket_launcher.tres``)
-     - ``weapon``
-     - :ref:`Trigger<class_Trigger>` [``user_effects`` = a
-       :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` with
-       ``projectiles/rocket.tscn``; 40 damage on a direct hit],
-       :ref:`Magazine<class_Magazine>` (1 rocket, 1.5 second reload, auto reload)
-   * - Rockets (``rockets.tres``)
-     - none
-     - None: ammo for the rocket launcher, up to 20 per stack.
-   * - Marksman rifle (``marksman_rifle.tres``)
-     - ``weapon``
-     - :ref:`Trigger<class_Trigger>` (1.5 per second), :ref:`Magazine<class_Magazine>` (5
-       rounds of rifle ammo, 1.5 second reload), :ref:`Hitscan<class_Hitscan>` [35 damage; a
-       :ref:`SpawnSceneEffect<class_SpawnSceneEffect>` of sparks at the hit point], and the
-       example :ref:`Scope<class_Scope>`
-   * - Soldier rifle (``soldier_rifle.tres``)
-     - ``weapon``
-     - For AI. :ref:`Trigger<class_Trigger>` (2 per second), :ref:`Magazine<class_Magazine>`
-       (8 rounds, no ammo item, auto reload), :ref:`Hitscan<class_Hitscan>` [8 damage with an
-       :ref:`IsHostileCondition<class_IsHostileCondition>`, so no friendly fire]
-
-More ideas, built from the same parts:
-
-.. list-table::
-   :header-rows: 1
-
-   * - Item
-     - Components
-     - Result
-   * - Assault rifle
-     - :ref:`Trigger<class_Trigger>` (automatic, 10 per second), :ref:`Magazine<class_Magazine>` (30, rifle ammo), :ref:`Hitscan<class_Hitscan>` [damage]
-     - Full-auto, ammo-limited hitscan weapon
-   * - Flaming sword
-     - :ref:`Trigger<class_Trigger>` (1.5 per second), :ref:`MeleeSweep<class_MeleeSweep>` [damage, apply Burning]
-     - Melee weapon that sets targets on fire
-   * - Storm rod
-     - :ref:`Trigger<class_Trigger>`, :ref:`Hitscan<class_Hitscan>` [lightning damage, extra lightning damage if target has tag ``wet``]
-     - Rewards combining with water, using a condition
-   * - Healing staff
-     - :ref:`Trigger<class_Trigger>`, :ref:`Hitscan<class_Hitscan>` [heal]
-     - Same delivery, friendly effect
-   * - Ring of haste
-     - :ref:`Grants<class_Grants>` [a Haste passive with duration 0]
-     - No trigger at all, only a passive
-   * - Bow
-     - :ref:`Trigger<class_Trigger>` [``user_effects`` = a
-       :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` with a Projectile with
-       ``gravity_scale`` 1; damage with a :ref:`StatAmount<class_StatAmount>` of ``dexterity``]
-     - Arrows that arc, and hit harder as the archer levels
-   * - Looted ring with random numbers
-     - :ref:`Grants<class_Grants>` with nothing listed; the rolls are in each
-       copy's ``state``
-     - One scene, a different ring every drop
-   * - Vampiric blade
-     - A sword + :ref:`Grants<class_Grants>` [the example Vampiric passive]
-     - Heals its wielder for a share of every hit
-   * - Cursed rifle
-     - The rifle + :ref:`Grants<class_Grants>` [a Fragile passive]
-     - A weapon and a passive drawback in one item

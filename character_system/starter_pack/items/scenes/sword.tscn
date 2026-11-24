@@ -56,9 +56,11 @@ script = ExtResource("1_6ut2e")
 [node name="Trigger" type="Node" parent="." unique_id=2039643971]
 script = ExtResource("2_6iydm")
 fire_rate = 2.0
+wind_up = 0.25
 
 [node name="MeleeSweep" type="Node" parent="." unique_id=1550529136]
 script = ExtResource("3_n51ox")
 shape = SubResource("BoxShape3D_mbkqi")
 offset = Vector3(0, 0, -1.2)
+active = 0.15
 effects = Array[ExtResource("4_qdnpc")]([SubResource("Resource_w3lrm"), SubResource("Resource_j1gld"), SubResource("Resource_r0752")])

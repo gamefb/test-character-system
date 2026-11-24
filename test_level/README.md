@@ -25,7 +25,7 @@ player picks up, uses potions and grenades, draws the text on screen and brings 
 
 | Place | What to try |
 | --- | --- |
-| **Armoury**, straight ahead | Walk over an item to pick it up. Rifle, shotgun, flare gun, marksman rifle (scope), rocket launcher, fire staff (grants Fireball) and sword (melee), with their ammo; potions and grenades; a ring (+25 health), a cloak (fire immunity) and an amulet (ward), which are put on at once. |
+| **Armoury**, straight ahead | Walk over an item to pick it up. Rifle, shotgun, flare gun, marksman rifle (scope), rocket launcher, fire staff (grants Fireball) and sword (melee: it winds up for a quarter of a second, and its swing follows the animated hand), with their ammo; potions and grenades; a ring (+25 health), a cloak (fire immunity) and an amulet (ward), which are put on at once. |
 | **Targets**, behind the armoury | Dummies that show each hit as a number and stand back up after 4 seconds. One is plain, one undead (immune to poison), one a construct (immune to fire and poison), one has thorns, one is weak to fire and tough against bullets, and the mage has a shield that soaks up damage first. Heads count double. |
 | **Shrines**, on the left | Step on a pad for its passive: Sharpshooter, Lucky strikes, Vampiric, Bloodlust, Thorns, Fire ward, Regenerating, Haste, Executioner, Berserk. The white pad takes them all away. |
 | **Hazards**, on the right | The example zones (fire, water, healing, ward, poison) and pads that stun, silence and root you. Each is a status that lists what it blocks. |

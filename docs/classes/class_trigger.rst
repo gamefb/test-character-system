@@ -19,6 +19,10 @@ Description
 
 Each press of :ref:`action<class_Trigger_property_action>` on the wielder's :ref:`Brain<class_Brain>` fires once, and an automatic item keeps firing while it's held. If a :ref:`Magazine<class_Magazine>` is beside it, each shot takes a round. Delivery components such as :ref:`Hitscan<class_Hitscan>` and :ref:`MeleeSweep<class_MeleeSweep>` listen to :ref:`fired<class_Trigger_signal_fired>`, and :ref:`user_effects<class_Trigger_property_user_effects>` run on the wielder. 
 
+With a :ref:`wind_up<class_Trigger_property_wind_up>` the shot comes that long after the press: a sword's backswing, a bow's draw. Being stunned in between cancels it, and the round goes back. 
+
+The wielder hears each use as events, with the item's data as the origin: ``weapon_started`` in the frame of the press, with the wind-up as its :ref:`EffectContext.duration<class_EffectContext_property_duration>`; ``weapon_fired`` at the shot; and ``weapon_interrupted`` if the wind-up was cut short. An :ref:`Animator<class_Animator>` plays clips from them, and statuses can react to them. 
+
 A stunned or dead wielder can't fire, because its :ref:`Brain<class_Brain>` reports no presses. A status that should stop weapons only, such as Disarmed, blocks ``weapons``, which every trigger answers to through :ref:`blocked_by<class_Trigger_property_blocked_by>`.
 
 .. rst-class:: classref-reftable-group
@@ -35,6 +39,8 @@ Properties
    | :ref:`float<class_float>`                                        | :ref:`fire_rate<class_Trigger_property_fire_rate>`       | ``5.0``        |
    +------------------------------------------------------------------+----------------------------------------------------------+----------------+
    | :ref:`bool<class_bool>`                                          | :ref:`automatic<class_Trigger_property_automatic>`       | ``false``      |
+   +------------------------------------------------------------------+----------------------------------------------------------+----------------+
+   | :ref:`float<class_float>`                                        | :ref:`wind_up<class_Trigger_property_wind_up>`           | ``0.0``        |
    +------------------------------------------------------------------+----------------------------------------------------------+----------------+
    | :ref:`float<class_float>`                                        | :ref:`buffer_time<class_Trigger_property_buffer_time>`   | ``0.15``       |
    +------------------------------------------------------------------+----------------------------------------------------------+----------------+
@@ -53,6 +59,8 @@ Methods
 
    +-------------------------------+---------------------------------------------------------------------------------------------------+
    | :ref:`Trigger<class_Trigger>` | :ref:`find_on<class_Trigger_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| |
+   +-------------------------------+---------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`       | :ref:`is_blocked<class_Trigger_method_is_blocked>`\ (\ )                                          |
    +-------------------------------+---------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
@@ -117,6 +125,18 @@ On: fire while held. Off: one shot per press.
 
 ----
 
+.. _class_Trigger_property_wind_up:
+
+.. rst-class:: classref-property
+
+:ref:`float<class_float>` **wind_up** = ``0.0`` :ref:`🔗<class_Trigger_property_wind_up>`
+
+Seconds between the press and the shot: a sword's backswing, a bow's draw. 0 fires in the frame of the press. Being stunned or disarmed in between cancels the shot.
+
+.. rst-class:: classref-item-separator
+
+----
+
 .. _class_Trigger_property_buffer_time:
 
 .. rst-class:: classref-property
@@ -165,6 +185,18 @@ Method Descriptions
 :ref:`Trigger<class_Trigger>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Trigger_method_find_on>`
 
 The **Trigger** on the item scene ``node``, or null if there is none. Safe on a freed node.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Trigger_method_is_blocked:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **is_blocked**\ (\ ) :ref:`🔗<class_Trigger_method_is_blocked>`
+
+True while the wielder can't use this: its :ref:`Brain<class_Brain>` is blocked, or a status blocks one of :ref:`blocked_by<class_Trigger_property_blocked_by>`.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

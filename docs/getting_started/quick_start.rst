@@ -54,7 +54,7 @@ Add a **CharacterBody3D** named Player at the origin, and give it:
 
 Then add these as children of Player, in any order: **ComponentManager**, **Health**, **Statuses**, **PlayerBrain**, **CharacterMotor**, **MouseLook**, **Inventory**, **Equipment** and **WeaponSwitch**. PlayerBrain and MouseLook find the camera by themselves.
 
-Add a **WalkMode** and an **AirMode** as children of CharacterMotor. They're the ways the player can move: walking and jumping on the floor, and falling, steering and double jumping in the air. The motor starts in WalkMode, and the two hand over to each other by themselves.
+Add a **WalkMode** and an **AirMode** as children of CharacterMotor. They come from the starter pack, and they're the ways the player can move: walking and jumping on the floor, and falling, steering and double jumping in the air. The motor starts in WalkMode, and the two hand over to each other by themselves.
 
 Set two things in the Inspector:
 
@@ -96,4 +96,5 @@ Next steps
   own statuses, items and abilities.
 - :ref:`Extending the system <doc_extending>` covers writing your own components, effects and
   conditions.
-- The :ref:`Manual <toc-manual>` explains each part of the system with its source code.
+- :ref:`Core <toc-core>`, the :ref:`Character framework <toc-character-framework>` and the
+  :ref:`Starter pack <toc-starter-pack>` explain each part of the system with its source code.

@@ -79,6 +79,9 @@ var from_status := false
 var cause: EffectContext
 ## How many status triggers led to this one. See [constant MAX_DEPTH].
 var depth: int = 0
+## For events that start something timed, such as [code]weapon_started[/code] and
+## [code]ability_cast_started[/code]: the seconds until it goes off. 0 when it is instant.
+var duration: float = 0.0
 
 
 ## [param p_source] caused it, [param p_target] receives it, and [param p_origin] is the

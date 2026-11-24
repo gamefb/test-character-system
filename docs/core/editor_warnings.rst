@@ -19,7 +19,7 @@ The warnings show in two places. :ref:`Statuses<class_Statuses>`, :ref:`Grants<c
 Names are picked from a list
 ----------------------------
 
-The same names fill the Inspector. Every field that holds one opens a list of what the project already has: a modifier's Stat, a trigger's Event, a status's Tags, Immune To, Removes Tags and Blocks, the keys of an ability's Costs, every Blocked By, the Pool of an effect, condition or amount, and the Tags of a hit, a :ref:`Hurtbox<class_Hurtbox>` or a :ref:`HitCondition<class_HitCondition>`. The list is a suggestion, not a limit: typing a name that isn't in it works, which is how a new tag or a new thing to block comes into being. A :ref:`Pool<class_Pool>`'s own Pool field has no list, because that is where a pool's name is made up.
+The same names fill the Inspector. Every field that holds one opens a list of what the project already has: a modifier's Stat, a trigger's Event, a status's Tags, Immune To, Removes Tags and Blocks, the keys of an ability's Costs, every Blocked By, the Pool of an effect, condition or amount, the events in an :ref:`Animator<class_Animator>`'s Animations, and the Tags of a hit, a :ref:`Hurtbox<class_Hurtbox>` or a :ref:`HitCondition<class_HitCondition>`. The list is a suggestion, not a limit: typing a name that isn't in it works, which is how a new tag or a new thing to block comes into being. A :ref:`Pool<class_Pool>`'s own Pool field has no list, because that is where a pool's name is made up.
 
 .. figure:: ../img/name_list.png
    :alt: The Inspector on the Stunned status, with the list for its Blocks open: abilities, damage, everything, healing, movement, spells, targeting, weapons.

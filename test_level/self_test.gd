@@ -27,6 +27,7 @@ func _ready() -> void:
 	await _check_pickups()
 	await _check_shrines_and_hazards()
 	await _check_combat()
+	await _check_swing()
 	print("%d passed, %d failed" % [_passed, _failed])
 	get_tree().quit(1 if _failed > 0 else 0)
 
@@ -141,6 +142,26 @@ func _check_combat() -> void:
 	var fighters: Array[Node] = _level.get_node(^"Arena").find_children("*", "CharacterBody3D")
 	check(fighters.any(func(who: Node) -> bool: return _is_hurt(who)),
 			"the soldiers in the arena fight each other")
+
+
+func _check_swing() -> void:
+	var target: Node3D = _level.get_node(^"Targets/Plain")
+	Health.find_on(target).revive()
+	var switch := WeaponSwitch.find_on(_player)
+	var sword: ItemData = load(SYSTEM + "starter_pack/items/sword.tres")
+	for index in switch.weapons().size():
+		if switch.weapons()[index].data == sword:
+			switch.select(index)
+	_player.global_position = target.global_position + Vector3(0, 0.1, 1.8)
+	(_player.get_node(^"Head/Camera3D") as Camera3D).rotation.x = 0.0
+	await _frames(10)
+	await _tap(&"primary")
+	var clip: String = (_player.get_node(^"AnimationPlayer") as AnimationPlayer).current_animation
+	check(clip == "swing" and not _is_hurt(target),
+			"a sword swing starts its animation at the press and winds up before it lands")
+	await _frames(30)
+	check(_is_hurt(target), "then hits what the blade sweeps across as the hand turns")
+	switch.select(0)
 
 
 func _is_hurt(who: Node) -> bool:

@@ -406,6 +406,22 @@ click swings once and hits everything in the box in front of the item. See
 `items/sword.tres`: its damage has a RandomAmount and a StatAmount of `strength`, and its
 other effects knock the target back and make it bleed.
 
+### Give a weapon a wind-up
+
+Set **Wind Up** on its Trigger: the seconds between the click and the shot. It works on any
+weapon, so a sword's backswing, a bow's draw and a rocket launcher's spin-up are the same
+number. Being stunned or disarmed during the wind-up cancels the shot, and the round goes
+back in the magazine. With Wind Up at 0 the weapon fires in the frame of the click.
+`items/sword.tres` winds up for a quarter of a second.
+
+### Make a swing follow the blade
+
+Set **Active** on the MeleeSweep: the seconds the swing stays dangerous. For that long the
+Shape is checked wherever the weapon is, along the path it took, and each character is hit
+once. Put the weapon in a socket that an animation moves, such as a BoneAttachment3D on the
+hand bone, and the swing hits what the blade passes through. With Active at 0 the shape is
+checked once, at the shot.
+
 ### Make an item that grants an ability
 
 Add a **Grants** to the item's scene and fill in **Abilities**: an action name and an
@@ -530,6 +546,59 @@ Set the ability's **Targeting** to a new **RadiusTargeting** and choose its radi
 **Hostile Only** on, it only reaches what the user's Faction fights; for a party heal, turn it
 off and **Include User** on. A shockwave is a RadiusTargeting with a DamageEffect and a
 KnockbackEffect: see `abilities/shockwave.tres`, which also has two charges.
+
+## Animations
+
+Animations are optional. Timing lives in the Inspector as numbers (**Wind Up**, **Active**,
+**Cast Time**), and a game with no animations plays the same as one with them.
+
+### Play an animation when a character attacks, casts or dies
+
+Add an **Animator** to the character and set **Player** to its AnimationPlayer. Then add rows
+to **Animations**: an event on the left, picked from the list, and a clip on the right.
+
+| Event | Plays when |
+| --- | --- |
+| `weapon_started` | A weapon is used, at the click and before any wind-up |
+| `weapon_started:sword` | The same, but only for the item whose id is `sword` |
+| `weapon_fired` | The shot itself, after the wind-up |
+| `weapon_interrupted` | A wind-up is cut short by a stun |
+| `ability_cast_started` | A cast begins |
+| `ability_used` | An ability goes off |
+| `took_damage` | The character is hurt |
+| `died` | The character dies |
+| `air_mode_entered` | The character leaves the ground |
+
+A row with an id wins over the plain one, and a row whose clip the player doesn't have is
+skipped. See the player in `test_level/scenes/player.tscn`.
+
+### Keep a swing animation in step with its hit
+
+Add a marker named `hit` to the clip, at the moment the blade connects or the spell leaves the
+hand. The Animator plays the clip faster or slower so the marker lands on the shot: a clip
+whose marker is at 0.5 seconds, on a weapon with a Wind Up of 0.25, plays at double speed.
+Change the Wind Up and the animation follows. A clip without the marker plays at its own
+speed.
+
+### Use an AnimationTree
+
+The Animator drives an AnimationPlayer. With a tree, leave it out and listen to the same
+events from the script that drives the tree:
+
+```gdscript
+class_name SwingAnimations
+extends Node
+
+@export var tree: AnimationTree
+
+
+func _ready() -> void:
+	ComponentManager.of(owner).event(&"weapon_started").connect(_on_weapon_started)
+
+
+func _on_weapon_started(_ctx: EffectContext) -> void:
+	tree.set("parameters/Swing/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
+```
 
 ## Your own code
 

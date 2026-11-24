@@ -1,7 +1,7 @@
 .. _doc_stats_and_modifiers:
 
-Stats and modifiers
-===================
+Stats, pools and health
+=======================
 
 Every number that a status, passive or item may change lives on the component that uses it: ``max_health`` on :ref:`Health<class_Health>`, ``move_speed`` on :ref:`CharacterMotor<class_CharacterMotor>`. The component lists its numbers in ``_stats()``, and the :ref:`ComponentManager<class_ComponentManager>` combines each one with the stat modifiers currently active on the host. A stat's value is ``(base + sum of adds) * (1 + sum of percents) * product of muls``.
 
@@ -89,3 +89,20 @@ A :ref:`Pool<class_Pool>` is a number that's spent and regained: health, mana, s
 -  **Running out.** ``status_while_empty`` is on the character for as long as the pool is empty, and comes off when it has something again: Exhausted on a stamina pool, say. What the character can't do meanwhile is that status's ``blocks``. The character needs a :ref:`Statuses<class_Statuses>` component for it.
 -  **Health is the pool named** ``health``. :ref:`Health<class_Health>` extends Pool, so costs, ``max_health``, ``health_regen``, :ref:`PoolAmount<class_PoolAmount>` and :ref:`PoolBelowCondition<class_PoolBelowCondition>` treat it like any other. Its status while empty is the death status; see :ref:`doc_health`.
 -  **Several per host.** ``find()`` returns the first component of a type, so pools are looked up by name with ``Pool.named(node, &"mana")``.
+
+.. _doc_health:
+
+Health
+------
+
+.. source-file:: ../../character_system/core/health.gd
+
+**Health is a pool.** It is the :ref:`Pool<class_Pool>` named ``health``, so everything that works on pools works on health: ``max_health`` and ``health_regen`` are stats, an ability can list ``health`` in its costs, a :ref:`PoolAmount<class_PoolAmount>` or :ref:`PoolBelowCondition<class_PoolBelowCondition>` reads it, and a bar that shows a pool shows health. What it adds is resistances and death.
+
+**Death is a status.** At zero the character gets the status in **Death Status**, and keeps it until ``revive()``. Health itself only stops changing while dead. Everything else a dead character can't do is written on that status, in its ``blocks`` (see :ref:`what a status blocks <doc_stuns>`). The default, ``core/statuses/dead.tres``, blocks ``everything``, ``healing`` and ``targeting`` and ends timed statuses: the dead can't act or be healed, shots pass through them, and AI leaves them alone. Give a boss a status that blocks less for a last stand, make a "Downed" status for a game with revives, or clear the field for a game in which nothing dies.
+
+What death means for the game (ragdoll, loot drop, game over) is decided by whatever connects to ``died``; every component on the character also hears it as the ``died`` event, and whoever dealt the killing blow hears ``killed``. ``revive()`` sends ``revived``.
+
+For a shield that takes damage before health does, add a :ref:`Pool<class_Pool>` with Absorbs Damage on; see :ref:`doc_pools`.
+
+Health stays full until the manager sends ``started``, the moment every component has had its chance to start. Innate passives such as "+20 max health" are applied by then, so a character starts at its buffed maximum whatever the node order. After that, raising the maximum doesn't heal.
