@@ -48,9 +48,9 @@ Methods
    +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`Health<class_Health>` | :ref:`find_on<class_Health_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                                            |
    +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`     | :ref:`is_dead<class_Health_method_is_dead>`\ (\ )                                                                                           |
-   +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
    | |void|                      | :ref:`change<class_Health_method_change>`\ (\ amount\: :ref:`float<class_float>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |
+   +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`     | :ref:`is_dead<class_Health_method_is_dead>`\ (\ )                                                                                           |
    +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
    | |void|                      | :ref:`revive<class_Health_method_revive>`\ (\ amount\: :ref:`float<class_float>` = -1.0\ )                                                  |
    +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
@@ -126,18 +126,6 @@ The **Health** of ``node``'s character, or null if there is none. Safe on a free
 
 ----
 
-.. _class_Health_method_is_dead:
-
-.. rst-class:: classref-method
-
-:ref:`bool<class_bool>` **is_dead**\ (\ ) :ref:`🔗<class_Health_method_is_dead>`
-
-Whether health is at zero and the character has a :ref:`death_status<class_Health_property_death_status>` to show for it.
-
-.. rst-class:: classref-item-separator
-
-----
-
 .. _class_Health_method_change:
 
 .. rst-class:: classref-method
@@ -145,6 +133,18 @@ Whether health is at zero and the character has a :ref:`death_status<class_Healt
 |void| **change**\ (\ amount\: :ref:`float<class_float>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) :ref:`🔗<class_Health_method_change>`
 
 Adds ``amount``, or takes it away when it is negative. Nothing changes while dead: only :ref:`revive()<class_Health_method_revive>` brings a character back.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Health_method_is_dead:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **is_dead**\ (\ ) :ref:`🔗<class_Health_method_is_dead>`
+
+Whether health is at zero and the character has a :ref:`death_status<class_Health_property_death_status>` to show for it.
 
 .. rst-class:: classref-item-separator
 

@@ -43,8 +43,10 @@ func _nearest_enemy() -> Node3D:
 	var nearest: Node3D = null
 	for team in (find(Faction) as Faction).hostile_to:
 		for other in get_tree().get_nodes_in_group(team):
-			if other is Node3D and other != host \
-					and not ComponentManager.blocked(other, &"targeting"):
+			if (
+					other is Node3D and other != host
+					and not ComponentManager.blocked(other, &"targeting")
+			):
 				if not nearest or _distance_to(other) < _distance_to(nearest):
 					nearest = other
 	return nearest

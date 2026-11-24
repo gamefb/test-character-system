@@ -3,16 +3,6 @@ extends GutTest
 ## acting at all.
 
 
-## Targets nobody, or whoever it's told to.
-class FixedTargeting:
-	extends Targeting
-
-	var targets: Array[Node] = []
-
-	func find(_ctx: EffectContext) -> Array[Node]:
-		return targets
-
-
 var caster: Node3D
 var abilities: Abilities
 var brain: Brain
@@ -277,3 +267,13 @@ func test_a_pressed_action_uses_its_slot() -> void:
 		await get_tree().process_frame
 	brain.release(&"secondary")
 	assert_eq(health.current, 60.0)
+
+
+## Targets nobody, or whoever it's told to.
+class FixedTargeting:
+	extends Targeting
+
+	var targets: Array[Node] = []
+
+	func find(_ctx: EffectContext) -> Array[Node]:
+		return targets

@@ -12,7 +12,6 @@ func make_host(parts: Array = [], stats: Dictionary[StringName, float] = {}) -> 
 	return host
 
 
-
 func modifier(stat_name: StringName, add := 0.0, percent := 0.0, mul := 1.0) -> StatModifier:
 	var m := StatModifier.new()
 	m.stat = stat_name

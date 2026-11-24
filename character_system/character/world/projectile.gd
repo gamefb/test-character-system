@@ -28,7 +28,7 @@ signal impacted(ctx: EffectContext)
 ## just disappears.
 @export_range(0.1, 30.0, 0.1, "or_greater", "suffix:s") var lifetime: float = 5.0
 ## Physics layers it can hit. Areas on these layers count too, so hurtboxes can be hit.
-@export_flags_3d_physics var collision_mask: int = 0xffffffff
+@export_flags_3d_physics var collision_mask: int = 0xffff_ffff
 ## Applied in order to what it hits directly, after any effects the launcher handed over.
 @export var effects: Array[Effect] = []
 ## How far the blast reaches from the point of impact, in metres. 0 for no blast.

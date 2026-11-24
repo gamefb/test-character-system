@@ -41,10 +41,6 @@ static func find_on(node: Variant) -> Trigger:
 	return Component.of(node, Trigger) as Trigger
 
 
-func _warnings() -> PackedStringArray:
-	return NameCheck.problems_in(user_effects)
-
-
 func _process(delta: float) -> void:
 	_cooldown -= delta
 	_buffered -= delta
@@ -68,6 +64,10 @@ func _process(delta: float) -> void:
 			ctx.position = (host as Node3D).global_position
 		Effect.apply_all(user_effects, ctx)
 		fired.emit()
+
+
+func _warnings() -> PackedStringArray:
+	return NameCheck.problems_in(user_effects)
 
 
 func _wielder_blocked() -> bool:

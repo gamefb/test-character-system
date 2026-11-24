@@ -110,6 +110,13 @@ static func stat_of(node: Variant, stat_name: StringName) -> float:
 	return m.stat(stat_name) if m else 0.0
 
 
+## Whether [param node]'s host is blocking [param what], e.g. [code]&"damage"[/code]. False
+## for a node without a manager, and safe on a freed one.
+static func blocked(node: Variant, what: StringName) -> bool:
+	var m := of(node)
+	return m != null and m.blocks.has(what)
+
+
 func _init() -> void:
 	name = &"ComponentManager"  # So ComponentManager.new() gets the name of() looks for first.
 
@@ -258,18 +265,12 @@ func unblock(what: StringName) -> void:
 ## Whether anything is blocking one of [param names] right now.
 func is_blocked(names: Array[StringName]) -> bool:
 	if blocks.is_empty():
-		return false  # Nearly always, so this is asked many times a frame for nothing.
+		# Nearly always, so this is asked many times a frame for nothing.
+		return false
 	for what in names:
 		if blocks.has(what):
 			return true
 	return false
-
-
-## Whether [param node]'s host is blocking [param what], e.g. [code]&"damage"[/code]. False
-## for a node without a manager, and safe on a freed one.
-static func blocked(node: Variant, what: StringName) -> bool:
-	var m := of(node)
-	return m != null and m.blocks.has(what)
 
 
 ## Current value of a stat: (base + all adds) × (1 + all percents) × all muls. The base comes

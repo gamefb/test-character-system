@@ -38,11 +38,11 @@ static func total(base: float, scaling: Array[Amount], ctx: EffectContext) -> fl
 	return sum
 
 
-## Override this: return the number for this use. [param ctx] says who is involved; either
-## side may be null or have no components.
-@abstract func value(ctx: EffectContext) -> float
-
-
 func _validate_property(property: Dictionary) -> void:
 	if Engine.is_editor_hint():
 		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
+
+
+## Override this: return the number for this use. [param ctx] says who is involved; either
+## side may be null or have no components.
+@abstract func value(ctx: EffectContext) -> float

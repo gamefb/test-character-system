@@ -230,7 +230,7 @@ func test_components_warn_about_their_resources() -> void:
 
 
 func field(name: String, type: int, hint_string := "") -> Dictionary:
-	return {"name": name, "type": type, "hint": PROPERTY_HINT_NONE, "hint_string": hint_string}
+	return { "name": name, "type": type, "hint": PROPERTY_HINT_NONE, "hint_string": hint_string }
 
 
 func test_name_fields_get_lists_to_pick_from() -> void:

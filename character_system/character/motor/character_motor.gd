@@ -86,8 +86,10 @@ var body: CharacterBody3D
 var _modes: Array[MovementMode] = []
 var _moves: Array[LayeredMove] = []
 var _consumed: Dictionary[StringName, bool] = {}  # Presses already used this frame.
-var _blocked := false  # Whether movement is blocked, worked out once a physics frame.
-var _push := Vector3.ZERO  # Sideways knockback, kept in the body's velocity between frames.
+# Whether movement is blocked, worked out once a physics frame.
+var _blocked := false
+# Sideways knockback, kept in the body's velocity between frames.
+var _push := Vector3.ZERO
 
 
 ## The [CharacterMotor] of [param node]'s character, or null if there is none. Safe on a freed node.

@@ -45,7 +45,7 @@ const MIN_AIM_DISTANCE := 1.5
 ## the Input Map too.
 @export var extra_actions: Array[StringName] = []
 ## The physics layers the crosshair can rest on. Untick a layer to aim through it.
-@export_flags_3d_physics var aim_mask: int = 0xffffffff
+@export_flags_3d_physics var aim_mask: int = 0xffff_ffff
 
 var _actions: Array[StringName] = []  # The actions passed on that the Input Map has.
 var _own_rids: Array[RID] = []  # The character's body and hurtboxes, which the aim ignores.

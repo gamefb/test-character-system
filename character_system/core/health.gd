@@ -55,21 +55,11 @@ func _stats() -> Dictionary[StringName, float]:
 	return owned
 
 
-## Whether health is at zero and the character has a [member death_status] to show for it.
-func is_dead() -> bool:
-	return death_status != null and not _fresh and _current <= 0.0
-
-
 ## Adds [param amount], or takes it away when it is negative. Nothing changes while dead:
 ## only [method revive] brings a character back.
 func change(amount: float, ctx: EffectContext = null) -> void:
 	if not is_dead():
 		super(amount, ctx)
-
-
-## Sets health to [param amount], or to the maximum if it is left out, and ends death.
-func revive(amount := -1.0) -> void:
-	_set_current(maximum() if amount < 0.0 else amount)
 
 
 func _regenerates() -> bool:
@@ -92,3 +82,13 @@ func _emptied(ctx: EffectContext) -> void:
 func _refilled() -> void:
 	if manager:
 		manager.send(&"revived", null)
+
+
+## Whether health is at zero and the character has a [member death_status] to show for it.
+func is_dead() -> bool:
+	return death_status != null and not _fresh and _current <= 0.0
+
+
+## Sets health to [param amount], or to the maximum if it is left out, and ends death.
+func revive(amount := -1.0) -> void:
+	_set_current(maximum() if amount < 0.0 else amount)

@@ -42,8 +42,10 @@ func _check_coverage() -> void:
 	var unused: PackedStringArray = []
 	for entry: Dictionary in ProjectSettings.get_global_class_list():
 		var path: String = entry["path"]
-		if path.begins_with(SYSTEM) and entry["class"] not in NOT_CONTENT \
-				and not (load(path) as Script).is_abstract() and not _classes.has(entry["class"]):
+		if (
+				path.begins_with(SYSTEM) and entry["class"] not in NOT_CONTENT
+				and not (load(path) as Script).is_abstract() and not _classes.has(entry["class"])
+		):
 			unused.append(entry["class"])
 	check(unused.is_empty(), "the level uses every class: %s" % ", ".join(unused))
 	var missing: PackedStringArray = []

@@ -21,7 +21,7 @@ extends ItemComponent
 ## It needs a [Trigger] beside it, and fires each time the trigger does.
 
 ## The physics layers it can hit. Every layer by default.
-@export_flags_3d_physics var collision_mask: int = 0xffffffff
+@export_flags_3d_physics var collision_mask: int = 0xffff_ffff
 ## Applied to each thing hit, in order.
 @export var effects: Array[Effect] = []
 

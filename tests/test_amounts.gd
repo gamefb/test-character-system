@@ -13,7 +13,6 @@ func make_host(parts: Array = [], stats: Dictionary[StringName, float] = {}) -> 
 	return host
 
 
-
 func health_of(node: Node) -> Health:
 	return Health.find_on(node)
 

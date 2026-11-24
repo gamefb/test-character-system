@@ -36,7 +36,8 @@ extends RefCounted
 ## reported even though it works. With the plugin enabled, the project is read again whenever
 ## its files change; otherwise at most every 30 seconds.
 
-const _RESCAN_MS := 30000  # How long scan results are reused if nothing says files changed.
+# How long scan results are reused if nothing says files changed.
+const _RESCAN_MS := 30000
 # The names the system's own scripts answer to. See StatusData.blocks.
 const _BUILT_IN_BLOCKS: Array[String] = ["everything", "movement", "abilities", "weapons",
 		"damage", "healing", "targeting"]
@@ -89,16 +90,16 @@ static func suggest(object: Object, property: Dictionary) -> void:
 	if known.is_empty():
 		return
 	var list: String = ",".join(known)
+	# How a typed array or dictionary says that each element or key is a name from the list.
+	var element: String = "%d/%d:%s" % [TYPE_STRING_NAME, PROPERTY_HINT_ENUM_SUGGESTION, list]
 	match property.type:
 		TYPE_STRING_NAME, TYPE_STRING:
 			property.hint = PROPERTY_HINT_ENUM_SUGGESTION
 			property.hint_string = list
-		TYPE_ARRAY:  # Each element is a name.
-			property.hint_string = "%d/%d:%s" % [
-					TYPE_STRING_NAME, PROPERTY_HINT_ENUM_SUGGESTION, list]
-		TYPE_DICTIONARY:  # Each key is a name; the value's type stays as declared.
-			property.hint_string = "%d/%d:%s;%s" % [TYPE_STRING_NAME,
-					PROPERTY_HINT_ENUM_SUGGESTION, list, property.hint_string.get_slice(";", 1)]
+		TYPE_ARRAY:
+			property.hint_string = element
+		TYPE_DICTIONARY:  # The value's type stays as declared.
+			property.hint_string = element + ";" + property.hint_string.get_slice(";", 1)
 
 
 ## Stat names declared by components, e.g. move_speed.

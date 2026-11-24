@@ -98,16 +98,16 @@ func test_stops_and_restarts_with_its_requirement() -> void:
 	host.add_child(needed)
 	host.add_child(needy)
 	add_child_autofree(host)
-	needed.ping.emit()
+	needed.pinged.emit()
 	assert_eq(needy.pings, 1)
 	host.remove_child(needed)
 	assert_false(needy.running)
 	assert_eq(needy.stops, 1)
-	needed.ping.emit()
+	needed.pinged.emit()
 	assert_eq(needy.pings, 1, "listen() connections are undone on stop")
 	host.add_child(needed)
 	assert_eq(needy.starts, 2)
-	needed.ping.emit()
+	needed.pinged.emit()
 	assert_eq(needy.pings, 2, "and made again on restart")
 
 
@@ -210,7 +210,7 @@ func test_new_component_reports_its_stats() -> void:
 
 
 class Needed extends Component:
-	signal ping
+	signal pinged
 
 	func _stats() -> Dictionary[StringName, float]:
 		return { &"power": 10.0 }
@@ -230,7 +230,7 @@ class Needy extends Component:
 
 	func _start() -> void:
 		starts += 1
-		listen((find(Needed) as Needed).ping, func() -> void: pings += 1)
+		listen((find(Needed) as Needed).pinged, func() -> void: pings += 1)
 		listen(manager.event_sent, _on_event)
 
 	func _stop() -> void:

@@ -21,7 +21,7 @@ extends MovementMode
 @export var walk_mode: MovementMode
 
 ## Air jumps left before landing, e.g. for a HUD.
-var jumps_left := 0
+var jumps_left: int = 0
 
 
 func _stats() -> Dictionary[StringName, float]:

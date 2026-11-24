@@ -85,8 +85,10 @@ func release(action: StringName) -> void:
 ## Presses made meanwhile are lost; a button still held when it ends counts as held again.
 func is_blocked() -> bool:
 	# Asked many times a frame: nearly always nothing at all is blocked, which is one look.
-	return _manager != null and not _manager.blocks.is_empty() \
+	return (
+			_manager != null and not _manager.blocks.is_empty()
 			and _manager.is_blocked(blocked_by)
+	)
 
 
 ## True while [param action] is held down, like [method Input.is_action_pressed].

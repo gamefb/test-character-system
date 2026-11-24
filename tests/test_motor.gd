@@ -285,7 +285,6 @@ func test_moves_have_a_cooldown() -> void:
 	assert_true(dash.active, "and it dashes again")
 
 
-
 ## A capsule character standing on the floor, with a motor and its modes. With
 ## [param air_first], AirMode comes before WalkMode, to show the order doesn't matter.
 func _make_character(air_first := false, with_dash := false) -> CharacterBody3D:
@@ -394,7 +393,7 @@ class EventLog extends Component:
 
 ## A move after the dash that counts the dash presses left for it.
 class PressCatcher extends LayeredMove:
-	var caught := 0
+	var caught: int = 0
 
 	func _can_start() -> bool:
 		if motor.consume_action(&"dash"):

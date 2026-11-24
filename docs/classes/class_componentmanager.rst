@@ -71,6 +71,8 @@ Methods
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`float<class_float>`                                        | :ref:`stat_of<class_ComponentManager_method_stat_of>`\ (\ node\: :ref:`Variant<class_Variant>`, stat_name\: :ref:`StringName<class_StringName>`\ ) |static|                                                   |
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                                          | :ref:`blocked<class_ComponentManager_method_blocked>`\ (\ node\: :ref:`Variant<class_Variant>`, what\: :ref:`StringName<class_StringName>`\ ) |static|                                                        |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`Component<class_Component>`                                | :ref:`find<class_ComponentManager_method_find>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                                                     |
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`Array<class_Array>`\[:ref:`Component<class_Component>`\]   | :ref:`find_all<class_ComponentManager_method_find_all>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                                             |
@@ -90,8 +92,6 @@ Methods
    | |void|                                                           | :ref:`unblock<class_ComponentManager_method_unblock>`\ (\ what\: :ref:`StringName<class_StringName>`\ )                                                                                                       |
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`bool<class_bool>`                                          | :ref:`is_blocked<class_ComponentManager_method_is_blocked>`\ (\ names\: :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]\ )                                                                   |
-   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`                                          | :ref:`blocked<class_ComponentManager_method_blocked>`\ (\ node\: :ref:`Variant<class_Variant>`, what\: :ref:`StringName<class_StringName>`\ ) |static|                                                        |
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`float<class_float>`                                        | :ref:`stat<class_ComponentManager_method_stat>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                                                                                                        |
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -249,6 +249,18 @@ Reads ``stat_name`` from ``node``, or 0 if it has no **ComponentManager**.
 
 ----
 
+.. _class_ComponentManager_method_blocked:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **blocked**\ (\ node\: :ref:`Variant<class_Variant>`, what\: :ref:`StringName<class_StringName>`\ ) |static| :ref:`🔗<class_ComponentManager_method_blocked>`
+
+Whether ``node``'s host is blocking ``what``, e.g. ``&"damage"``. False for a node without a manager, and safe on a freed one.
+
+.. rst-class:: classref-item-separator
+
+----
+
 .. _class_ComponentManager_method_find:
 
 .. rst-class:: classref-method
@@ -374,18 +386,6 @@ Takes back one :ref:`block()<class_ComponentManager_method_block>` of ``what``.
 :ref:`bool<class_bool>` **is_blocked**\ (\ names\: :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]\ ) :ref:`🔗<class_ComponentManager_method_is_blocked>`
 
 Whether anything is blocking one of ``names`` right now.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_ComponentManager_method_blocked:
-
-.. rst-class:: classref-method
-
-:ref:`bool<class_bool>` **blocked**\ (\ node\: :ref:`Variant<class_Variant>`, what\: :ref:`StringName<class_StringName>`\ ) |static| :ref:`🔗<class_ComponentManager_method_blocked>`
-
-Whether ``node``'s host is blocking ``what``, e.g. ``&"damage"``. False for a node without a manager, and safe on a freed one.
 
 .. rst-class:: classref-item-separator
 

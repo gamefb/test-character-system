@@ -4,7 +4,6 @@ extends GutTest
 ## WallSlideMode scripts.
 
 const EX := "res://character_system/starter_pack/"
-const HUD := preload("res://character_system/starter_pack/scripts/character_hud.gd")
 
 
 func make_character(position := Vector3.ZERO, extra: Array[Node] = []) -> CharacterBody3D:
@@ -128,15 +127,6 @@ func test_melee_sweep_hits_what_is_in_front() -> void:
 	assert_eq(Health.find_on(swinger).current, 100.0, "never the wielder")
 
 
-## A new weapon part writes only what a shot reaches.
-class Pulse extends WeaponDelivery:
-	var targeting := RadiusTargeting.new()
-
-	func _fire() -> void:
-		for target in targeting.find(context_for(wielder)):
-			Effect.apply_all(effects, context_for(target))
-
-
 func test_a_new_weapon_part_only_writes_what_a_shot_reaches() -> void:
 	var wielder: CharacterBody3D = make_character(Vector3.ZERO, [Brain.new()])
 	var near: CharacterBody3D = make_character(Vector3(0, 0, -3))
@@ -150,12 +140,6 @@ func test_a_new_weapon_part_only_writes_what_a_shot_reaches() -> void:
 	assert_eq(Health.find_on(near).current, 90.0, "the trigger, effects and context are inherited")
 	assert_eq(Health.find_on(far).current, 100.0)
 	assert_eq(Health.find_on(wielder).current, 100.0)
-
-
-## A new effect with a number writes only what the number does.
-class ShoveEffect extends AmountEffect:
-	func _execute(ctx: EffectContext) -> void:
-		(ctx.target as Node3D).position.z -= total(ctx)
 
 
 func test_a_new_effect_with_a_number_inherits_amount_and_scaling() -> void:
@@ -259,7 +243,7 @@ func test_character_hud_shows_health_statuses_and_ammo() -> void:
 		var label := Label.new()
 		label.name = label_name
 		hud.add_child(label)
-	hud.set_script(HUD)
+	hud.set_script(CharacterHud)
 	hud.set(&"character", hero)
 	add_child_autofree(hud)
 	Health.find_on(hero).change(-30.0)
@@ -268,16 +252,6 @@ func test_character_hud_shows_health_statuses_and_ammo() -> void:
 	assert_eq(bar.value, 70.0)
 	assert_eq((hud.get_node("Statuses") as Label).text, "Haste")
 	assert_eq((hud.get_node("Ammo") as Label).text, "Ammo: 12")
-
-
-## Counts presses of primary, the way a weapon's Trigger sees them.
-class PressProbe extends Component:
-	var presses: int = 0
-
-	func _process(_delta: float) -> void:
-		if (find(Brain) as Brain).is_action_just_pressed(&"primary"):
-			presses += 1
-
 
 
 ## A standing character with a motor holding WalkMode, AirMode and [param extra], on a floor
@@ -348,3 +322,27 @@ func walker() -> CharacterMotor:
 	motor.add_child(WalkMode.new())
 	motor.add_child(AirMode.new())
 	return motor
+
+
+## A new weapon part writes only what a shot reaches.
+class Pulse extends WeaponDelivery:
+	var targeting := RadiusTargeting.new()
+
+	func _fire() -> void:
+		for target in targeting.find(context_for(wielder)):
+			Effect.apply_all(effects, context_for(target))
+
+
+## A new effect with a number writes only what the number does.
+class ShoveEffect extends AmountEffect:
+	func _execute(ctx: EffectContext) -> void:
+		(ctx.target as Node3D).position.z -= total(ctx)
+
+
+## Counts presses of primary, the way a weapon's Trigger sees them.
+class PressProbe extends Component:
+	var presses: int = 0
+
+	func _process(_delta: float) -> void:
+		if (find(Brain) as Brain).is_action_just_pressed(&"primary"):
+			presses += 1

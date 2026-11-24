@@ -3,16 +3,6 @@ extends GutTest
 ## resist stats, trigger conditions and shields.
 
 
-## An effect that counts how often it ran.
-class CountEffect:
-	extends Effect
-
-	var count: int = 0
-
-	func _execute(_ctx: EffectContext) -> void:
-		count += 1
-
-
 func make_host(parts: Array = []) -> Node3D:
 	var host := Node3D.new()
 	for node: Node in [ComponentManager.new(), Health.new(), Statuses.new()] + parts:
@@ -227,3 +217,13 @@ func test_old_style_listeners_can_still_change_the_amount() -> void:
 			func(ctx: EffectContext) -> void: ctx.amount *= 0.5)
 	hit(target)
 	assert_eq(health_of(target).current, 95.0)
+
+
+## An effect that counts how often it ran.
+class CountEffect:
+	extends Effect
+
+	var count: int = 0
+
+	func _execute(_ctx: EffectContext) -> void:
+		count += 1

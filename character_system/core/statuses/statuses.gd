@@ -82,23 +82,6 @@ func _stop() -> void:
 	changed.emit()
 
 
-# Every event on the host passes through here, to run the status triggers for it.
-func _on_event(event: StringName, ctx: EffectContext) -> void:
-	if active.is_empty():
-		return
-	if not ctx:
-		return
-	var other: Node = ctx.target if ctx.source == host else ctx.source
-	for data: StatusData in active.keys():
-		for t in data.triggers:
-			if (
-					t.event == event and active.has(data)
-					and (t.react_to_statuses or not ctx.from_status)
-			):
-				_run(t.effects, data, active[data], other if t.affects_other else host, ctx,
-						t.conditions)
-
-
 ## Applies a status, handling conditions, blocking, removal of opposing statuses,
 ## stacking and refresh. Returns false if the status was refused.
 func add(data: StatusData, source: Node = null) -> bool:
@@ -194,6 +177,23 @@ func is_immune_to(data: StatusData) -> bool:
 		if _overlaps(data.tags, other.immune_to):
 			return true
 	return false
+
+
+# Every event on the host passes through here, to run the status triggers for it.
+func _on_event(event: StringName, ctx: EffectContext) -> void:
+	if active.is_empty():
+		return
+	if not ctx:
+		return
+	var other: Node = ctx.target if ctx.source == host else ctx.source
+	for data: StatusData in active.keys():
+		for t in data.triggers:
+			if (
+					t.event == event and active.has(data)
+					and (t.react_to_statuses or not ctx.from_status)
+			):
+				_run(t.effects, data, active[data], other if t.affects_other else host, ctx,
+						t.conditions)
 
 
 # Runs _process() only while a status can expire or tick; passives need nothing per frame.

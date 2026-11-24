@@ -50,8 +50,10 @@ func _get_configuration_warnings() -> PackedStringArray:
 ## True while a status on the character blocks one of [member blocked_by].
 func is_blocked() -> bool:
 	# Asked for every mode on every frame, so the usual case (no names) leaves at once.
-	return not blocked_by.is_empty() and motor != null and motor.manager != null \
+	return (
+			not blocked_by.is_empty() and motor != null and motor.manager != null
 			and motor.manager.is_blocked(blocked_by)
+	)
 
 
 ## Current value of [param stat_name] on this character, with statuses applied, e.g.
@@ -64,7 +66,6 @@ func stat(stat_name: StringName) -> float:
 func update_stats() -> void:
 	if motor:
 		motor.update_stats()
-
 
 
 ## The stats this node owns and their base values, as in [method Component._stats]. Call
