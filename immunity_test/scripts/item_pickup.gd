@@ -19,7 +19,7 @@ func _ready() -> void:
 
 
 func _on_body_entered(body: Node3D) -> void:
-	var bag := Component.of(body, Inventory) as Inventory
+	var bag := Inventory.find_on(body)
 	if not bag or not item:
 		return
 	bag.add(item, count)

@@ -3,41 +3,6 @@ extends GutTest
 ## the whole level through WorldEvents.
 
 
-## Remembers the events it heard, in order.
-class Listener:
-	extends Component
-
-	var heard: Array = []
-	var log: Array = []
-	var other: Node
-
-	func _start() -> void:
-		on(&"ping", _on_ping)
-		listen(manager.event_sent, _on_any)
-		if other:
-			on(&"ping", _on_other_ping, other)
-
-	func _on_ping(ctx: EffectContext) -> void:
-		heard.append(ctx)
-
-	func _on_other_ping(_ctx: EffectContext) -> void:
-		heard.append(&"other")
-
-	func _on_world_ping(host: Node, _ctx: EffectContext) -> void:
-		heard.append(host)
-
-	## Subscribes lambdas that use this object, the way a HUD script might.
-	func watch(host: Node) -> void:
-		ComponentManager.of(host).event(&"ping").connect(
-				func(_ctx: EffectContext) -> void: heard.append(&"lambda"))
-		WorldEvents.event(&"ping").connect(func(_host: Node, _ctx: EffectContext) -> void:
-			heard.append(&"world lambda"))
-
-	func _on_any(event: StringName, _ctx: EffectContext) -> void:
-		if event == &"ordered":
-			log.append(&"every event")
-
-
 var world_heard: Array = []
 
 
@@ -47,10 +12,6 @@ func make_host(parts: Array = []) -> Node3D:
 		host.add_child(node)
 	add_child_autofree(host)
 	return host
-
-
-func _on_world_ping(host: Node, ctx: EffectContext) -> void:
-	world_heard.append([host, ctx])
 
 
 func test_on_hears_one_event_until_the_component_stops() -> void:
@@ -195,7 +156,46 @@ func test_any_death_can_be_counted_from_one_place() -> void:
 	WorldEvents.event(&"died").connect(count)
 	var grunt: Node3D = make_host([Health.new()])
 	var brute: Node3D = make_host([Health.new()])
-	(Component.of(brute, Health) as Health).change(-500.0)
-	(Component.of(grunt, Health) as Health).change(-500.0)
+	Health.find_on(brute).change(-500.0)
+	Health.find_on(grunt).change(-500.0)
 	assert_eq(deaths, [brute, grunt])
 	WorldEvents.event(&"died").disconnect(count)
+
+
+func _on_world_ping(host: Node, ctx: EffectContext) -> void:
+	world_heard.append([host, ctx])
+
+
+## Remembers the events it heard, in order.
+class Listener:
+	extends Component
+
+	var heard: Array = []
+	var log: Array = []
+	var other: Node
+
+	func _start() -> void:
+		on(&"ping", _on_ping)
+		listen(manager.event_sent, _on_any)
+		if other:
+			on(&"ping", _on_other_ping, other)
+
+	func _on_ping(ctx: EffectContext) -> void:
+		heard.append(ctx)
+
+	func _on_other_ping(_ctx: EffectContext) -> void:
+		heard.append(&"other")
+
+	func _on_world_ping(host: Node, _ctx: EffectContext) -> void:
+		heard.append(host)
+
+	## Subscribes lambdas that use this object, the way a HUD script might.
+	func watch(host: Node) -> void:
+		ComponentManager.of(host).event(&"ping").connect(
+				func(_ctx: EffectContext) -> void: heard.append(&"lambda"))
+		WorldEvents.event(&"ping").connect(func(_host: Node, _ctx: EffectContext) -> void:
+			heard.append(&"world lambda"))
+
+	func _on_any(event: StringName, _ctx: EffectContext) -> void:
+		if event == &"ordered":
+			log.append(&"every event")

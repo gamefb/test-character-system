@@ -3,16 +3,6 @@ extends GutTest
 ## acting at all.
 
 
-## Targets nobody, or whoever it's told to.
-class FixedTargeting:
-	extends Targeting
-
-	var targets: Array[Node] = []
-
-	func find(_ctx: EffectContext) -> Array[Node]:
-		return targets
-
-
 var caster: Node3D
 var abilities: Abilities
 var brain: Brain
@@ -52,9 +42,9 @@ func mend(cooldown := 1.0) -> AbilityData:
 	return ability
 
 
-func tagged(tag: StringName, duration := 5.0) -> StatusData:
+func blocking(what: StringName, duration := 5.0) -> StatusData:
 	var s := StatusData.new()
-	s.tags = [tag]
+	s.blocks = [what]
 	s.duration = duration
 	return s
 
@@ -116,7 +106,7 @@ func test_reset_cooldown_makes_it_ready() -> void:
 
 func test_conditions_decide_when_it_can_be_used() -> void:
 	var last_stand: AbilityData = mend()
-	var hurt := HealthBelowCondition.new()
+	var hurt := PoolBelowCondition.new()
 	hurt.fraction = 0.5
 	last_stand.conditions = [hurt]
 	assert_eq(abilities.why_not(last_stand), &"condition")
@@ -126,14 +116,18 @@ func test_conditions_decide_when_it_can_be_used() -> void:
 	assert_eq(health.current, 40.0)
 
 
-func test_a_status_tag_blocks_the_ability() -> void:
+func test_a_status_blocks_the_abilities_that_answer_to_it() -> void:
 	var spell: AbilityData = mend()
-	spell.blocked_by_tags = [&"silenced"]
-	var silenced: StatusData = tagged(&"silenced")
+	spell.blocked_by = [&"abilities", &"spells"]
+	var silenced: StatusData = blocking(&"spells")
 	statuses.add(silenced)
 	assert_eq(abilities.why_not(spell), &"blocked")
 	assert_true(abilities.can_use(mend()), "other abilities still work")
 	statuses.remove(silenced)
+	var dazed: StatusData = blocking(&"abilities")
+	statuses.add(dazed)
+	assert_eq(abilities.why_not(mend()), &"blocked", "every ability answers to abilities")
+	statuses.remove(dazed)
 	assert_true(abilities.use(spell))
 
 
@@ -178,9 +172,8 @@ func test_damage_can_interrupt_a_cast() -> void:
 func test_a_blocking_status_interrupts_a_cast() -> void:
 	var spell: AbilityData = mend()
 	spell.cast_time = 1.0
-	spell.blocked_by_tags = [&"silenced"]
 	abilities.use(spell)
-	statuses.add(tagged(&"silenced"))
+	statuses.add(blocking(&"abilities"))
 	abilities._process(0.1)
 	assert_null(abilities.casting)
 	abilities.use(mend(0.0))
@@ -188,7 +181,7 @@ func test_a_blocking_status_interrupts_a_cast() -> void:
 	var long: AbilityData = mend()
 	long.cast_time = 1.0
 	abilities.use(long)
-	statuses.add(tagged(&"stunned"))
+	statuses.add(blocking(&"everything"))
 	abilities._process(0.1)
 	assert_null(abilities.casting, "so does a stun")
 
@@ -211,7 +204,7 @@ func test_a_status_is_held_for_as_long_as_the_cast() -> void:
 
 func test_an_ability_can_need_a_target() -> void:
 	var friend: Node3D = make_host()
-	(Component.of(friend, Health) as Health).change(-50.0)
+	Health.find_on(friend).change(-50.0)
 	var nobody := FixedTargeting.new()
 	var spell: AbilityData = mend()
 	spell.targeting = nobody
@@ -222,7 +215,7 @@ func test_an_ability_can_need_a_target() -> void:
 	assert_eq(mana.current, 50.0)
 	nobody.targets = [friend]
 	assert_true(abilities.use(spell))
-	assert_eq((Component.of(friend, Health) as Health).current, 60.0)
+	assert_eq(Health.find_on(friend).current, 60.0)
 	nobody.targets = []
 	spell.needs_target = false
 	abilities.reset_cooldown()
@@ -242,7 +235,7 @@ func test_user_effects_run_on_the_user() -> void:
 	drain.effects = [bite]
 	health.change(-50.0)
 	abilities.use(drain)
-	assert_eq((Component.of(enemy, Health) as Health).current, 80.0)
+	assert_eq(Health.find_on(enemy).current, 80.0)
 	assert_eq(health.current, 60.0, "the heal half of a life drain")
 
 
@@ -274,3 +267,13 @@ func test_a_pressed_action_uses_its_slot() -> void:
 		await get_tree().process_frame
 	brain.release(&"secondary")
 	assert_eq(health.current, 60.0)
+
+
+## Targets nobody, or whoever it's told to.
+class FixedTargeting:
+	extends Targeting
+
+	var targets: Array[Node] = []
+
+	func find(_ctx: EffectContext) -> Array[Node]:
+		return targets

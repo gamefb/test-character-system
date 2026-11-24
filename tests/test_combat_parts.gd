@@ -1,7 +1,7 @@
 extends GutTest
 ## Hitscan, what shots pass through, ability cooldowns on game time, and teams as Godot groups.
 
-const EX := "res://character_system/examples/"
+const EX := "res://character_system/starter_pack/"
 
 
 func make_character(position := Vector3.ZERO, extra: Array[Node] = []) -> CharacterBody3D:
@@ -16,14 +16,15 @@ func make_character(position := Vector3.ZERO, extra: Array[Node] = []) -> Charac
 	hand.position = Vector3(0, 1, -0.8)
 	var gear := Equipment.new()
 	gear.sockets = { &"weapon": ^"../Hand" }
-	for node in [shape, hand, ComponentManager.new(), Health.new(), Brain.new(), gear] + extra:
+	for node in [shape, hand, ComponentManager.new(), Health.new(), Statuses.new(), Brain.new(),
+			gear] + extra:
 		body.add_child(node)
 	add_child_autofree(body)
 	return body
 
 
 func pull_trigger(who: Node) -> void:
-	var brain := Component.of(who, Brain) as Brain
+	var brain := Brain.find_on(who)
 	brain.press(&"primary")
 	# A press counts from the next frame; process_frame comes just before nodes run.
 	for i in 3:
@@ -36,12 +37,12 @@ func test_hitscan_hits_the_target_and_not_its_wielder() -> void:
 	# Behind the shooter: the shot crosses its own body.
 	var target: CharacterBody3D = make_character(Vector3(0, 0, 6))
 	var rifle: ItemData = load(EX + "items/rifle.tres")
-	(Component.of(shooter, Equipment) as Equipment).equip(ItemInstance.new(rifle))
-	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP
+	Equipment.find_on(shooter).equip(ItemInstance.new(rifle))
+	Brain.find_on(shooter).aim_point = target.global_position + Vector3.UP
 	await get_tree().physics_frame
 	await pull_trigger(shooter)
-	assert_eq((Component.of(target, Health) as Health).current, 90.0)
-	assert_eq((Component.of(shooter, Health) as Health).current, 100.0, "its own body is skipped")
+	assert_eq(Health.find_on(target).current, 90.0)
+	assert_eq(Health.find_on(shooter).current, 100.0, "its own body is skipped")
 
 
 func trigger_volume(position: Vector3) -> Area3D:
@@ -66,21 +67,21 @@ func test_shots_pass_through_plain_areas_and_the_dead() -> void:
 	(head.get_child(0) as CollisionShape3D).shape = SphereShape3D.new()
 	corpse.add_child(head)
 	head.position = Vector3(0, 1, 1)  # In front of the corpse, on the line of fire.
-	(Component.of(corpse, Health) as Health).change(-1000.0)
+	Health.find_on(corpse).change(-1000.0)
 	# The target has a detection range around it that isn't a hurtbox.
 	target.add_child(trigger_volume(Vector3.ZERO).duplicate())
 	var rifle: ItemData = load(EX + "items/rifle.tres")
-	(Component.of(shooter, Equipment) as Equipment).equip(ItemInstance.new(rifle))
-	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP
+	Equipment.find_on(shooter).equip(ItemInstance.new(rifle))
+	Brain.find_on(shooter).aim_point = target.global_position + Vector3.UP
 	await get_tree().physics_frame
 	await pull_trigger(shooter)
-	assert_eq((Component.of(target, Health) as Health).current, 90.0,
+	assert_eq(Health.find_on(target).current, 90.0,
 			"through the area, the dead body, its hurtbox and the target's own area")
-	(Component.of(corpse, Health) as Health).revive()
+	Health.find_on(corpse).revive()
 	await get_tree().create_timer(0.3).timeout  # The rifle's cooldown.
 	await pull_trigger(shooter)
-	assert_eq((Component.of(corpse, Health) as Health).current, 90.0, "the living stop shots")
-	assert_eq((Component.of(target, Health) as Health).current, 90.0)
+	assert_eq(Health.find_on(corpse).current, 90.0, "the living stop shots")
+	assert_eq(Health.find_on(target).current, 90.0)
 
 
 func test_projectiles_pass_through_plain_areas_and_the_dead() -> void:
@@ -88,7 +89,7 @@ func test_projectiles_pass_through_plain_areas_and_the_dead() -> void:
 	var target: CharacterBody3D = make_character(Vector3(0, 0, -12))
 	trigger_volume(Vector3(0, 1, -4))
 	var corpse: CharacterBody3D = make_character(Vector3(0, 0, -8))
-	(Component.of(corpse, Health) as Health).change(-1000.0)
+	Health.find_on(corpse).change(-1000.0)
 	await get_tree().physics_frame
 	var hit := DamageEffect.new()
 	hit.amount = 15.0
@@ -97,17 +98,52 @@ func test_projectiles_pass_through_plain_areas_and_the_dead() -> void:
 	Projectile.launch(scene, shooter, Vector3(0, 1, -1), Vector3(0, 1, -12), [hit])
 	for i in 40:
 		await get_tree().physics_frame
-	assert_eq((Component.of(target, Health) as Health).current, 85.0)
+	assert_eq(Health.find_on(target).current, 85.0)
+
+
+func test_a_weapons_projectile_leaves_from_the_weapon() -> void:
+	var shooter: CharacterBody3D = make_character()
+	var slow := Projectile.new()
+	slow.speed = 0.01
+	var shot := PackedScene.new()
+	shot.pack(slow)
+	slow.free()
+	var loose := LaunchProjectileEffect.new()
+	loose.projectile = shot
+	var string := Trigger.new()
+	string.user_effects = [loose]
+	var root := Node3D.new()
+	for node: Node in [ComponentManager.new(), string]:
+		root.add_child(node)
+		node.owner = root
+	var bow := ItemData.new()
+	bow.slot = &"weapon"
+	bow.scene = PackedScene.new()
+	bow.scene.pack(root)
+	root.free()
+	Equipment.find_on(shooter).equip(ItemInstance.new(bow))
+	Brain.find_on(shooter).aim_point = Vector3(0, 1, -50)
+	var launched: Array[Projectile] = []
+	get_tree().node_added.connect(func(node: Node) -> void:
+		if node is Projectile:
+			launched.append(node))
+	await get_tree().physics_frame
+	await pull_trigger(shooter)
+	await get_tree().physics_frame
+	assert_eq(launched.size(), 1)
+	assert_almost_eq(launched[0].global_position, Vector3(0, 1, -0.8), Vector3.ONE * 0.05,
+			"at the hand that holds the weapon, not at the chest")
+	launched[0].queue_free()
 
 
 func test_hits_say_which_item_dealt_them() -> void:
 	var shooter: CharacterBody3D = make_character()
 	var target: CharacterBody3D = make_character(Vector3(0, 0, 6))
-	var health := Component.of(target, Health) as Health
-	health.max_health = 10.0  # One shot kills.
+	var health := Health.find_on(target)
+	health.max_value = 10.0  # One shot kills.
 	var rifle: ItemData = load(EX + "items/rifle.tres")
-	(Component.of(shooter, Equipment) as Equipment).equip(ItemInstance.new(rifle))
-	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP
+	Equipment.find_on(shooter).equip(ItemInstance.new(rifle))
+	Brain.find_on(shooter).aim_point = target.global_position + Vector3.UP
 	watch_signals(health)
 	await get_tree().physics_frame
 	await pull_trigger(shooter)
@@ -117,7 +153,7 @@ func test_hits_say_which_item_dealt_them() -> void:
 
 func test_cooldown_blocks_reuse() -> void:
 	var who: CharacterBody3D = make_character(Vector3.ZERO, [Abilities.new()])
-	var abilities := Component.of(who, Abilities) as Abilities
+	var abilities := Abilities.find_on(who)
 	var heal: AbilityData = load(EX + "abilities/second_wind.tres")
 	assert_true(abilities.use(heal))
 	assert_false(abilities.use(heal))
@@ -126,7 +162,7 @@ func test_cooldown_blocks_reuse() -> void:
 
 func test_cooldown_waits_while_paused() -> void:
 	var who: CharacterBody3D = make_character(Vector3.ZERO, [Abilities.new()])
-	var abilities := Component.of(who, Abilities) as Abilities
+	var abilities := Abilities.find_on(who)
 	var heal: AbilityData = load(EX + "abilities/second_wind.tres")
 	abilities.use(heal)
 	var before: float = abilities.cooldown_left(heal)
@@ -153,7 +189,7 @@ func test_teams_are_groups() -> void:
 	# Anything in the group counts, Faction or not.
 	crate.add_to_group(&"enemy")
 	add_child_autofree(crate)
-	var f := Component.of(player, Faction) as Faction
+	var f := Faction.find_on(player)
 	assert_true(grunt.is_in_group(&"enemy"))
 	assert_true(f.is_hostile(grunt))
 	assert_false(f.is_hostile(player))
@@ -164,7 +200,7 @@ func test_teams_are_groups() -> void:
 
 func test_changing_team_changes_group() -> void:
 	var grunt: CharacterBody3D = make_character(Vector3.ZERO, [faction(&"enemy", [&"player"])])
-	var f := Component.of(grunt, Faction) as Faction
+	var f := Faction.find_on(grunt)
 	f.team = &"player"  # Charmed.
 	assert_false(grunt.is_in_group(&"enemy"))
 	assert_true(grunt.is_in_group(&"player"))

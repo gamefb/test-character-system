@@ -8,7 +8,7 @@
 DamageEffect
 ============
 
-**Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`AmountEffect<class_AmountEffect>` **<** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Deals damage, scaled by magnitude and reduced by the target's resistance to its type.
 
@@ -17,7 +17,7 @@ Deals damage, scaled by magnitude and reduced by the target's resistance to its 
 Description
 -----------
 
-The number starts as :ref:`amount<class_DamageEffect_property_amount>` plus everything in :ref:`scaling<class_DamageEffect_property_scaling>`, times :ref:`EffectContext.magnitude<class_EffectContext_property_magnitude>`. Then, in a fixed order: 
+The number starts as :ref:`AmountEffect.total()<class_AmountEffect_method_total>`: :ref:`AmountEffect.amount<class_AmountEffect_property_amount>` plus everything in :ref:`AmountEffect.scaling<class_AmountEffect_property_scaling>`, times :ref:`EffectContext.magnitude<class_EffectContext_property_magnitude>`. Then, in a fixed order: 
 
 1. The source's ``bonus_<type>`` stat is added as a percentage, e.g. ``bonus_fire`` 0.2 for 20% more fire damage. 
 
@@ -31,7 +31,7 @@ The number starts as :ref:`amount<class_DamageEffect_property_amount>` plus ever
 
 6. :ref:`Health<class_Health>` loses what's left, and the source hears ``dealt_damage`` and the target ``took_damage``. A killing blow also sends ``died`` to the target and ``killed`` to the source. 
 
-Steps 2 and 3 don't depend on the order statuses were applied in. A target that is already dead is left alone: no damage and no events.
+Steps 2 and 3 don't depend on the order statuses were applied in. A target with no health left, or with a status that blocks ``damage``, is left alone: no damage and no events.
 
 .. rst-class:: classref-reftable-group
 
@@ -41,15 +41,11 @@ Properties
 .. table::
    :widths: auto
 
-   +------------------------------------------------------------------+-----------------------------------------------------+-----------------+
-   | :ref:`float<class_float>`                                        | :ref:`amount<class_DamageEffect_property_amount>`   | ``10.0``        |
-   +------------------------------------------------------------------+-----------------------------------------------------+-----------------+
-   | :ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\]         | :ref:`scaling<class_DamageEffect_property_scaling>` | ``[]``          |
-   +------------------------------------------------------------------+-----------------------------------------------------+-----------------+
-   | :ref:`StringName<class_StringName>`                              | :ref:`type<class_DamageEffect_property_type>`       | ``&"physical"`` |
-   +------------------------------------------------------------------+-----------------------------------------------------+-----------------+
-   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`tags<class_DamageEffect_property_tags>`       | ``[]``          |
-   +------------------------------------------------------------------+-----------------------------------------------------+-----------------+
+   +------------------------------------------------------------------+-----------------------------------------------+-----------------+
+   | :ref:`StringName<class_StringName>`                              | :ref:`type<class_DamageEffect_property_type>` | ``&"physical"`` |
+   +------------------------------------------------------------------+-----------------------------------------------+-----------------+
+   | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`tags<class_DamageEffect_property_tags>` | ``[]``          |
+   +------------------------------------------------------------------+-----------------------------------------------+-----------------+
 
 .. rst-class:: classref-section-separator
 
@@ -59,30 +55,6 @@ Properties
 
 Property Descriptions
 ---------------------
-
-.. _class_DamageEffect_property_amount:
-
-.. rst-class:: classref-property
-
-:ref:`float<class_float>` **amount** = ``10.0`` :ref:`🔗<class_DamageEffect_property_amount>`
-
-Damage before scaling, magnitude and resistance.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_DamageEffect_property_scaling:
-
-.. rst-class:: classref-property
-
-:ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] **scaling** = ``[]`` :ref:`🔗<class_DamageEffect_property_scaling>`
-
-Added to :ref:`amount<class_DamageEffect_property_amount>` each time it runs, e.g. a :ref:`StatAmount<class_StatAmount>` for 2 per point of the user's strength, or a :ref:`HealthAmount<class_HealthAmount>` for 5% of the target's health.
-
-.. rst-class:: classref-item-separator
-
-----
 
 .. _class_DamageEffect_property_type:
 

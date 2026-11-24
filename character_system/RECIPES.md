@@ -1,10 +1,13 @@
 # Recipes
 
 Short answers to "how do I…". Every resource named here has a working copy in
-`character_system/examples/`: duplicate it (right-click > Duplicate) and change the copy.
+`character_system/starter_pack/`: duplicate it (right-click > Duplicate) and change the copy.
 For any class, press **F1** in Godot and search its name for the full reference. New to the
 system? The Quick start page of the documentation builds a whole level, step by step. To
 try everything here in play, open `test_level/test_level.tscn` and press F6.
+
+A field that holds a name (a stat, a pool, an event, a tag, something to block) opens a list
+of the names the project already has. Pick one, or type a new one.
 
 ## Characters
 
@@ -24,7 +27,7 @@ try everything here in play, open `test_level/test_level.tscn` and press F6.
 5. Fix any yellow warning triangles in the Scene dock. They name what's missing.
 
 A component without what it needs waits instead of crashing, and starts once it's added.
-`examples/characters/mage.tscn` is a small character to look at: health, stats of her own, a
+`starter_pack/characters/mage.tscn` is a small character to look at: health, stats of her own, a
 mana pool, a shield and a Fireball.
 
 ### Give a character its own stats
@@ -56,28 +59,61 @@ that starts. A character can have several pools.
   the character has gone 3 seconds without being hit.
 - **Rage that builds up:** turn **Starts Full** off and give `Regen` a negative number, so it
   fades.
+- **Something happens when it runs out:** set **Status While Empty**. The character has that
+  status for as long as the pool is empty: an Exhausted status that blocks `movement` on a
+  stamina pool, say. Death works this way.
+- **Sprint on stamina:** a Pool called `stamina`, and the example **Sprint** component
+  (`starter_pack/scripts/sprint.gd`) beside it, which spends from the pool while a button is
+  held.
 
-### Stun, silence or disarm a character
+**Health is a pool too**, named `health`. So `max_health` and `health_regen` are stats, an
+ability can cost health, and a bar that shows a pool shows health. Its settings are on the
+**Health** component: **Max Value**, **Regen**, **Resistances** and **Death Status**.
 
-Each is a status with a tag, and no code:
+### Stun, silence, root or disarm a character
+
+Each is a status that lists what it stops in **Blocks**, and no code. Everything that can be
+stopped answers to a name, and a status that lists the name stops it:
+
+| Want | Put in the status's Blocks | Example |
+| --- | --- | --- |
+| Stun: can't move, shoot or cast | `everything` (the Brain answers to it) | `statuses/stunned.tres` |
+| Root: can't walk, jump or dash | `movement` (the CharacterMotor) | `statuses/rooted.tres` |
+| Disarm: can't fire or swing | `weapons` (every Trigger) | |
+| Daze: no abilities at all | `abilities` (every ability) | |
+| Silence: no spells, other abilities still work | `spells` | `statuses/silenced.tres` |
+| Invulnerable | `damage` | |
+| Can't be healed | `healing` | |
+| Hidden: shots pass through, AI and area abilities leave it alone | `targeting` | |
+
+`spells` is a name of your own. Add it to **Blocked By** on the abilities that count as
+spells, as `abilities/fireball.tres` does, and any status that blocks `spells` stops them.
+The same works for one weapon (**Trigger > Blocked By**) or one move (a dash's **Blocked
+By**). From code, `ComponentManager.of(player).block(&"everything")` does what a status
+does, for a cutscene, until `unblock()`.
+
+### Decide what death does
+
+Death is a status too. A **Health** component gives the character its **Death Status** at
+zero health and takes it back on `Health.revive()`. The default, `core/statuses/dead.tres`,
+blocks `everything`, `healing` and `targeting` and ends timed statuses, so the dead can't
+act or be healed, and shots pass through them.
 
 | Want | Do |
 | --- | --- |
-| Stun: can't move, shoot or cast | Give the status the tag `stunned`. The brain stops on it. See `statuses/stunned.tres`. |
-| Stop on other tags too (frozen, asleep) | Add them to the brain's **Blocked By Tags** |
-| Silence: can't cast | Give the status a tag such as `silenced`, and add it to each ability's **Blocked By Tags**. See `statuses/silenced.tres`. |
-| Disarm: can't fire | The same, on the weapon's **Trigger > Blocked By Tags** |
-| Root: can't move | See "Stop movement with a status" |
+| A boss that keeps fighting at zero for a last phase | Give it a Death Status of your own that blocks less |
+| "Downed": crawling, can be revived by an ally | A status that blocks `weapons` and `abilities` and slows `move_speed`; the ally's ability calls `revive()` |
+| A corpse that still blocks shots | Copy Dead without `targeting` in its Blocks |
+| Nothing ever dies | Clear **Death Status**. Health then simply stops at zero; the `died` event is still sent |
 
-A dead character can't act either, until `Health.revive()`. Turn on the brain's **Acts While
-Dead** for something that should carry on.
+The character needs a **Statuses** component for any of this.
 
 ### Make an enemy that attacks
 
 1. Make a character with an **AIBrain** as its brain and a **NavigationAgent3D**, a
    **CharacterMotor** (with a WalkMode and an AirMode under it), a **Faction** and the example
    **AttackNearest**
-   (`examples/scripts/attack_nearest.gd`) beside it.
+   (`starter_pack/scripts/attack_nearest.gd`) beside it.
 2. Set its **Faction > Team** to `enemy` and **Hostile To** to `player`. Give the player a
    Faction with the team `player`.
 3. Give it a weapon as for a player: a **Node3D** named Hand in front of it, **Equipment >
@@ -95,20 +131,20 @@ The **AirMode** under the `CharacterMotor` already double jumps: pressing jump i
 again, and taking off refills it. `Air Jumps` sets how many (2 for a triple jump, 0 for none).
 
 To grant it with an item or a status instead, set `Air Jumps` to 0 and give the status a
-`StatModifier` on `air_jumps` with add 1. A rooted status can take it away with mul 0.
+`StatModifier` on `air_jumps` with add 1.
 
 ### Add a dash
 
 Add a **DashMove** as a child of the `CharacterMotor`, and a `dash` action to the Input Map and
 to **PlayerBrain > Extra Actions**. `Speed`, `Duration` and `Cooldown` are in the Inspector.
-A stunned character can't start one. To stop it while rooted, or to cut a dash short when a
-stun lands, add those tags to its **Blocked By Tags**: see "Stop movement with a status".
+A stunned or rooted character can't start one, and a dash in progress ends when the status
+lands: see "Stop movement with a status".
 
 ### Add a new way to move
 
 Gliding, wall slides, swimming and climbing go under the `CharacterMotor` as a movement mode
 (a new way of moving that takes over) or a layered move (extra movement on top, for a while).
-Copy `examples/scripts/wall_slide_mode.gd` or `examples/scripts/glide_move.gd`, and add your
+Copy `starter_pack/scripts/wall_slide_mode.gd` or `starter_pack/scripts/glide_move.gd`, and add your
 copy as a child of the motor. "Write your own movement mode or move" below explains how to
 write one from scratch.
 
@@ -135,7 +171,7 @@ New Resource > **StatusData**. The fields you'll use most:
 Give it at least one tag, such as `fire`. Tags are how immunities and conditions find it.
 Examples: `statuses/burning.tres`, `poisoned.tres`, `haste.tres`, `thorns.tres`.
 
-From code: `(Component.of(enemy, Statuses) as Statuses).add(burning, player)`, where
+From code: `Statuses.find_on(enemy).add(burning, player)`, where
 `burning` is the loaded StatusData and `player` caused it.
 
 ### Make something immune
@@ -190,14 +226,15 @@ list. Everything in the list is added to the amount each time the effect runs:
 | --- | --- |
 | 10 + 2 per point of the user's strength | **StatAmount**: stat `strength`, of SOURCE, per point 2 |
 | Damage by level, on a curve | **StatAmount**: stat `level`, with a **Curve** from level 1 to the top level |
-| 5% of the target's maximum health | **HealthAmount**: of TARGET, part MAXIMUM, fraction 0.05 |
-| Heal 30% of missing health | **HealthAmount**: of TARGET, part MISSING, fraction 0.3 |
+| 5% of the target's maximum health | **PoolAmount**: of TARGET, part MAXIMUM, fraction 0.05 |
+| Heal 30% of missing health | **PoolAmount**: of TARGET, part MISSING, fraction 0.3 |
+| More the less mana the caster has | **PoolAmount**: of SOURCE, pool `mana`, part MISSING |
 | 0 to 6 extra, at random | **RandomAmount**: low 0, high 6 |
 | A share of the hit that set off a trigger | **HitAmount**: see the next recipe |
 
 The stat can be one a component owns (`max_health`) or one you listed in the
 manager's Stats. A status tick's source is whoever applied the status, so a mage's burns grow with
-the mage's `spell_power`. `examples/projectiles/fireball.tscn` uses one, and
+the mage's `spell_power`. `starter_pack/projectiles/fireball.tscn` uses one, and
 `statuses/bleeding.tres` takes 2% of the victim's maximum health each second.
 
 ### Make a status that reacts to hits, kills and heals
@@ -219,15 +256,15 @@ they hit the holder; with it on, the other side.
 ### Stop movement with a status
 
 Slowing goes through stats: a StatModifier on `move_speed`, `jump_velocity` or `air_jumps`, as
-in `statuses/wet.tres`. To stop a mode or move outright, give the status a tag, e.g. `rooted`,
-and add that tag to the **Blocked By Tags** of each mode and move under the `CharacterMotor`
-it should stop. A blocked move ends at once; a blocked mode hands back to the start mode
-(WalkMode). `statuses/rooted.tres` does both for the tag `rooted`: it zeroes speed and jumps,
-and stops anything with `rooted` in its Blocked By Tags.
+in `statuses/wet.tres`. To stop movement outright, put `movement` in the status's **Blocks**,
+as `statuses/rooted.tres` does: the character can't steer, jump or start a move, and a move
+in progress ends, but it still falls and can still be knocked back. To stop one mode or move
+only, give that node a name of its own in its **Blocked By**, e.g. `flight` on a glide, and
+block that name instead. A blocked mode hands back to the start mode.
 
 ### Make a zone
 
-Instance one of `examples/zones/`, or build one: an **EffectZone** (Area3D) with a
+Instance one of `starter_pack/zones/`, or build one: an **EffectZone** (Area3D) with a
 CollisionShape3D.
 
 - **While inside** (water, healing pad, ward circle): set `status_while_inside` to a
@@ -289,7 +326,7 @@ var bonus := StatModifier.new()
 bonus.stat = &"max_health"
 bonus.add = randf_range(5.0, 25.0)
 ring.state[&"modifiers"] = [bonus]
-(Component.of(player, Inventory) as Inventory).add_instance(ring)
+Inventory.find_on(player).add_instance(ring)
 ```
 
 Grant a status instead (the next recipe) when the bonus should show on a status bar, grant
@@ -336,7 +373,7 @@ See `items/rifle.tres`. More to set in the Inspector:
   **Multiplier** 2.
 - **What a shot stops at:** the first body or Hurtbox on the layers in the Hitscan's
   **Collision Mask**. It passes through other areas, such as trigger volumes, and through
-  dead characters.
+  characters with a status that blocks `targeting`, such as the dead.
 - **Something for the shooter on each shot**, such as a status that slows them while
   firing: the Trigger's **User Effects**.
 
@@ -356,8 +393,9 @@ and each copy of a weapon remembers how many rounds are in it. See `items/rifle_
    **LaunchProjectileEffect**: set its **Projectile** to that scene and put the direct hit's
    DamageEffect in its **Effects**.
 
-A projectile never hits whoever launched it directly, but its blast reaches everyone in
-range. Put an IsHostileCondition on the blast's DamageEffect to spare the shooter and allies.
+The projectile leaves from the weapon, toward what the wielder is aiming at. It never hits
+whoever launched it directly, but its blast reaches everyone in range. Put an
+IsHostileCondition on the blast's DamageEffect to spare the shooter and allies.
 See `items/rocket_launcher.tres` and `projectiles/rocket.tscn`.
 
 ### Make a melee weapon
@@ -382,7 +420,7 @@ New Resource > **ItemData**: leave `slot` empty, set `max_stack`, and put what i
 (`items/mana_potion.tres`), or an ApplyStatusEffect for an elixir. Then:
 
 ```gdscript
-(Component.of(player, Inventory) as Inventory).use(potion_data)  # False if none is left.
+Inventory.find_on(player).use(potion_data)  # False if none is left.
 ```
 
 One is taken from the stack on each use, unless **Consumed On Use** is off.
@@ -399,7 +437,7 @@ Effects**. `Inventory.use()` then throws one where the character is aiming. See
 
 When no built-in component does it, write one: a script that extends **ItemComponent**, added
 to the item's scene like the others. It has `wielder`, `item` and the wielder's `brain`, and
-runs only while the item is equipped. `examples/scripts/scope.gd` is one: while the secondary
+runs only while the item is equipped. `starter_pack/scripts/scope.gd` is one: while the secondary
 button is held it narrows the camera and slows the wielder. `items/marksman_rifle.tres` uses
 it. "Write your own effect, condition or component" below has the pattern.
 
@@ -410,7 +448,7 @@ Add a **WeaponSwitch** to the character (it needs a brain, Inventory and Equipme
 Inventory; the first one is drawn, the rest wait. From code:
 
 ```gdscript
-var switch := Component.of(player, WeaponSwitch) as WeaponSwitch
+var switch := WeaponSwitch.find_on(player)
 switch.cycle(1)  # Next weapon; -1 = previous.
 switch.select(0)  # The first weapon picked up.
 switch.holster()  # Put it away.
@@ -419,10 +457,10 @@ switch.holster()  # Put it away.
 ### Pick up, wear and drop items
 
 ```gdscript
-var bag := Component.of(player, Inventory) as Inventory
+var bag := Inventory.find_on(player)
 bag.add(ammo_data, 30)  # Fills existing stacks first.
 bag.add_instance(dropped_rifle)  # Keeps that copy's rounds.
-var gear := Component.of(player, Equipment) as Equipment
+var gear := Equipment.find_on(player)
 gear.equip(bag.first(ring_data))  # Put on something from the bag.
 gear.unequip(&"ring")  # Take it off; it stays in the bag.
 bag.remove_instance(bag.first(rifle_data))  # Drops it; it's unequipped automatically.
@@ -453,14 +491,15 @@ Everything else on an AbilityData is optional, and none of it needs code:
 | A wind-up | **Cast Time**. Nothing is spent until it ends. |
 | Slowed or rooted while casting | **Status While Casting**: a status with duration 0 |
 | Damage interrupts the cast | **Interrupted By Damage** |
-| Silence stops it | **Blocked By Tags**: `silenced` |
-| Only when badly hurt | **Conditions**: a HealthBelowCondition |
+| Silence stops it | Add `spells` to **Blocked By**; the Silenced status blocks `spells` |
+| A health cost | **Costs**: `health` and the amount. Health is a pool like any other. |
+| Only when badly hurt | **Conditions**: a PoolBelowCondition (the pool is `health` by default) |
 | Only with someone in range | **Needs Target**, with a Targeting set |
 | Something for the caster too | **User Effects**, e.g. the heal half of a life drain |
 | Faster cooldowns from gear | A StatModifier on `cooldown_speed`, percent 0.2 |
 
-`abilities/fireball.tres` costs 20 mana, takes half a second to cast and is stopped by
-`silenced`.
+`abilities/fireball.tres` costs 20 mana, takes half a second to cast and is stopped by a
+status that blocks `spells`, such as Silenced.
 
 ### Make an ability that throws a projectile
 
@@ -473,7 +512,7 @@ that scene. It flies from the user toward where they're aiming. See
 
 ```gdscript
 func _ready() -> void:
-	(Component.of(player, Abilities) as Abilities).failed.connect(_on_ability_failed)
+	Abilities.find_on(player).failed.connect(_on_ability_failed)
 
 func _on_ability_failed(_ability: AbilityData, reason: StringName) -> void:
 	match reason:
@@ -584,32 +623,40 @@ The connection ends by itself when the listening node is freed.
 ### Write your own effect, condition or component
 
 The Extending the system page of the documentation has a complete, tested example of each,
-also in `examples/scripts/`. In short:
+also in `starter_pack/scripts/`. In short:
 
 - **Effect:** extend `Effect` and override `_execute(ctx)`. The target may have none of the
-  components you need, so check for null.
+  components you need, so check for null. If it has a number, extend `AmountEffect` instead:
+  it brings the **Amount** and **Scaling** fields, and `total(ctx)` adds them up.
 - **Condition:** extend `Condition` and override `_test(node) -> bool`, or `check(ctx)` to
   compare both sides, as `IsHostileCondition` does.
 - **Amount:** extend `Amount` and override `value(ctx) -> float`. It then fits in every
   Scaling list.
 - **Component:** extend `Component`. Do your setup in `_start()` (not `_ready()`), list what
   you need in `_requires()`, and numbers statuses may change in `_stats()`. Its
-  `_process()` only runs while it's running. See `examples/scripts/stamina.gd`.
+  `_process()` only runs while it's running. See `starter_pack/scripts/sprint.gd`.
 - **Item component:** extend `ItemComponent`. `wielder`, `item` and `brain` are ready in
   `_start()`, and anything it changes on the wielder must be undone in `_stop()`. See
-  `examples/scripts/scope.gd`.
+  `starter_pack/scripts/scope.gd`.
+- **A new way for a weapon to hit** (a cone, a beam, chain lightning): extend
+  `WeaponDelivery` and write `_fire()`. The trigger, the **Effects** list and
+  `context_for(what_was_hit)` come with it. See `character/items/melee_sweep.gd`.
+
+Name a field `stat`, `pool`, `event`, `tag`, `tags`, `blocks` or `blocked_by`, start the
+script with `@tool`, and the Inspector offers the project's names for it, like the built-in
+fields. To reach your component from other scripts, `Component.of(node, MyType) as MyType`
+works for any type; the built-in ones have a shortcut, such as `Health.find_on(node)`.
 
 A complete effect, which moves mana from the target to whoever caused it:
 
 ```gdscript
 # With a class_name, it appears in the effect list in the Inspector.
+@tool  # So the Inspector lists the project's pools for the field below.
 class_name SiphonEffect
-extends Effect
+extends AmountEffect  # Brings Amount and Scaling: the most taken each time.
 
 ## The pool to take from and give to, e.g. &"mana".
 @export var pool: StringName = &"mana"
-## The most taken each time.
-@export var amount: float = 10.0
 
 
 # It works wherever effects do: a weapon's hit, an ability, a status tick.
@@ -617,7 +664,7 @@ func _execute(ctx: EffectContext) -> void:
 	var theirs := Pool.named(ctx.target, pool)
 	if not theirs:  # The target may have no such pool, or be a wall.
 		return
-	var taken: float = minf(theirs.current, amount * ctx.magnitude)
+	var taken: float = minf(theirs.current, total(ctx))
 	theirs.change(-taken)
 	var mine := Pool.named(ctx.source, pool)
 	if mine:
@@ -645,7 +692,7 @@ The parts to override:
 | `_enter()`, `_exit()` | Both | Setup and cleanup when it takes over or starts, and when it hands over or ends. Use these, not `_ready()`. |
 | `_stats()` | Both | Numbers statuses may change, as in a component. Read them with `stat()`. |
 | `cooldown` (Inspector) | Move | Time from one start to the next. While it counts down, `_can_start()` isn't asked, so the press is left for something else. |
-| `blocked_by_tags` (Inspector) | Both | Status tags that stop it, e.g. `rooted`. See "Stop movement with a status". |
+| `blocked_by` (Inspector) | Both | Names of its own that a status can block. See "Stop movement with a status". |
 
 Inside, `body` is the character, `motor.brain` gives `move_dir` and held buttons, and
 `motor.consume_action(&"jump")` uses up a press so nothing else acts on it. A move sets
@@ -685,13 +732,13 @@ func _get_next_mode() -> MovementMode:
 Add it as a child of the `CharacterMotor`, beside the WalkMode and AirMode, and add a `fly`
 action to the Input Map and to **PlayerBrain > Extra Actions**. Nothing else changes: the
 walk and air modes keep working, and the motor hands over to `FlyMode` when it asks. For a
-layered move, see `examples/scripts/glide_move.gd`.
+layered move, see `starter_pack/scripts/glide_move.gd`.
 
 ## Show it on screen
 
 ### Show health, statuses, ammo and cooldowns
 
-`examples/scripts/character_hud.gd` (**CharacterHud**) does all four. Attach it to a Control,
+`starter_pack/scripts/character_hud.gd` (**CharacterHud**) does all four. Attach it to a Control,
 add a ProgressBar named HealthBar and Labels named Statuses, Ammo and Cooldown under it, and set
 **Character** to the player and **Ability** to one of its abilities. To build your own, read
 these:
@@ -703,12 +750,11 @@ these:
 | Ammo | `Component.of(gear.node_in(&"weapon"), Magazine)`, then its `rounds` and `capacity` |
 | Cooldown | `Abilities.cooldown_left(ability)`, and `charges_left(ability)` for one with charges |
 | Cast bar | `Abilities.cast_started` and `used`, then `cast_progress()` every frame |
-| Mana, stamina, shield | `Pool.named(player, &"mana")`, then its `changed(current, maximum)` |
+| Health, mana, stamina, shield | `Pool.named(player, &"mana")`, then its `changed(current, maximum)`. Health is the pool named `health`. |
 | Damage numbers | Subscribe to `took_damage` (see "React to an event"): `ctx.amount`, `ctx.hit_position()`, and `ctx.has_tag(&"crit")` to colour it |
 | Why a stat has its value | `manager.base_of(&"move_speed")` and `manager.modifiers_of(&"move_speed")`: each modifier and the status or item behind it |
 | Dash cooldown | `cooldown_left()` on the DashMove, or any layered move |
 | Air jumps left | `jumps_left` on the AirMode |
-| Stamina | the example Stamina's `changed(current, maximum)` |
 
 ## Find out what's going on
 

@@ -47,7 +47,7 @@ func heal(amount: float) -> HealEffect:
 
 func test_gear_changes_stats_while_equipped() -> void:
 	var who: Node3D = make_character()
-	var gear := Component.of(who, Equipment) as Equipment
+	var gear := Equipment.find_on(who)
 	var vigor := Grants.new()
 	vigor.modifiers = [modifier(&"max_health", 25.0)]
 	var ring: ItemData = item([vigor])
@@ -62,7 +62,7 @@ func test_gear_changes_stats_while_equipped() -> void:
 
 func test_each_copy_can_carry_its_own_rolls() -> void:
 	var who: Node3D = make_character()
-	var gear := Component.of(who, Equipment) as Equipment
+	var gear := Equipment.find_on(who)
 	var ring: ItemData = item([Grants.new()])
 	var lucky := ItemInstance.new(ring)
 	lucky.state[&"modifiers"] = [modifier(&"max_health", 40.0)]
@@ -76,8 +76,8 @@ func test_each_copy_can_carry_its_own_rolls() -> void:
 
 func test_gear_grants_abilities_while_equipped() -> void:
 	var who: Node3D = make_character([Abilities.new()])
-	var gear := Component.of(who, Equipment) as Equipment
-	var abilities := Component.of(who, Abilities) as Abilities
+	var gear := Equipment.find_on(who)
+	var abilities := Abilities.find_on(who)
 	var punch := AbilityData.new()
 	var fireball := AbilityData.new()
 	abilities.slots = { &"secondary": punch }
@@ -95,8 +95,8 @@ func test_gear_grants_abilities_while_equipped() -> void:
 
 func test_a_potion_is_used_up() -> void:
 	var who: Node3D = make_character()
-	var bag := Component.of(who, Inventory) as Inventory
-	var health := Component.of(who, Health) as Health
+	var bag := Inventory.find_on(who)
+	var health := Health.find_on(who)
 	var potion := ItemData.new()
 	potion.max_stack = 5
 	potion.use_effects = [heal(30.0)]
@@ -114,7 +114,7 @@ func test_a_potion_is_used_up() -> void:
 
 func test_some_items_are_not_used_up_and_some_cannot_be_used() -> void:
 	var who: Node3D = make_character()
-	var bag := Component.of(who, Inventory) as Inventory
+	var bag := Inventory.find_on(who)
 	var horn := ItemData.new()
 	horn.use_effects = [heal(1.0)]
 	horn.consumed_on_use = false

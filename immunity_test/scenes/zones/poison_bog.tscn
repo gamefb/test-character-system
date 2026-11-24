@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3]
 
-[ext_resource type="Script" path="res://character_system/kit/world/effect_zone.gd" id="1_vwqls"]
+[ext_resource type="Script" path="res://character_system/character/world/effect_zone.gd" id="1_vwqls"]
 [ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="2_yxpfp"]
 [ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="3_ryt2f"]
 [ext_resource type="Script" path="res://character_system/core/effects/apply_status_effect.gd" id="4_jqjy7"]

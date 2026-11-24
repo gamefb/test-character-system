@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="PackedScene" path="res://character_system/starter_pack/items/scenes/ring_of_vigor.tscn" id="1_8tekc"]
+[ext_resource type="Script" path="res://character_system/character/items/item_data.gd" id="2_ww7vd"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_cgokt"]
+
+[resource]
+script = ExtResource("2_ww7vd")
+id = &"ring_of_vigor"
+display_name = "Ring of vigor"
+description = "+25 max health while worn."
+slot = &"ring"
+scene = ExtResource("1_8tekc")

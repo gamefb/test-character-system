@@ -1,9 +1,9 @@
 [gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_fc4l1"]
-[ext_resource type="Script" path="res://character_system/kit/items/trigger.gd" id="2_6fns8"]
-[ext_resource type="Script" path="res://character_system/kit/items/magazine.gd" id="3_qr4m7"]
-[ext_resource type="Script" path="res://character_system/kit/items/hitscan.gd" id="4_5sta8"]
+[ext_resource type="Script" path="res://character_system/character/items/trigger.gd" id="2_6fns8"]
+[ext_resource type="Script" path="res://character_system/character/items/magazine.gd" id="3_qr4m7"]
+[ext_resource type="Script" path="res://character_system/character/items/hitscan.gd" id="4_5sta8"]
 [ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="5_o2hpl"]
 [ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="6_5hw43"]
 [ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="7_al0xl"]

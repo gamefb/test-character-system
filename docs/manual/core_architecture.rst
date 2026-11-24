@@ -29,7 +29,7 @@ A component that can't start shows a yellow warning in the editor and reports it
      - ``find_node_of_type(&"Camera3D")`` in ``_start()``
      - :ref:`PlayerBrain<class_PlayerBrain>` finds its camera when Camera is left empty
    * - A component on another node
-     - ``Component.of(node, Type)``
+     - ``Type.find_on(node)``, or ``Component.of(node, Type)`` for a type of your own
      - :ref:`DamageEffect<class_DamageEffect>` finds the target's :ref:`Health<class_Health>`
    * - React to another component's signal
      - ``listen(signal, method)`` in ``_start()``

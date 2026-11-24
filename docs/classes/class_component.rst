@@ -10,7 +10,7 @@ Component
 
 **Inherits:** :ref:`Node<class_Node>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`Abilities<class_Abilities>`, :ref:`AttackNearest<class_AttackNearest>`, :ref:`Brain<class_Brain>`, :ref:`CharacterMotor<class_CharacterMotor>`, :ref:`Equipment<class_Equipment>`, :ref:`Faction<class_Faction>`, :ref:`Health<class_Health>`, :ref:`Inventory<class_Inventory>`, :ref:`ItemComponent<class_ItemComponent>`, :ref:`MouseLook<class_MouseLook>`, :ref:`Pool<class_Pool>`, :ref:`Stamina<class_Stamina>`, :ref:`Statuses<class_Statuses>`, :ref:`WeaponSwitch<class_WeaponSwitch>`
+**Inherited By:** :ref:`Abilities<class_Abilities>`, :ref:`AttackNearest<class_AttackNearest>`, :ref:`Brain<class_Brain>`, :ref:`CharacterMotor<class_CharacterMotor>`, :ref:`Equipment<class_Equipment>`, :ref:`Faction<class_Faction>`, :ref:`Inventory<class_Inventory>`, :ref:`ItemComponent<class_ItemComponent>`, :ref:`MouseLook<class_MouseLook>`, :ref:`Pool<class_Pool>`, :ref:`Sprint<class_Sprint>`, :ref:`Statuses<class_Statuses>`, :ref:`WeaponSwitch<class_WeaponSwitch>`
 
 Base class for every component: a child node that adds one feature to its parent, the host.
 
@@ -45,15 +45,15 @@ The host also needs a :ref:`ComponentManager<class_ComponentManager>` child. Com
 
 If a component can't start, the editor shows a warning on it and the Output panel reports once what's missing. The rest of the host keeps working.
 
-\ **Using components from other code.** Get one with :ref:`of()<class_Component_method_of>`, read stats with :ref:`ComponentManager.stat_of()<class_ComponentManager_method_stat_of>` and send events with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>`. All three are safe on null or freed nodes and on nodes without components, such as walls.
+\ **Using components from other code.** Get one with its type's ``find_on()``, such as :ref:`Health.find_on()<class_Health_method_find_on>`, read stats with :ref:`ComponentManager.stat_of()<class_ComponentManager_method_stat_of>` and send events with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>`. All three are safe on null or freed nodes and on nodes without components, such as walls.
 
 ::
 
-    var health := Component.of(body, Health) as Health  # null if body has no Health.
+    var health := Health.find_on(body)  # null if body has no Health.
     if health:
         health.change(-10.0)
 
-\ **Writing your own.** Extend this class and override any of :ref:`_requires()<class_Component_private_method__requires>`, :ref:`_stats()<class_Component_private_method__stats>`, :ref:`_start()<class_Component_private_method__start>`, :ref:`_stop()<class_Component_private_method__stop>` and :ref:`_warnings()<class_Component_private_method__warnings>`. Do setup in :ref:`_start()<class_Component_private_method__start>`, not ``_ready()``: it runs once everything is in place, and never in the editor. This outline shows where each part goes; :ref:`Stamina<class_Stamina>` in ``examples/scripts/`` is a complete one to copy.
+\ **Writing your own.** Extend this class and override any of :ref:`_requires()<class_Component_private_method__requires>`, :ref:`_stats()<class_Component_private_method__stats>`, :ref:`_start()<class_Component_private_method__start>`, :ref:`_stop()<class_Component_private_method__stop>` and :ref:`_warnings()<class_Component_private_method__warnings>`. Do setup in :ref:`_start()<class_Component_private_method__start>`, not ``_ready()``: it runs once everything is in place, and never in the editor. This outline shows where each part goes; :ref:`Sprint<class_Sprint>` in ``starter_pack/scripts/`` is a complete one to copy.
 
 
 
@@ -216,11 +216,16 @@ Method Descriptions
 
 Returns the ``type`` component on ``node``, or null. Safe on null or freed nodes.
 
-Use it from any script: effects, level scripts, UI. Subclasses count, so asking for :ref:`Brain<class_Brain>` finds a :ref:`PlayerBrain<class_PlayerBrain>` or :ref:`AIBrain<class_AIBrain>`. Cast the result to use its members:
+Use it from any script: effects, level scripts, UI. Subclasses count, so asking for :ref:`Brain<class_Brain>` finds a :ref:`PlayerBrain<class_PlayerBrain>` or :ref:`AIBrain<class_AIBrain>`. The components a game looks up most have a typed shortcut, such as :ref:`Health.find_on()<class_Health_method_find_on>`. For a type of your own, cast the result, or give the type the same two lines:
 
 ::
 
-    var statuses := Component.of(enemy, Statuses) as Statuses
+    var statuses := Statuses.find_on(enemy)
+    var sprint := Component.of(enemy, Sprint) as Sprint
+
+    # In sprint.gd, so other scripts can write Sprint.find_on(enemy):
+    static func find_on(node: Variant) -> Sprint:
+        return Component.of(node, Sprint) as Sprint
 
 It works on a scene that hasn't been added to the level yet, e.g. to set a spawned enemy's :ref:`Faction.team<class_Faction_property_team>` before ``add_child()``.
 

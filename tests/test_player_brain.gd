@@ -73,7 +73,7 @@ func test_the_aim_point_is_what_the_crosshair_is_on() -> void:
 	brain.aim_mask = 0
 	await frames()
 	assert_almost_eq(brain.aim_point.z, -PlayerBrain.AIM_DISTANCE, 0.01, "a layer aimed through")
-	brain.aim_mask = 0xffffffff
+	brain.aim_mask = 0xffff_ffff
 	wall.queue_free()
 	var volume := Area3D.new()
 	volume.add_child(CollisionShape3D.new())

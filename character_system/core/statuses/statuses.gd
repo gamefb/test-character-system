@@ -14,7 +14,7 @@ extends Component
 ## [member StatusData.tick_interval]. Characters with nothing but passives cost nothing per frame.
 ##
 ## [codeblock]
-## var statuses := Component.of(enemy, Statuses) as Statuses
+## var statuses := Statuses.find_on(enemy)
 ## if not statuses.add(burning, player):
 ## 	print("Immune")  # Or connect to the refused signal.
 ## [/codeblock]
@@ -31,6 +31,11 @@ signal refused(data: StatusData, source: Node)
 ## Every status this character has right now, with its runtime state. Read it, but change it
 ## through [method add], [method remove] and [method drop_hold].
 var active: Dictionary[StatusData, ActiveStatus] = {}
+
+
+## The [Statuses] of [param node]'s character, or null if there is none. Safe on a freed node.
+static func find_on(node: Variant) -> Statuses:
+	return Component.of(node, Statuses) as Statuses
 
 
 static func _overlaps(a: Array[StringName], b: Array[StringName]) -> bool:
@@ -72,30 +77,9 @@ func _stop() -> void:
 	# but don't run on_remove, which is for a status that ends.
 	for data: StatusData in active.keys():
 		_set_stacks(data, active[data], 0)
+		data.blocks.map(manager.unblock)
 	active.clear()
 	changed.emit()
-
-
-# Every event on the host passes through here, to run the status triggers for it.
-func _on_event(event: StringName, ctx: EffectContext) -> void:
-	if active.is_empty():
-		return
-	if event == &"died":
-		for data: StatusData in active.keys():
-			if data.duration > 0.0:
-				# Timed statuses end on death. Passives stay for a revive.
-				remove(data)
-	if not ctx:
-		return
-	var other: Node = ctx.target if ctx.source == host else ctx.source
-	for data: StatusData in active.keys():
-		for t in data.triggers:
-			if (
-					t.event == event and active.has(data)
-					and (t.react_to_statuses or not ctx.from_status)
-			):
-				_run(t.effects, data, active[data], other if t.affects_other else host, ctx,
-						t.conditions)
 
 
 ## Applies a status, handling conditions, blocking, removal of opposing statuses,
@@ -108,8 +92,9 @@ func add(data: StatusData, source: Node = null) -> bool:
 		refused.emit(data, source)
 		return false
 	for other: StatusData in active.keys():
-		if _overlaps(other.tags, data.removes_tags):
-			remove(other)  # e.g. Wet puts out Burning.
+		if _overlaps(other.tags, data.removes_tags) or (data.removes_timed
+				and other.duration > 0.0 and other != data):
+			remove(other)  # e.g. Wet puts out Burning, and death ends what was ticking.
 
 	var s: ActiveStatus = active.get(data)
 	var is_new: bool = s == null
@@ -117,6 +102,7 @@ func add(data: StatusData, source: Node = null) -> bool:
 		s = ActiveStatus.new()
 		s.tick_in = data.tick_interval
 		active[data] = s
+		data.blocks.map(manager.block)
 		_update_processing()
 	if data.duration == 0.0:
 		s.holds += 1
@@ -139,6 +125,7 @@ func remove(data: StatusData) -> void:
 		return
 	_set_stacks(data, s, 0)
 	active.erase(data)
+	data.blocks.map(manager.unblock)
 	_update_processing()
 	_run(data.on_remove, data, s)
 	changed.emit()
@@ -183,15 +170,6 @@ func has_tag(tag: StringName) -> bool:
 	return false
 
 
-## True if [param node] has a status with any of [param tags]. Safe on anything: a node with
-## no [Statuses] has none. It's how movement, weapons and abilities are blocked by statuses.
-static func has_any_tag(node: Variant, tags: Array[StringName]) -> bool:
-	if tags.is_empty():
-		return false
-	var statuses := Component.of(node, Statuses) as Statuses
-	return statuses != null and tags.any(statuses.has_tag)
-
-
 ## True if an active status or trait is immune to one of [param data]'s tags,
 ## e.g. Wet is immune to &"fire", so Burning can't be added.
 func is_immune_to(data: StatusData) -> bool:
@@ -199,6 +177,23 @@ func is_immune_to(data: StatusData) -> bool:
 		if _overlaps(data.tags, other.immune_to):
 			return true
 	return false
+
+
+# Every event on the host passes through here, to run the status triggers for it.
+func _on_event(event: StringName, ctx: EffectContext) -> void:
+	if active.is_empty():
+		return
+	if not ctx:
+		return
+	var other: Node = ctx.target if ctx.source == host else ctx.source
+	for data: StatusData in active.keys():
+		for t in data.triggers:
+			if (
+					t.event == event and active.has(data)
+					and (t.react_to_statuses or not ctx.from_status)
+			):
+				_run(t.effects, data, active[data], other if t.affects_other else host, ctx,
+						t.conditions)
 
 
 # Runs _process() only while a status can expire or tick; passives need nothing per frame.

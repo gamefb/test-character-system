@@ -1,3 +1,4 @@
+@tool
 class_name StatModifier
 extends Resource
 ## A change to one stat while it's applied.
@@ -27,8 +28,13 @@ extends Resource
 @export var percent: float = 0.0
 ## Multiplies the total. 1.5 = +50%, 0 = none at all.
 @export var mul: float = 1.0
-## The modifier only counts while all of these pass, e.g. a [HealthBelowCondition] for "faster
+## The modifier only counts while all of these pass, e.g. a [PoolBelowCondition] for "faster
 ## while badly hurt". They're checked on the character that has the modifier, each time the
 ## stat is read. [signal ComponentManager.stat_changed] isn't emitted when one flips, so UI
 ## that shows such a stat should read it every frame.
 @export var conditions: Array[Condition] = []
+
+
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Name fields become lists to pick from.

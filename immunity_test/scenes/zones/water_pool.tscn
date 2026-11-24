@@ -1,6 +1,6 @@
 [gd_scene load_steps=11 format=3]
 
-[ext_resource type="Script" path="res://character_system/kit/world/effect_zone.gd" id="1_lku1b"]
+[ext_resource type="Script" path="res://character_system/character/world/effect_zone.gd" id="1_lku1b"]
 [ext_resource type="Resource" path="res://immunity_test/data/statuses/soaked.tres" id="2_v3c6q"]
 [ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_hcfgq"]
 [ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="4_hsaif"]

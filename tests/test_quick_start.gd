@@ -3,7 +3,7 @@ extends GutTest
 ## the rifle is drawn at start, a click hits the dummy for 10, and the fire patch burns.
 
 const MOVES: Array[StringName] = [&"left", &"right", &"forward", &"back"]
-const EX := "res://character_system/examples/"
+const EX := "res://character_system/starter_pack/"
 
 var added: Array[StringName] = []
 
@@ -89,7 +89,7 @@ func test_quick_start_level_plays_as_described() -> void:
 	add_child_autofree(level)
 	for i in 3:
 		await get_tree().physics_frame
-	var gear := Component.of(player, Equipment) as Equipment
+	var gear := Equipment.find_on(player)
 	assert_true(gear.equipped.has(&"weapon"), "WeaponSwitch draws the rifle at start")
 	# Step 6: a left click, as the Input Map sends it.
 	var click := InputEventAction.new()
@@ -99,11 +99,11 @@ func test_quick_start_level_plays_as_described() -> void:
 	get_viewport().push_input(click)
 	for i in 3:
 		await get_tree().physics_frame
-	assert_eq((Component.of(dummy, Health) as Health).current, 90.0, "10 damage per shot")
+	assert_eq(Health.find_on(dummy).current, 90.0, "10 damage per shot")
 	player.global_position = fire.global_position
 	for i in 3:
 		await get_tree().physics_frame
-	assert_true((Component.of(player, Statuses) as Statuses).has_tag(&"fire"), "Burning")
+	assert_true(Statuses.find_on(player).has_tag(&"fire"), "Burning")
 
 
 ## A CharacterMotor that walks and jumps, as in the docs.

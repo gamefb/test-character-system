@@ -1,9 +1,11 @@
+@tool
 class_name DamageEffect
-extends Effect
+extends AmountEffect
 ## Deals damage, scaled by magnitude and reduced by the target's resistance to its type.
 ##
-## The number starts as [member amount] plus everything in [member scaling], times
-## [member EffectContext.magnitude]. Then, in a fixed order:
+## The number starts as [method AmountEffect.total]: [member AmountEffect.amount] plus
+## everything in [member AmountEffect.scaling], times [member EffectContext.magnitude]. Then,
+## in a fixed order:
 ## [br]1. The source's [code]bonus_<type>[/code] stat is added as a percentage, e.g.
 ## [code]bonus_fire[/code] 0.2 for 20% more fire damage.
 ## [br]2. The source hears [code]dealing_damage[/code] and the target
@@ -17,19 +19,15 @@ extends Effect
 ## [br]6. [Health] loses what's left, and the source hears [code]dealt_damage[/code] and the
 ## target [code]took_damage[/code]. A killing blow also sends [code]died[/code] to the target
 ## and [code]killed[/code] to the source.
-## [br][br]Steps 2 and 3 don't depend on the order statuses were applied in. A target that is
-## already dead is left alone: no damage and no events.
+## [br][br]Steps 2 and 3 don't depend on the order statuses were applied in. A target with
+## no health left, or with a status that blocks [code]damage[/code], is left alone: no damage
+## and no events.
 
 const _NO_NAMES: Array = []
 
 # Damage type -> its [bonus, resist] stat names, so they aren't built again for every hit.
 static var _stat_names: Dictionary[StringName, Array] = {}
 
-## Damage before scaling, magnitude and resistance.
-@export var amount: float = 10.0
-## Added to [member amount] each time it runs, e.g. a [StatAmount] for 2 per point of the
-## user's strength, or a [HealthAmount] for 5% of the target's health.
-@export var scaling: Array[Amount] = []
 ## Matched against the source's bonus_<type> stat and the target's resist_<type> stat, e.g.
 ## bonus_fire and resist_fire. [HitCondition] tests it.
 @export var type: StringName = &"physical"
@@ -39,8 +37,9 @@ static var _stat_names: Dictionary[StringName, Array] = {}
 
 
 func _execute(ctx: EffectContext) -> void:
-	var health := Component.of(ctx.target, Health) as Health
-	if not health or health.is_dead():
+	var health := Health.find_on(ctx.target)
+	# Nothing left to take, or a status is keeping damage off.
+	if not health or health.current <= 0.0 or health.manager.blocks.has(&"damage"):
 		return
 	# This effect's tags only last while it runs; the hit's own tags (a hurtbox's) stay.
 	var own_tags: int = ctx.tags.size()
@@ -48,7 +47,7 @@ func _execute(ctx: EffectContext) -> void:
 		if tag not in ctx.tags:
 			ctx.tags.append(tag)
 	ctx.damage_type = type
-	ctx.reset_amount(Amount.total(amount, scaling, ctx) * ctx.magnitude)
+	ctx.reset_amount(total(ctx))
 	var names: Array = _stat_names.get(type, _NO_NAMES)
 	if names.is_empty():
 		names = [StringName("bonus_" + type), StringName("resist_" + type)]

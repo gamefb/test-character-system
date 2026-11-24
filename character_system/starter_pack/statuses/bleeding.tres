@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_gdo8m"]
+[ext_resource type="Script" path="res://character_system/core/stats/stat_modifier.gd" id="2_ypqnf"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_pc7au"]
+[ext_resource type="Script" path="res://character_system/core/amounts/amount.gd" id="4_sg4j7"]
+[ext_resource type="Script" path="res://character_system/character/amounts/pool_amount.gd" id="5_amjy5"]
+[ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="6_on0eh"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="7_8dp8w"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_trigger.gd" id="8_8cskh"]
+
+[sub_resource type="Resource" id="Resource_csjn5"]
+script = ExtResource("5_amjy5")
+fraction = 0.02
+
+[sub_resource type="Resource" id="Resource_4lxwe"]
+script = ExtResource("6_on0eh")
+amount = 0.0
+scaling = Array[ExtResource("4_sg4j7")]([SubResource("Resource_csjn5")])
+
+[resource]
+script = ExtResource("7_8dp8w")
+id = &"bleeding"
+display_name = "Bleeding"
+description = "Loses 2% of maximum health each second for 5 seconds. Stacks 3 times."
+tags = Array[StringName]([&"bleed"])
+duration = 5.0
+max_stacks = 3
+tick_interval = 1.0
+on_tick = Array[ExtResource("3_pc7au")]([SubResource("Resource_4lxwe")])

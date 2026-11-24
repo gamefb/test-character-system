@@ -3,16 +3,6 @@ extends GutTest
 ## resist stats, trigger conditions and shields.
 
 
-## An effect that counts how often it ran.
-class CountEffect:
-	extends Effect
-
-	var count: int = 0
-
-	func _execute(_ctx: EffectContext) -> void:
-		count += 1
-
-
 func make_host(parts: Array = []) -> Node3D:
 	var host := Node3D.new()
 	for node: Node in [ComponentManager.new(), Health.new(), Statuses.new()] + parts:
@@ -22,11 +12,11 @@ func make_host(parts: Array = []) -> Node3D:
 
 
 func health_of(node: Node) -> Health:
-	return Component.of(node, Health) as Health
+	return Health.find_on(node)
 
 
 func statuses_of(node: Node) -> Statuses:
-	return Component.of(node, Statuses) as Statuses
+	return Statuses.find_on(node)
 
 
 func modify(add := 0.0, percent := 0.0, mul := 1.0) -> ModifyAmountEffect:
@@ -186,7 +176,7 @@ func test_a_trigger_checks_its_conditions_once_for_all_its_effects() -> void:
 	var target: Node3D = make_host()
 	var count := CountEffect.new()
 	var fragile: StatusData = reacting(&"took_damage", [count, count])
-	var hurt := HealthBelowCondition.new()
+	var hurt := PoolBelowCondition.new()
 	hurt.fraction = 0.5
 	fragile.triggers[0].conditions = [hurt]
 	statuses_of(target).add(fragile)
@@ -227,3 +217,13 @@ func test_old_style_listeners_can_still_change_the_amount() -> void:
 			func(ctx: EffectContext) -> void: ctx.amount *= 0.5)
 	hit(target)
 	assert_eq(health_of(target).current, 95.0)
+
+
+## An effect that counts how often it ran.
+class CountEffect:
+	extends Effect
+
+	var count: int = 0
+
+	func _execute(_ctx: EffectContext) -> void:
+		count += 1

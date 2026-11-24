@@ -4,8 +4,8 @@ extends Node
 ## [codeblock lang=text]
 ## godot --headless --fixed-fps 60 res://test_level/test_level.tscn -- --self-test
 ## [/codeblock]
-## It first checks that the level uses every class and every example in
-## [code]character_system/[/code], so a new part can't be left out of the level unnoticed.
+## It first checks that the level uses every class in [code]character_system/[/code] and
+## every file in the starter pack, so a new part can't be left out of the level unnoticed.
 
 ## Classes that can't be placed in a level.
 const NOT_CONTENT: Array[StringName] = [&"EffectContext", &"WorldEvents", &"NameCheck"]
@@ -42,12 +42,14 @@ func _check_coverage() -> void:
 	var unused: PackedStringArray = []
 	for entry: Dictionary in ProjectSettings.get_global_class_list():
 		var path: String = entry["path"]
-		if path.begins_with(SYSTEM) and entry["class"] not in NOT_CONTENT \
-				and not (load(path) as Script).is_abstract() and not _classes.has(entry["class"]):
+		if (
+				path.begins_with(SYSTEM) and entry["class"] not in NOT_CONTENT
+				and not (load(path) as Script).is_abstract() and not _classes.has(entry["class"])
+		):
 			unused.append(entry["class"])
 	check(unused.is_empty(), "the level uses every class: %s" % ", ".join(unused))
 	var missing: PackedStringArray = []
-	var folders: Array[String] = [SYSTEM + "examples"]
+	var folders: Array[String] = [SYSTEM + "starter_pack"]
 	while not folders.is_empty():
 		var folder: String = folders.pop_back()
 		for name: String in DirAccess.get_directories_at(folder):
@@ -55,12 +57,12 @@ func _check_coverage() -> void:
 		for name: String in DirAccess.get_files_at(folder):
 			if name.get_extension() in ["tres", "tscn"] and not _files.has(folder.path_join(name)):
 				missing.append(name)
-	check(missing.is_empty(), "the level uses every example: %s" % ", ".join(missing))
+	check(missing.is_empty(), "the level uses all of the starter pack: %s" % ", ".join(missing))
 
 
 func _check_pickups() -> void:
-	var bag := Component.of(_player, Inventory) as Inventory
-	var gear := Component.of(_player, Equipment) as Equipment
+	var bag := Inventory.find_on(_player)
+	var gear := Equipment.find_on(_player)
 	var items: Array[ItemData] = []
 	for pickup: ItemPickup in _level.find_children("*", "ItemPickup", true, false):
 		items.append(pickup.item)
@@ -72,7 +74,7 @@ func _check_pickups() -> void:
 			"a weapon is drawn and the ring, cloak and amulet are put on")
 	check(ComponentManager.stat_of(_player, &"max_health") == 125.0,
 			"the ring of vigor raises max health to 125")
-	var switch := Component.of(_player, WeaponSwitch) as WeaponSwitch
+	var switch := WeaponSwitch.find_on(_player)
 	for index in switch.weapons().size():
 		switch.select(index)
 		await _frames(2)
@@ -81,7 +83,7 @@ func _check_pickups() -> void:
 
 
 func _check_shrines_and_hazards() -> void:
-	var statuses := Component.of(_player, Statuses) as Statuses
+	var statuses := Statuses.find_on(_player)
 	var worn: int = statuses.active.size()
 	var pads: Array[Node] = _level.get_node(^"Shrines").find_children("*", "EffectZone", true, false)
 	for pad in pads:
@@ -96,7 +98,7 @@ func _check_shrines_and_hazards() -> void:
 			await _stand_on(zone)
 	check(statuses.has_tag(&"poison") and not statuses.has_tag(&"fire"),
 			"the zones apply their statuses; the fireproof cloak keeps burning off")
-	var brain := Component.of(_player, Brain) as Brain
+	var brain := Brain.find_on(_player)
 	await _stand_on(_level.get_node(^"Hazards/Stunned"))
 	check(brain.is_blocked(), "the stun pad stops the player")
 	await _frames(150)
@@ -105,7 +107,7 @@ func _check_shrines_and_hazards() -> void:
 
 func _check_combat() -> void:
 	var target: Node3D = _level.get_node(^"Targets/Plain")
-	var health := Component.of(target, Health) as Health
+	var health := Health.find_on(target)
 	# Straight in front, with the crosshair on the head. The rifle is held low and to the
 	# right, and still hits what the crosshair is on.
 	_player.global_position = target.global_position + Vector3(0, 0.1, 6)
@@ -119,13 +121,13 @@ func _check_combat() -> void:
 	await _tap(&"ability_3")
 	await _frames(60)
 	check(mana.current < mana.maximum(), "casting Fireball costs mana")
-	var own := Component.of(_player, Health) as Health
+	var own := Health.find_on(_player)
 	own.change(-60.0)
 	var before: float = own.current
 	await _tap(&"use_health_potion")
 	check(own.current > before, "a potion heals")
 	var grenades: ItemData = _level.quick_items[&"throw_grenade"]
-	var bag := Component.of(_player, Inventory) as Inventory
+	var bag := Inventory.find_on(_player)
 	var held: int = bag.count(grenades)
 	health.revive()
 	await _tap(&"throw_grenade")
@@ -142,7 +144,7 @@ func _check_combat() -> void:
 
 
 func _is_hurt(who: Node) -> bool:
-	var health := Component.of(who, Health) as Health
+	var health := Health.find_on(who)
 	return health.current < health.maximum()
 
 

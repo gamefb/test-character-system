@@ -1,4 +1,4 @@
-# Runs the unit tests, the scene checks, the linter and the core-alone check.
+# Runs the unit tests, the scene checks, the linter and the check that each layer stands alone.
 name: Tests
 
 on:
@@ -37,15 +37,20 @@ jobs:
         run: |
           pip install --quiet "gdtoolkit==$GDTOOLKIT_VERSION"
           gdlint character_system tests addons/character_system_warnings immunity_test test_level
-      - name: Core loads on its own
-        # Before the full import, so the copy has no import cache to lean on.
+      - name: Each layer loads without the ones built on it
+        # Before the full import, so the copies have no import cache to lean on.
         run: |
-          mkdir "$RUNNER_TEMP/core_only"
-          cp -r project.godot character_system "$RUNNER_TEMP/core_only/"
-          rm -rf "$RUNNER_TEMP/core_only/character_system/kit" "$RUNNER_TEMP/core_only/character_system/examples"
-          godot --headless --path "$RUNNER_TEMP/core_only" --import 2>&1 | tee core.log
-          ! grep -E "SCRIPT ERROR|Parse Error" core.log
-          godot --headless --path "$RUNNER_TEMP/core_only" -s "$PWD/tests/check_scripts_load.gd"
+          check() {  # check <name of the copy> <folders to delete from it>...
+            local copy="$RUNNER_TEMP/$1"; shift
+            mkdir "$copy"
+            cp -r project.godot character_system "$copy/"
+            for folder in "$@"; do rm -rf "$copy/character_system/$folder"; done
+            godot --headless --path "$copy" --import 2>&1 | tee layer.log
+            ! grep -E "SCRIPT ERROR|Parse Error" layer.log
+            godot --headless --path "$copy" -s "$PWD/tests/check_scripts_load.gd"
+          }
+          check core_only character starter_pack
+          check core_and_character starter_pack
       - name: Import the project
         run: |
           godot --headless --import 2>&1 | tee import.log

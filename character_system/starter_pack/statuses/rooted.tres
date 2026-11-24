@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_5kkhx"]
+[ext_resource type="Script" path="res://character_system/core/stats/stat_modifier.gd" id="2_hkvyg"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_lu7tv"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="4_7xrpn"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_trigger.gd" id="5_xbg6m"]
+
+[resource]
+script = ExtResource("4_7xrpn")
+id = &"rooted"
+display_name = "Rooted"
+description = "Can't walk, jump or dash for 3 seconds: it blocks \"movement\", which stops the CharacterMotor. Shooting and abilities still work."
+tags = Array[StringName]([&"rooted"])
+blocks = Array[StringName]([&"movement"])
+immune_to = Array[StringName]([])
+apply_conditions = Array[ExtResource("1_5kkhx")]([])
+duration = 3.0
+stacking = 0
+max_stacks = 1
+removes_tags = Array[StringName]([])
+modifiers = Array[ExtResource("2_hkvyg")]([])
+tick_interval = 0.0
+on_apply = Array[ExtResource("3_lu7tv")]([])
+on_tick = Array[ExtResource("3_lu7tv")]([])
+on_remove = Array[ExtResource("3_lu7tv")]([])
+triggers = Array[ExtResource("5_xbg6m")]([])

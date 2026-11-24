@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="StatusData" format=3]
+
+[ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="1_lgqwo"]
+[ext_resource type="Script" path="res://character_system/core/stats/stat_modifier.gd" id="2_nph5f"]
+[ext_resource type="Script" path="res://character_system/core/effects/effect.gd" id="3_mbo84"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="4_mf863"]
+[ext_resource type="Script" path="res://character_system/core/statuses/status_trigger.gd" id="5_nbb16"]
+[ext_resource type="Script" path="res://character_system/core/conditions/has_tag_condition.gd" id="6_mj2bi"]
+[ext_resource type="Script" path="res://character_system/character/conditions/pool_below_condition.gd" id="7_eqyms"]
+[ext_resource type="Script" path="res://character_system/character/conditions/any_condition.gd" id="8_w37rj"]
+[ext_resource type="Script" path="res://character_system/core/effects/modify_amount_effect.gd" id="9_ffk6h"]
+
+[sub_resource type="Resource" id="Resource_esb2h"]
+script = ExtResource("6_mj2bi")
+tag = &"wet"
+
+[sub_resource type="Resource" id="Resource_lda84"]
+script = ExtResource("7_eqyms")
+
+[sub_resource type="Resource" id="Resource_nctvo"]
+script = ExtResource("8_w37rj")
+conditions = Array[ExtResource("1_lgqwo")]([SubResource("Resource_esb2h"), SubResource("Resource_lda84")])
+
+[sub_resource type="Resource" id="Resource_1dys6"]
+script = ExtResource("9_ffk6h")
+percent = 0.5
+
+[sub_resource type="Resource" id="Resource_qceau"]
+script = ExtResource("5_nbb16")
+event = &"dealing_damage"
+conditions = Array[ExtResource("1_lgqwo")]([SubResource("Resource_nctvo")])
+affects_other = true
+effects = Array[ExtResource("3_mbo84")]([SubResource("Resource_1dys6")])
+
+[resource]
+script = ExtResource("4_mf863")
+id = &"executioner"
+display_name = "Executioner"
+description = "+50% damage to targets that are wet or below half health."
+triggers = Array[ExtResource("5_nbb16")]([SubResource("Resource_qceau")])

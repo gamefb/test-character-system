@@ -219,6 +219,10 @@ scene. It is the hub: registry, stats and events.
    * - ``set_base(name, value)`` / ``add_base(name, amount)``
      - func
      - Change an entry of ``stats`` during play, such as ``level``.
+   * - ``block(what)`` / ``unblock(what)`` / ``is_blocked(names)`` / ``blocked(node, what)``
+     - func
+     - A count for each name in ``blocks``. Statuses raise it for each name they block;
+       brains, motors, abilities, triggers and effects ask it.
    * - ``stat(name)``
      - func
      - ``(base + Σadd) × (1 + Σpercent) × Πmul``, cached unless one of the stat's modifiers
@@ -422,29 +426,33 @@ stats of its own, and knows its team. All extend ``Component``.
    * - Class
      - Data
      - Must implement
-   * - ``Health``
-     - ``max_health``, ``resistances: Dictionary[type, float]``, ``current``, ``_full``;
-       signals ``changed(current, maximum)``, ``died(ctx)``
-     - ``_stats()`` returns ``max_health`` and one ``resist_<type>`` per entry; ``maximum()``,
-       ``is_dead()``, ``change(amount, ctx)``, ``revive(amount)``; clamp ``current`` when
-       ``max_health`` drops. On death, send ``died`` to the host and ``killed`` to
-       ``ctx.source``; ``revive()`` sends ``revived``
    * - ``Pool``
      - ``pool`` (its name), ``max_value``, ``regen``, ``regen_delay``, ``starts_full``,
-       ``absorbs_damage``, ``absorbed_types``, ``current``; signals
+       ``status_while_empty``, ``absorbs_damage``, ``absorbed_types``, ``current``; signals
        ``changed(current, maximum)``, ``emptied``
      - ``_stats()`` returns ``max_<pool>`` and ``<pool>_regen``; ``named(node, name)``
-       (static), ``maximum()``, ``fraction()``, ``spend(amount) -> bool``, ``change(amount)``;
-       regen in ``_process`` once the delay has passed; on ``absorbing_damage``, take what it
-       can from ``ctx.amount``
+       (static), ``maximum()``, ``fraction()``, ``spend(amount) -> bool``,
+       ``change(amount, ctx)``; regen in ``_process`` once the delay has passed, and only
+       while the regen stat isn't zero; on ``absorbing_damage``, take what it can from
+       ``ctx.amount``. On reaching zero, add ``status_while_empty`` through ``Statuses``
+       and remember it; on rising above zero, ``drop_hold()`` it. Empty hooks
+       ``_emptied(ctx)``, ``_refilled()``, ``_regenerates()`` and ``_empty_status()``
+   * - ``Health`` (extends ``Pool``)
+     - ``death_status`` (a preloaded Dead by default), ``resistances: Dictionary[type,
+       float]``; signal ``died(ctx)``. Its ``pool`` is fixed to ``health`` in ``_init()``,
+       and ``_validate_property()`` hides the pool settings that mean nothing for health
+     - ``_stats()`` adds one ``resist_<type>`` per entry; ``_empty_status()`` returns
+       ``death_status``; ``is_dead()``; ``change()`` does nothing while dead;
+       ``revive(amount)``. ``_emptied()`` sends ``died`` to the host and ``killed`` to
+       ``ctx.source``; ``_refilled()`` sends ``revived``
    * - ``Brain``
-     - ``move_dir``, ``aim_point``, ``blocked_by_tags``, ``acts_while_dead``, ``_held``,
+     - ``move_dir``, ``aim_point``, ``blocked_by`` (``[&"everything"]``), ``_held``,
        ``_pressed_on``
      - ``press(action)``, ``release(action)``, ``is_action_pressed(action)``,
        ``is_action_just_pressed(action)``. It's the shared interface that the motor, Abilities
-       and items read, the way your scripts read Godot's ``Input``. ``is_blocked()`` is true
-       while the character is dead or has a status with one of ``blocked_by_tags``; then
-       ``move_dir`` reads as zero and no action counts as pressed
+       and items read, the way your scripts read Godot's ``Input``. ``is_blocked()`` asks the
+       manager whether one of ``blocked_by`` is blocked; then ``move_dir`` reads as zero and
+       no action counts as pressed. The brain knows nothing about stuns or death
    * - ``PlayerBrain``
      - ``camera`` (empty: the first ``Camera3D`` under the host), ``ACTIONS`` list
      - Fill ``move_dir`` and ``aim_point`` in ``_process``, and release any held action
@@ -458,7 +466,8 @@ stats of its own, and knows its team. All extend ``Component``.
        ``agent.target_position`` only once the target has moved ``repath_distance``; decision
        logic calls ``press()`` and ``release()``
    * - ``CharacterMotor``
-     - ``move_speed``, ``jump_velocity``, ``start_mode``, ``push_friction``, ``mode``,
+     - ``move_speed``, ``jump_velocity``, ``start_mode``, ``push_friction``, ``blocked_by``
+       (``[&"movement"]``), ``mode``, ``move_dir`` (the brain's, or zero while blocked),
        ``brain``, ``body``, ``_modes``, ``_moves``, ``_consumed``, ``_push``; signal
        ``mode_changed(old_mode, new_mode)``
      - ``_requires()`` returns ``[Brain]``; ``_stats()`` returns ``move_speed``,
@@ -468,7 +477,8 @@ stats of its own, and knows its team. All extend ``Component``.
        switches to the mode's ``_get_next_mode()`` or to another mode whose ``_can_enter()``
        is true
    * - ``MotorNode``, ``MovementMode``, ``LayeredMove``
-     - ``blocked_by_tags``; ``motor``, ``body`` and ``event_prefix``, set when entering the
+     - ``blocked_by`` (names of its own); ``motor``, ``body`` and ``event_prefix``, set when
+       entering the
        tree; a move's ``cooldown``, ``active`` and signals ``started``, ``finished``
      - Empty hooks ``_stats()``, ``_enter()``, ``_exit()`` and ``_physics_update(delta)``;
        ``stat()``, ``is_blocked()``; a mode's ``_can_enter()`` and ``_get_next_mode()``; a
@@ -491,15 +501,15 @@ stats of its own, and knows its team. All extend ``Component``.
 
 How a brain remembers presses, modelled on Godot's ``Input``:
 
-.. literalinclude:: ../../character_system/kit/brains/brain.gd
+.. literalinclude:: ../../character_system/character/brains/brain.gd
    :language: gdscript
-   :caption: character_system/kit/brains/brain.gd (variables)
+   :caption: character_system/character/brains/brain.gd (variables)
    :start-at: var _pressed_on
    :end-at: var _held
 
-.. literalinclude:: ../../character_system/kit/brains/brain.gd
+.. literalinclude:: ../../character_system/character/brains/brain.gd
    :language: gdscript
-   :caption: character_system/kit/brains/brain.gd (functions)
+   :caption: character_system/character/brains/brain.gd (functions)
    :start-at: func press(
 
 Watch out for
@@ -510,9 +520,14 @@ Watch out for
   raising the maximum doesn't heal, and lowering it clamps ``current``.
 - **Health listens to** ``manager.stat_changed`` with ``listen()``, so the connection is undone
   when Health stops.
-- **Stop the brain, not each reader.** A stun or a death makes the Brain report no intent, so
-  the motor, weapons and abilities all stop without knowing why. ``Statuses`` doesn't exist
-  until stage 4; ``is_blocked()`` finds it with ``find()`` and copes with it being absent.
+- **Stop the brain, not each reader.** A status that blocks ``everything`` makes the Brain
+  report no intent, so the motor, weapons and abilities all stop without knowing why.
+  ``Statuses`` doesn't exist until stage 4, and the brain doesn't need it: it asks the
+  manager, which only counts ``block()`` and ``unblock()`` calls.
+- **Make health a pool, and death the status of an empty pool.** One class then serves
+  mana, stamina, shields and health; costs, regen and bars need no special case for
+  health; and what death stops is data on a status, not ``if dead`` checks spread through
+  the code.
 - **A shield is a pool that listens.** ``Pool`` needs no special case in the damage code: it
   listens to ``absorbing_damage`` with ``on()``, which hears it after the status triggers,
   and lowers ``ctx.amount``.
@@ -583,7 +598,7 @@ Condition
      - static
      - True if every condition passes. An empty list passes.
 
-Subclasses to write: ``HasTagCondition(tag)``, ``HealthBelowCondition(fraction)``,
+Subclasses to write: ``HasTagCondition(tag)``, ``PoolBelowCondition(fraction)``,
 ``StatCondition(stat, value)`` and ``ChanceCondition(chance, bonus_stat)`` override
 ``_test()``. ``HitCondition(types, tags)`` and ``AnyCondition(conditions)`` override
 ``check()``; the first reads ``ctx.hit()``, so it works inside status triggers.
@@ -609,7 +624,7 @@ grow with a stat.
      - ``base`` plus the ``value()`` of everything in ``scaling``. Effects call this.
 
 Subclasses to write: ``StatAmount(stat, of, per_point, curve)``,
-``HealthAmount(of, part, fraction)``, ``HitAmount(fraction)`` (a share of ``ctx.cause.amount``)
+``PoolAmount(of, part, fraction)``, ``HitAmount(fraction)`` (a share of ``ctx.cause.amount``)
 and ``RandomAmount(low, high)``.
 
 Effect
@@ -640,7 +655,8 @@ DamageEffect
 
 Exports ``amount``, ``scaling: Array[Amount]``, ``type`` (e.g. ``physical``, ``fire``) and
 ``tags``. It is the pipeline every damage hook plugs into, and the order of its steps is what
-makes shields, crits and thorns possible. A target that is already dead is skipped.
+makes shields, crits and thorns possible. A target with no health left, or with a status
+that blocks ``damage``, is skipped.
 
 .. graphviz::
    :caption: The DamageEffect pipeline, and who hears each event.
@@ -711,7 +727,8 @@ character.
    * - ``raycast(space, query)`` / ``stops_shots(collider)``
      - static
      - The ray every shot, projectile and crosshair uses. It casts again past anything
-       ``stops_shots()`` says no to: areas that aren't hurtboxes, and dead characters.
+       ``stops_shots()`` says no to: areas that aren't hurtboxes, and characters on which a
+       status blocks ``targeting``, such as the dead.
    * - ``rids_of(character)``
      - static
      - The body and hurtbox RIDs, so a character's own shots ignore them. It searches the
@@ -786,7 +803,9 @@ StatusData
      - ``id``, ``display_name``, ``icon``, ``description``
    * - Rules
      - ``tags``, ``immune_to``, ``apply_conditions``, ``duration`` (0 = permanent, a passive),
-       ``stacking`` (``REFRESH`` / ``STACK`` / ``IGNORE``), ``max_stacks``, ``removes_tags``
+       ``stacking`` (``REFRESH`` / ``STACK`` / ``IGNORE``), ``max_stacks``, ``removes_tags``,
+       ``removes_timed``, ``blocks`` (names handed to the manager's ``block()`` while the
+       status is active)
    * - Effects
      - ``modifiers``, ``tick_interval``, ``on_apply``, ``on_tick``, ``on_remove``, ``triggers``
    * - Functions
@@ -961,8 +980,9 @@ Poison (duration 6, tick 1, ``DamageEffect`` 2 poison) ticks once a second until
 come back while it's wet. An Undead trait with ``immune_to: [poison]`` refuses Poison. A ward
 (``taking_damage`` trigger, ``react_to_statuses``, ``ModifyAmountEffect`` ``mul 0.5``) halves
 hits, and with armour (``add -3``) beside it a hit of 10 lands for 3.5 whichever was added
-first. A passive granted by a ring and a zone stays until both let go. A status tagged
-``stunned`` stops the capsule from stage 2.
+first. A passive granted by a ring and a zone stays until both let go. A status with
+``everything`` in its ``blocks`` stops the capsule from stage 2, and lethal damage gives the
+Dead status, which does the same.
 
 Stage 5: Items
 --------------
@@ -1046,12 +1066,13 @@ Brain.
      - Data
      - Must implement
    * - ``Trigger``
-     - ``action``, ``fire_rate``, ``automatic``, ``buffer_time``, ``blocked_by_tags``,
+     - ``action``, ``fire_rate``, ``automatic``, ``buffer_time``, ``blocked_by``,
        ``user_effects``, ``_buffered``, ``_cooldown``; signal ``fired``
      - In ``_process``: buffer a press when ``brain.is_action_just_pressed(action)``; with
        ``automatic``, also want to fire while ``is_action_pressed``; when the cooldown is over
-       and the wielder has none of ``blocked_by_tags``, take a round from a ``Magazine`` if
-       there is one, run ``user_effects`` on the wielder, then emit ``fired``
+       and nothing on the wielder blocks one of ``blocked_by``, take a round from a ``Magazine`` if
+       there is one, run ``user_effects`` on the wielder with the item's position in the
+       context, then emit ``fired``
    * - ``Magazine``
      - ``ammo: ItemData``, ``capacity``, ``reload_time``, ``auto_reload``, ``rounds`` (stored
        in ``item.state``); signals ``changed(rounds)``, ``reload_started``,
@@ -1157,7 +1178,7 @@ to pick targets, and a list of effects.
    * - ``AbilityData``
      - ``Resource``
      - Display: ``id``, ``display_name``, ``icon``, ``description``. Use: ``cooldown``,
-       ``charges``, ``costs: Dictionary[pool, float]``, ``conditions``, ``blocked_by_tags``.
+       ``charges``, ``costs: Dictionary[pool, float]``, ``conditions``, ``blocked_by``.
        Casting: ``cast_time``, ``status_while_casting``, ``interrupted_by_damage``. Effects:
        ``targeting``, ``needs_target``, ``effects``, ``user_effects``
    * - ``Abilities``
@@ -1172,14 +1193,16 @@ to pick targets, and a list of effects.
        ``cast_progress()``, ``reset_cooldown()``
    * - ``LaunchProjectileEffect``
      - ``Effect``
-     - ``projectile``, ``effects``, ``height``, ``forward``. Launches from the source toward
-       its Brain's ``aim_point``: a fireball in an ability's ``user_effects``, or a rocket in a
-       Trigger's.
+     - ``projectile``, ``effects``, ``height``, ``forward``. Launches toward the source's
+       Brain's ``aim_point``: from ``ctx.position`` when the context has one, which a Trigger
+       sets to its item, so a rocket leaves the weapon; otherwise from the source's chest, for
+       a fireball in an ability's ``user_effects``.
 
 ``use(ability)`` in order:
 
 1. Ask ``why_not(ability)``. It names the first thing against it: the Brain is blocked or a
-   status has one of ``blocked_by_tags``, another cast is under way, no charge is ready, a
+   status blocks one of the ability's ``blocked_by``, another cast is under way, no charge is
+   ready, a
    Pool can't pay, a condition fails, or it needs a target and has none. If there is one, emit
    ``failed`` with it and return false.
 2. With a ``cast_time``, remember the ability in ``casting``, give the user
@@ -1219,7 +1242,7 @@ These were added late in the reference build and are easier once everything else
   projectiles. A cooldown, a ray and an instant reload are enough to play with.
 
 Get stages 1–3 running with plain ``print`` debugging first. When you're done,
-``character_system/examples/`` and the :ref:`recipes <doc_recipes>` show finished statuses,
+``character_system/starter_pack/`` and the :ref:`recipes <doc_recipes>` show finished statuses,
 items, zones and abilities to compare with yours, and :ref:`doc_extending` adds a melee
 weapon, radius targeting, a hostility condition and example components on top.
 

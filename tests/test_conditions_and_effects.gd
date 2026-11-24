@@ -52,13 +52,13 @@ func test_any_condition_needs_only_one() -> void:
 	var ctx := EffectContext.new(null, who)
 	var wet := HasTagCondition.new()
 	wet.tag = &"wet"
-	var hurt := HealthBelowCondition.new()
+	var hurt := PoolBelowCondition.new()
 	hurt.fraction = 0.5
 	var either := AnyCondition.new()
 	assert_false(either.check(ctx), "an empty list never passes")
 	either.conditions = [wet, hurt]
 	assert_false(either.check(ctx))
-	(Component.of(who, Statuses) as Statuses).add(tagged(&"wet"))
+	Statuses.find_on(who).add(tagged(&"wet"))
 	assert_true(either.check(ctx), "wet is enough")
 	either.negate = true
 	assert_false(either.check(ctx))

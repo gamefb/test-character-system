@@ -25,7 +25,9 @@ Stats, events and tags are typed as text, so ``move_sped`` or ``took_damgae`` wo
 
 - :ref:`StatusTrigger.event<class_StatusTrigger_property_event>` against the events scripts send with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>` or :ref:`ComponentManager.send()<class_ComponentManager_method_send>`, and the ones the :ref:`CharacterMotor<class_CharacterMotor>` sends for each mode and move with a ``class_name``, such as ``walk_mode_entered``, 
 
-- tags in :ref:`StatusData.immune_to<class_StatusData_property_immune_to>`, :ref:`StatusData.removes_tags<class_StatusData_property_removes_tags>`, :ref:`AbilityData.blocked_by_tags<class_AbilityData_property_blocked_by_tags>`, :ref:`HasTagCondition<class_HasTagCondition>` and :ref:`RemoveStatusEffect<class_RemoveStatusEffect>` against the tags your saved statuses have. 
+- names in :ref:`StatusData.blocks<class_StatusData_property_blocks>` against the Blocked By lists of your saved abilities, triggers and motors, and the other way round, 
+
+- tags in :ref:`StatusData.immune_to<class_StatusData_property_immune_to>`, :ref:`StatusData.removes_tags<class_StatusData_property_removes_tags>`, :ref:`HasTagCondition<class_HasTagCondition>` and :ref:`RemoveStatusEffect<class_RemoveStatusEffect>` against the tags your saved statuses have. 
 
 The editor shows the results above the Inspector (enable the Character System Warnings plugin) and as warnings on :ref:`Statuses<class_Statuses>`, :ref:`Grants<class_Grants>`, :ref:`Abilities<class_Abilities>`, :ref:`Hitscan<class_Hitscan>` and :ref:`MeleeSweep<class_MeleeSweep>`.
 
@@ -46,23 +48,25 @@ Methods
 .. table::
    :widths: auto
 
-   +---------------------------------------------------+---------------------------------------------------------------------------------------------------------+
-   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`problems<class_NameCheck_method_problems>`\ (\ object\: :ref:`Object<class_Object>`\ ) |static|   |
-   +---------------------------------------------------+---------------------------------------------------------------------------------------------------------+
-   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`problems_in<class_NameCheck_method_problems_in>`\ (\ list\: :ref:`Array<class_Array>`\ ) |static| |
-   +---------------------------------------------------+---------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`                           | :ref:`handles<class_NameCheck_method_handles>`\ (\ object\: :ref:`Object<class_Object>`\ ) |static|     |
-   +---------------------------------------------------+---------------------------------------------------------------------------------------------------------+
-   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`known_stats<class_NameCheck_method_known_stats>`\ (\ ) |static|                                   |
-   +---------------------------------------------------+---------------------------------------------------------------------------------------------------------+
-   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`known_events<class_NameCheck_method_known_events>`\ (\ ) |static|                                 |
-   +---------------------------------------------------+---------------------------------------------------------------------------------------------------------+
-   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`known_tags<class_NameCheck_method_known_tags>`\ (\ ) |static|                                     |
-   +---------------------------------------------------+---------------------------------------------------------------------------------------------------------+
-   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`known_pools<class_NameCheck_method_known_pools>`\ (\ ) |static|                                   |
-   +---------------------------------------------------+---------------------------------------------------------------------------------------------------------+
-   | |void|                                            | :ref:`rescan<class_NameCheck_method_rescan>`\ (\ ) |static|                                             |
-   +---------------------------------------------------+---------------------------------------------------------------------------------------------------------+
+   +---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`problems<class_NameCheck_method_problems>`\ (\ object\: :ref:`Object<class_Object>`\ ) |static|                                               |
+   +---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`problems_in<class_NameCheck_method_problems_in>`\ (\ list\: :ref:`Array<class_Array>`\ ) |static|                                             |
+   +---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                           | :ref:`handles<class_NameCheck_method_handles>`\ (\ object\: :ref:`Object<class_Object>`\ ) |static|                                                 |
+   +---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                            | :ref:`suggest<class_NameCheck_method_suggest>`\ (\ object\: :ref:`Object<class_Object>`, property\: :ref:`Dictionary<class_Dictionary>`\ ) |static| |
+   +---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`known_stats<class_NameCheck_method_known_stats>`\ (\ ) |static|                                                                               |
+   +---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`known_events<class_NameCheck_method_known_events>`\ (\ ) |static|                                                                             |
+   +---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`known_tags<class_NameCheck_method_known_tags>`\ (\ ) |static|                                                                                 |
+   +---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`PackedStringArray<class_PackedStringArray>` | :ref:`known_pools<class_NameCheck_method_known_pools>`\ (\ ) |static|                                                                               |
+   +---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                            | :ref:`rescan<class_NameCheck_method_rescan>`\ (\ ) |static|                                                                                         |
+   +---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -104,6 +108,18 @@ Problems in every resource in ``list``.
 :ref:`bool<class_bool>` **handles**\ (\ object\: :ref:`Object<class_Object>`\ ) |static| :ref:`🔗<class_NameCheck_method_handles>`
 
 True for the kinds of resource this checks, directly or inside them.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_NameCheck_method_suggest:
+
+.. rst-class:: classref-method
+
+|void| **suggest**\ (\ object\: :ref:`Object<class_Object>`, property\: :ref:`Dictionary<class_Dictionary>`\ ) |static| :ref:`🔗<class_NameCheck_method_suggest>`
+
+Turns a name field into a list to pick from in the Inspector, filled with the names the project already has, while still taking a new one typed in. Call it from ``_validate_property()`` in a ``@tool`` script; the system's own resources and components do. Fields are recognised by name, as :ref:`problems()<class_NameCheck_method_problems>` does: ``stat``, ``pool``, ``event``, ``tag``, ``blocks``, ``blocked_by`` and the keys of ``costs``.
 
 .. rst-class:: classref-item-separator
 

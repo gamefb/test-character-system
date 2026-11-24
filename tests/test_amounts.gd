@@ -13,9 +13,8 @@ func make_host(parts: Array = [], stats: Dictionary[StringName, float] = {}) -> 
 	return host
 
 
-
 func health_of(node: Node) -> Health:
-	return Component.of(node, Health) as Health
+	return Health.find_on(node)
 
 
 func per_point(stat_name: StringName, amount: float, of := Condition.Subject.SOURCE) -> StatAmount:
@@ -100,13 +99,13 @@ func test_a_share_of_health() -> void:
 	var target: Node3D = make_host()
 	health_of(target).change(-60.0)
 	var ctx := EffectContext.new(null, target)
-	var share := HealthAmount.new()
+	var share := PoolAmount.new()
 	share.fraction = 0.5
-	share.part = HealthAmount.Part.MAXIMUM
+	share.part = PoolAmount.Part.MAXIMUM
 	assert_eq(share.value(ctx), 50.0)
-	share.part = HealthAmount.Part.CURRENT
+	share.part = PoolAmount.Part.CURRENT
 	assert_eq(share.value(ctx), 20.0)
-	share.part = HealthAmount.Part.MISSING
+	share.part = PoolAmount.Part.MISSING
 	assert_eq(share.value(ctx), 30.0)
 	assert_eq(share.value(EffectContext.new(null, autofree(Node.new()))), 0.0, "no Health: 0")
 	var mend := HealEffect.new()
@@ -123,7 +122,7 @@ func test_life_steal_is_a_share_of_the_hit() -> void:
 	var steal := HealEffect.new()
 	steal.amount = 0.0
 	steal.scaling = [share_of_hit(0.5)]
-	(Component.of(attacker, Statuses) as Statuses).add(reacting(&"dealt_damage", steal))
+	Statuses.find_on(attacker).add(reacting(&"dealt_damage", steal))
 	var bite := DamageEffect.new()
 	bite.amount = 10.0
 	bite.apply(EffectContext.new(attacker, target))
@@ -139,7 +138,7 @@ func test_thorns_return_a_share_of_the_hit() -> void:
 	var prick := DamageEffect.new()
 	prick.amount = 0.0
 	prick.scaling = [share_of_hit(0.3)]
-	(Component.of(target, Statuses) as Statuses).add(reacting(&"took_damage", prick, true))
+	Statuses.find_on(target).add(reacting(&"took_damage", prick, true))
 	var bite := DamageEffect.new()
 	bite.amount = 10.0
 	bite.apply(EffectContext.new(attacker, target))
@@ -160,7 +159,7 @@ func test_a_status_tick_scales_with_whoever_applied_it() -> void:
 	burning.duration = 5.0
 	burning.tick_interval = 1.0
 	burning.on_tick = [burn]
-	var statuses := Component.of(target, Statuses) as Statuses
+	var statuses := Statuses.find_on(target)
 	statuses.add(burning, mage)
 	statuses._process(1.0)
 	assert_eq(health_of(target).current, 95.0, "1 + the mage's 4 spell power")

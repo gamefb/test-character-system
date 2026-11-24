@@ -1,3 +1,4 @@
+@tool
 @icon("res://character_system/icons/effect.svg")
 @abstract
 class_name Amount
@@ -5,10 +6,10 @@ extends Resource
 ## A number worked out when an effect runs, instead of typed in: "2 per point of strength",
 ## "5% of the target's health", "a third of the hit".
 ##
-## Effects with a number have a plain field for it, such as [member DamageEffect.amount], and a
+## Effects with a number have a plain field for it, such as [member AmountEffect.amount], and a
 ## [code]scaling[/code] list of these beside it. Each one's [method value] is added to the plain
 ## number, so "10 + 2 per strength" is amount 10 with one [StatAmount] in scaling. The built-in
-## ones are [StatAmount], [HealthAmount], [HitAmount] and [RandomAmount]. To make your own,
+## ones are [StatAmount], [PoolAmount], [HitAmount] and [RandomAmount]. To make your own,
 ## extend this class and override [method value]:
 ## [codeblock]
 ## class_name DistanceAmount
@@ -35,6 +36,11 @@ static func total(base: float, scaling: Array[Amount], ctx: EffectContext) -> fl
 		if extra:
 			sum += extra.value(ctx)
 	return sum
+
+
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
 
 
 ## Override this: return the number for this use. [param ctx] says who is involved; either

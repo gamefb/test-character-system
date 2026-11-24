@@ -53,6 +53,8 @@ Properties
    +-------------------------------------------------------------------------------------------------------+---------------------------------------------------------+-----------+
    | :ref:`Node<class_Node>`                                                                               | :ref:`host<class_ComponentManager_property_host>`       |           |
    +-------------------------------------------------------------------------------------------------------+---------------------------------------------------------+-----------+
+   | :ref:`Dictionary<class_Dictionary>`\[:ref:`StringName<class_StringName>`, :ref:`int<class_int>`\]     | :ref:`blocks<class_ComponentManager_property_blocks>`   | ``{}``    |
+   +-------------------------------------------------------------------------------------------------------+---------------------------------------------------------+-----------+
 
 .. rst-class:: classref-reftable-group
 
@@ -69,6 +71,8 @@ Methods
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`float<class_float>`                                        | :ref:`stat_of<class_ComponentManager_method_stat_of>`\ (\ node\: :ref:`Variant<class_Variant>`, stat_name\: :ref:`StringName<class_StringName>`\ ) |static|                                                   |
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                                          | :ref:`blocked<class_ComponentManager_method_blocked>`\ (\ node\: :ref:`Variant<class_Variant>`, what\: :ref:`StringName<class_StringName>`\ ) |static|                                                        |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`Component<class_Component>`                                | :ref:`find<class_ComponentManager_method_find>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                                                     |
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`Array<class_Array>`\[:ref:`Component<class_Component>`\]   | :ref:`find_all<class_ComponentManager_method_find_all>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                                             |
@@ -82,6 +86,12 @@ Methods
    | |void|                                                           | :ref:`set_base<class_ComponentManager_method_set_base>`\ (\ stat_name\: :ref:`StringName<class_StringName>`, value\: :ref:`float<class_float>`\ )                                                             |
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | |void|                                                           | :ref:`add_base<class_ComponentManager_method_add_base>`\ (\ stat_name\: :ref:`StringName<class_StringName>`, amount\: :ref:`float<class_float>`\ )                                                            |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`block<class_ComponentManager_method_block>`\ (\ what\: :ref:`StringName<class_StringName>`\ )                                                                                                           |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                           | :ref:`unblock<class_ComponentManager_method_unblock>`\ (\ what\: :ref:`StringName<class_StringName>`\ )                                                                                                       |
+   +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                                          | :ref:`is_blocked<class_ComponentManager_method_is_blocked>`\ (\ names\: :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]\ )                                                                   |
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`float<class_float>`                                        | :ref:`stat<class_ComponentManager_method_stat>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                                                                                                        |
    +------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -180,6 +190,18 @@ True once the host is ready and its components have had the chance to start. At 
 
 The node this manager belongs to (its parent).
 
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ComponentManager_property_blocks:
+
+.. rst-class:: classref-property
+
+:ref:`Dictionary<class_Dictionary>`\[:ref:`StringName<class_StringName>`, :ref:`int<class_int>`\] **blocks** = ``{}`` :ref:`🔗<class_ComponentManager_property_blocks>`
+
+What is blocked on this host right now, and by how many things: see :ref:`block()<class_ComponentManager_method_block>`. Read it; change it only through :ref:`block()<class_ComponentManager_method_block>` and :ref:`unblock()<class_ComponentManager_method_unblock>`.
+
 .. rst-class:: classref-section-separator
 
 ----
@@ -222,6 +244,18 @@ Use it for your own events, e.g. ``&"jumped"`` or ``&"level_up"``. Every listene
 :ref:`float<class_float>` **stat_of**\ (\ node\: :ref:`Variant<class_Variant>`, stat_name\: :ref:`StringName<class_StringName>`\ ) |static| :ref:`🔗<class_ComponentManager_method_stat_of>`
 
 Reads ``stat_name`` from ``node``, or 0 if it has no **ComponentManager**.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ComponentManager_method_blocked:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **blocked**\ (\ node\: :ref:`Variant<class_Variant>`, what\: :ref:`StringName<class_StringName>`\ ) |static| :ref:`🔗<class_ComponentManager_method_blocked>`
+
+Whether ``node``'s host is blocking ``what``, e.g. ``&"damage"``. False for a node without a manager, and safe on a freed one.
 
 .. rst-class:: classref-item-separator
 
@@ -316,6 +350,42 @@ Sets the base value of a stat in :ref:`stats<class_ComponentManager_property_sta
 |void| **add_base**\ (\ stat_name\: :ref:`StringName<class_StringName>`, amount\: :ref:`float<class_float>`\ ) :ref:`🔗<class_ComponentManager_method_add_base>`
 
 Adds ``amount`` to the base value of a stat in :ref:`stats<class_ComponentManager_property_stats>`, e.g. a level on level up: ``manager.add_base(&"level", 1)``. Everything scaled by the stat follows.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ComponentManager_method_block:
+
+.. rst-class:: classref-method
+
+|void| **block**\ (\ what\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_ComponentManager_method_block>`
+
+Stops everything on this host that answers to the name ``what``, such as ``&"movement"``, until :ref:`unblock()<class_ComponentManager_method_unblock>` is called as many times. A status does this with each of its :ref:`StatusData.blocks<class_StatusData_property_blocks>`; a cutscene can do it from code.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ComponentManager_method_unblock:
+
+.. rst-class:: classref-method
+
+|void| **unblock**\ (\ what\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_ComponentManager_method_unblock>`
+
+Takes back one :ref:`block()<class_ComponentManager_method_block>` of ``what``.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_ComponentManager_method_is_blocked:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **is_blocked**\ (\ names\: :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]\ ) :ref:`🔗<class_ComponentManager_method_is_blocked>`
+
+Whether anything is blocking one of ``names`` right now.
 
 .. rst-class:: classref-item-separator
 

@@ -1,8 +1,8 @@
 extends GutTest
-## What stops a character acting: stuns and death stop its Brain, and single tags stop one
-## weapon or ability.
+## What stops a character acting: a status lists what it blocks. Stuns and death block
+## everything, which stops the Brain; others block movement, weapons or abilities only.
 
-const EX := "res://character_system/examples/"
+const EX := "res://character_system/starter_pack/"
 
 
 func make_character(position := Vector3.ZERO, extra: Array[Node] = []) -> CharacterBody3D:
@@ -26,7 +26,7 @@ func make_character(position := Vector3.ZERO, extra: Array[Node] = []) -> Charac
 
 
 func health_of(node: Node) -> Health:
-	return Component.of(node, Health) as Health
+	return Health.find_on(node)
 
 
 func physics_frames(count := 2) -> void:
@@ -35,7 +35,7 @@ func physics_frames(count := 2) -> void:
 
 
 func pull_trigger(who: Node) -> void:
-	var brain := Component.of(who, Brain) as Brain
+	var brain := Brain.find_on(who)
 	brain.press(&"primary")
 	# A press counts from the next frame; process_frame comes just before nodes run.
 	for i in 3:
@@ -43,21 +43,21 @@ func pull_trigger(who: Node) -> void:
 	brain.release(&"primary")
 
 
-func tagged(tag: StringName) -> StatusData:
+func blocking(what: StringName) -> StatusData:
 	var s := StatusData.new()
-	s.tags = [tag]
+	s.blocks = [what]
 	s.duration = 5.0
 	return s
 
 
 func test_a_stunned_character_cannot_act() -> void:
 	var who: CharacterBody3D = make_character(Vector3.ZERO, [Abilities.new()])
-	var brain := Component.of(who, Brain) as Brain
-	var statuses := Component.of(who, Statuses) as Statuses
-	var abilities := Component.of(who, Abilities) as Abilities
+	var brain := Brain.find_on(who)
+	var statuses := Statuses.find_on(who)
+	var abilities := Abilities.find_on(who)
 	brain.move_dir = Vector3.FORWARD
 	brain.press(&"primary")
-	var stunned: StatusData = tagged(&"stunned")
+	var stunned: StatusData = blocking(&"everything")
 	statuses.add(stunned)
 	assert_true(brain.is_blocked())
 	assert_eq(brain.move_dir, Vector3.ZERO)
@@ -70,8 +70,8 @@ func test_a_stunned_character_cannot_act() -> void:
 
 func test_a_dead_character_cannot_act_until_revived() -> void:
 	var who: CharacterBody3D = make_character(Vector3.ZERO, [Abilities.new()])
-	var brain := Component.of(who, Brain) as Brain
-	var abilities := Component.of(who, Abilities) as Abilities
+	var brain := Brain.find_on(who)
+	var abilities := Abilities.find_on(who)
 	brain.move_dir = Vector3.FORWARD
 	health_of(who).change(-500.0)
 	assert_true(brain.is_blocked())
@@ -80,20 +80,77 @@ func test_a_dead_character_cannot_act_until_revived() -> void:
 	health_of(who).revive()
 	assert_false(brain.is_blocked())
 	assert_true(abilities.use(AbilityData.new()))
-	brain.acts_while_dead = true
+	assert_eq(health_of(who).death_status.id, &"dead", "death is a status, Dead by default")
+	var downed := StatusData.new()
+	downed.blocks = [&"weapons"]
+	health_of(who).death_status = downed
 	health_of(who).change(-500.0)
-	assert_false(brain.is_blocked(), "unless the brain is told to carry on")
+	assert_true(health_of(who).is_dead())
+	assert_false(brain.is_blocked(), "a different death status decides what death stops")
+	assert_true(Statuses.find_on(who).active.has(downed))
+	health_of(who).revive()
+	assert_false(Statuses.find_on(who).active.has(downed))
+	health_of(who).death_status = null
+	health_of(who).change(-500.0)
+	assert_false(health_of(who).is_dead(), "no death status: nothing dies")
+	health_of(who).change(30.0)
+	assert_eq(health_of(who).current, 30.0, "and health goes on changing at zero")
 
 
-func test_the_brain_can_stop_on_other_tags() -> void:
+func test_the_brain_answers_to_the_names_it_lists() -> void:
 	var who: CharacterBody3D = make_character()
-	var brain := Component.of(who, Brain) as Brain
-	var statuses := Component.of(who, Statuses) as Statuses
-	brain.blocked_by_tags = [&"frozen", &"asleep"]
-	statuses.add(tagged(&"stunned"))
-	assert_false(brain.is_blocked(), "stunned is only the default")
-	statuses.add(tagged(&"asleep"))
+	var brain := Brain.find_on(who)
+	var statuses := Statuses.find_on(who)
+	brain.blocked_by = [&"sleep"]
+	statuses.add(blocking(&"everything"))
+	assert_false(brain.is_blocked(), "everything is only the default")
+	statuses.add(blocking(&"sleep"))
 	assert_true(brain.is_blocked())
+	brain.blocked_by = []
+	assert_false(brain.is_blocked(), "a brain that answers to nothing can't be stopped")
+
+
+func test_blocks_are_counted_and_code_can_block_too() -> void:
+	var who: CharacterBody3D = make_character()
+	var brain := Brain.find_on(who)
+	var statuses := Statuses.find_on(who)
+	var manager := ComponentManager.of(who)
+	var first: StatusData = blocking(&"everything")
+	var second: StatusData = blocking(&"everything")
+	statuses.add(first)
+	statuses.add(second)
+	statuses.remove(first)
+	assert_true(brain.is_blocked(), "still blocked by the second status")
+	statuses.remove(second)
+	assert_false(brain.is_blocked())
+	manager.block(&"everything")  # A cutscene, say.
+	assert_true(brain.is_blocked())
+	assert_true(ComponentManager.blocked(who, &"everything"))
+	manager.unblock(&"everything")
+	assert_false(brain.is_blocked())
+	assert_false(ComponentManager.blocked(null, &"everything"), "safe without a manager")
+
+
+func test_death_ends_timed_statuses_and_blocks_healing() -> void:
+	var who: CharacterBody3D = make_character()
+	var statuses := Statuses.find_on(who)
+	var burning: StatusData = load(EX + "statuses/burning.tres")
+	var passive := StatusData.new()
+	statuses.add(burning)
+	statuses.add(passive)
+	health_of(who).change(-500.0)
+	assert_false(statuses.active.has(burning), "Dead removes timed statuses")
+	assert_true(statuses.active.has(passive), "passives stay for a revive")
+	var heal := HealEffect.new()
+	heal.amount = 50.0
+	heal.apply(EffectContext.new(who, who))
+	assert_true(health_of(who).is_dead(), "Dead blocks healing")
+	health_of(who).change(50.0)
+	assert_true(health_of(who).is_dead(), "and health doesn't change while dead")
+	health_of(who).revive(40.0)
+	assert_eq(health_of(who).current, 40.0)
+	heal.apply(EffectContext.new(who, who))
+	assert_eq(health_of(who).current, 90.0)
 
 
 func test_a_stunned_character_stops_walking() -> void:
@@ -109,27 +166,32 @@ func test_a_stunned_character_stops_walking() -> void:
 	floor_body.add_child(slab)
 	floor_body.position.y = -0.5
 	add_child_autofree(floor_body)
-	var brain := Component.of(who, Brain) as Brain
+	var brain := Brain.find_on(who)
 	brain.move_dir = Vector3.FORWARD
 	await physics_frames(20)
 	var walked: float = -who.position.z
 	assert_gt(walked, 0.5, "walking")
-	(Component.of(who, Statuses) as Statuses).add(tagged(&"stunned"))
-	await physics_frames(2)
-	var stopped_at: float = who.position.z
-	await physics_frames(20)
-	assert_almost_eq(who.position.z, stopped_at, 0.01, "the motor reads no intent")
+	var statuses := Statuses.find_on(who)
+	for what: StringName in [&"everything", &"movement"]:
+		var status: StatusData = blocking(what)
+		statuses.add(status)
+		await physics_frames(2)
+		var stopped_at: float = who.position.z
+		await physics_frames(20)
+		assert_almost_eq(who.position.z, stopped_at, 0.01, "%s: the motor reads no intent" % what)
+		statuses.remove(status)
+		await physics_frames(5)
+		assert_lt(who.position.z, stopped_at - 0.1, "walking again")
 
 
-func test_a_status_tag_stops_the_trigger() -> void:
+func test_a_status_that_blocks_weapons_stops_the_trigger() -> void:
 	var shooter: CharacterBody3D = make_character()
 	var target: CharacterBody3D = make_character(Vector3(0, 0, -6))
-	var gear := Component.of(shooter, Equipment) as Equipment
+	var gear := Equipment.find_on(shooter)
 	gear.equip(ItemInstance.new(load(EX + "items/rifle.tres")))
-	(Component.of(gear.node_in(&"weapon"), Trigger) as Trigger).blocked_by_tags = [&"disarmed"]
-	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP
-	var statuses := Component.of(shooter, Statuses) as Statuses
-	var disarmed: StatusData = tagged(&"disarmed")
+	Brain.find_on(shooter).aim_point = target.global_position + Vector3.UP
+	var statuses := Statuses.find_on(shooter)
+	var disarmed: StatusData = blocking(&"weapons")
 	statuses.add(disarmed)
 	await physics_frames()
 	await pull_trigger(shooter)
@@ -142,11 +204,11 @@ func test_a_status_tag_stops_the_trigger() -> void:
 func test_a_stunned_or_dead_wielder_cannot_fire() -> void:
 	var shooter: CharacterBody3D = make_character()
 	var target: CharacterBody3D = make_character(Vector3(0, 0, -6))
-	(Component.of(shooter, Equipment) as Equipment).equip(
+	Equipment.find_on(shooter).equip(
 			ItemInstance.new(load(EX + "items/rifle.tres")))
-	(Component.of(shooter, Brain) as Brain).aim_point = target.global_position + Vector3.UP
-	var statuses := Component.of(shooter, Statuses) as Statuses
-	var stunned: StatusData = tagged(&"stunned")
+	Brain.find_on(shooter).aim_point = target.global_position + Vector3.UP
+	var statuses := Statuses.find_on(shooter)
+	var stunned: StatusData = blocking(&"everything")
 	statuses.add(stunned)
 	await physics_frames()
 	await pull_trigger(shooter)

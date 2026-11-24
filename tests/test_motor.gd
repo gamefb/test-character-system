@@ -26,7 +26,7 @@ func test_double_jump_air_mode_first() -> void:
 
 func test_walks_at_move_speed_and_stats_change_it() -> void:
 	var body := _make_character()
-	var brain := Component.of(body, Brain) as Brain
+	var brain := Brain.find_on(body)
 	await _land(body)
 	brain.move_dir = Vector3.RIGHT
 	await _physics_frames(3)
@@ -49,7 +49,7 @@ func test_walks_at_move_speed_and_stats_change_it() -> void:
 
 func test_dash() -> void:
 	var body := _make_character(false, true)
-	var brain := Component.of(body, Brain) as Brain
+	var brain := Brain.find_on(body)
 	var dash := _part(body, DashMove) as DashMove
 	await _land(body)
 
@@ -192,18 +192,18 @@ func test_statuses_block_modes_and_moves() -> void:
 	var motor := _motor_of(body)
 	var air := _part(body, AirMode) as AirMode
 	var dash := _part(body, DashMove) as DashMove
-	var statuses := Component.of(body, Statuses) as Statuses
-	dash.blocked_by_tags = [&"rooted"]
-	air.blocked_by_tags = [&"grounded"]
-	var rooted: StatusData = load("res://character_system/examples/statuses/rooted.tres")
-	var grounded := _tagged(&"grounded")
+	var statuses := Statuses.find_on(body)
+	air.blocked_by = [&"flight"]
+	var rooted: StatusData = load("res://character_system/starter_pack/statuses/rooted.tres")
+	var grounded := StatusData.new()
+	grounded.blocks = [&"flight"]
 	await _land(body)
 
 	statuses.add(rooted)
 	await _tap(body, &"dash")
-	assert_false(dash.active, "Rooted stops a dash with rooted in its tags")
+	assert_false(dash.active, "Rooted blocks movement, which stops a dash")
 	await _tap(body, &"jump")
-	assert_is(motor.mode, WalkMode, "and the example status cancels jumps through jump_velocity")
+	assert_is(motor.mode, WalkMode, "and a jump")
 	statuses.remove(rooted)
 	await _tap(body, &"dash")
 	assert_true(dash.active, "Once it's gone, the dash works")
@@ -253,8 +253,8 @@ func test_motor_sends_events() -> void:
 	damage.amount = 5.0
 	trigger.effects = [damage]
 	stomp.triggers = [trigger]
-	(Component.of(body, Statuses) as Statuses).add(stomp)
-	var health := Component.of(body, Health) as Health
+	Statuses.find_on(body).add(stomp)
+	var health := Health.find_on(body)
 	var before := health.current
 	await _tap(body, &"jump")
 	await _land(body)
@@ -283,7 +283,6 @@ func test_moves_have_a_cooldown() -> void:
 	assert_eq(dash.cooldown_left(), 0.0, "The cooldown runs out")
 	await _tap(body, &"dash")
 	assert_true(dash.active, "and it dashes again")
-
 
 
 ## A capsule character standing on the floor, with a motor and its modes. With
@@ -317,7 +316,7 @@ func _physics_frames(count: int) -> void:
 
 
 func _tap(body: CharacterBody3D, action: StringName) -> void:
-	var brain := Component.of(body, Brain) as Brain
+	var brain := Brain.find_on(body)
 	brain.press(action)
 	await _physics_frames(3)
 	brain.release(action)
@@ -333,7 +332,7 @@ func _land(body: CharacterBody3D) -> void:
 
 
 func _motor_of(body: CharacterBody3D) -> CharacterMotor:
-	return Component.of(body, CharacterMotor) as CharacterMotor
+	return CharacterMotor.find_on(body)
 
 
 ## The first node under the motor that is a [param type].
@@ -376,14 +375,6 @@ func _check_jumps(air_first: bool) -> void:
 	assert_eq(air.jumps_left, 1, "and the next take-off refills the air jump")
 
 
-## A status with [param tag] that lasts until removed.
-func _tagged(tag: StringName) -> StatusData:
-	var data := StatusData.new()
-	data.id = tag
-	data.tags = [tag]
-	return data
-
-
 ## Records the events its host receives.
 class EventLog extends Component:
 	var events: Array[StringName] = []
@@ -402,7 +393,7 @@ class EventLog extends Component:
 
 ## A move after the dash that counts the dash presses left for it.
 class PressCatcher extends LayeredMove:
-	var caught := 0
+	var caught: int = 0
 
 	func _can_start() -> bool:
 		if motor.consume_action(&"dash"):

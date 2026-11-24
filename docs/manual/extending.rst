@@ -103,16 +103,16 @@ Some examples:
        cooldown.
    * - Being rooted stops dashing and climbing
      - Status
-     - Give the status a tag, and add the tag to each mode's or move's Blocked By Tags. See
+     - Put ``movement`` in the status's Blocks. See
        :ref:`doc_movement_statuses_events_cooldowns`.
    * - A stun
      - Status
-     - A status tagged ``stunned`` and nothing else: the :ref:`Brain<class_Brain>` stops on
-       it. ``examples/statuses/stunned.tres``.
+     - A status with ``everything`` in its Blocks and nothing else: the
+       :ref:`Brain<class_Brain>` answers to that name. ``starter_pack/statuses/stunned.tres``.
    * - A fireball that costs mana and takes a moment to cast
      - Ability
      - Costs, Cast Time and a :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>`.
-       ``examples/abilities/fireball.tres``.
+       ``starter_pack/abilities/fireball.tres``.
    * - Damage that grows with strength or level
      - Setting
      - A :ref:`StatAmount<class_StatAmount>` in the effect's Scaling, and the stat in the
@@ -120,10 +120,10 @@ Some examples:
    * - Critical hits
      - Status
      - A passive with a ``dealing_damage`` trigger and a
-       :ref:`ChanceCondition<class_ChanceCondition>`. ``examples/statuses/lucky_strikes.tres``.
+       :ref:`ChanceCondition<class_ChanceCondition>`. ``starter_pack/statuses/lucky_strikes.tres``.
    * - Life steal, heal on kill
      - Status
-     - Triggers on ``dealt_damage`` and ``killed``. ``examples/statuses/vampiric.tres`` and
+     - Triggers on ``dealt_damage`` and ``killed``. ``starter_pack/statuses/vampiric.tres`` and
        ``bloodlust.tres``.
    * - A shield that recharges out of combat
      - Setting
@@ -152,7 +152,7 @@ Some examples:
        :ref:`doc_extending_movement`.
    * - Sprint for a few seconds
      - Ability
-     - Once per press: applies a speed status (``examples/abilities/sprint.tres`` applies
+     - Once per press: applies a speed status (``starter_pack/abilities/sprint.tres`` applies
        Haste).
    * - Sprint while a button is held, with stamina
      - Component
@@ -180,8 +180,11 @@ Before you write a script
 - **Hear events with** ``on()``. ``on(&"took_damage", _on_took_damage)`` in ``_start()`` calls
   your method for that event until the component stops. :ref:`doc_events` lists the events.
 - **Look things up when you need them.** ``find(Type)`` for a component beside yours,
-  ``Component.of(node, Type)`` for one on another node. Both are cheap, so don't keep the
-  result in a variable: components can come and go during play.
+  ``Health.find_on(node)`` for one on another node. Both are cheap, so don't keep the
+  result in a variable: components can come and go during play. The built-in components a
+  game looks up have ``find_on()``; for your own, ``Component.of(node, Type) as Type`` does
+  the same, and :ref:`Component.of<class_Component_method_of>` shows the two lines that give
+  your type its own.
 - **Read numbers with** ``stat()`` **at the moment you use them.** Numbers statuses should be
   able to change go in your component's ``_stats()``; call ``update_stats()`` when you change
   one yourself.
@@ -190,7 +193,10 @@ Before you write a script
   :ref:`EffectContext<class_EffectContext>`, per-character state in a component, and an item's
   own state, such as rounds loaded, in ``item.state``.
 - **Cope with what isn't there.** An effect can hit a wall and a condition can check a crate,
-  so check for null after every ``Component.of()``.
+  so check for null after every ``find_on()``.
+- **Give a name field its usual name.** An exported ``stat``, ``pool``, ``event``, ``tag``,
+  ``tags``, ``blocks`` or ``blocked_by`` in a script that starts with ``@tool`` becomes a
+  :ref:`list to pick from <doc_name_lists>` in the Inspector, with no code.
 - **Add** ``@tool`` **to components for editor warnings.** The base class turns processing off
   in the editor and never calls ``_start()`` there, but your own ``_ready()`` would still run,
   which is one more reason to set up in ``_start()``. The
@@ -204,25 +210,26 @@ The :ref:`pitfalls <doc_pitfalls>` list the mistakes that are easiest to make.
 A component
 -----------
 
-:ref:`Stamina<class_Stamina>` lets a character sprint while a button is held, using up stamina that comes back when it's let go.
+:ref:`Sprint<class_Sprint>` lets a character run faster while a button is held, for as long as a :ref:`Pool<class_Pool>` named ``stamina`` has something left. The stamina itself is an ordinary pool beside it, with a Regen and a Regen Delay; the component only spends from it, which is all a component of your own has to do to use a resource.
 
-.. source-file:: ../../character_system/examples/scripts/stamina.gd
+.. source-file:: ../../character_system/starter_pack/scripts/sprint.gd
 
 Each part does one job:
 
 - ``_requires()`` returns ``[Brain, CharacterMotor]``, so the component waits, with a warning,
   until both are beside it. Sprinting means nothing without movement.
-- ``_stats()`` owns ``max_stamina``, so a status can raise it with a
-  :ref:`StatModifier<class_StatModifier>` and ``stat(&"max_stamina")`` returns the result. The
-  setter calls ``update_stats()``, so a change in the Inspector during play counts at once.
+- It owns no stats: the maximum and the refill rate are the pool's ``max_stamina`` and
+  ``stamina_regen``, which a status can change with a
+  :ref:`StatModifier<class_StatModifier>`. A component that does own a number returns it
+  from ``_stats()``.
 - ``_process()`` only runs while the component runs, so it can use the Brain without a null
   check. It reads the button with ``is_action_pressed()``, which stays true while it's held.
 - The speed boost is a stat modifier added to the manager, so it combines with every other
   speed change, such as Wet slowing the character down. ``_stop()`` takes it off, so removing
   the component mid-sprint leaves nothing behind.
-- The ``changed`` signal is for a stamina bar.
+- ``_warnings()`` tells the editor when there is no pool with that name beside it.
 
-To use it, add it to a character beside the CharacterMotor, add a ``sprint`` action to the Input Map, and add ``sprint`` to the :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions.
+To use it, add it to a character beside the CharacterMotor, with a Pool named ``stamina``, add a ``sprint`` action to the Input Map, and add ``sprint`` to the :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions.
 
 .. _doc_extending_movement:
 
@@ -238,7 +245,7 @@ New ways to move go under the character's :ref:`CharacterMotor<class_CharacterMo
 
 :ref:`WallSlideMode<class_WallSlideMode>` slides slowly down a wall while the character falls against it, and jumps off it:
 
-.. source-file:: ../../character_system/examples/scripts/wall_slide_mode.gd
+.. source-file:: ../../character_system/starter_pack/scripts/wall_slide_mode.gd
 
 - ``_can_enter()`` lets it take over by itself once the character falls against a wall. The
   motor asks every mode that isn't in charge, so WalkMode and AirMode don't need to know this
@@ -251,7 +258,7 @@ New ways to move go under the character's :ref:`CharacterMotor<class_CharacterMo
 
 :ref:`GlideMove<class_GlideMove>` slows the fall while jump is held:
 
-.. source-file:: ../../character_system/examples/scripts/glide_move.gd
+.. source-file:: ../../character_system/starter_pack/scripts/glide_move.gd
 
 - ``_can_start()`` is asked every frame while it's idle. It reads the held button with
   ``is_action_pressed()``, which doesn't use anything up, so AirMode still gets the press for its
@@ -277,23 +284,38 @@ An item component
 
 Item components extend :ref:`ItemComponent<class_ItemComponent>`, which adds ``wielder`` (the character holding the item), ``item`` (this copy of it) and ``brain`` (the wielder's brain). There are two common kinds.
 
-**One that acts when the item is used** listens to the item's :ref:`Trigger<class_Trigger>`, which decides when it fires. :ref:`MeleeSweep<class_MeleeSweep>` hits everything inside a shape in front of the item:
+**One that decides what a shot reaches** extends :ref:`WeaponDelivery<class_WeaponDelivery>` and writes one method, ``_fire()``, which runs each time the item's :ref:`Trigger<class_Trigger>` fires. :ref:`MeleeSweep<class_MeleeSweep>` hits everything inside a shape in front of the item:
 
-.. source-file:: ../../character_system/kit/items/melee_sweep.gd
+.. source-file:: ../../character_system/character/items/melee_sweep.gd
 
-- ``_requires()`` returns ``[Trigger]``, and ``_start()`` listens to its ``fired`` signal.
-- The wielder's body and hurtboxes are collected once, in ``_start()``, so swings pass through
-  them.
-- ``Hurtbox.hit()`` builds each hit's context: it turns a hurtbox into its character, applies
-  its multiplier, and records the item as ``origin``.
-- The effects come from the Inspector, so the same component makes a sword, a burning axe or a
-  healing touch.
+The base class brings the rest, so a new one has only its own settings and its ``_fire()``:
+
+- the Effects and Collision Mask fields, and the name warnings for the effects,
+- the wait for a Trigger and the connection to its ``fired`` signal,
+- ``_wielder_rids``, the wielder's body and hurtboxes, so shots can pass through them,
+- ``context_for(collider, position, normal)``, which builds each hit's context: it turns a
+  hurtbox into its character, applies its multiplier, and records the item as ``origin``.
+
+This one hits whatever a :ref:`Targeting<class_Targeting>` finds around the wielder, which makes a shock baton out of the same targeting an ability uses:
+
+.. code-block:: gdscript
+
+    class_name Pulse
+    extends WeaponDelivery
+
+    @export var targeting: Targeting
+
+    func _fire() -> void:
+    	for target in targeting.find(context_for(wielder)):
+    		Effect.apply_all(effects, context_for(target))
+
+An item component that acts on use without hitting anything, such as a flashlight, extends :ref:`ItemComponent<class_ItemComponent>` and listens to the Trigger itself: return ``[Trigger]`` from ``_requires()`` and call ``listen((find(Trigger) as Trigger).fired, _on_fired)`` in ``_start()``.
 
 To make a sword, build an item scene with a :ref:`ComponentManager<class_ComponentManager>`, a Trigger and a MeleeSweep with a BoxShape3D about a metre across and a :ref:`DamageEffect<class_DamageEffect>` in its effects. A projectile weapon needs no delivery component: a :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` in the Trigger's ``user_effects`` launches a :ref:`Projectile<class_Projectile>`, which applies the effects to what it touches; see :ref:`doc_projectiles`.
 
 **One that changes the wielder while equipped** finds what it needs in ``_start()`` and undoes everything in ``_stop()``, which runs on unequip. :ref:`Scope<class_Scope>` zooms the wielder's camera and slows it down while the aim button is held:
 
-.. source-file:: ../../character_system/examples/scripts/scope.gd
+.. source-file:: ../../character_system/starter_pack/scripts/scope.gd
 
 Whatever an item changes on its wielder must be undone in ``_stop()``. A stat modifier left on the wielder's manager would slow the character for the rest of the game.
 
@@ -318,7 +340,7 @@ An effect
 
 An effect extends :ref:`Effect<class_Effect>` and overrides ``_execute(ctx)``. :ref:`SpawnSceneEffect<class_SpawnSceneEffect>` spawns a scene, such as a puddle or an explosion, where the target is:
 
-.. source-file:: ../../character_system/kit/effects/spawn_scene_effect.gd
+.. source-file:: ../../character_system/character/effects/spawn_scene_effect.gd
 
 - Its numbers are ``@export`` variables, so each use is set up in the Inspector.
 - ``ctx.target`` is whoever it happens to, and may be anything: a character, a crate or null.
@@ -327,7 +349,22 @@ An effect extends :ref:`Effect<class_Effect>` and overrides ``_execute(ctx)``. :
   such as a zone's ``body_entered``, where new areas can't be added yet.
 - It stores nothing on itself between uses.
 
-Conditions work on every effect without any code: put one in its ``conditions`` and the effect only runs when it passes. Effects that deal damage should scale by ``ctx.magnitude``, so status stacks and headshots strengthen them, as :ref:`DamageEffect<class_DamageEffect>` does. An effect with a number can take a ``scaling`` list too, in one line: ``Amount.total(amount, scaling, ctx)`` is the plain number plus every :ref:`Amount<class_Amount>` in the list.
+Conditions work on every effect without any code: put one in its ``conditions`` and the effect only runs when it passes.
+
+**An effect with a number** extends :ref:`AmountEffect<class_AmountEffect>` instead. That gives it the Amount and Scaling fields of :ref:`DamageEffect<class_DamageEffect>` and :ref:`HealEffect<class_HealEffect>`, and ``total(ctx)``: the plain number plus every :ref:`Amount<class_Amount>` in the list, times ``ctx.magnitude``, so status stacks and headshots strengthen it. This one moves mana from the target to whoever caused it, and takes more for each point of the user's spell power once a :ref:`StatAmount<class_StatAmount>` is in its Scaling:
+
+.. code-block:: gdscript
+
+    class_name SiphonEffect
+    extends AmountEffect
+
+    func _execute(ctx: EffectContext) -> void:
+    	var theirs := Pool.named(ctx.target, &"mana")
+    	var mine := Pool.named(ctx.source, &"mana")
+    	if theirs and mine:  # Either may have no mana, or be a wall.
+    		var taken: float = minf(theirs.current, total(ctx))
+    		theirs.change(-taken)
+    		mine.change(taken)
 
 .. _doc_extending_amount:
 
@@ -345,7 +382,7 @@ An amount extends :ref:`Amount<class_Amount>` and overrides ``value(ctx)``. :ref
 
 The :ref:`Amount<class_Amount>` reference has a short one of your own to copy, which grows with distance.
 
-To make a water spell, give an ability two effects: an :ref:`ApplyStatusEffect<class_ApplyStatusEffect>` with Wet, and a SpawnSceneEffect with ``examples/zones/water_pool.tscn`` and a lifetime of 10 seconds.
+To make a water spell, give an ability two effects: an :ref:`ApplyStatusEffect<class_ApplyStatusEffect>` with Wet, and a SpawnSceneEffect with ``starter_pack/zones/water_pool.tscn`` and a lifetime of 10 seconds.
 
 .. _doc_extending_condition:
 
@@ -354,7 +391,7 @@ A condition
 
 A condition extends :ref:`Condition<class_Condition>`. Most override ``_test(node)``, which checks one side; ``subject`` picks which side and ``negate`` flips the answer, with no code of your own. The :ref:`Condition<class_Condition>` reference shows one. A condition that compares both sides overrides ``check(ctx)`` instead, like :ref:`IsHostileCondition<class_IsHostileCondition>`:
 
-.. source-file:: ../../character_system/kit/conditions/is_hostile_condition.gd
+.. source-file:: ../../character_system/character/conditions/is_hostile_condition.gd
 
 Put it in the ``conditions`` of a weapon's DamageEffect to turn friendly fire off: allies are still hit, but take no damage.
 
@@ -365,7 +402,7 @@ Ability targeting
 
 An ability's ``targeting`` decides who its effects reach. Left empty, it's the user. :ref:`RadiusTargeting<class_RadiusTargeting>` picks everything within a radius:
 
-.. source-file:: ../../character_system/kit/abilities/radius_targeting.gd
+.. source-file:: ../../character_system/character/abilities/radius_targeting.gd
 
 - ``find(ctx)`` gets the user as ``ctx.source`` and returns the targets.
 - It asks the physics engine what's inside a sphere, through the user's world. A resource
@@ -382,7 +419,7 @@ AI decision logic
 
 :ref:`AIBrain<class_AIBrain>` walks toward a target and aims at it, but doesn't choose one. That's the job of a component beside it. :ref:`AttackNearest<class_AttackNearest>` picks the nearest enemy every half second and taps the fire button while it's in range:
 
-.. source-file:: ../../character_system/examples/scripts/attack_nearest.gd
+.. source-file:: ../../character_system/starter_pack/scripts/attack_nearest.gd
 
 - It only sets ``target`` and presses buttons, exactly as a player would, so every weapon and
   ability works for it.
@@ -401,7 +438,7 @@ A HUD
 
 :ref:`CharacterHud<class_CharacterHud>` shows a character's health, statuses, ammo and an ability's cooldown. Health and statuses are shown when their ``changed`` signals fire; ammo and the cooldown are read every frame, which is cheap.
 
-.. source-file:: ../../character_system/examples/scripts/character_hud.gd
+.. source-file:: ../../character_system/starter_pack/scripts/character_hud.gd
 
 .. _doc_extending_names:
 

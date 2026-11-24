@@ -18,6 +18,7 @@ Core
     :name: toc-class-ref-core
 
     class_amount
+    class_amounteffect
     class_applystatuseffect
     class_component
     class_componentmanager
@@ -30,6 +31,7 @@ Core
     class_health
     class_modifyamounteffect
     class_namecheck
+    class_pool
     class_removestatuseffect
     class_statamount
     class_statmodifier
@@ -39,12 +41,12 @@ Core
     class_statuses
     class_worldevents
 
-Kit
-===
+Character
+=========
 
 .. toctree::
     :maxdepth: 1
-    :name: toc-class-ref-kit
+    :name: toc-class-ref-character
 
     class_aibrain
     class_abilities.state
@@ -61,8 +63,6 @@ Kit
     class_equipment
     class_faction
     class_grants
-    class_healthamount
-    class_healthbelowcondition
     class_hitamount
     class_hitcondition
     class_hitscan
@@ -81,7 +81,8 @@ Kit
     class_mouselook
     class_movementmode
     class_playerbrain
-    class_pool
+    class_poolamount
+    class_poolbelowcondition
     class_projectile
     class_radiustargeting
     class_randomamount
@@ -90,18 +91,19 @@ Kit
     class_targeting
     class_trigger
     class_walkmode
+    class_weapondelivery
     class_weaponswitch
 
-Examples
-========
+Starter pack
+============
 
 .. toctree::
     :maxdepth: 1
-    :name: toc-class-ref-examples
+    :name: toc-class-ref-starter-pack
 
     class_attacknearest
     class_characterhud
     class_glidemove
     class_scope
-    class_stamina
+    class_sprint
     class_wallslidemode

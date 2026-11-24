@@ -8,36 +8,6 @@ const MOVES: Array[StringName] = [&"left", &"right", &"forward", &"back"]
 var added: Array[StringName] = []
 
 
-## Checks the brain's buttons from [code]_process()[/code] and [code]_physics_process()[/code],
-## and counts how often it sees each press.
-class Spy:
-	extends Node
-
-	var brain: Brain
-	var process_presses: int = 0
-	var physics_presses: int = 0
-
-	func _process(_delta: float) -> void:
-		if brain.is_action_just_pressed(&"primary"):
-			process_presses += 1
-
-	func _physics_process(_delta: float) -> void:
-		if brain.is_action_just_pressed(&"primary"):
-			physics_presses += 1
-
-
-## Presses primary once from _physics_process(), as AI decision logic would.
-class Presser:
-	extends Node
-
-	var brain: Brain
-
-	func _physics_process(_delta: float) -> void:
-		if not brain.is_action_pressed(&"primary"):
-			brain.press(&"primary")
-			set_physics_process(false)
-
-
 func before_each() -> void:
 	for a in MOVES + [&"primary"]:
 		if not InputMap.has_action(a):
@@ -222,3 +192,33 @@ func test_automatic_fires_once_for_a_quick_tap() -> void:
 	brain.release(&"primary")
 	await frames(10)
 	assert_eq(shots[0], 1)
+
+
+## Checks the brain's buttons from [code]_process()[/code] and [code]_physics_process()[/code],
+## and counts how often it sees each press.
+class Spy:
+	extends Node
+
+	var brain: Brain
+	var process_presses: int = 0
+	var physics_presses: int = 0
+
+	func _process(_delta: float) -> void:
+		if brain.is_action_just_pressed(&"primary"):
+			process_presses += 1
+
+	func _physics_process(_delta: float) -> void:
+		if brain.is_action_just_pressed(&"primary"):
+			physics_presses += 1
+
+
+## Presses primary once from _physics_process(), as AI decision logic would.
+class Presser:
+	extends Node
+
+	var brain: Brain
+
+	func _physics_process(_delta: float) -> void:
+		if not brain.is_action_pressed(&"primary"):
+			brain.press(&"primary")
+			set_physics_process(false)

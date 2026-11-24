@@ -5,10 +5,10 @@ extends Label3D
 func _process(_delta: float) -> void:
 	var who: Node = get_parent()
 	var lines: Array[String] = [who.name]
-	var health := Component.of(who, Health) as Health
+	var health := Health.find_on(who)
 	if health:
 		lines.append("%d / %d" % [health.current, health.maximum()])
-	var statuses := Component.of(who, Statuses) as Statuses
+	var statuses := Statuses.find_on(who)
 	if statuses:
 		var names: Array[String] = []
 		for data in statuses.active:

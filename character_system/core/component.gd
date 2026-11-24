@@ -40,11 +40,12 @@ extends Node
 ## If a component can't start, the editor shows a warning on it and the Output panel reports
 ## once what's missing. The rest of the host keeps working.
 ##
-## [b]Using components from other code.[/b] Get one with [method Component.of], read stats with
-## [method ComponentManager.stat_of] and send events with [method ComponentManager.notify]. All
-## three are safe on null or freed nodes and on nodes without components, such as walls.
+## [b]Using components from other code.[/b] Get one with its type's [code]find_on()[/code],
+## such as [method Health.find_on], read stats with [method ComponentManager.stat_of] and send
+## events with [method ComponentManager.notify]. All three are safe on null or freed nodes and
+## on nodes without components, such as walls.
 ## [codeblock]
-## var health := Component.of(body, Health) as Health  # null if body has no Health.
+## var health := Health.find_on(body)  # null if body has no Health.
 ## if health:
 ## 	health.change(-10.0)
 ## [/codeblock]
@@ -52,8 +53,8 @@ extends Node
 ## [b]Writing your own.[/b] Extend this class and override any of [method _requires],
 ## [method _stats], [method _start], [method _stop] and [method _warnings]. Do setup in
 ## [method _start], not [code]_ready()[/code]: it runs once everything is in place, and never
-## in the editor. This outline shows where each part goes; [Stamina] in
-## [code]examples/scripts/[/code] is a complete one to copy.
+## in the editor. This outline shows where each part goes; [Sprint] in
+## [code]starter_pack/scripts/[/code] is a complete one to copy.
 ##
 ## [codeblock]
 ## @tool  # Optional: shows this component's warnings in the editor.
@@ -118,9 +119,16 @@ var _required: Array[Script] = []
 ## Returns the [param type] component on [param node], or null. Safe on null or freed nodes.
 ##
 ## Use it from any script: effects, level scripts, UI. Subclasses count, so asking for
-## [Brain] finds a [PlayerBrain] or [AIBrain]. Cast the result to use its members:
+## [Brain] finds a [PlayerBrain] or [AIBrain]. The components a game looks up most have a
+## typed shortcut, such as [method Health.find_on]. For a type of your own, cast the result,
+## or give the type the same two lines:
 ## [codeblock]
-## var statuses := Component.of(enemy, Statuses) as Statuses
+## var statuses := Statuses.find_on(enemy)
+## var sprint := Component.of(enemy, Sprint) as Sprint
+##
+## # In sprint.gd, so other scripts can write Sprint.find_on(enemy):
+## static func find_on(node: Variant) -> Sprint:
+## 	return Component.of(node, Sprint) as Sprint
 ## [/codeblock]
 ## It works on a scene that hasn't been added to the level yet, e.g. to set a spawned
 ## enemy's [member Faction.team] before [code]add_child()[/code].
@@ -137,6 +145,11 @@ static func type_name(type: Script) -> String:
 
 
 #region Engine callbacks: no need to change these
+
+
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
 
 
 func _notification(what: int) -> void:

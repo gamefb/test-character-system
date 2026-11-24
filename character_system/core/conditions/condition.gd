@@ -1,3 +1,4 @@
+@tool
 @icon("res://character_system/icons/condition.svg")
 @abstract
 class_name Condition
@@ -13,13 +14,13 @@ extends Resource
 ## extends Condition
 ##
 ## func _test(node: Node) -> bool:
-## 	var statuses := Component.of(node, Statuses) as Statuses
+## 	var statuses := Statuses.find_on(node)
 ## 	return statuses != null and statuses.has_tag(&"fire")
 ## [/codeblock]
 ##
 ## Set [member subject] to check whoever caused it instead ("only rangers can apply this"),
 ## and [member negate] to flip the result. The built-in ones are [HasTagCondition],
-## [StatCondition], [HealthBelowCondition] and [IsHostileCondition].
+## [StatCondition], [PoolBelowCondition] and [IsHostileCondition].
 ##
 ## A check that needs both sides, such as "the source is hostile to the target", overrides
 ## [method check] instead and reads [member EffectContext.source] and
@@ -44,6 +45,11 @@ static func all_pass(conditions: Array[Condition], ctx: EffectContext) -> bool:
 		if not c.check(ctx):
 			return false
 	return true
+
+
+func _validate_property(property: Dictionary) -> void:
+	if Engine.is_editor_hint():
+		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
 
 
 ## Tests the node [member subject] picks and applies [member negate]. Override this

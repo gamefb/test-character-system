@@ -110,7 +110,7 @@ Multiplies the total. 1.5 = +50%, 0 = none at all.
 
 :ref:`Array<class_Array>`\[:ref:`Condition<class_Condition>`\] **conditions** = ``[]`` :ref:`🔗<class_StatModifier_property_conditions>`
 
-The modifier only counts while all of these pass, e.g. a :ref:`HealthBelowCondition<class_HealthBelowCondition>` for "faster while badly hurt". They're checked on the character that has the modifier, each time the stat is read. :ref:`ComponentManager.stat_changed<class_ComponentManager_signal_stat_changed>` isn't emitted when one flips, so UI that shows such a stat should read it every frame.
+The modifier only counts while all of these pass, e.g. a :ref:`PoolBelowCondition<class_PoolBelowCondition>` for "faster while badly hurt". They're checked on the character that has the modifier, each time the stat is read. :ref:`ComponentManager.stat_changed<class_ComponentManager_signal_stat_changed>` isn't emitted when one flips, so UI that shows such a stat should read it every frame.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`
