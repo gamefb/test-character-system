@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/item_component.svg")
 @abstract
 class_name ItemComponent
 extends Component

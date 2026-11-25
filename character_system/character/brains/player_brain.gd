@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/player_brain.svg")
 class_name PlayerBrain
 extends Brain
 ## Turns keyboard, mouse and gamepad input into intent.

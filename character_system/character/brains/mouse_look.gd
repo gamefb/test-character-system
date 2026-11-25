@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/mouse_look.svg")
 class_name MouseLook
 extends Component
 ## Turns the character and tilts its camera with the mouse.

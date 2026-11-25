@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/magazine.svg")
 class_name Magazine
 extends ItemComponent
 ## Limits shots to [member capacity] and reloads from the wielder's Inventory.

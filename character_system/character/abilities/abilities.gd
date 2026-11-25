@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/abilities.svg")
 class_name Abilities
 extends Component
 ## Uses abilities when their action is pressed, and tracks cooldowns, charges, costs and casts.

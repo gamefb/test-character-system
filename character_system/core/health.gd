@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/health.svg")
 class_name Health
 extends Pool
 ## The pool named [code]health[/code]: what damage takes away and healing gives back.

@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/layered_move.svg")
 class_name GlideMove
 extends LayeredMove
 ## An example layered move to copy: hold jump while falling to glide down slowly.

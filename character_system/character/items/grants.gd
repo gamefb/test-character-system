@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/grants.svg")
 class_name Grants
 extends ItemComponent
 ## What the wielder gains while the item is equipped: passives, stat changes and abilities.
