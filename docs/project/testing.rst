@@ -16,8 +16,8 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - Tests
      - What it checks
    * - ``test_core.gd``
-     - 15
-     - Components start in any order and once a requirement arrives, only process and get input while running, keep their own process mode, and stop and restart with a requirement (but keep running while another of its type is left); stats combine and update, and a new component reports its stats; events reach running components only; lookups work before the host is in the scene and follow components that come and go, and ``find_on()`` is safe on null, freed and plain nodes
+     - 16
+     - Components start in any order and once a requirement arrives, only process and get input while running, keep their own process mode, and stop and restart with a requirement (but keep running while another of its type is left); stats combine and update, and a new component reports its stats; events reach running components only; lookups work before the host is in the scene and follow components that come and go, ``find_on()`` is safe on null, freed and plain nodes, and every base class has an icon whose picture no other base class has
    * - ``test_input.gd``
      - 9
      - Presses and releases, a release while paused or never seen, a press the UI used, two keys on one action, an AI press seen once by every node, automatic fire held and tapped
@@ -171,7 +171,7 @@ The base classes for effects with a number and for weapon parts, the typed ``fin
 Verification status
 -------------------
 
-All 254 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
+All 255 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
 
 .. list-table::
    :header-rows: 1
@@ -179,7 +179,7 @@ All 254 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 an
    * - Check
      - Godot 4.8 beta 4
    * - GUT tests (25 files above, test_statuses.gd included)
-     - 254 of 254, 1165 asserts
+     - 255 of 255, 1226 asserts
    * - ``immunity_test`` scene
      - 43 of 43
    * - Test level, ``--self-test``

@@ -1,4 +1,5 @@
 @tool
+@icon("res://character_system/icons/stat_modifier.svg")
 class_name StatModifier
 extends Resource
 ## A change to one stat while it's applied.

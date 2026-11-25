@@ -1,4 +1,5 @@
 @tool
+@icon("res://character_system/icons/name_check.svg")
 class_name NameCheck
 extends RefCounted
 ## Finds names in your data that nothing in the project recognizes, which is usually a typo.

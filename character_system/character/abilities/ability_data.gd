@@ -1,4 +1,5 @@
 @tool
+@icon("res://character_system/icons/ability_data.svg")
 class_name AbilityData
 extends Resource
 ## An active ability: when it can be used, what it costs, who it targets and what it does.

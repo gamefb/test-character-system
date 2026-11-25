@@ -1,3 +1,4 @@
+@icon("res://character_system/icons/effect_context.svg")
 class_name EffectContext
 extends RefCounted
 ## Who did what to whom, and how strongly: passed to every effect, condition and event.

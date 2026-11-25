@@ -1,5 +1,5 @@
 @tool
-@icon("res://character_system/icons/effect.svg")
+@icon("res://character_system/icons/amount.svg")
 @abstract
 class_name Amount
 extends Resource

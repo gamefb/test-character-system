@@ -1,4 +1,5 @@
 @tool
+@icon("res://character_system/icons/status_trigger.svg")
 class_name StatusTrigger
 extends Resource
 ## Runs effects when the status holder takes part in an event.

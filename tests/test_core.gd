@@ -200,6 +200,28 @@ func test_find_on_is_a_typed_lookup_that_is_safe_on_anything() -> void:
 	assert_null(Health.find_on(host), "freed")
 
 
+## A class that extends an engine class directly needs its own picture; classes built on it
+## may share it. Compares the pictures, not the file names, so a copied file doesn't count.
+func test_every_base_class_has_an_icon_of_its_own() -> void:
+	var classes: Dictionary[StringName, Dictionary] = {}
+	for entry: Dictionary in ProjectSettings.get_global_class_list():
+		if String(entry["path"]).begins_with("res://character_system/"):
+			classes[entry["class"]] = entry
+	# Picture -> the base class that has it.
+	var pictures: Dictionary[String, StringName] = {}
+	for name: StringName in classes:
+		if classes.has(classes[name]["base"]):
+			continue
+		var icon: String = classes[name]["icon"]
+		assert_ne(icon, "", "%s has no icon" % name)
+		var picture: String = FileAccess.get_file_as_string(icon)
+		assert_ne(picture, "", "%s: %s can't be read" % [name, icon])
+		assert_false(pictures.has(picture),
+				"%s has the same picture as %s" % [name, pictures.get(picture, &"")])
+		pictures[picture] = name
+	assert_gt(pictures.size(), 15)
+
+
 func test_new_component_reports_its_stats() -> void:
 	add_child_autofree(host)
 	var manager := ComponentManager.of(host)

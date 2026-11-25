@@ -1,4 +1,5 @@
 @tool
+@icon("res://character_system/icons/motor_node.svg")
 @abstract
 class_name MotorNode
 extends Node

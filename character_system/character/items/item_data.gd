@@ -1,3 +1,4 @@
+@icon("res://character_system/icons/item_data.svg")
 class_name ItemData
 extends Resource
 ## Shared definition of an item type, saved as a .tres file.
