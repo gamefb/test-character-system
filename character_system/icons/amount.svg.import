@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://uclgufjuihia"
-path="res://.godot/imported/faction.svg-f1f422ae8e62e43a1261faadebd53f2f.ctex"
+uid="uid://cs7phxnyguedd"
+path="res://.godot/imported/amount.svg-ba82557e71ca455708ffdf73cf13d1b4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://character_system/icons/faction.svg"
-dest_files=["res://.godot/imported/faction.svg-f1f422ae8e62e43a1261faadebd53f2f.ctex"]
+source_file="res://character_system/icons/amount.svg"
+dest_files=["res://.godot/imported/amount.svg-ba82557e71ca455708ffdf73cf13d1b4.ctex"]
 
 [params]
 

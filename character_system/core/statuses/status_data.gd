@@ -1,4 +1,5 @@
 @tool
+@icon("res://character_system/icons/status_data.svg")
 class_name StatusData
 extends Resource
 ## A status or passive, saved as a .tres file.

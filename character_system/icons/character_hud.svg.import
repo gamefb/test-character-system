@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bthllj88u8vcw"
-path="res://.godot/imported/abilities.svg-962c0f3e8510387ac13c96fc674cccff.ctex"
+uid="uid://baxqrckop0n4r"
+path="res://.godot/imported/character_hud.svg-189d82cf5843690d0a9fae72c5fff4d8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://character_system/icons/abilities.svg"
-dest_files=["res://.godot/imported/abilities.svg-962c0f3e8510387ac13c96fc674cccff.ctex"]
+source_file="res://character_system/icons/character_hud.svg"
+dest_files=["res://.godot/imported/character_hud.svg-189d82cf5843690d0a9fae72c5fff4d8.ctex"]
 
 [params]
 

@@ -1,3 +1,4 @@
+@icon("res://character_system/icons/item_instance.svg")
 class_name ItemInstance
 extends Resource
 ## One copy (or one stack) of an item, with its own state.

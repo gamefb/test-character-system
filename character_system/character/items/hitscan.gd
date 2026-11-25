@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/hitscan.svg")
 class_name Hitscan
 extends WeaponDelivery
 ## Fires an instant ray on each [Trigger] shot and applies [member WeaponDelivery.effects] to

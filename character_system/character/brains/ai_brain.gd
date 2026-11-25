@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/ai_brain.svg")
 class_name AIBrain
 extends Brain
 ## Steers toward [member target] along the navigation mesh.

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpq3kp0of7dn2"
-path="res://.godot/imported/grants.svg-7aa2527c9853940858aa0c86b9be060e.ctex"
+uid="uid://dsvpa8wg85fwx"
+path="res://.godot/imported/motor_node.svg-bc72d6f30ff3eb76cd4537e1d9dc7160.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://character_system/icons/grants.svg"
-dest_files=["res://.godot/imported/grants.svg-7aa2527c9853940858aa0c86b9be060e.ctex"]
+source_file="res://character_system/icons/motor_node.svg"
+dest_files=["res://.godot/imported/motor_node.svg-bc72d6f30ff3eb76cd4537e1d9dc7160.ctex"]
 
 [params]
 

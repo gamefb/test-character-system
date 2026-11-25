@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/inventory.svg")
 class_name Inventory
 extends Component
 ## The items a character carries, as stacks.

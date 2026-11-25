@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dbghwe2re76ds"
-path="res://.godot/imported/ai_brain.svg-896a5e54e5a16e92d0df81bea6f544bd.ctex"
+uid="uid://cpkmb4hxo1ee6"
+path="res://.godot/imported/effect_context.svg-0321634d6061b8fcc3fd09cbfa244e50.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://character_system/icons/ai_brain.svg"
-dest_files=["res://.godot/imported/ai_brain.svg-896a5e54e5a16e92d0df81bea6f544bd.ctex"]
+source_file="res://character_system/icons/effect_context.svg"
+dest_files=["res://.godot/imported/effect_context.svg-0321634d6061b8fcc3fd09cbfa244e50.ctex"]
 
 [params]
 

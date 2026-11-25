@@ -1,4 +1,4 @@
-@icon("res://character_system/icons/effect_zone.svg")
+@icon("res://character_system/icons/projectile.svg")
 class_name Projectile
 extends Node3D
 ## A shot that takes time to arrive: a rocket, a fireball, an arrow, a thrown grenade.

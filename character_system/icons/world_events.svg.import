@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwkqa77btyn3m"
-path="res://.godot/imported/inventory.svg-4402362e2ef29507e0f329f62b282923.ctex"
+uid="uid://cksuqcyq32bab"
+path="res://.godot/imported/world_events.svg-547c6df1f3cf01c9c2ea1dfd48b114fb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://character_system/icons/inventory.svg"
-dest_files=["res://.godot/imported/inventory.svg-4402362e2ef29507e0f329f62b282923.ctex"]
+source_file="res://character_system/icons/world_events.svg"
+dest_files=["res://.godot/imported/world_events.svg-547c6df1f3cf01c9c2ea1dfd48b114fb.ctex"]
 
 [params]
 

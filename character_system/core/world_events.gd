@@ -1,3 +1,4 @@
+@icon("res://character_system/icons/world_events.svg")
 class_name WorldEvents
 extends RefCounted
 ## Every host's events in one place: any death, any kill, any ability used.

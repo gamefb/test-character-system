@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/component.svg")
 class_name Pool
 extends Component
 ## An amount that is spent and refilled: health, mana, stamina, rage or a shield.

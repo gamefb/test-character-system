@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/melee_sweep.svg")
 class_name MeleeSweep
 extends WeaponDelivery
 ## Hits everything inside [member shape] on each [Trigger] shot, e.g. a sword swing.

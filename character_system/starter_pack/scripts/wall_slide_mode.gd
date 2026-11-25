@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/movement_mode.svg")
 class_name WallSlideMode
 extends MovementMode
 ## An example movement mode to copy: slide slowly down a wall while falling against it, and jump

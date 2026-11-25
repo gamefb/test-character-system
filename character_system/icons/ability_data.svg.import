@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wlok5yibtnlx"
-path="res://.godot/imported/trigger.svg-6bd23ce58147ca926d97c5766390d7ca.ctex"
+uid="uid://kxc8xvsc50bl"
+path="res://.godot/imported/ability_data.svg-da04d352c0989b3c976298252070ac25.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://character_system/icons/trigger.svg"
-dest_files=["res://.godot/imported/trigger.svg-6bd23ce58147ca926d97c5766390d7ca.ctex"]
+source_file="res://character_system/icons/ability_data.svg"
+dest_files=["res://.godot/imported/ability_data.svg-da04d352c0989b3c976298252070ac25.ctex"]
 
 [params]
 

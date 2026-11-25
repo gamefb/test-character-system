@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/faction.svg")
 class_name Faction
 extends Component
 ## Which team this character is on and which teams it fights.

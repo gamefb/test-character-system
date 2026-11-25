@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/statuses.svg")
 class_name Statuses
 extends Component
 ## Holds a character's statuses and passives, and applies, ticks, expires and triggers them.

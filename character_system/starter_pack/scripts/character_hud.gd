@@ -1,3 +1,4 @@
+@icon("res://character_system/icons/character_hud.svg")
 class_name CharacterHud
 extends Control
 ## An example HUD to copy: shows a character's health, statuses, ammo, ability cooldowns and

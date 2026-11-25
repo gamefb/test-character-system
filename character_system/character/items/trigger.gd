@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/trigger.svg")
 class_name Trigger
 extends ItemComponent
 ## Decides when the item fires, from the wielder's button presses and the fire rate.

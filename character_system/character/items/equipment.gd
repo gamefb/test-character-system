@@ -1,5 +1,4 @@
 @tool
-@icon("res://character_system/icons/equipment.svg")
 class_name Equipment
 extends Component
 ## Holds equipped items: spawns each item's scene at a socket, and frees it when unequipped.

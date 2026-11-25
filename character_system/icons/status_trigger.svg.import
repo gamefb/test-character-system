@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bfgqunw5787v1"
-path="res://.godot/imported/player_brain.svg-d7891916c121aa475248379368e470ad.ctex"
+uid="uid://dud70rxpd5ewk"
+path="res://.godot/imported/status_trigger.svg-66494b18b58a786f7f0dcb46546c6d6a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://character_system/icons/player_brain.svg"
-dest_files=["res://.godot/imported/player_brain.svg-d7891916c121aa475248379368e470ad.ctex"]
+source_file="res://character_system/icons/status_trigger.svg"
+dest_files=["res://.godot/imported/status_trigger.svg-66494b18b58a786f7f0dcb46546c6d6a.ctex"]
 
 [params]
 
