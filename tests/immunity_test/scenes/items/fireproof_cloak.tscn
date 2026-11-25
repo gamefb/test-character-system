@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="1_cpf3y"]
 [ext_resource type="Script" path="res://character_system/character/items/grants.gd" id="2_pwgek"]
 [ext_resource type="Script" path="res://character_system/core/statuses/status_data.gd" id="3_pn4rs"]
-[ext_resource type="Resource" path="res://immunity_test/data/statuses/fireproof.tres" id="4_w2b3c"]
+[ext_resource type="Resource" path="res://tests/immunity_test/data/statuses/fireproof.tres" id="4_w2b3c"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7x1qp"]
 albedo_color = Color(0.8, 0.3, 0.1, 1)

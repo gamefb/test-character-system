@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://immunity_test/scripts/item_pickup.gd" id="1_mwa4b"]
+[ext_resource type="Script" path="res://test_level/item_pickup.gd" id="1_mwa4b"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_1dd13"]
 radius = 0.6

@@ -1,7 +1,7 @@
 class_name ItemPickup
 extends Area3D
-## Test-scene helper: puts an item into the Inventory of whoever walks over it, then disappears.
-## It only fills the bag. Equipping is up to the game (see immunity_test.gd).
+## Test-level helper: puts an item into the Inventory of whoever walks over it, then disappears.
+## It only fills the bag. Equipping is up to the game (see test_level.gd).
 
 ## Emitted when [param by] picks the item up.
 signal picked_up(by: Node)

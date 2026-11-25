@@ -57,8 +57,9 @@ Your own data and scenes stay outside all three, so the system can be copied to 
    ├── data/                         your .tres files
    ├── scenes/                       your characters, items and levels
    ├── tests/                        test_*.gd, run with GUT; benchmark.gd
-   ├── test_level/                   a playable level with every part in it
-   └── immunity_test/                scripted checks: immunities, zones, items
+   │   └── immunity_test/            scripted checks: immunities, zones, items
+   └── test_level/                   a playable level with every part in it, and the pickup
+                                     and nameplate the immunity test borrows
 
 **What the character folders need.** Every script in ``character/`` needs the core. Some also need another folder of ``character/``, which matters when you delete or replace one:
 

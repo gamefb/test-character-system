@@ -36,7 +36,7 @@ jobs:
       - name: Lint
         run: |
           pip install --quiet "gdtoolkit==$GDTOOLKIT_VERSION"
-          gdlint character_system tests addons/character_system_warnings immunity_test test_level
+          gdlint character_system tests addons/character_system_warnings test_level
       - name: Each layer loads without the ones built on it
         # Before the full import, so the copies have no import cache to lean on.
         run: |
@@ -58,6 +58,6 @@ jobs:
       - name: Unit tests
         run: godot --headless -s addons/gut/gut_cmdln.gd -gexit
       - name: Scene checks
-        run: godot --headless --fixed-fps 60 res://immunity_test/immunity_test.tscn
+        run: godot --headless --fixed-fps 60 res://tests/immunity_test/immunity_test.tscn
       - name: Test level
         run: godot --headless --fixed-fps 60 res://test_level/test_level.tscn -- --self-test

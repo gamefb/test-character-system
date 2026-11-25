@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://character_system/character/combat/hurtbox.gd" id="1_a5afc"]
-[ext_resource type="Script" path="res://immunity_test/scripts/nameplate.gd" id="2_d6dww"]
+[ext_resource type="Script" path="res://test_level/nameplate.gd" id="2_d6dww"]
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="3_gpgxw"]
 [ext_resource type="Script" path="res://character_system/core/statuses/statuses.gd" id="4_jrn1p"]
 [ext_resource type="Script" path="res://character_system/core/health.gd" id="5_6dbe3"]

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3]
 
-[ext_resource type="PackedScene" path="res://immunity_test/scenes/items/rifle.tscn" id="1_5kiru"]
+[ext_resource type="PackedScene" path="res://tests/immunity_test/scenes/items/rifle.tscn" id="1_5kiru"]
 [ext_resource type="Script" path="res://character_system/character/items/item_data.gd" id="2_vbj8q"]
 
 [resource]

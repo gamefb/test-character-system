@@ -8,7 +8,7 @@ they go. Delete the folder and nothing else changes; it only uses `character_sys
 
 - **In the editor:** open `immunity_test.tscn` and press **F6**. The results list fills in at
   the top left; nameplates show each character's health and statuses. It takes about 18 seconds.
-- **Headless:** `godot --headless --path . --fixed-fps 60 res://immunity_test/immunity_test.tscn`
+- **Headless:** `godot --headless --path . --fixed-fps 60 res://tests/immunity_test/immunity_test.tscn`
   finishes in about a second and quits with exit code 0 if every check passed, 1 if not.
 
 ## The tracks
@@ -31,4 +31,7 @@ they go. Delete the folder and nothing else changes; it only uses `character_sys
   other levels.
 - `scripts/immunity_test.gd`: the scenario and its checks.
 - `scripts/walker_brain.gd`: a Brain that walks to a point on cue, standing in for real AI.
-- `scripts/item_pickup.gd`: puts an item into the Inventory of whoever walks over it.
+
+The pickups and nameplates come from `test_level/` (`scenes/item_pickup.tscn`,
+`item_pickup.gd` and `nameplate.gd`), so this scene needs that folder. The test level doesn't
+need this one.
