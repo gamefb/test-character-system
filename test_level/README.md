@@ -51,7 +51,9 @@ left out of the level unnoticed.
 - `scenes/player.tscn`: a first-person character with every component.
 - `scenes/soldier.tscn`: an AI character; the level makes one of them an ally.
 - `scenes/dummy.tscn`: a target with health, statuses and a head hurtbox.
-- The pickups and nameplates come from `immunity_test/`.
+- `scenes/item_pickup.tscn` and `item_pickup.gd`: a pickup that puts its item in the bag of
+  whoever walks over it.
+- `nameplate.gd`: the label above each character with its name, health and statuses.
 
 Shots leave from the weapon in the player's hand and land where the crosshair is, at any
 range: the `PlayerBrain` aims at the first thing the middle of the screen is on.

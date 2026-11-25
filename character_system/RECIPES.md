@@ -517,7 +517,7 @@ bag.remove_instance(bag.first(rifle_data))  # Drops it; it's unequipped automati
 Putting an item in the bag doesn't put it on: when to equip is your game's rule. Weapons are
 the exception with a WeaponSwitch, which draws the first one by itself. A pickup in the world
 is an Area3D that calls `bag.add()` for the body that enters it; `ItemPickup` in
-`immunity_test/scripts/item_pickup.gd` is one to copy, and `test_level/test_level.gd` puts on
+`test_level/item_pickup.gd` is one to copy, and `test_level/test_level.gd` puts on
 whatever has a free slot.
 
 ## Abilities

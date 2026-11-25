@@ -10,13 +10,13 @@ extends Node3D
 ##   Diver   water makes it Wet (immune to fire) and puts out Burning
 ##   Cleric  a ward amulet only helps once it is equipped; ward circle and amulet hold it together
 
-const BURNING := preload("res://immunity_test/data/statuses/burning.tres")
-const WARDED := preload("res://immunity_test/data/statuses/warded.tres")
-const RIFLE := preload("res://immunity_test/data/items/rifle.tres")
-const AMMO := preload("res://immunity_test/data/items/rifle_ammo.tres")
-const CLOAK := preload("res://immunity_test/data/items/fireproof_cloak.tres")
-const AMULET := preload("res://immunity_test/data/items/ward_amulet.tres")
-const FLARE := preload("res://immunity_test/data/items/flare_gun.tres")
+const BURNING := preload("res://tests/immunity_test/data/statuses/burning.tres")
+const WARDED := preload("res://tests/immunity_test/data/statuses/warded.tres")
+const RIFLE := preload("res://tests/immunity_test/data/items/rifle.tres")
+const AMMO := preload("res://tests/immunity_test/data/items/rifle_ammo.tres")
+const CLOAK := preload("res://tests/immunity_test/data/items/fireproof_cloak.tres")
+const AMULET := preload("res://tests/immunity_test/data/items/ward_amulet.tres")
+const FLARE := preload("res://tests/immunity_test/data/items/flare_gun.tres")
 
 ## Seconds of game time before the test gives up.
 @export var time_limit: float = 90.0

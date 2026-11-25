@@ -19,9 +19,8 @@ minutes.
 | `character_system/character/` | The character framework: the scaffold a character and its gear are assembled on. Brains, the motor, abilities, inventory, weapon parts, zones, projectiles and timing for animations. Keep what you use. |
 | `character_system/starter_pack/` | What a player sees and uses: statuses, items, abilities, zones, ways of moving and characters to copy. Start with `character_system/RECIPES.md`. |
 | `addons/character_system_warnings/` | Editor plugin that warns about mistyped stat, event and tag names. |
-| `tests/` | GUT unit tests (254 tests), and `benchmark.gd`. |
+| `tests/` | GUT unit tests (254 tests), `benchmark.gd`, and in `tests/immunity_test/` a scripted scene that runs 43 checks on immunities, zones and items. |
 | `test_level/` | A playable level with every part of the system in it, and a self-test that plays it. |
-| `immunity_test/` | A scripted scene that runs 43 checks on immunities, zones and items. |
 | `docs/` | The documentation site (Sphinx). |
 
 ## Running the tests
@@ -31,7 +30,7 @@ from the AssetLib tab, then:
 
 ```shell
 godot --headless -s addons/gut/gut_cmdln.gd -gexit
-godot --headless --fixed-fps 60 res://immunity_test/immunity_test.tscn
+godot --headless --fixed-fps 60 res://tests/immunity_test/immunity_test.tscn
 godot --headless --fixed-fps 60 res://test_level/test_level.tscn -- --self-test
 ```
 

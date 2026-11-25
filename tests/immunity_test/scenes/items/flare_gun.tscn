@@ -8,7 +8,7 @@
 [ext_resource type="Script" path="res://character_system/core/conditions/condition.gd" id="6_5hw43"]
 [ext_resource type="Script" path="res://character_system/core/effects/damage_effect.gd" id="7_al0xl"]
 [ext_resource type="Script" path="res://character_system/core/effects/apply_status_effect.gd" id="8_r4jig"]
-[ext_resource type="Resource" path="res://immunity_test/data/statuses/burning.tres" id="9_2fmui"]
+[ext_resource type="Resource" path="res://tests/immunity_test/data/statuses/burning.tres" id="9_2fmui"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eg1ac"]
 albedo_color = Color(0.9, 0.2, 0.15, 1)

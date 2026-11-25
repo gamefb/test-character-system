@@ -93,7 +93,7 @@ GUT has no default test folder. In the GUT panel's settings, add ``res://tests/`
 .. source-file:: ../../.gutconfig.json
    :language: json
 
-The ``immunity_test/`` folder holds a scripted scene that runs 43 checks on immunities, zones and equipment together. Five characters walk their own track at once: a Knight who picks up a rifle, ammo, a flare gun and a fireproof cloak along the way and switches between the two guns, an Undead Ghoul, a Construct Golem, a Diver crossing water and fire, and a Cleric with a ward amulet. Press F6 on ``immunity_test.tscn`` to watch it, or run ``godot --headless --path . --fixed-fps 60 res://immunity_test/immunity_test.tscn``, which quits with exit code 0 when every check passes. Its README lists what each track shows.
+The ``tests/immunity_test/`` folder holds a scripted scene that runs 43 checks on immunities, zones and equipment together. Five characters walk their own track at once: a Knight who picks up a rifle, ammo, a flare gun and a fireproof cloak along the way and switches between the two guns, an Undead Ghoul, a Construct Golem, a Diver crossing water and fire, and a Cleric with a ward amulet. Press F6 on ``immunity_test.tscn`` to watch it, or run ``godot --headless --path . --fixed-fps 60 res://tests/immunity_test/immunity_test.tscn``, which quits with exit code 0 when every check passes. Its README lists what each track shows. Its pickups and nameplates come from ``test_level/``, so it needs that folder; the test level doesn't need this one.
 
 .. _doc_test_level:
 
