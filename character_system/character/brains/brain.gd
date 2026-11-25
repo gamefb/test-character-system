@@ -63,6 +63,13 @@ static func find_on(node: Variant) -> Brain:
 	return Component.of(node, Brain) as Brain
 
 
+func _init() -> void:
+	# A brain decides before anything acts on what it decided, wherever the two sit in the
+	# tree. A weapon in a hand under the camera would otherwise fire at last frame's aim point.
+	process_priority = -1
+	process_physics_priority = -1
+
+
 func _warnings() -> PackedStringArray:
 	var brains: Array = host.get_children().filter(func(node: Node) -> bool: return node is Brain)
 	if brains.size() > 1:

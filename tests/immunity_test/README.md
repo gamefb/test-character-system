@@ -32,6 +32,6 @@ they go. Delete the folder and nothing else changes; it only uses `character_sys
 - `scripts/immunity_test.gd`: the scenario and its checks.
 - `scripts/walker_brain.gd`: a Brain that walks to a point on cue, standing in for real AI.
 
-The pickups and nameplates come from `test_level/` (`scenes/item_pickup.tscn`,
-`item_pickup.gd` and `nameplate.gd`), so this scene needs that folder. The test level doesn't
+The pickups come from `test_level/` (`scenes/item_pickup.tscn` and `item_pickup.gd`), so
+this scene needs that folder, and the nameplates are the starter pack's `Nameplate`. The test level doesn't
 need this one.

@@ -22,8 +22,8 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - 9
      - Presses and releases, a release while paused or never seen, a press the UI used, two keys on one action, an AI press seen once by every node, automatic fire held and tapped
    * - ``test_player_brain.gd``
-     - 6
-     - Weapon actions and extra actions are passed on; a Camera left empty is found; missing Input Map actions are skipped without errors; the aim point is what the crosshair is on, never behind the weapon and never on an area a shot would pass through, and a camera behind the character doesn't aim at what is in between
+     - 7
+     - A shot fired in the frame the camera turns goes where the camera looks now, with the weapon above the brain in the tree; weapon actions and extra actions are passed on; a Camera left empty is found; missing Input Map actions are skipped without errors; the aim point is what the crosshair is on, never behind the weapon and never on an area a shot would pass through, and a camera behind the character doesn't aim at what is in between
    * - ``test_inventory.gd``
      - 12
      - Weapon switching (drawing, wrapping around, holstering, dropping, each weapon's own rounds) and the carrying rule between Inventory and Equipment
@@ -85,15 +85,15 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - 13
      - The scripts on :ref:`doc_extending`: GlideMove slows the fall only while held and leaves the double jump alone, WallSlideMode takes over by itself and jumps off the wall, radius targeting finds enemies in range, the hostility condition spares allies, a spawned scene appears where the target is and goes after its lifetime, a melee swing hits only what's in front, Sprint spends from a pool while held, cleans up and stops when the pool is empty, Scope slows only while aiming, AttackNearest picks the nearest enemy and attacks it, an enemy built from it shoots the player, the HUD shows health, statuses and ammo, a weapon part of your own needs only ``_fire()``, and an effect of your own that extends AmountEffect gets the amount, the scaling and the magnitude
    * - ``test_quick_start.gd``
-     - 1
-     - The :ref:`quick start <doc_quick_start>` level, built as the page describes it, plays as promised
+     - 3
+     - The :ref:`quick start <doc_quick_start>` page, built step by step with the values it gives: Part 1's level (the rifle drawn, 10 a shot, the nameplate, 12 rounds); Part 2's two statuses, ice patch and frost pistol (half speed on the ice and full speed off it, Q drawing the pistol, 6 for the first shot and 16 after, 3 a second from Frostbite); and its things to try (three stacks taking 9 a second, and an immune dummy)
 
 GUT has no default test folder. In the GUT panel's settings, add ``res://tests/`` under Directories. For the command line, a ``.gutconfig.json`` file in the project root does the same:
 
 .. source-file:: ../../.gutconfig.json
    :language: json
 
-The ``tests/immunity_test/`` folder holds a scripted scene that runs 43 checks on immunities, zones and equipment together. Five characters walk their own track at once: a Knight who picks up a rifle, ammo, a flare gun and a fireproof cloak along the way and switches between the two guns, an Undead Ghoul, a Construct Golem, a Diver crossing water and fire, and a Cleric with a ward amulet. Press F6 on ``immunity_test.tscn`` to watch it, or run ``godot --headless --path . --fixed-fps 60 res://tests/immunity_test/immunity_test.tscn``, which quits with exit code 0 when every check passes. Its README lists what each track shows. Its pickups and nameplates come from ``test_level/``, so it needs that folder; the test level doesn't need this one.
+The ``tests/immunity_test/`` folder holds a scripted scene that runs 43 checks on immunities, zones and equipment together. Five characters walk their own track at once: a Knight who picks up a rifle, ammo, a flare gun and a fireproof cloak along the way and switches between the two guns, an Undead Ghoul, a Construct Golem, a Diver crossing water and fire, and a Cleric with a ward amulet. Press F6 on ``immunity_test.tscn`` to watch it, or run ``godot --headless --path . --fixed-fps 60 res://tests/immunity_test/immunity_test.tscn``, which quits with exit code 0 when every check passes. Its README lists what each track shows. Its pickups come from ``test_level/``, so it needs that folder; the test level doesn't need this one.
 
 .. _doc_test_level:
 
@@ -171,7 +171,7 @@ The base classes for effects with a number and for weapon parts, the typed ``fin
 Verification status
 -------------------
 
-All 255 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
+All 258 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
 
 .. list-table::
    :header-rows: 1
@@ -179,7 +179,7 @@ All 255 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 an
    * - Check
      - Godot 4.8 beta 4
    * - GUT tests (25 files above, test_statuses.gd included)
-     - 255 of 255, 1226 asserts
+     - 258 of 258, 1246 asserts
    * - ``immunity_test`` scene
      - 43 of 43
    * - Test level, ``--self-test``

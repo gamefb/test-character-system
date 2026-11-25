@@ -101,6 +101,8 @@ Input actions are created in Project > Project Settings > Input Map. Leave Camer
 
 Because AI presses the same "buttons" as the player, with ``press()`` and ``release()``, every weapon and ability works for AI with no extra code.
 
+A brain is processed before the other nodes in the scene, wherever it sits in the tree, so a weapon or an ability acting in the same frame reads this frame's aim point and presses, not last frame's.
+
 A stunned or dead character presses nothing: those statuses block ``everything``, which every brain answers to through its **Blocked By**. :ref:`doc_stuns` lists what else a status can block.
 
 Leave Agent empty and :ref:`AIBrain<class_AIBrain>` uses the first ``NavigationAgent3D`` under the character. Finding a path is the expensive part of steering, so a new one is only asked for once the target has moved ``repath_distance`` metres (1 by default). In a test with 50 enemies chasing a running player, asking every physics frame cost about seven times as much frame time. Lower the distance for a target that moves fast and turns sharply.

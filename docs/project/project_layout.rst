@@ -51,15 +51,15 @@ Your own data and scenes stay outside all three, so the system can be copied to 
    │       ├── statuses/, traits/    Burning, Stunned, Vampiric, Undead and the rest
    │       ├── items/                item data, with their scenes in items/scenes/
    │       ├── abilities/, zones/, projectiles/, characters/
-   │       └── scripts/              9 scripts: walk_mode, air_mode, dash_move, glide_move,
+   │       └── scripts/              10 scripts: walk_mode, air_mode, dash_move, glide_move,
    │                                 wall_slide_mode, sprint, scope, attack_nearest,
-   │                                 character_hud
+   │                                 character_hud, nameplate
    ├── data/                         your .tres files
    ├── scenes/                       your characters, items and levels
    ├── tests/                        test_*.gd, run with GUT; benchmark.gd
    │   └── immunity_test/            scripted checks: immunities, zones, items
    └── test_level/                   a playable level with every part in it, and the pickup
-                                     and nameplate the immunity test borrows
+                                     the immunity test borrows
 
 **What the character folders need.** Every script in ``character/`` needs the core. Some also need another folder of ``character/``, which matters when you delete or replace one:
 
