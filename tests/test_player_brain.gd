@@ -40,6 +40,8 @@ func press(action: StringName) -> void:
 func frames() -> void:
 	for i in 2:
 		await get_tree().physics_frame
+	# The signal comes before the nodes are processed, so the second one is after a whole frame.
+	await get_tree().process_frame
 	await get_tree().process_frame
 
 
@@ -95,6 +97,45 @@ func test_a_camera_behind_the_character_aims_from_the_character() -> void:
 	await frames()
 	assert_almost_eq(brain.aim_point, Vector3(0, 1.6, -20), Vector3.ONE * 0.01,
 			"what is between the camera and the character is not aimed at")
+
+
+## The hand is under the camera, above the brain in the tree, as on the Quick start page.
+func test_a_shot_goes_where_the_camera_looks_in_that_same_frame() -> void:
+	for action in MOVES + [&"primary"]:
+		add_action(action)
+	var targets: Array[CharacterBody3D] = []
+	for where: Vector3 in [Vector3(0, 0, -6), Vector3(6, 0, 0)]:
+		var target := CharacterBody3D.new()
+		target.position = where
+		var shape := CollisionShape3D.new()
+		shape.shape = CapsuleShape3D.new()
+		shape.position.y = 1.0
+		for node: Node in [shape, ComponentManager.new(), Health.new()]:
+			target.add_child(node)
+		add_child_autofree(target)
+		targets.append(target)
+	var shooter := Node3D.new()
+	var camera := Camera3D.new()
+	camera.position.y = 1.6
+	var hand := Node3D.new()
+	hand.name = "Hand"
+	camera.add_child(hand)
+	var gear := Equipment.new()
+	gear.sockets = { &"weapon": ^"../Camera3D/Hand" }
+	camera.name = "Camera3D"
+	for node: Node in [camera, ComponentManager.new(), PlayerBrain.new(), gear]:
+		shooter.add_child(node)
+	add_child_autofree(shooter)
+	gear.equip(ItemInstance.new(load("res://character_system/starter_pack/items/flare_gun.tres")))
+	await frames()
+	await frames()
+	# Turn to the second target and click, both before this frame is processed.
+	await get_tree().process_frame
+	camera.rotation.y = deg_to_rad(-90.0)
+	press(&"primary")
+	await frames()
+	assert_eq(Health.find_on(targets[0]).current, 100.0, "not where it was looking a frame ago")
+	assert_lt(Health.find_on(targets[1]).current, 100.0, "where it looks now")
 
 
 func test_weapon_actions_are_passed_on() -> void:

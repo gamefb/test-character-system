@@ -119,3 +119,6 @@ Example scripts
    * - :ref:`CharacterHud<class_CharacterHud>`
      - Health, statuses, ammo and a weapon's charge on screen
      - :ref:`doc_extending_hud`
+   * - :ref:`Nameplate<class_Nameplate>`
+     - A character's name, health and statuses above its head
+     - :ref:`doc_quick_start`, which puts one on its training dummy

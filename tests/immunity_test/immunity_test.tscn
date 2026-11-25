@@ -1,7 +1,7 @@
 [gd_scene load_steps=65 format=3]
 
 [ext_resource type="Script" path="res://tests/immunity_test/scripts/immunity_test.gd" id="1_ao2wf"]
-[ext_resource type="Script" path="res://test_level/nameplate.gd" id="2_rg5bo"]
+[ext_resource type="Script" path="res://character_system/starter_pack/scripts/nameplate.gd" id="2_rg5bo"]
 [ext_resource type="Script" path="res://character_system/core/component_manager.gd" id="3_53kh5"]
 [ext_resource type="Script" path="res://character_system/core/statuses/statuses.gd" id="4_ke4w3"]
 [ext_resource type="Script" path="res://character_system/core/health.gd" id="5_0gagl"]

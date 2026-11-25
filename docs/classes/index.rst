@@ -106,6 +106,7 @@ Starter pack
     class_characterhud
     class_dashmove
     class_glidemove
+    class_nameplate
     class_scope
     class_sprint
     class_walkmode

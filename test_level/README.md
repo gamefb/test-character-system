@@ -53,7 +53,8 @@ left out of the level unnoticed.
 - `scenes/dummy.tscn`: a target with health, statuses and a head hurtbox.
 - `scenes/item_pickup.tscn` and `item_pickup.gd`: a pickup that puts its item in the bag of
   whoever walks over it.
-- `nameplate.gd`: the label above each character with its name, health and statuses.
+
+The label above each character is the starter pack's `Nameplate`.
 
 Shots leave from the weapon in the player's hand and land where the crosshair is, at any
 range: the `PlayerBrain` aims at the first thing the middle of the screen is on.

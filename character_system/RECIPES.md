@@ -839,6 +839,10 @@ layered move, see `starter_pack/scripts/glide_move.gd`.
 
 ### Show health, statuses, ammo and cooldowns
 
+For a label above a character's head with its name, health and statuses, add a **Nameplate**
+as its child (`starter_pack/scripts/nameplate.gd`). The rest of this recipe is about the
+player's own HUD.
+
 `starter_pack/scripts/character_hud.gd` (**CharacterHud**) does all four, and fills a
 ProgressBar named ChargeBar while a weapon charges, if you add one. Attach it to a Control,
 add a ProgressBar named HealthBar and Labels named Statuses, Ammo and Cooldown under it, and set
