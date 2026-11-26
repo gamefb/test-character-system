@@ -39,7 +39,7 @@ tags = Array[StringName]([&"melee"])
 
 [sub_resource type="Resource" id="Resource_j1gld"]
 script = ExtResource("10_lk4w2")
-strength = 6.0
+amount = 6.0
 
 [sub_resource type="Resource" id="Resource_r0752"]
 script = ExtResource("11_s41fq")

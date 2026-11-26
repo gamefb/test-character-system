@@ -15,7 +15,6 @@ type = &"fire"
 
 [sub_resource type="Resource" id="Resource_msr6w"]
 script = ExtResource("6_6dxly")
-strength = 10.0
 lift = 4.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mo7wd"]

@@ -236,6 +236,7 @@ func test_knockback_and_projectile_speed_can_grow_with_the_charge() -> void:
 	var by_charge := ChargeAmount.new()
 	by_charge.at_full = 8.0
 	var shove := KnockbackEffect.new()
+	shove.amount = 8.0
 	shove.lift = 0.0
 	shove.scaling = [by_charge]
 	var source := Node3D.new()

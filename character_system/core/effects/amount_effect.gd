@@ -4,9 +4,9 @@ class_name AmountEffect
 extends Effect
 ## An effect with a number: a base amount, plus whatever it scales with.
 ##
-## [DamageEffect], [HealEffect] and [ChangePoolEffect] are built on it. Extend it for an
-## effect of your own that needs a number designers can scale with stats, pools or the hit,
-## and read the number for this run with [method total].
+## [DamageEffect], [HealEffect], [ChangePoolEffect] and [KnockbackEffect] are built on it.
+## Extend it for an effect of your own that needs a number designers can scale with stats,
+## pools or the hit, and read the number for this run with [method total].
 
 ## The number before scaling and magnitude.
 @export var amount: float = 10.0
