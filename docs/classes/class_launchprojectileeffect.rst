@@ -8,7 +8,7 @@
 LaunchProjectileEffect
 ======================
 
-**Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Launches a :ref:`Projectile<class_Projectile>` from whoever caused the effect, e.g. a fireball ability.
 

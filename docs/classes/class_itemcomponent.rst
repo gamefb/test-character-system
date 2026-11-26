@@ -21,7 +21,7 @@ Description
 
 The item scene needs its own :ref:`ComponentManager<class_ComponentManager>`. :ref:`Equipment<class_Equipment>` sets :ref:`wielder<class_ItemComponent_property_wielder>` and :ref:`item<class_ItemComponent_property_item>` before the scene is added, so both are ready in :ref:`Component._start()<class_Component_private_method__start>`.
 
-Keep per-copy state, such as rounds loaded, in :ref:`ItemInstance.state<class_ItemInstance_property_state>`, not on the node: the node is freed when the item is unequipped. Anything you change on the wielder, such as a stat modifier, must be undone in :ref:`Component._stop()<class_Component_private_method__stop>`, which runs on unequip.
+Keep per-copy state, such as rounds loaded, in :ref:`ItemInstance.state<class_ItemInstance_property_state>`, not on the node: the node is freed when the item is unequipped. :ref:`Component.hold_modifier()<class_Component_method_hold_modifier>` and :ref:`Component.hold_status()<class_Component_method_hold_status>` act on the wielder here, and are taken back on unequip. Anything else you change on the wielder must be undone in :ref:`Component._stop()<class_Component_private_method__stop>`.
 
 A component that acts when the item is used listens to its :ref:`Trigger<class_Trigger>`, as :ref:`Hitscan<class_Hitscan>` and :ref:`MeleeSweep<class_MeleeSweep>` do:
 

@@ -8,7 +8,7 @@
 ItemData
 ========
 
-**Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`DisplayData<class_DisplayData>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Shared definition of an item type, saved as a .tres file.
 
@@ -17,7 +17,7 @@ Shared definition of an item type, saved as a .tres file.
 Description
 -----------
 
-It never changes while playing. Each copy a character carries is an :ref:`ItemInstance<class_ItemInstance>`.
+It never changes while playing. Each copy a character carries is an :ref:`ItemInstance<class_ItemInstance>`. Its name, icon and description come from :ref:`DisplayData<class_DisplayData>`.
 
 .. rst-class:: classref-reftable-group
 
@@ -27,14 +27,6 @@ Properties
 .. table::
    :widths: auto
 
-   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
-   | :ref:`StringName<class_StringName>`                      | :ref:`id<class_ItemData_property_id>`                           |          |
-   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
-   | :ref:`String<class_String>`                              | :ref:`display_name<class_ItemData_property_display_name>`       |          |
-   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
-   | :ref:`Texture2D<class_Texture2D>`                        | :ref:`icon<class_ItemData_property_icon>`                       |          |
-   +----------------------------------------------------------+-----------------------------------------------------------------+----------+
-   | :ref:`String<class_String>`                              | :ref:`description<class_ItemData_property_description>`         |          |
    +----------------------------------------------------------+-----------------------------------------------------------------+----------+
    | :ref:`int<class_int>`                                    | :ref:`max_stack<class_ItemData_property_max_stack>`             | ``1``    |
    +----------------------------------------------------------+-----------------------------------------------------------------+----------+
@@ -55,54 +47,6 @@ Properties
 
 Property Descriptions
 ---------------------
-
-.. _class_ItemData_property_id:
-
-.. rst-class:: classref-property
-
-:ref:`StringName<class_StringName>` **id** :ref:`🔗<class_ItemData_property_id>`
-
-A unique name for your code and save files, e.g. &"rifle".
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_ItemData_property_display_name:
-
-.. rst-class:: classref-property
-
-:ref:`String<class_String>` **display_name** :ref:`🔗<class_ItemData_property_display_name>`
-
-The name players see.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_ItemData_property_icon:
-
-.. rst-class:: classref-property
-
-:ref:`Texture2D<class_Texture2D>` **icon** :ref:`🔗<class_ItemData_property_icon>`
-
-For your inventory and HUD. The system doesn't use it.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_ItemData_property_description:
-
-.. rst-class:: classref-property
-
-:ref:`String<class_String>` **description** :ref:`🔗<class_ItemData_property_description>`
-
-Tooltip text for your UI.
-
-.. rst-class:: classref-item-separator
-
-----
 
 .. _class_ItemData_property_max_stack:
 

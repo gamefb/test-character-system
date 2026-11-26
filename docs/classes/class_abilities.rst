@@ -21,7 +21,7 @@ Put an :ref:`AbilityData<class_AbilityData>` in :ref:`slots<class_Abilities_prop
 
 
 
-An ability is used only if :ref:`why_not()<class_Abilities_method_why_not>` finds nothing against it: the character can act, isn't casting something else, has a charge and enough in its :ref:`Pool<class_Pool>`\ s, and the ability's conditions pass. Otherwise :ref:`failed<class_Abilities_signal_failed>` says why, e.g. for a "Not enough mana" message. Costs and the charge are taken when the effects run, so an interrupted cast costs nothing. 
+An ability is used only if :ref:`why_not()<class_Abilities_method_why_not>` finds nothing against it: the character can act, isn't casting something else, has a charge and enough in its :ref:`Pool<class_Pool>`\ s, and the ability's conditions pass. Otherwise :ref:`failed<class_Abilities_signal_failed>` says why with a :ref:`Refusal<enum_Abilities_Refusal>`, e.g. for a "Not enough mana" message. Costs and the charge are taken when the effects run, so an interrupted cast costs nothing. 
 
 The character's components and statuses hear ``ability_cast_started``, ``ability_used`` and ``ability_interrupted`` as events, with the ability as :ref:`EffectContext.origin<class_EffectContext_property_origin>`.
 
@@ -49,27 +49,27 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Abilities<class_Abilities>`   | :ref:`find_on<class_Abilities_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                        |
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`             | :ref:`use<class_Abilities_method_use>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )                              |
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`             | :ref:`can_use<class_Abilities_method_can_use>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )                      |
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`StringName<class_StringName>` | :ref:`why_not<class_Abilities_method_why_not>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )                      |
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
-   | |void|                              | :ref:`interrupt<class_Abilities_method_interrupt>`\ (\ )                                                                   |
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`float<class_float>`           | :ref:`cooldown_left<class_Abilities_method_cooldown_left>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )          |
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`float<class_float>`           | :ref:`recharge_left<class_Abilities_method_recharge_left>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )          |
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`int<class_int>`               | :ref:`charges_left<class_Abilities_method_charges_left>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )            |
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`float<class_float>`           | :ref:`cast_progress<class_Abilities_method_cast_progress>`\ (\ )                                                           |
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
-   | |void|                              | :ref:`reset_cooldown<class_Abilities_method_reset_cooldown>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>` = null\ ) |
-   +-------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Abilities<class_Abilities>`      | :ref:`find_on<class_Abilities_method_find_on>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static|                              |
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                | :ref:`use<class_Abilities_method_use>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )                              |
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                | :ref:`can_use<class_Abilities_method_can_use>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )                      |
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Refusal<enum_Abilities_Refusal>` | :ref:`why_not<class_Abilities_method_why_not>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )                      |
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                 | :ref:`interrupt<class_Abilities_method_interrupt>`\ (\ )                                                                   |
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`float<class_float>`              | :ref:`cooldown_left<class_Abilities_method_cooldown_left>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )          |
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`float<class_float>`              | :ref:`recharge_left<class_Abilities_method_recharge_left>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )          |
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`int<class_int>`                  | :ref:`charges_left<class_Abilities_method_charges_left>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ )            |
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`float<class_float>`              | :ref:`cast_progress<class_Abilities_method_cast_progress>`\ (\ )                                                           |
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                 | :ref:`reset_cooldown<class_Abilities_method_reset_cooldown>`\ (\ ability\: :ref:`AbilityData<class_AbilityData>` = null\ ) |
+   +----------------------------------------+----------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -120,9 +120,80 @@ Emitted when a cast is cut short. Nothing was spent.
 
 .. rst-class:: classref-signal
 
-**failed**\ (\ ability\: :ref:`AbilityData<class_AbilityData>`, reason\: :ref:`StringName<class_StringName>`\ ) :ref:`🔗<class_Abilities_signal_failed>`
+**failed**\ (\ ability\: :ref:`AbilityData<class_AbilityData>`, reason\: :ref:`Refusal<enum_Abilities_Refusal>`\ ) :ref:`🔗<class_Abilities_signal_failed>`
 
 Emitted when :ref:`use()<class_Abilities_method_use>` refuses. ``reason`` is what :ref:`why_not()<class_Abilities_method_why_not>` returned.
+
+.. rst-class:: classref-section-separator
+
+----
+
+.. rst-class:: classref-descriptions-group
+
+Enumerations
+------------
+
+.. _enum_Abilities_Refusal:
+
+.. rst-class:: classref-enumeration
+
+enum **Refusal**: :ref:`🔗<enum_Abilities_Refusal>`
+
+.. _class_Abilities_constant_NONE:
+
+.. rst-class:: classref-enumeration-constant
+
+:ref:`Refusal<enum_Abilities_Refusal>` **NONE** = ``0``
+
+Nothing is against it.
+
+.. _class_Abilities_constant_BLOCKED:
+
+.. rst-class:: classref-enumeration-constant
+
+:ref:`Refusal<enum_Abilities_Refusal>` **BLOCKED** = ``1``
+
+A status is blocking the :ref:`Brain<class_Brain>`, as Stunned and Dead do, or one of the ability's :ref:`AbilityData.blocked_by<class_AbilityData_property_blocked_by>`.
+
+.. _class_Abilities_constant_CASTING:
+
+.. rst-class:: classref-enumeration-constant
+
+:ref:`Refusal<enum_Abilities_Refusal>` **CASTING** = ``2``
+
+Another ability is being cast.
+
+.. _class_Abilities_constant_COOLDOWN:
+
+.. rst-class:: classref-enumeration-constant
+
+:ref:`Refusal<enum_Abilities_Refusal>` **COOLDOWN** = ``3``
+
+No charge is ready.
+
+.. _class_Abilities_constant_COST:
+
+.. rst-class:: classref-enumeration-constant
+
+:ref:`Refusal<enum_Abilities_Refusal>` **COST** = ``4``
+
+A :ref:`Pool<class_Pool>` in :ref:`AbilityData.costs<class_AbilityData_property_costs>` is missing or too low.
+
+.. _class_Abilities_constant_CONDITION:
+
+.. rst-class:: classref-enumeration-constant
+
+:ref:`Refusal<enum_Abilities_Refusal>` **CONDITION** = ``5``
+
+One of its :ref:`AbilityData.conditions<class_AbilityData_property_conditions>` fails.
+
+.. _class_Abilities_constant_NO_TARGET:
+
+.. rst-class:: classref-enumeration-constant
+
+:ref:`Refusal<enum_Abilities_Refusal>` **NO_TARGET** = ``6``
+
+It needs a target and its targeting found none.
 
 .. rst-class:: classref-section-separator
 
@@ -182,9 +253,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Abilities<class_Abilities>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Abilities_method_find_on>`
+:ref:`Abilities<class_Abilities>` **find_on**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_Abilities_method_find_on>`
 
-The **Abilities** of ``node``'s character, or null if there is none. Safe on a freed node.
+The **Abilities** of ``node``'s character, or null if there is none.
 
 .. rst-class:: classref-item-separator
 
@@ -218,21 +289,15 @@ True if :ref:`use()<class_Abilities_method_use>` would use ``ability`` right now
 
 .. rst-class:: classref-method
 
-:ref:`StringName<class_StringName>` **why_not**\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ ) :ref:`🔗<class_Abilities_method_why_not>`
+:ref:`Refusal<enum_Abilities_Refusal>` **why_not**\ (\ ability\: :ref:`AbilityData<class_AbilityData>`\ ) :ref:`🔗<class_Abilities_method_why_not>`
 
-Why ``ability`` can't be used right now, or an empty name if it can: 
+The first thing against using ``ability`` right now, or :ref:`NONE<class_Abilities_constant_NONE>`:
 
-- ``&"blocked"``: a status is blocking the :ref:`Brain<class_Brain>`, as Stunned and Dead do, or one of the ability's :ref:`AbilityData.blocked_by<class_AbilityData_property_blocked_by>`. 
+::
 
-- ``&"casting"``: another ability is being cast. 
-
-- ``&"cooldown"``: no charge is ready. 
-
-- ``&"cost"``: a :ref:`Pool<class_Pool>` in :ref:`AbilityData.costs<class_AbilityData_property_costs>` is missing or too low. 
-
-- ``&"condition"``: one of its :ref:`AbilityData.conditions<class_AbilityData_property_conditions>` fails. 
-
-- ``&"no_target"``: it needs a target and its targeting found none.
+    func _on_abilities_failed(_ability: AbilityData, reason: Abilities.Refusal) -> void:
+        if reason == Abilities.Refusal.COST:
+            show_message("Not enough mana")
 
 .. rst-class:: classref-item-separator
 

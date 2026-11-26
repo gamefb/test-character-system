@@ -61,17 +61,17 @@ Methods
 .. table::
    :widths: auto
 
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Pool<class_Pool>`   | :ref:`named<class_Pool_method_named>`\ (\ node\: :ref:`Variant<class_Variant>`, pool_name\: :ref:`StringName<class_StringName>`\ ) |static| |
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`float<class_float>` | :ref:`maximum<class_Pool_method_maximum>`\ (\ )                                                                                             |
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`float<class_float>` | :ref:`fraction<class_Pool_method_fraction>`\ (\ )                                                                                           |
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`   | :ref:`spend<class_Pool_method_spend>`\ (\ amount\: :ref:`float<class_float>`\ )                                                             |
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                    | :ref:`change<class_Pool_method_change>`\ (\ amount\: :ref:`float<class_float>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ )   |
-   +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+   +---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Pool<class_Pool>`   | :ref:`named<class_Pool_method_named>`\ (\ node\: :ref:`Node<class_Node>`, pool_name\: :ref:`StringName<class_StringName>`\ ) |static|     |
+   +---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`float<class_float>` | :ref:`maximum<class_Pool_method_maximum>`\ (\ )                                                                                           |
+   +---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`float<class_float>` | :ref:`fraction<class_Pool_method_fraction>`\ (\ )                                                                                         |
+   +---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`   | :ref:`spend<class_Pool_method_spend>`\ (\ amount\: :ref:`float<class_float>`\ )                                                           |
+   +---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                    | :ref:`change<class_Pool_method_change>`\ (\ amount\: :ref:`float<class_float>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |
+   +---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -249,9 +249,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Pool<class_Pool>` **named**\ (\ node\: :ref:`Variant<class_Variant>`, pool_name\: :ref:`StringName<class_StringName>`\ ) |static| :ref:`🔗<class_Pool_method_named>`
+:ref:`Pool<class_Pool>` **named**\ (\ node\: :ref:`Node<class_Node>`, pool_name\: :ref:`StringName<class_StringName>`\ ) |static| :ref:`🔗<class_Pool_method_named>`
 
-The pool called ``pool_name`` on ``node``'s character, or null. Safe on a freed node.
+The pool called ``pool_name`` on ``node``'s character, or null.
 
 .. rst-class:: classref-item-separator
 

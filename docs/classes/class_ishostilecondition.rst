@@ -8,7 +8,7 @@
 IsHostileCondition
 ==================
 
-**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Passes when whoever caused it is hostile to the target, e.g. so a weapon or an area attack doesn't hurt allies.
 
@@ -17,38 +17,7 @@ Passes when whoever caused it is hostile to the target, e.g. so a weapon or an a
 Description
 -----------
 
-Hostility comes from the source's :ref:`Faction<class_Faction>`. A source without one, such as a trap or a zone, counts as hostile to everyone. It looks at both sides, so it overrides :ref:`Condition.check()<class_Condition_method_check>` instead of :ref:`Condition._test()<class_Condition_private_method__test>`, and :ref:`Condition.subject<class_Condition_property_subject>` isn't used.
-
-.. rst-class:: classref-reftable-group
-
-Methods
--------
-
-.. table::
-   :widths: auto
-
-   +-------------------------+------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`check<class_IsHostileCondition_method_check>`\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) |
-   +-------------------------+------------------------------------------------------------------------------------------------------------+
-
-.. rst-class:: classref-section-separator
-
-----
-
-.. rst-class:: classref-descriptions-group
-
-Method Descriptions
--------------------
-
-.. _class_IsHostileCondition_method_check:
-
-.. rst-class:: classref-method
-
-:ref:`bool<class_bool>` **check**\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) :ref:`🔗<class_IsHostileCondition_method_check>`
-
-.. container:: contribute
-
-	No description yet.
+Hostility comes from the source's :ref:`Faction<class_Faction>`. A source without one, such as a trap or a zone, counts as hostile to everyone.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

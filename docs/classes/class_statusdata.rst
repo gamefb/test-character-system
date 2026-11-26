@@ -8,7 +8,7 @@
 StatusData
 ==========
 
-**Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`DisplayData<class_DisplayData>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 A status or passive, saved as a .tres file.
 
@@ -17,9 +17,9 @@ A status or passive, saved as a .tres file.
 Description
 -----------
 
-A passive is a status with :ref:`duration<class_StatusData_property_duration>` 0. This resource is shared by every character that has the status, so it holds no runtime state; that lives in :ref:`Statuses<class_Statuses>`.
+A passive is a status with :ref:`duration<class_StatusData_property_duration>` 0. This resource is shared by every character that has the status, so it holds no runtime state; that lives in :ref:`Statuses<class_Statuses>`. Its name, icon and description come from :ref:`DisplayData<class_DisplayData>`.
 
-Tags drive interactions: :ref:`immune_to<class_StatusData_property_immune_to>` keeps out statuses with those tags, :ref:`removes_tags<class_StatusData_property_removes_tags>` clears them, and :ref:`HasTagCondition<class_HasTagCondition>` tests for them.
+Tags drive interactions: :ref:`immune_to<class_StatusData_property_immune_to>` keeps out statuses with those tags, :ref:`removes_tags<class_StatusData_property_removes_tags>` clears them, and :ref:`HasTagCondition<class_HasTagCondition>` tests for them. Tags, not :ref:`DisplayData.id<class_DisplayData_property_id>`, are what conditions and other statuses look for.
 
 .. rst-class:: classref-reftable-group
 
@@ -29,14 +29,6 @@ Properties
 .. table::
    :widths: auto
 
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
-   | :ref:`StringName<class_StringName>`                                    | :ref:`id<class_StatusData_property_id>`                             |           |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
-   | :ref:`String<class_String>`                                            | :ref:`display_name<class_StatusData_property_display_name>`         |           |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
-   | :ref:`Texture2D<class_Texture2D>`                                      | :ref:`icon<class_StatusData_property_icon>`                         |           |
-   +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
-   | :ref:`String<class_String>`                                            | :ref:`description<class_StatusData_property_description>`           |           |
    +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
    | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\]       | :ref:`tags<class_StatusData_property_tags>`                         | ``[]``    |
    +------------------------------------------------------------------------+---------------------------------------------------------------------+-----------+
@@ -130,54 +122,6 @@ Reapplying does nothing.
 
 Property Descriptions
 ---------------------
-
-.. _class_StatusData_property_id:
-
-.. rst-class:: classref-property
-
-:ref:`StringName<class_StringName>` **id** :ref:`🔗<class_StatusData_property_id>`
-
-A unique name for your code, e.g. &"burning". Tags, not this, are what conditions and other statuses look for.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_StatusData_property_display_name:
-
-.. rst-class:: classref-property
-
-:ref:`String<class_String>` **display_name** :ref:`🔗<class_StatusData_property_display_name>`
-
-The name players see, e.g. in a status bar.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_StatusData_property_icon:
-
-.. rst-class:: classref-property
-
-:ref:`Texture2D<class_Texture2D>` **icon** :ref:`🔗<class_StatusData_property_icon>`
-
-For your status UI. The system doesn't use it.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_StatusData_property_description:
-
-.. rst-class:: classref-property
-
-:ref:`String<class_String>` **description** :ref:`🔗<class_StatusData_property_description>`
-
-Tooltip text for your UI.
-
-.. rst-class:: classref-item-separator
-
-----
 
 .. _class_StatusData_property_tags:
 

@@ -36,7 +36,7 @@ Your own scripts get the lists by naming the field as the built-in ones do. In a
 
     @export var pool: StringName = &"mana"  # Lists the project's pools.
 
-A script that extends something else calls ``NameCheck.suggest(self, property)`` from its own ``_validate_property()``, as the base classes do. If it overrides ``_validate_property()`` for another reason, it calls ``super(property)`` there, because Godot only runs the most derived one.
+The data classes get this from one base class, :ref:`DataResource<class_DataResource>`: extend it for a kind of data of your own that isn't an effect, a condition or an amount. A script that extends something else calls ``NameCheck.suggest(self, property)`` from its own ``_validate_property()``, as ``DataResource``, ``Component`` and ``MotorNode`` do. If it overrides ``_validate_property()`` for another reason, it calls ``super(property)`` there, because Godot only runs the most derived one.
 
 .. source-file:: ../../character_system/core/name_check.gd
 

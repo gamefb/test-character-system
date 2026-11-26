@@ -187,8 +187,10 @@ Before you write a script
 - **Give it a** ``class_name``. Components then appear in the Add Node dialog, and effects,
   conditions and targeting in the Inspector's resource lists.
 - **Do setup in** ``_start()``, **not** ``_ready()``. ``_start()`` runs once everything in
-  ``_requires()`` is present, and never in the editor. Undo in ``_stop()`` whatever ``listen()``
-  and ``on()`` don't undo for you: stat modifiers, groups, spawned nodes.
+  ``_requires()`` is present, and never in the editor.
+- **Give with** ``hold_modifier()`` **and** ``hold_status()``. A stat modifier or a status given
+  that way is taken back when the component stops, as ``listen()`` and ``on()`` are undone.
+  Undo in ``_stop()`` only what none of the four covers: groups, spawned nodes.
 - **Hear events with** ``on()``. ``on(&"took_damage", _on_took_damage)`` in ``_start()`` calls
   your method for that event until the component stops. :ref:`doc_events` lists the events.
 - **Look things up when you need them.** ``find(Type)`` for a component beside yours,
@@ -236,9 +238,10 @@ Each part does one job:
   from ``_stats()``.
 - ``_process()`` only runs while the component runs, so it can use the Brain without a null
   check. It reads the button with ``is_action_pressed()``, which stays true while it's held.
-- The speed boost is a stat modifier added to the manager, so it combines with every other
-  speed change, such as Wet slowing the character down. ``_stop()`` takes it off, so removing
-  the component mid-sprint leaves nothing behind.
+- The speed boost is a stat modifier, so it combines with every other speed change, such as
+  Wet slowing the character down. ``hold_modifier(_boost, sprinting)`` keeps it on only while
+  sprinting, and takes it off when the component stops, so removing the component mid-sprint
+  leaves nothing behind. It needs no ``_stop()``.
 - ``_warnings()`` tells the editor when there is no pool with that name beside it.
 
 To use it, add it to a character beside the CharacterMotor, with a Pool named ``stamina``, add a ``sprint`` action to the Input Map, and add ``sprint`` to the :ref:`PlayerBrain<class_PlayerBrain>`'s Extra Actions.
@@ -305,7 +308,7 @@ The base class brings the rest, so a new one has only its own settings and its `
 - the Effects and Collision Mask fields, and the name warnings for the effects,
 - the wait for a Trigger and the connection to its ``fired`` signal,
 - ``_wielder_rids``, the wielder's body and hurtboxes, so shots can pass through them,
-- ``context_for(collider, position, normal)``, which builds each hit's context: it turns a
+- ``context_for(collider, position)``, which builds each hit's context: it turns a
   hurtbox into its character, applies its multiplier, and records the item as ``origin``.
 
 This one hits whatever a :ref:`Targeting<class_Targeting>` finds around the wielder, which makes a shock baton out of the same targeting an ability uses:
@@ -325,11 +328,11 @@ An item component that acts on use without hitting anything, such as a flashligh
 
 To make a sword, build an item scene with a :ref:`ComponentManager<class_ComponentManager>`, a Trigger and a MeleeSweep with a BoxShape3D about a metre across and a :ref:`DamageEffect<class_DamageEffect>` in its effects. A projectile weapon needs no delivery component: a :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>` in the Trigger's ``user_effects`` launches a :ref:`Projectile<class_Projectile>`, which applies the effects to what it touches; see :ref:`doc_projectiles`.
 
-**One that changes the wielder while equipped** finds what it needs in ``_start()`` and undoes everything in ``_stop()``, which runs on unequip. :ref:`Scope<class_Scope>` zooms the wielder's camera and slows it down while the aim button is held:
+**One that changes the wielder while equipped** gives stat modifiers and statuses with ``hold_modifier()`` and ``hold_status()``, which act on the wielder in an item component and are taken back on unequip, and undoes anything else in ``_stop()``. :ref:`Scope<class_Scope>` zooms the wielder's camera and slows it down while the aim button is held:
 
 .. source-file:: ../../character_system/starter_pack/scripts/scope.gd
 
-Whatever an item changes on its wielder must be undone in ``_stop()``. A stat modifier left on the wielder's manager would slow the character for the rest of the game.
+Whatever else an item changes on its wielder must be undone in ``_stop()``: here, the camera's zoom. The slowdown is held for the same reason: a stat modifier left on the wielder's manager would slow the character for the rest of the game.
 
 An item component hears its wielder's events by passing the wielder to ``on()``, and that is undone on unequip like everything else:
 
@@ -401,7 +404,7 @@ To make a water spell, give an ability two effects: an :ref:`ApplyStatusEffect<c
 A condition
 -----------
 
-A condition extends :ref:`Condition<class_Condition>`. Most override ``_test(node)``, which checks one side; ``subject`` picks which side and ``negate`` flips the answer, with no code of your own. The :ref:`Condition<class_Condition>` reference shows one. A condition that compares both sides overrides ``check(ctx)`` instead, like :ref:`IsHostileCondition<class_IsHostileCondition>`:
+Most conditions check one side. Those extend :ref:`SubjectCondition<class_SubjectCondition>` and override ``_test(node)``; ``subject`` picks which side and ``negate`` flips the answer, with no code of your own. The :ref:`SubjectCondition<class_SubjectCondition>` reference shows one. A condition that compares both sides, or reads the hit, extends :ref:`Condition<class_Condition>` itself and overrides ``_passes(ctx)``, like :ref:`IsHostileCondition<class_IsHostileCondition>`:
 
 .. source-file:: ../../character_system/character/conditions/is_hostile_condition.gd
 

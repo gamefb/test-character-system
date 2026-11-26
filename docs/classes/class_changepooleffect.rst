@@ -8,7 +8,7 @@
 ChangePoolEffect
 ================
 
-**Inherits:** :ref:`AmountEffect<class_AmountEffect>` **<** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`AmountEffect<class_AmountEffect>` **<** :ref:`Effect<class_Effect>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Adds :ref:`AmountEffect.total()<class_AmountEffect_method_total>` to one of the target's :ref:`Pool<class_Pool>`\ s, or takes it away when the amount is negative: a mana potion, a stamina drain or a shield recharge. Targets without that pool are left alone.
 

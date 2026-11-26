@@ -46,7 +46,7 @@ Methods
    :widths: auto
 
    +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Health<class_Health>` | :ref:`find_on<class_Health_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                                            |
+   | :ref:`Health<class_Health>` | :ref:`find_on<class_Health_method_find_on>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static|                                                  |
    +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
    | |void|                      | :ref:`change<class_Health_method_change>`\ (\ amount\: :ref:`float<class_float>`, ctx\: :ref:`EffectContext<class_EffectContext>` = null\ ) |
    +-----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
@@ -118,9 +118,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Health<class_Health>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Health_method_find_on>`
+:ref:`Health<class_Health>` **find_on**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_Health_method_find_on>`
 
-The **Health** of ``node``'s character, or null if there is none. Safe on a freed node.
+The **Health** of ``node``'s character, or null if there is none.
 
 .. rst-class:: classref-item-separator
 

@@ -8,9 +8,16 @@
 KnockbackEffect
 ===============
 
-**Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`AmountEffect<class_AmountEffect>` **<** :ref:`Effect<class_Effect>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Pushes the target away from the source, e.g. on a shotgun blast or an explosion.
+
+.. rst-class:: classref-introduction-group
+
+Description
+-----------
+
+Its :ref:`AmountEffect.amount<class_AmountEffect_property_amount>` is the sideways speed of the push, in metres per second. :ref:`AmountEffect.scaling<class_AmountEffect_property_scaling>` adds to it: a :ref:`StatAmount<class_StatAmount>` for a shove that grows with a stat, a :ref:`ChargeAmount<class_ChargeAmount>` for one that grows with the charge.
 
 .. rst-class:: classref-reftable-group
 
@@ -20,13 +27,9 @@ Properties
 .. table::
    :widths: auto
 
-   +----------------------------------------------------------+----------------------------------------------------------+---------+
-   | :ref:`float<class_float>`                                | :ref:`strength<class_KnockbackEffect_property_strength>` | ``8.0`` |
-   +----------------------------------------------------------+----------------------------------------------------------+---------+
-   | :ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] | :ref:`scaling<class_KnockbackEffect_property_scaling>`   | ``[]``  |
-   +----------------------------------------------------------+----------------------------------------------------------+---------+
-   | :ref:`float<class_float>`                                | :ref:`lift<class_KnockbackEffect_property_lift>`         | ``2.0`` |
-   +----------------------------------------------------------+----------------------------------------------------------+---------+
+   +---------------------------+--------------------------------------------------+---------+
+   | :ref:`float<class_float>` | :ref:`lift<class_KnockbackEffect_property_lift>` | ``2.0`` |
+   +---------------------------+--------------------------------------------------+---------+
 
 .. rst-class:: classref-section-separator
 
@@ -36,30 +39,6 @@ Properties
 
 Property Descriptions
 ---------------------
-
-.. _class_KnockbackEffect_property_strength:
-
-.. rst-class:: classref-property
-
-:ref:`float<class_float>` **strength** = ``8.0`` :ref:`🔗<class_KnockbackEffect_property_strength>`
-
-Sideways speed of the push, in metres per second.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_KnockbackEffect_property_scaling:
-
-.. rst-class:: classref-property
-
-:ref:`Array<class_Array>`\[:ref:`Amount<class_Amount>`\] **scaling** = ``[]`` :ref:`🔗<class_KnockbackEffect_property_scaling>`
-
-Added to the strength, as an :ref:`AmountEffect<class_AmountEffect>`'s scaling is: a :ref:`StatAmount<class_StatAmount>` for a shove that grows with a stat, a :ref:`ChargeAmount<class_ChargeAmount>` for one that grows with the charge.
-
-.. rst-class:: classref-item-separator
-
-----
 
 .. _class_KnockbackEffect_property_lift:
 

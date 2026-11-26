@@ -8,7 +8,7 @@
 ChanceCondition
 ===============
 
-**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`SubjectCondition<class_SubjectCondition>` **<** :ref:`Condition<class_Condition>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Passes some of the time: a critical hit chance, a 1 in 5 chance to set alight.
 
@@ -60,7 +60,7 @@ How often it passes: 0 never, 1 always, 0.25 one time in four.
 
 :ref:`StringName<class_StringName>` **bonus_stat** :ref:`🔗<class_ChanceCondition_property_bonus_stat>`
 
-Optional. This stat of the node :ref:`Condition.subject<class_Condition_property_subject>` picks is added to :ref:`chance<class_ChanceCondition_property_chance>`, e.g. &"crit_chance" so gear and statuses can raise it.
+Optional. This stat of the node :ref:`SubjectCondition.subject<class_SubjectCondition_property_subject>` picks is added to :ref:`chance<class_ChanceCondition_property_chance>`, e.g. &"crit_chance" so gear and statuses can raise it.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

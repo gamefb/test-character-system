@@ -43,7 +43,7 @@ Effects
 
 .. source-file:: ../../character_system/character/effects/knockback_effect.gd
 
-The strength of a :ref:`KnockbackEffect<class_KnockbackEffect>` has a **Scaling** list too. :ref:`KnockbackEffect<class_KnockbackEffect>` shows the rule that every effect handles a target without the component it needs: a character is shoved through ``CharacterMotor.push()``, a physics prop gets an impulse, and a wall is left alone.
+A :ref:`KnockbackEffect<class_KnockbackEffect>` is an effect with a number too: its **Amount** is the speed of the push, with the same **Scaling** list. It shows the rule that every effect handles a target without the component it needs: a character is shoved through ``CharacterMotor.push()``, a physics prop gets an impulse, and a wall is left alone.
 
 .. source-file:: ../../character_system/character/effects/spawn_scene_effect.gd
 
@@ -64,7 +64,7 @@ Conditions
 
 .. source-file:: ../../character_system/character/conditions/is_hostile_condition.gd
 
-:ref:`IsHostileCondition<class_IsHostileCondition>` compares both sides, so it overrides ``check(ctx)`` instead of ``_test(node)``. On a weapon's damage effect, it turns friendly fire off. :ref:`doc_extending_condition` shows how to write your own.
+:ref:`IsHostileCondition<class_IsHostileCondition>` compares both sides, so it extends :ref:`Condition<class_Condition>` itself and overrides ``_passes(ctx)``, where the two above extend :ref:`SubjectCondition<class_SubjectCondition>` and override ``_test(node)``. On a weapon's damage effect, it turns friendly fire off. :ref:`doc_extending_condition` shows how to write your own.
 
 .. source-file:: ../../character_system/character/conditions/chance_condition.gd
 

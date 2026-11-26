@@ -8,7 +8,7 @@
 Amount
 ======
 
-**Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 **Inherited By:** :ref:`ChargeAmount<class_ChargeAmount>`, :ref:`HitAmount<class_HitAmount>`, :ref:`PoolAmount<class_PoolAmount>`, :ref:`RandomAmount<class_RandomAmount>`, :ref:`StatAmount<class_StatAmount>`
 
@@ -32,7 +32,7 @@ Effects with a number have a plain field for it, such as :ref:`AmountEffect.amou
     func value(ctx: EffectContext) -> float:
         var from := ctx.source as Node3D
         var to := ctx.target as Node3D
-        if not is_instance_valid(from) or not to:
+        if not from or not to:
             return 0.0
         return from.global_position.distance_to(to.global_position) * per_metre
 

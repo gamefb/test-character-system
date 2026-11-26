@@ -8,7 +8,7 @@
 ChargeCondition
 ===============
 
-**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Passes when the weapon was charged at least this far, e.g. so only a full charge pierces, stuns or sets alight.
 
@@ -17,7 +17,7 @@ Passes when the weapon was charged at least this far, e.g. so only a full charge
 Description
 -----------
 
-It reads :ref:`EffectContext.charge<class_EffectContext_property_charge>`, which a :ref:`Trigger<class_Trigger>` with a :ref:`Trigger.charge_time<class_Trigger_property_charge_time>` sets, and in a :ref:`StatusTrigger<class_StatusTrigger>` the charge of the hit that set it off. It looks at the context, so it overrides :ref:`Condition.check()<class_Condition_method_check>` instead of :ref:`Condition._test()<class_Condition_private_method__test>`, and :ref:`Condition.subject<class_Condition_property_subject>` isn't used. With :ref:`Condition.negate<class_Condition_property_negate>` it passes below the mark instead.
+It reads :ref:`EffectContext.charge<class_EffectContext_property_charge>`, which a :ref:`Trigger<class_Trigger>` with a :ref:`Trigger.charge_time<class_Trigger_property_charge_time>` sets, and in a :ref:`StatusTrigger<class_StatusTrigger>` the charge of the hit that set it off. With :ref:`Condition.negate<class_Condition_property_negate>` it passes below the mark instead.
 
 .. rst-class:: classref-reftable-group
 
@@ -30,18 +30,6 @@ Properties
    +---------------------------+----------------------------------------------------------+---------+
    | :ref:`float<class_float>` | :ref:`at_least<class_ChargeCondition_property_at_least>` | ``1.0`` |
    +---------------------------+----------------------------------------------------------+---------+
-
-.. rst-class:: classref-reftable-group
-
-Methods
--------
-
-.. table::
-   :widths: auto
-
-   +-------------------------+---------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`check<class_ChargeCondition_method_check>`\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) |
-   +-------------------------+---------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -59,25 +47,6 @@ Property Descriptions
 :ref:`float<class_float>` **at_least** = ``1.0`` :ref:`🔗<class_ChargeCondition_property_at_least>`
 
 The share of a full charge needed, from 0 to 1. 1 means fully charged.
-
-.. rst-class:: classref-section-separator
-
-----
-
-.. rst-class:: classref-descriptions-group
-
-Method Descriptions
--------------------
-
-.. _class_ChargeCondition_method_check:
-
-.. rst-class:: classref-method
-
-:ref:`bool<class_bool>` **check**\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) :ref:`🔗<class_ChargeCondition_method_check>`
-
-.. container:: contribute
-
-	No description yet.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

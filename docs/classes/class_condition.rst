@@ -8,33 +8,34 @@
 Condition
 =========
 
-**Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`AnyCondition<class_AnyCondition>`, :ref:`ChanceCondition<class_ChanceCondition>`, :ref:`ChargeCondition<class_ChargeCondition>`, :ref:`HasTagCondition<class_HasTagCondition>`, :ref:`HitCondition<class_HitCondition>`, :ref:`IsHostileCondition<class_IsHostileCondition>`, :ref:`PoolBelowCondition<class_PoolBelowCondition>`, :ref:`StatCondition<class_StatCondition>`
+**Inherited By:** :ref:`AnyCondition<class_AnyCondition>`, :ref:`ChargeCondition<class_ChargeCondition>`, :ref:`HitCondition<class_HitCondition>`, :ref:`IsHostileCondition<class_IsHostileCondition>`, :ref:`SubjectCondition<class_SubjectCondition>`
 
-A yes/no check on a node, used to gate effects and statuses.
+A yes/no check, used to gate effects and statuses.
 
 .. rst-class:: classref-introduction-group
 
 Description
 -----------
 
-:ref:`Effect<class_Effect>` uses its :ref:`Effect.conditions<class_Effect_property_conditions>` to decide whether it runs, and :ref:`StatusData<class_StatusData>` uses :ref:`StatusData.apply_conditions<class_StatusData_property_apply_conditions>` to decide whether it can be applied. To make your own, extend this class and override :ref:`_test()<class_Condition_private_method__test>`.
+:ref:`Effect<class_Effect>` uses its :ref:`Effect.conditions<class_Effect_property_conditions>` to decide whether it runs, and :ref:`StatusData<class_StatusData>` uses :ref:`StatusData.apply_conditions<class_StatusData_property_apply_conditions>` to decide whether it can be applied. Turn on :ref:`negate<class_Condition_property_negate>` to flip the answer. The built-in ones are :ref:`HasTagCondition<class_HasTagCondition>`, :ref:`StatCondition<class_StatCondition>`, :ref:`PoolBelowCondition<class_PoolBelowCondition>`, :ref:`ChanceCondition<class_ChanceCondition>`, :ref:`HitCondition<class_HitCondition>`, :ref:`ChargeCondition<class_ChargeCondition>`, :ref:`IsHostileCondition<class_IsHostileCondition>` and :ref:`AnyCondition<class_AnyCondition>`.
 
-
+\ **Making your own.** A check on one node, such as "is burning", extends :ref:`SubjectCondition<class_SubjectCondition>` and overrides :ref:`SubjectCondition._test()<class_SubjectCondition_private_method__test>`; the Inspector then also offers which side to check. A check that needs both sides, or the hit itself, extends this class and overrides :ref:`_passes()<class_Condition_private_method__passes>`:
 
 ::
 
-    class_name IsBurningCondition
+    class_name IsCloseCondition
     extends Condition
 
-    func _test(node: Node) -> bool:
-        var statuses := Statuses.find_on(node)
-        return statuses != null and statuses.has_tag(&"fire")
+    @export var within := 3.0
 
-Set :ref:`subject<class_Condition_property_subject>` to check whoever caused it instead ("only rangers can apply this"), and :ref:`negate<class_Condition_property_negate>` to flip the result. The built-in ones are :ref:`HasTagCondition<class_HasTagCondition>`, :ref:`StatCondition<class_StatCondition>`, :ref:`PoolBelowCondition<class_PoolBelowCondition>` and :ref:`IsHostileCondition<class_IsHostileCondition>`.
+    func _passes(ctx: EffectContext) -> bool:
+        var from := ctx.source as Node3D
+        var to := ctx.target as Node3D
+        return from and to and from.global_position.distance_to(to.global_position) <= within
 
-A check that needs both sides, such as "the source is hostile to the target", overrides :ref:`check()<class_Condition_method_check>` instead and reads :ref:`EffectContext.source<class_EffectContext_property_source>` and :ref:`EffectContext.target<class_EffectContext_property_target>` itself. :ref:`IsHostileCondition<class_IsHostileCondition>` is a short example.
+Either way :ref:`negate<class_Condition_property_negate>` is applied for you, by :ref:`check()<class_Condition_method_check>`.
 
 .. rst-class:: classref-reftable-group
 
@@ -44,11 +45,9 @@ Properties
 .. table::
    :widths: auto
 
-   +----------------------------------------+--------------------------------------------------+-----------+
-   | :ref:`Subject<enum_Condition_Subject>` | :ref:`subject<class_Condition_property_subject>` | ``0``     |
-   +----------------------------------------+--------------------------------------------------+-----------+
-   | :ref:`bool<class_bool>`                | :ref:`negate<class_Condition_property_negate>`   | ``false`` |
-   +----------------------------------------+--------------------------------------------------+-----------+
+   +-------------------------+------------------------------------------------+-----------+
+   | :ref:`bool<class_bool>` | :ref:`negate<class_Condition_property_negate>` | ``false`` |
+   +-------------------------+------------------------------------------------+-----------+
 
 .. rst-class:: classref-reftable-group
 
@@ -63,39 +62,8 @@ Methods
    +-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`bool<class_bool>` | :ref:`check<class_Condition_method_check>`\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ )                                                                                             |
    +-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`_test<class_Condition_private_method__test>`\ (\ _node\: :ref:`Node<class_Node>`\ ) |virtual|                                                                                           |
+   | :ref:`bool<class_bool>` | :ref:`_passes<class_Condition_private_method__passes>`\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) |virtual|                                                                       |
    +-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-.. rst-class:: classref-section-separator
-
-----
-
-.. rst-class:: classref-descriptions-group
-
-Enumerations
-------------
-
-.. _enum_Condition_Subject:
-
-.. rst-class:: classref-enumeration
-
-enum **Subject**: :ref:`🔗<enum_Condition_Subject>`
-
-.. _class_Condition_constant_TARGET:
-
-.. rst-class:: classref-enumeration-constant
-
-:ref:`Subject<enum_Condition_Subject>` **TARGET** = ``0``
-
-Whoever receives the effect or status.
-
-.. _class_Condition_constant_SOURCE:
-
-.. rst-class:: classref-enumeration-constant
-
-:ref:`Subject<enum_Condition_Subject>` **SOURCE** = ``1``
-
-Whoever caused it. Null for the environment.
 
 .. rst-class:: classref-section-separator
 
@@ -105,18 +73,6 @@ Whoever caused it. Null for the environment.
 
 Property Descriptions
 ---------------------
-
-.. _class_Condition_property_subject:
-
-.. rst-class:: classref-property
-
-:ref:`Subject<enum_Condition_Subject>` **subject** = ``0`` :ref:`🔗<class_Condition_property_subject>`
-
-Which side to check: who receives the effect or status, or who caused it.
-
-.. rst-class:: classref-item-separator
-
-----
 
 .. _class_Condition_property_negate:
 
@@ -153,19 +109,19 @@ True if every condition passes. An empty list always passes.
 
 :ref:`bool<class_bool>` **check**\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) :ref:`🔗<class_Condition_method_check>`
 
-Tests the node :ref:`subject<class_Condition_property_subject>` picks and applies :ref:`negate<class_Condition_property_negate>`. Override this instead of :ref:`_test()<class_Condition_private_method__test>` for a check that compares both sides.
+Whether the condition passes for ``ctx``, with :ref:`negate<class_Condition_property_negate>` applied. Callers use this, never :ref:`_passes()<class_Condition_private_method__passes>`.
 
 .. rst-class:: classref-item-separator
 
 ----
 
-.. _class_Condition_private_method__test:
+.. _class_Condition_private_method__passes:
 
 .. rst-class:: classref-method
 
-:ref:`bool<class_bool>` **_test**\ (\ _node\: :ref:`Node<class_Node>`\ ) |virtual| :ref:`🔗<class_Condition_private_method__test>`
+:ref:`bool<class_bool>` **_passes**\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) |virtual| :ref:`🔗<class_Condition_private_method__passes>`
 
-Override this: return true if the node passes. It may be null or have no components.
+Override this: return true if ``ctx`` passes. Either side may be null or have no components. Leave :ref:`negate<class_Condition_property_negate>` to :ref:`check()<class_Condition_method_check>`.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

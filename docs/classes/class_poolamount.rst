@@ -8,7 +8,7 @@
 PoolAmount
 ==========
 
-**Inherits:** :ref:`Amount<class_Amount>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Amount<class_Amount>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 A share of what is in a :ref:`Pool<class_Pool>`, such as 2% of the target's maximum health for a bleed, or more damage the less mana the caster has left. Health is the pool named ``health``.
 
@@ -20,15 +20,15 @@ Properties
 .. table::
    :widths: auto
 
-   +----------------------------------------+-----------------------------------------------------+---------------+
-   | :ref:`Subject<enum_Condition_Subject>` | :ref:`of<class_PoolAmount_property_of>`             | ``0``         |
-   +----------------------------------------+-----------------------------------------------------+---------------+
-   | :ref:`StringName<class_StringName>`    | :ref:`pool<class_PoolAmount_property_pool>`         | ``&"health"`` |
-   +----------------------------------------+-----------------------------------------------------+---------------+
-   | :ref:`Part<enum_PoolAmount_Part>`      | :ref:`part<class_PoolAmount_property_part>`         | ``2``         |
-   +----------------------------------------+-----------------------------------------------------+---------------+
-   | :ref:`float<class_float>`              | :ref:`fraction<class_PoolAmount_property_fraction>` | ``0.1``       |
-   +----------------------------------------+-----------------------------------------------------+---------------+
+   +--------------------------------------+-----------------------------------------------------+---------------+
+   | :ref:`Role<enum_EffectContext_Role>` | :ref:`of<class_PoolAmount_property_of>`             | ``0``         |
+   +--------------------------------------+-----------------------------------------------------+---------------+
+   | :ref:`StringName<class_StringName>`  | :ref:`pool<class_PoolAmount_property_pool>`         | ``&"health"`` |
+   +--------------------------------------+-----------------------------------------------------+---------------+
+   | :ref:`Part<enum_PoolAmount_Part>`    | :ref:`part<class_PoolAmount_property_part>`         | ``2``         |
+   +--------------------------------------+-----------------------------------------------------+---------------+
+   | :ref:`float<class_float>`            | :ref:`fraction<class_PoolAmount_property_fraction>` | ``0.1``       |
+   +--------------------------------------+-----------------------------------------------------+---------------+
 
 .. rst-class:: classref-reftable-group
 
@@ -94,7 +94,7 @@ Property Descriptions
 
 .. rst-class:: classref-property
 
-:ref:`Subject<enum_Condition_Subject>` **of** = ``0`` :ref:`🔗<class_PoolAmount_property_of>`
+:ref:`Role<enum_EffectContext_Role>` **of** = ``0`` :ref:`🔗<class_PoolAmount_property_of>`
 
 Whose pool to read.
 

@@ -8,7 +8,7 @@
 HitAmount
 =========
 
-**Inherits:** :ref:`Amount<class_Amount>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Amount<class_Amount>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 A share of the hit that set off a status trigger, e.g. heal for a quarter of the damage dealt (life steal) or deal back a third of the damage taken (thorns).
 

@@ -8,7 +8,7 @@
 SpawnSceneEffect
 ================
 
-**Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Spawns a scene, e.g. a puddle, an explosion, a blood splash or a loot drop.
 

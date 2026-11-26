@@ -41,11 +41,11 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------------+---------------------------------------------------------------------------------------------------+
-   | :ref:`Faction<class_Faction>` | :ref:`find_on<class_Faction_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| |
-   +-------------------------------+---------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`       | :ref:`is_hostile<class_Faction_method_is_hostile>`\ (\ other\: :ref:`Variant<class_Variant>`\ )   |
-   +-------------------------------+---------------------------------------------------------------------------------------------------+
+   +-------------------------------+---------------------------------------------------------------------------------------------+
+   | :ref:`Faction<class_Faction>` | :ref:`find_on<class_Faction_method_find_on>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static| |
+   +-------------------------------+---------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`       | :ref:`is_hostile<class_Faction_method_is_hostile>`\ (\ other\: :ref:`Node<class_Node>`\ )   |
+   +-------------------------------+---------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -93,9 +93,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Faction<class_Faction>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Faction_method_find_on>`
+:ref:`Faction<class_Faction>` **find_on**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_Faction_method_find_on>`
 
-The **Faction** of ``node``'s character, or null if there is none. Safe on a freed node.
+The **Faction** of ``node``'s character, or null if there is none.
 
 .. rst-class:: classref-item-separator
 
@@ -105,7 +105,7 @@ The **Faction** of ``node``'s character, or null if there is none. Safe on a fre
 
 .. rst-class:: classref-method
 
-:ref:`bool<class_bool>` **is_hostile**\ (\ other\: :ref:`Variant<class_Variant>`\ ) :ref:`🔗<class_Faction_method_is_hostile>`
+:ref:`bool<class_bool>` **is_hostile**\ (\ other\: :ref:`Node<class_Node>`\ ) :ref:`🔗<class_Faction_method_is_hostile>`
 
 True if ``other`` is in the group of a team this character fights.
 

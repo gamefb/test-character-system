@@ -19,7 +19,7 @@ Your own data and scenes stay outside all three, so the system can be copied to 
    ├── character_system/
    │   ├── RECIPES.md                one-page answers to "how do I…"
    │   ├── icons/                    editor icons: one per base class, and some more
-   │   ├── core/                     the rules: 22 scripts, keep all of them
+   │   ├── core/                     the rules: 25 scripts, keep all of them
    │   │   ├── component.gd          the base class of every component
    │   │   ├── component_manager.gd  add one to every host; stats, events and blocks
    │   │   ├── effect_context.gd     who did what to whom
@@ -27,10 +27,12 @@ Your own data and scenes stay outside all three, so the system can be copied to 
    │   │   ├── pool.gd               an amount that is spent and refilled
    │   │   ├── health.gd             the pool named health; resistances and death
    │   │   ├── name_check.gd         finds mistyped stat, event, tag, pool and block names
+   │   │   ├── data_resource.gd      the base class of the data: name fields become lists
+   │   │   ├── display_data.gd       id, name, icon and description, for statuses, abilities, items
    │   │   ├── stats/                stat_modifier
    │   │   ├── effects/              effect and amount_effect (bases), damage, heal,
    │   │   │                         apply_status, remove_status, modify_amount
-   │   │   ├── conditions/           condition (base), has_tag
+   │   │   ├── conditions/           condition and subject_condition (bases), has_tag
    │   │   ├── amounts/              amount (base), stat_amount
    │   │   └── statuses/             statuses, status_data, status_trigger, dead.tres
    │   ├── character/                the framework: 44 scripts, keep what you use
@@ -113,10 +115,10 @@ Pitfalls
 -  **Chance conditions roll each time they're checked.** One on each of a trigger's effects rolls separately for each. Put it in the trigger's own ``conditions`` to roll once.
 -  **A stat must be listed before the warnings know it.** A stat in a :ref:`ComponentManager<class_ComponentManager>`'s Stats, or a :ref:`Pool<class_Pool>`'s name, is known to the editor warnings once a saved scene has it. Until then a modifier on it is flagged, though it works.
 -  **Events are signals, so listeners clean up after themselves.** A method connected to ``event()`` or ``WorldEvents.event()`` is dropped when its object is freed, and so is a lambda that uses the object it was written in. A lambda that uses nothing of its object stays connected until ``disconnect()``.
--  **Costs need a pool of that name.** An ability whose ``costs`` name a pool the character doesn't have can never be used; ``why_not()`` answers ``cost``.
--  **Sources can die.** A status may outlive the character that applied it, and a rocket whoever fired it. A context built after that has a null ``source``, and ``Component.of``, ``ComponentManager.of``, ``stat_of`` and ``notify`` accept a freed node. GDScript refuses a freed node for a typed parameter, so your own functions that may be handed one should leave that parameter untyped, and custom effects must check ``is_instance_valid(ctx.source)`` before using it directly.
+-  **Costs need a pool of that name.** An ability whose ``costs`` name a pool the character doesn't have can never be used; ``why_not()`` answers ``Refusal.COST``.
+-  **Sources can die.** A status may outlive the character that applied it, and a rocket whoever fired it. That is settled where a context is built: ``EffectContext.new()`` and ``Hurtbox.hit()`` turn a node that has been freed into null, so an effect, a condition or a listener is handed a ``source`` and a ``target`` that are each a live node or null, and the lookups (``find_on()``, ``Component.of``, ``ComponentManager.of``, ``stat_of``, ``notify``) take null. A node your own script kept in a variable is yours to check: GDScript refuses a freed node for a typed parameter, so test it with ``is_instance_valid()`` before passing it to a lookup.
 -  **Friendly fire is a rule, not a system.** If allies should not hurt each other, add a :ref:`Condition<class_Condition>` that checks ``Faction.is_hostile`` and put it on weapon damage effects.
--  **Connect with ``listen()``, and hear events with ``on()``.** Both are undone when the component stops, which is what makes "unequip is free" and removing components mid-game safe. A plain ``connect()`` to another node stays until one of them is freed.
+-  **Connect with ``listen()``, hear events with ``on()``, and give with ``hold_modifier()`` and ``hold_status()``.** All four are undone when the component stops, which is what makes "unequip is free" and removing components mid-game safe. A plain ``connect()`` to another node stays until one of them is freed, and a modifier added with ``add_modifier()`` stays until ``remove_modifier()``.
 -  **Your own components need ``@tool`` for editor warnings.** Without it they still work, and problems are reported in the Output panel when the game runs. With it, keep editor-only care in mind: the base class turns processing off in the editor, but your own ``_ready()`` still runs there.
 -  **Areas on a weapon's layers block its shots.** Rays hit areas so that hurtboxes work, so a trigger volume or pickup on a layer in the weapon's mask stops the shot. Put such areas on no layer, as :ref:`EffectZone<class_EffectZone>` does, or on a layer your weapons leave out.
 -  **An AI that has a path but stands still.** A navigation mesh baked from colliders sits a little above the floor (0.5 m for a default bake). If the agent's Path Height Offset doesn't match, the next waypoint can be straight above the character, so :ref:`AIBrain<class_AIBrain>` has no direction to walk. Set Path Height Offset to the mesh's height above the floor; the enemy template already does.

@@ -51,15 +51,15 @@ Methods
 .. table::
    :widths: auto
 
-   +-----------------------------------------+-----------------------------------------------------------------------------------------------------+
-   | :ref:`Equipment<class_Equipment>`       | :ref:`find_on<class_Equipment_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| |
-   +-----------------------------------------+-----------------------------------------------------------------------------------------------------+
-   | |void|                                  | :ref:`equip<class_Equipment_method_equip>`\ (\ item\: :ref:`ItemInstance<class_ItemInstance>`\ )    |
-   +-----------------------------------------+-----------------------------------------------------------------------------------------------------+
-   | :ref:`Node<class_Node>`                 | :ref:`node_in<class_Equipment_method_node_in>`\ (\ slot\: :ref:`StringName<class_StringName>`\ )    |
-   +-----------------------------------------+-----------------------------------------------------------------------------------------------------+
-   | :ref:`ItemInstance<class_ItemInstance>` | :ref:`unequip<class_Equipment_method_unequip>`\ (\ slot\: :ref:`StringName<class_StringName>`\ )    |
-   +-----------------------------------------+-----------------------------------------------------------------------------------------------------+
+   +-----------------------------------------+--------------------------------------------------------------------------------------------------+
+   | :ref:`Equipment<class_Equipment>`       | :ref:`find_on<class_Equipment_method_find_on>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static|    |
+   +-----------------------------------------+--------------------------------------------------------------------------------------------------+
+   | |void|                                  | :ref:`equip<class_Equipment_method_equip>`\ (\ item\: :ref:`ItemInstance<class_ItemInstance>`\ ) |
+   +-----------------------------------------+--------------------------------------------------------------------------------------------------+
+   | :ref:`Node<class_Node>`                 | :ref:`node_in<class_Equipment_method_node_in>`\ (\ slot\: :ref:`StringName<class_StringName>`\ ) |
+   +-----------------------------------------+--------------------------------------------------------------------------------------------------+
+   | :ref:`ItemInstance<class_ItemInstance>` | :ref:`unequip<class_Equipment_method_unequip>`\ (\ slot\: :ref:`StringName<class_StringName>`\ ) |
+   +-----------------------------------------+--------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -124,9 +124,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Equipment<class_Equipment>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Equipment_method_find_on>`
+:ref:`Equipment<class_Equipment>` **find_on**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_Equipment_method_find_on>`
 
-The **Equipment** of ``node``'s character, or null if there is none. Safe on a freed node.
+The **Equipment** of ``node``'s character, or null if there is none.
 
 .. rst-class:: classref-item-separator
 

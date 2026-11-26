@@ -41,7 +41,7 @@ Use a new context for each target. Effects write to it (:ref:`amount<class_Effec
 
 The hit then lands for (amount + add) × (1 + percent) × mul, the same formula stats use, so the result doesn't depend on which status was applied first. See :ref:`resolve()<class_EffectContext_method_resolve>`.
 
-\ :ref:`source<class_EffectContext_property_source>` may have been freed by the time a status ticks. A context built then has a null source, and :ref:`Component.of()<class_Component_method_of>` and the :ref:`ComponentManager<class_ComponentManager>` helpers accept freed nodes; check ``is_instance_valid(ctx.source)`` before using it directly.
+\ **Sources can die.** A status may outlive whoever applied it, and a rocket whoever fired it. Building a context is where that is settled: a node that has been freed becomes null here, so effects, conditions and listeners get a :ref:`source<class_EffectContext_property_source>` and a :ref:`target<class_EffectContext_property_target>` that are each a live node or null, and only need the null check.
 
 .. rst-class:: classref-reftable-group
 
@@ -74,8 +74,6 @@ Properties
    +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
    | :ref:`Vector3<class_Vector3>`                                    | :ref:`position<class_EffectContext_property_position>`       | ``Vector3(inf, inf, inf)`` |
    +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
-   | :ref:`Vector3<class_Vector3>`                                    | :ref:`normal<class_EffectContext_property_normal>`           | ``Vector3(0, 0, 0)``       |
-   +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
    | :ref:`bool<class_bool>`                                          | :ref:`from_status<class_EffectContext_property_from_status>` | ``false``                  |
    +------------------------------------------------------------------+--------------------------------------------------------------+----------------------------+
    | :ref:`EffectContext<class_EffectContext>`                        | :ref:`cause<class_EffectContext_property_cause>`             |                            |
@@ -98,6 +96,8 @@ Methods
    +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | |void|                                    | :ref:`_init<class_EffectContext_private_method__init>`\ (\ p_source\: :ref:`Variant<class_Variant>` = null, p_target\: :ref:`Variant<class_Variant>` = null, p_origin\: :ref:`Resource<class_Resource>` = null\ ) |
    +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Node<class_Node>`                   | :ref:`node<class_EffectContext_method_node>`\ (\ role\: :ref:`Role<enum_EffectContext_Role>`\ )                                                                                                                   |
+   +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`EffectContext<class_EffectContext>` | :ref:`hit<class_EffectContext_method_hit>`\ (\ )                                                                                                                                                                  |
    +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`bool<class_bool>`                   | :ref:`has_tag<class_EffectContext_method_has_tag>`\ (\ tag\: :ref:`StringName<class_StringName>`\ )                                                                                                               |
@@ -108,6 +108,37 @@ Methods
    +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
    | |void|                                    | :ref:`reset_amount<class_EffectContext_method_reset_amount>`\ (\ value\: :ref:`float<class_float>`\ )                                                                                                             |
    +-------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+.. rst-class:: classref-section-separator
+
+----
+
+.. rst-class:: classref-descriptions-group
+
+Enumerations
+------------
+
+.. _enum_EffectContext_Role:
+
+.. rst-class:: classref-enumeration
+
+enum **Role**: :ref:`🔗<enum_EffectContext_Role>`
+
+.. _class_EffectContext_constant_TARGET:
+
+.. rst-class:: classref-enumeration-constant
+
+:ref:`Role<enum_EffectContext_Role>` **TARGET** = ``0``
+
+Whoever receives the effect or status.
+
+.. _class_EffectContext_constant_SOURCE:
+
+.. rst-class:: classref-enumeration-constant
+
+:ref:`Role<enum_EffectContext_Role>` **SOURCE** = ``1``
+
+Whoever caused it. Null for the environment.
 
 .. rst-class:: classref-section-separator
 
@@ -267,18 +298,6 @@ Where the hit landed, in world space. :ref:`Vector3.INF<class_Vector3_constant_I
 
 ----
 
-.. _class_EffectContext_property_normal:
-
-.. rst-class:: classref-property
-
-:ref:`Vector3<class_Vector3>` **normal** = ``Vector3(0, 0, 0)`` :ref:`🔗<class_EffectContext_property_normal>`
-
-The surface direction at :ref:`position<class_EffectContext_property_position>`, for decals and sparks. Zero if unknown.
-
-.. rst-class:: classref-item-separator
-
-----
-
 .. _class_EffectContext_property_from_status:
 
 .. rst-class:: classref-property
@@ -350,7 +369,19 @@ Method Descriptions
 
 |void| **_init**\ (\ p_source\: :ref:`Variant<class_Variant>` = null, p_target\: :ref:`Variant<class_Variant>` = null, p_origin\: :ref:`Resource<class_Resource>` = null\ ) :ref:`🔗<class_EffectContext_private_method__init>`
 
-``p_source`` caused it, ``p_target`` receives it, and ``p_origin`` is the ability, status or item behind it. A node that has already been freed counts as null, so a status whose applier is gone can still build its context.
+``p_source`` caused it, ``p_target`` receives it, and ``p_origin`` is the ability, status or item behind it. A node that has already been freed counts as null, so a status whose applier is gone can still build its context. The two have no type because GDScript refuses a freed node for a typed parameter.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_EffectContext_method_node:
+
+.. rst-class:: classref-method
+
+:ref:`Node<class_Node>` **node**\ (\ role\: :ref:`Role<enum_EffectContext_Role>`\ ) :ref:`🔗<class_EffectContext_method_node>`
+
+The node in ``role``: :ref:`source<class_EffectContext_property_source>` or :ref:`target<class_EffectContext_property_target>`.
 
 .. rst-class:: classref-item-separator
 
@@ -366,7 +397,7 @@ The hit this is about: :ref:`cause<class_EffectContext_property_cause>` inside a
 
 ::
 
-    func check(ctx: EffectContext) -> bool:
+    func _passes(ctx: EffectContext) -> bool:
         return ctx.hit().damage_type == &"fire"
 
 .. rst-class:: classref-item-separator

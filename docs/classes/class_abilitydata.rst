@@ -8,7 +8,7 @@
 AbilityData
 ===========
 
-**Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`DisplayData<class_DisplayData>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 An active ability: when it can be used, what it costs, who it targets and what it does.
 
@@ -17,7 +17,7 @@ An active ability: when it can be used, what it costs, who it targets and what i
 Description
 -----------
 
-Put it in :ref:`Abilities.slots<class_Abilities_property_slots>` under an action name. Everything here is optional beyond :ref:`effects<class_AbilityData_property_effects>`: an ability with only effects and a :ref:`cooldown<class_AbilityData_property_cooldown>` fires the moment its button is pressed. Add :ref:`costs<class_AbilityData_property_costs>` for mana or stamina, :ref:`charges<class_AbilityData_property_charges>` to bank several uses, :ref:`cast_time<class_AbilityData_property_cast_time>` for a wind-up that can be interrupted, and a name in :ref:`blocked_by<class_AbilityData_property_blocked_by>` so a status such as Silenced can stop it.
+Put it in :ref:`Abilities.slots<class_Abilities_property_slots>` under an action name. Everything here is optional beyond :ref:`effects<class_AbilityData_property_effects>`: an ability with only effects and a :ref:`cooldown<class_AbilityData_property_cooldown>` fires the moment its button is pressed. Add :ref:`costs<class_AbilityData_property_costs>` for mana or stamina, :ref:`charges<class_AbilityData_property_charges>` to bank several uses, :ref:`cast_time<class_AbilityData_property_cast_time>` for a wind-up that can be interrupted, and a name in :ref:`blocked_by<class_AbilityData_property_blocked_by>` so a status such as Silenced can stop it. Its name, icon and description come from :ref:`DisplayData<class_DisplayData>`.
 
 .. rst-class:: classref-reftable-group
 
@@ -27,14 +27,6 @@ Properties
 .. table::
    :widths: auto
 
-   +-------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+-----------+
-   | :ref:`StringName<class_StringName>`                                                                   | :ref:`id<class_AbilityData_property_id>`                                       |           |
-   +-------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+-----------+
-   | :ref:`String<class_String>`                                                                           | :ref:`display_name<class_AbilityData_property_display_name>`                   |           |
-   +-------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+-----------+
-   | :ref:`Texture2D<class_Texture2D>`                                                                     | :ref:`icon<class_AbilityData_property_icon>`                                   |           |
-   +-------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+-----------+
-   | :ref:`String<class_String>`                                                                           | :ref:`description<class_AbilityData_property_description>`                     |           |
    +-------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+-----------+
    | :ref:`float<class_float>`                                                                             | :ref:`cooldown<class_AbilityData_property_cooldown>`                           | ``1.0``   |
    +-------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------+-----------+
@@ -69,54 +61,6 @@ Properties
 
 Property Descriptions
 ---------------------
-
-.. _class_AbilityData_property_id:
-
-.. rst-class:: classref-property
-
-:ref:`StringName<class_StringName>` **id** :ref:`🔗<class_AbilityData_property_id>`
-
-A unique name for your code, e.g. &"fireball".
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_AbilityData_property_display_name:
-
-.. rst-class:: classref-property
-
-:ref:`String<class_String>` **display_name** :ref:`🔗<class_AbilityData_property_display_name>`
-
-The name players see.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_AbilityData_property_icon:
-
-.. rst-class:: classref-property
-
-:ref:`Texture2D<class_Texture2D>` **icon** :ref:`🔗<class_AbilityData_property_icon>`
-
-For your ability bar. The system doesn't use it.
-
-.. rst-class:: classref-item-separator
-
-----
-
-.. _class_AbilityData_property_description:
-
-.. rst-class:: classref-property
-
-:ref:`String<class_String>` **description** :ref:`🔗<class_AbilityData_property_description>`
-
-Tooltip text for your UI.
-
-.. rst-class:: classref-item-separator
-
-----
 
 .. _class_AbilityData_property_cooldown:
 

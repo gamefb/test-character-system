@@ -47,15 +47,15 @@ Methods
 .. table::
    :widths: auto
 
-   +---------------------------------+----------------------------------------------------------------------------------------------------+
-   | :ref:`Magazine<class_Magazine>` | :ref:`find_on<class_Magazine_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| |
-   +---------------------------------+----------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`         | :ref:`is_reloading<class_Magazine_method_is_reloading>`\ (\ )                                      |
-   +---------------------------------+----------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`         | :ref:`take<class_Magazine_method_take>`\ (\ )                                                      |
-   +---------------------------------+----------------------------------------------------------------------------------------------------+
-   | |void|                          | :ref:`reload<class_Magazine_method_reload>`\ (\ )                                                  |
-   +---------------------------------+----------------------------------------------------------------------------------------------------+
+   +---------------------------------+----------------------------------------------------------------------------------------------+
+   | :ref:`Magazine<class_Magazine>` | :ref:`find_on<class_Magazine_method_find_on>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static| |
+   +---------------------------------+----------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`         | :ref:`is_reloading<class_Magazine_method_is_reloading>`\ (\ )                                |
+   +---------------------------------+----------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`         | :ref:`take<class_Magazine_method_take>`\ (\ )                                                |
+   +---------------------------------+----------------------------------------------------------------------------------------------+
+   | |void|                          | :ref:`reload<class_Magazine_method_reload>`\ (\ )                                            |
+   +---------------------------------+----------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -181,9 +181,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Magazine<class_Magazine>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Magazine_method_find_on>`
+:ref:`Magazine<class_Magazine>` **find_on**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_Magazine_method_find_on>`
 
-The **Magazine** on the item scene ``node``, or null if there is none. Safe on a freed node.
+The **Magazine** on the item scene ``node``, or null if there is none.
 
 .. rst-class:: classref-item-separator
 

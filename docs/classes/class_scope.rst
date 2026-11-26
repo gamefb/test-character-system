@@ -17,7 +17,7 @@ An example item component to copy: while the aim action is held, the wielder zoo
 Description
 -----------
 
-It shows how an item changes the character holding it. The zoom uses the camera of the wielder's :ref:`PlayerBrain<class_PlayerBrain>`, so an AI wielder only slows down. The slowdown is a :ref:`StatModifier<class_StatModifier>` on the wielder's :ref:`ComponentManager<class_ComponentManager>`, and :ref:`Component._stop()<class_Component_private_method__stop>` takes it off again, so unequipping while aiming leaves nothing behind.
+It shows how an item changes the character holding it. The zoom uses the camera of the wielder's :ref:`PlayerBrain<class_PlayerBrain>`, so an AI wielder only slows down. The slowdown is a :ref:`StatModifier<class_StatModifier>` held on the wielder with :ref:`Component.hold_modifier()<class_Component_method_hold_modifier>`, which takes it off again on unequip. The zoom is this script's own change, so :ref:`Component._stop()<class_Component_private_method__stop>` undoes it.
 
 .. rst-class:: classref-reftable-group
 

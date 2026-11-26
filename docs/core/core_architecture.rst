@@ -11,7 +11,7 @@ How a component lives:
 
 1. **Enters the tree:** it registers with the host's :ref:`ComponentManager<class_ComponentManager>`, and the numbers its ``_stats()`` returns become readable.
 2. **Starts:** ``_start()`` runs once the host is ready and every type in ``_requires()`` is present. A component added mid-game starts straight away.
-3. **Stops:** ``_stop()`` runs when it leaves, or when something it requires leaves. Connections made with ``listen()`` and events asked for with ``on()`` are undone.
+3. **Stops:** ``_stop()`` runs when it leaves, or when something it requires leaves. Connections made with ``listen()`` and events asked for with ``on()`` are undone, and what it gave with ``hold_modifier()`` and ``hold_status()`` is taken back.
 4. **Restarts:** if what it required comes back, ``_start()`` runs again.
 
 A component that can't start shows a yellow warning in the editor and reports it once in the Output panel; the rest of the character keeps working. Nothing runs in the editor: built-in components are ``@tool`` so they can show warnings, and the base class turns their processing off there and never calls ``_start()``. It does its work in ``_notification()``, which Godot calls for every script in the inheritance chain, so a component may still override ``_ready()`` without calling ``super()``.

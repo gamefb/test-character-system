@@ -8,7 +8,7 @@
 RandomAmount
 ============
 
-**Inherits:** :ref:`Amount<class_Amount>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Amount<class_Amount>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 A random number from :ref:`low<class_RandomAmount_property_low>` to :ref:`high<class_RandomAmount_property_high>`, rolled each time the effect runs, e.g. 0 to 6 extra damage on every shot.
 

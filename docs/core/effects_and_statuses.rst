@@ -117,9 +117,11 @@ Conditions
 
 .. source-file:: ../../character_system/core/conditions/condition.gd
 
+.. source-file:: ../../character_system/core/conditions/subject_condition.gd
+
 .. source-file:: ../../character_system/core/conditions/has_tag_condition.gd
 
-``_test(node) != negate`` is a compact way to flip the result: when ``negate`` is true, true becomes false and false becomes true. ``Condition.all_pass()`` is shared by effects and by status apply conditions, described under Status data.
+``_passes(ctx) != negate`` is a compact way to flip the result: when ``negate`` is true, true becomes false and false becomes true. It is written once, in ``check()``, so no condition handles ``negate`` itself. Most conditions look at one node, and extend :ref:`SubjectCondition<class_SubjectCondition>`: its ``subject`` picks the target or the source, and the condition only answers ``_test(node)``. ``Condition.all_pass()`` is shared by effects and by status apply conditions, described under Status data.
 
 .. list-table::
    :header-rows: 1

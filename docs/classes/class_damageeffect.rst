@@ -8,7 +8,7 @@
 DamageEffect
 ============
 
-**Inherits:** :ref:`AmountEffect<class_AmountEffect>` **<** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`AmountEffect<class_AmountEffect>` **<** :ref:`Effect<class_Effect>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Deals damage, scaled by magnitude and reduced by the target's resistance to its type.
 

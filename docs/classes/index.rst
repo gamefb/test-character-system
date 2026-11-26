@@ -24,6 +24,8 @@ Core
     class_componentmanager
     class_condition
     class_damageeffect
+    class_dataresource
+    class_displaydata
     class_effect
     class_effectcontext
     class_hastagcondition
@@ -39,6 +41,7 @@ Core
     class_statustrigger
     class_statuses.activestatus
     class_statuses
+    class_subjectcondition
     class_worldevents
 
 Character framework

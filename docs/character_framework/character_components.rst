@@ -190,7 +190,7 @@ Only ``effects`` is needed; everything else is switched on by filling it in.
      - What happens to the targets, and to the user
      - Damage to enemies nearby, and a heal for the caster
 
-``use()`` asks ``why_not()`` first, which names the first thing against the ability: ``blocked`` (a status is blocking the brain or the ability), ``casting``, ``cooldown``, ``cost``, ``condition`` or ``no_target``. If there is one, nothing happens except the ``failed`` signal, which carries the reason for a "Not enough mana" message; ``can_use()`` answers the same question for a greyed-out button.
+``use()`` asks ``why_not()`` first, which answers with the first thing against the ability, as an ``Abilities.Refusal``: ``BLOCKED`` (a status is blocking the brain or the ability), ``CASTING``, ``COOLDOWN``, ``COST``, ``CONDITION`` or ``NO_TARGET``, and ``NONE`` when it can be used. If there is one, nothing happens except the ``failed`` signal, which carries the reason for a "Not enough mana" message; ``can_use()`` answers the same question for a greyed-out button.
 
 **Costs are paid when the effects run.** An ability with a cast time checks that it can be paid for when the cast starts, and takes the costs and the charge when it ends. A cast that is interrupted, by a stun, a blocking status, damage or your own call to ``interrupt()``, costs nothing and starts no cooldown. Only one ability is cast at a time.
 

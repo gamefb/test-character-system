@@ -8,7 +8,7 @@
 StatCondition
 =============
 
-**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`SubjectCondition<class_SubjectCondition>` **<** :ref:`Condition<class_Condition>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Passes if the node's :ref:`stat<class_StatCondition_property_stat>` is at least :ref:`value<class_StatCondition_property_value>`.
 

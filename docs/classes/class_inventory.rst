@@ -40,7 +40,7 @@ Methods
    :widths: auto
 
    +-----------------------------------------+--------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Inventory<class_Inventory>`       | :ref:`find_on<class_Inventory_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                            |
+   | :ref:`Inventory<class_Inventory>`       | :ref:`find_on<class_Inventory_method_find_on>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static|                                  |
    +-----------------------------------------+--------------------------------------------------------------------------------------------------------------------------------+
    | :ref:`int<class_int>`                   | :ref:`count<class_Inventory_method_count>`\ (\ data\: :ref:`ItemData<class_ItemData>`\ )                                       |
    +-----------------------------------------+--------------------------------------------------------------------------------------------------------------------------------+
@@ -104,9 +104,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Inventory<class_Inventory>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Inventory_method_find_on>`
+:ref:`Inventory<class_Inventory>` **find_on**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_Inventory_method_find_on>`
 
-The **Inventory** of ``node``'s character, or null if there is none. Safe on a freed node.
+The **Inventory** of ``node``'s character, or null if there is none.
 
 .. rst-class:: classref-item-separator
 

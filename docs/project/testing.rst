@@ -17,7 +17,10 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - What it checks
    * - ``test_core.gd``
      - 16
-     - Components start in any order and once a requirement arrives, only process and get input while running, keep their own process mode, and stop and restart with a requirement (but keep running while another of its type is left); stats combine and update, and a new component reports its stats; events reach running components only; lookups work before the host is in the scene and follow components that come and go, ``find_on()`` is safe on null, freed and plain nodes, and every base class has an icon whose picture no other base class has
+     - Components start in any order and once a requirement arrives, only process and get input while running, keep their own process mode, and stop and restart with a requirement (but keep running while another of its type is left); stats combine and update, and a new component reports its stats; events reach running components only; lookups work before the host is in the scene and follow components that come and go, ``find_on()`` is safe on null and plain nodes, and every base class has an icon whose picture no other base class has
+   * - ``test_holds.gd``
+     - 7
+     - A held modifier counting once and coming off when let go; a held status staying until then; stopping taking back everything held; a refused status not being held, and nobody else's hold being dropped for it; an item's holds going to its wielder; nothing being held by a component that is waiting to start; a wielder that was freed first
    * - ``test_input.gd``
      - 9
      - Presses and releases, a release while paused or never seen, a press the UI used, two keys on one action, an AI press seen once by every node, automatic fire held and tapped
@@ -34,8 +37,8 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - 1
      - The agent is found by itself, a new path is only asked for once the target has moved ``repath_distance``, and it aims ``aim_height`` above the target
    * - ``test_combat_parts.gd``
-     - 9
-     - Hitscan hits the target and not its wielder, and says which item dealt the hit; a weapon's projectile leaves from the weapon; shots and projectiles pass through plain areas, dead bodies and their hurtboxes, and stop at the living; cooldowns block reuse and wait while paused; teams are groups
+     - 10
+     - Hitscan hits the target and not its wielder, and says which item dealt the hit; a weapon's projectile leaves from the weapon; shots and projectiles pass through plain areas, dead bodies and their hurtboxes, and stop at the living; a shape finds each character once, by its strongest part, and no plain area, and an area ability leaves the dead alone; cooldowns block reuse and wait while paused; teams are groups
    * - ``test_examples.gd``
      - 8
      - Every example loads and does what its name says: Burning, the traits, Wet, Warded, Thorns, the abilities and the items
@@ -50,7 +53,7 @@ A test character is a plain ``Node3D`` with a :ref:`ComponentManager<class_Compo
      - A dead target takes no more hits and sends no events; the killer hears ``killed``, but not for killing itself; ``revived``; statuses changing healing given and received; triggers that set each other off are cut short; ``on_remove`` runs when a status ends and not when its character is freed; a status keeps ticking after whoever applied it is freed; removing statuses by tag
    * - ``test_conditions_and_effects.gd``
      - 6
-     - Chance from never to always, and a stat adding to it; AnyCondition needing only one; the hit conditions reading the hit inside and outside a trigger; a scene spawning at the target, the hit point or the source; the lookups accepting a node that was just freed
+     - Chance from never to always, and a stat adding to it; AnyCondition needing only one; the hit conditions reading the hit inside and outside a trigger; a scene spawning at the target, the hit point or the source; a freed node becoming null where a context is built, and every lookup taking null
    * - ``test_amounts.gd``
      - 10
      - Damage growing with the user's stat, with modifiers included; a curve by level; shares of current, missing and maximum health; life steal and thorns as a share of the hit; a status tick scaling with whoever applied it; random ranges; a pool effect scaling too
@@ -171,23 +174,23 @@ The base classes for effects with a number and for weapon parts, the typed ``fin
 Verification status
 -------------------
 
-All 258 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 23. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
+All 266 tests and all 43 scene checks pass on Godot 4.8 beta 4 with GUT 9.7.1 and Jolt physics, run headless, last on November 26. Godot 4.8 is the baseline: ``@abstract`` needs 4.5, and nothing older is tested any more.
 
 .. list-table::
    :header-rows: 1
 
    * - Check
      - Godot 4.8 beta 4
-   * - GUT tests (25 files above, test_statuses.gd included)
-     - 258 of 258, 1246 asserts
+   * - GUT tests (26 files above, test_statuses.gd included)
+     - 266 of 266, 1261 asserts
    * - ``immunity_test`` scene
      - 43 of 43
    * - Test level, ``--self-test``
      - 23 of 23
    * - ``core/`` on its own, with ``character/`` and ``starter_pack/`` deleted
-     - All 22 scripts load
+     - All 25 scripts load
    * - ``core/`` and ``character/``, with ``starter_pack/`` deleted
-     - All 66 scripts load
+     - All 69 scripts load
    * - Code examples in ``RECIPES.md``
      - All compile
 

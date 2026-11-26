@@ -67,13 +67,13 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------------+---------------------------------------------------------------------------------------------------+
-   | :ref:`Trigger<class_Trigger>` | :ref:`find_on<class_Trigger_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| |
-   +-------------------------------+---------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`       | :ref:`is_charging<class_Trigger_method_is_charging>`\ (\ )                                        |
-   +-------------------------------+---------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`       | :ref:`is_blocked<class_Trigger_method_is_blocked>`\ (\ )                                          |
-   +-------------------------------+---------------------------------------------------------------------------------------------------+
+   +-------------------------------+---------------------------------------------------------------------------------------------+
+   | :ref:`Trigger<class_Trigger>` | :ref:`find_on<class_Trigger_method_find_on>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static| |
+   +-------------------------------+---------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`       | :ref:`is_charging<class_Trigger_method_is_charging>`\ (\ )                                  |
+   +-------------------------------+---------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`       | :ref:`is_blocked<class_Trigger_method_is_blocked>`\ (\ )                                    |
+   +-------------------------------+---------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -242,9 +242,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Trigger<class_Trigger>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Trigger_method_find_on>`
+:ref:`Trigger<class_Trigger>` **find_on**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_Trigger_method_find_on>`
 
-The **Trigger** on the item scene ``node``, or null if there is none. Safe on a freed node.
+The **Trigger** on the item scene ``node``, or null if there is none.
 
 .. rst-class:: classref-item-separator
 

@@ -8,9 +8,9 @@
 Effect
 ======
 
-**Inherits:** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`AmountEffect<class_AmountEffect>`, :ref:`ApplyStatusEffect<class_ApplyStatusEffect>`, :ref:`KnockbackEffect<class_KnockbackEffect>`, :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>`, :ref:`ModifyAmountEffect<class_ModifyAmountEffect>`, :ref:`RemoveStatusEffect<class_RemoveStatusEffect>`, :ref:`SpawnSceneEffect<class_SpawnSceneEffect>`
+**Inherited By:** :ref:`AmountEffect<class_AmountEffect>`, :ref:`ApplyStatusEffect<class_ApplyStatusEffect>`, :ref:`LaunchProjectileEffect<class_LaunchProjectileEffect>`, :ref:`ModifyAmountEffect<class_ModifyAmountEffect>`, :ref:`RemoveStatusEffect<class_RemoveStatusEffect>`, :ref:`SpawnSceneEffect<class_SpawnSceneEffect>`
 
 One instant change to a target: damage, healing, a status, and so on.
 

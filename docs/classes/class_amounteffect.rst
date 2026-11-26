@@ -8,9 +8,9 @@
 AmountEffect
 ============
 
-**Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Effect<class_Effect>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
-**Inherited By:** :ref:`ChangePoolEffect<class_ChangePoolEffect>`, :ref:`DamageEffect<class_DamageEffect>`, :ref:`HealEffect<class_HealEffect>`
+**Inherited By:** :ref:`ChangePoolEffect<class_ChangePoolEffect>`, :ref:`DamageEffect<class_DamageEffect>`, :ref:`HealEffect<class_HealEffect>`, :ref:`KnockbackEffect<class_KnockbackEffect>`
 
 An effect with a number: a base amount, plus whatever it scales with.
 
@@ -19,7 +19,7 @@ An effect with a number: a base amount, plus whatever it scales with.
 Description
 -----------
 
-:ref:`DamageEffect<class_DamageEffect>`, :ref:`HealEffect<class_HealEffect>` and :ref:`ChangePoolEffect<class_ChangePoolEffect>` are built on it. Extend it for an effect of your own that needs a number designers can scale with stats, pools or the hit, and read the number for this run with :ref:`total()<class_AmountEffect_method_total>`.
+:ref:`DamageEffect<class_DamageEffect>`, :ref:`HealEffect<class_HealEffect>`, :ref:`ChangePoolEffect<class_ChangePoolEffect>` and :ref:`KnockbackEffect<class_KnockbackEffect>` are built on it. Extend it for an effect of your own that needs a number designers can scale with stats, pools or the hit, and read the number for this run with :ref:`total()<class_AmountEffect_method_total>`.
 
 .. rst-class:: classref-reftable-group
 

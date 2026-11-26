@@ -39,13 +39,13 @@ The host also needs a :ref:`ComponentManager<class_ComponentManager>` child. Com
 
 3. While running, it hears the events it asked for with :ref:`on()<class_Component_method_on>`, and its ``_process()``, ``_physics_process()`` and input callbacks run. Before it starts they don't run at all, so they can use what :ref:`_requires()<class_Component_private_method__requires>` promises without null checks. 
 
-4. :ref:`_stop()<class_Component_private_method__stop>` runs when it leaves the tree, when the host is freed, or when something it requires is removed. Everything connected with :ref:`listen()<class_Component_method_listen>` or :ref:`on()<class_Component_method_on>` is disconnected. 
+4. :ref:`_stop()<class_Component_private_method__stop>` runs when it leaves the tree, when the host is freed, or when something it requires is removed. Everything connected with :ref:`listen()<class_Component_method_listen>` or :ref:`on()<class_Component_method_on>` is disconnected, and everything given with :ref:`hold_modifier()<class_Component_method_hold_modifier>` or :ref:`hold_status()<class_Component_method_hold_status>` is taken back. 
 
 5. If what it required comes back, :ref:`_start()<class_Component_private_method__start>` runs again. Write :ref:`_start()<class_Component_private_method__start>` and :ref:`_stop()<class_Component_private_method__stop>` so they can run more than once.
 
 If a component can't start, the editor shows a warning on it and the Output panel reports once what's missing. The rest of the host keeps working.
 
-\ **Using components from other code.** Get one with its type's ``find_on()``, such as :ref:`Health.find_on()<class_Health_method_find_on>`, read stats with :ref:`ComponentManager.stat_of()<class_ComponentManager_method_stat_of>` and send events with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>`. All three are safe on null or freed nodes and on nodes without components, such as walls.
+\ **Using components from other code.** Get one with its type's ``find_on()``, such as :ref:`Health.find_on()<class_Health_method_find_on>`, read stats with :ref:`ComponentManager.stat_of()<class_ComponentManager_method_stat_of>` and send events with :ref:`ComponentManager.notify()<class_ComponentManager_method_notify>`. All three are safe on null and on nodes without components, such as walls.
 
 ::
 
@@ -92,6 +92,8 @@ If a component can't start, the editor shows a warning on it and the Output pane
 
 - Connect with :ref:`listen()<class_Component_method_listen>`, not ``connect()``, and hear events with :ref:`on()<class_Component_method_on>`, so both are undone when the component stops. 
 
+- Change a stat with :ref:`hold_modifier()<class_Component_method_hold_modifier>` and give a status with :ref:`hold_status()<class_Component_method_hold_status>`, for the same reason: a modifier left behind would change the character for good. 
+
 - A component that's optional for yours (used if present) doesn't go in :ref:`_requires()<class_Component_private_method__requires>`. :ref:`find()<class_Component_method_find>` it and check for null.
 
 .. rst-class:: classref-reftable-group
@@ -118,37 +120,41 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Component<class_Component>`                                                                     | :ref:`of<class_Component_method_of>`\ (\ node\: :ref:`Variant<class_Variant>`, type\: :ref:`Script<class_Script>`\ ) |static|                                                 |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`String<class_String>`                                                                           | :ref:`type_name<class_Component_method_type_name>`\ (\ type\: :ref:`Script<class_Script>`\ ) |static|                                                                         |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Component<class_Component>`                                                                     | :ref:`find<class_Component_method_find>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                            |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Array<class_Array>`\[:ref:`Component<class_Component>`\]                                        | :ref:`find_all<class_Component_method_find_all>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                    |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Node<class_Node>`                                                                               | :ref:`find_node_of_type<class_Component_method_find_node_of_type>`\ (\ type\: :ref:`StringName<class_StringName>`\ )                                                          |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`float<class_float>`                                                                             | :ref:`stat<class_Component_method_stat>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                                                                               |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                                                                                | :ref:`listen<class_Component_method_listen>`\ (\ sig\: :ref:`Signal<class_Signal>`, method\: :ref:`Callable<class_Callable>`\ )                                               |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                                                                                | :ref:`on<class_Component_method_on>`\ (\ event_name\: :ref:`StringName<class_StringName>`, method\: :ref:`Callable<class_Callable>`, node\: :ref:`Node<class_Node>` = null\ ) |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                                                                                | :ref:`update_stats<class_Component_method_update_stats>`\ (\ )                                                                                                                |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Array<class_Array>`\[:ref:`Script<class_Script>`\]                                              | :ref:`missing<class_Component_method_missing>`\ (\ )                                                                                                                          |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Array<class_Array>`\[:ref:`Script<class_Script>`\]                                              | :ref:`_requires<class_Component_private_method__requires>`\ (\ ) |virtual|                                                                                                    |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Dictionary<class_Dictionary>`\[:ref:`StringName<class_StringName>`, :ref:`float<class_float>`\] | :ref:`_stats<class_Component_private_method__stats>`\ (\ ) |virtual|                                                                                                          |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                                                                                | :ref:`_start<class_Component_private_method__start>`\ (\ ) |virtual|                                                                                                          |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                                                                                | :ref:`_stop<class_Component_private_method__stop>`\ (\ ) |virtual|                                                                                                            |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`PackedStringArray<class_PackedStringArray>`                                                     | :ref:`_warnings<class_Component_private_method__warnings>`\ (\ ) |virtual|                                                                                                    |
-   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Component<class_Component>`                                                                     | :ref:`of<class_Component_method_of>`\ (\ node\: :ref:`Node<class_Node>`, type\: :ref:`Script<class_Script>`\ ) |static|                                                                         |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`String<class_String>`                                                                           | :ref:`type_name<class_Component_method_type_name>`\ (\ type\: :ref:`Script<class_Script>`\ ) |static|                                                                                           |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Component<class_Component>`                                                                     | :ref:`find<class_Component_method_find>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                                              |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Array<class_Array>`\[:ref:`Component<class_Component>`\]                                        | :ref:`find_all<class_Component_method_find_all>`\ (\ type\: :ref:`Script<class_Script>`\ )                                                                                                      |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Node<class_Node>`                                                                               | :ref:`find_node_of_type<class_Component_method_find_node_of_type>`\ (\ type\: :ref:`StringName<class_StringName>`\ )                                                                            |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`float<class_float>`                                                                             | :ref:`stat<class_Component_method_stat>`\ (\ stat_name\: :ref:`StringName<class_StringName>`\ )                                                                                                 |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                                                                | :ref:`listen<class_Component_method_listen>`\ (\ sig\: :ref:`Signal<class_Signal>`, method\: :ref:`Callable<class_Callable>`\ )                                                                 |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                                                                | :ref:`on<class_Component_method_on>`\ (\ event_name\: :ref:`StringName<class_StringName>`, method\: :ref:`Callable<class_Callable>`, node\: :ref:`Node<class_Node>` = null\ )                   |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                                                                | :ref:`hold_modifier<class_Component_method_hold_modifier>`\ (\ m\: :ref:`StatModifier<class_StatModifier>`, on\: :ref:`bool<class_bool>` = true, source\: :ref:`Object<class_Object>` = null\ ) |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                                                                               | :ref:`hold_status<class_Component_method_hold_status>`\ (\ data\: :ref:`StatusData<class_StatusData>`, on\: :ref:`bool<class_bool>` = true, source\: :ref:`Node<class_Node>` = null\ )          |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                                                                | :ref:`update_stats<class_Component_method_update_stats>`\ (\ )                                                                                                                                  |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Array<class_Array>`\[:ref:`Script<class_Script>`\]                                              | :ref:`missing<class_Component_method_missing>`\ (\ )                                                                                                                                            |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Array<class_Array>`\[:ref:`Script<class_Script>`\]                                              | :ref:`_requires<class_Component_private_method__requires>`\ (\ ) |virtual|                                                                                                                      |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Dictionary<class_Dictionary>`\[:ref:`StringName<class_StringName>`, :ref:`float<class_float>`\] | :ref:`_stats<class_Component_private_method__stats>`\ (\ ) |virtual|                                                                                                                            |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                                                                | :ref:`_start<class_Component_private_method__start>`\ (\ ) |virtual|                                                                                                                            |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                                                                                | :ref:`_stop<class_Component_private_method__stop>`\ (\ ) |virtual|                                                                                                                              |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`PackedStringArray<class_PackedStringArray>`                                                     | :ref:`_warnings<class_Component_private_method__warnings>`\ (\ ) |virtual|                                                                                                                      |
+   +-------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -181,10 +187,6 @@ The node this component belongs to (its parent).
 
 :ref:`ComponentManager<class_ComponentManager>` **manager** :ref:`🔗<class_Component_property_manager>`
 
-.. rst-class:: classref-property-setget
-
-- :ref:`ComponentManager<class_ComponentManager>` **@manager_getter**\ (\ )
-
 The host's :ref:`ComponentManager<class_ComponentManager>`, or null if it has none. Set when the component enters the tree, so it's null in ``_init()`` and while the component is outside the tree.
 
 .. rst-class:: classref-item-separator
@@ -212,9 +214,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Component<class_Component>` **of**\ (\ node\: :ref:`Variant<class_Variant>`, type\: :ref:`Script<class_Script>`\ ) |static| :ref:`🔗<class_Component_method_of>`
+:ref:`Component<class_Component>` **of**\ (\ node\: :ref:`Node<class_Node>`, type\: :ref:`Script<class_Script>`\ ) |static| :ref:`🔗<class_Component_method_of>`
 
-Returns the ``type`` component on ``node``, or null. Safe on null or freed nodes.
+Returns the ``type`` component on ``node``, or null. Safe on a null node.
 
 Use it from any script: effects, level scripts, UI. Subclasses count, so asking for :ref:`Brain<class_Brain>` finds a :ref:`PlayerBrain<class_PlayerBrain>` or :ref:`AIBrain<class_AIBrain>`. The components a game looks up most have a typed shortcut, such as :ref:`Health.find_on()<class_Health_method_find_on>`. For a type of your own, cast the result, or give the type the same two lines:
 
@@ -224,7 +226,7 @@ Use it from any script: effects, level scripts, UI. Subclasses count, so asking 
     var sprint := Component.of(enemy, Sprint) as Sprint
 
     # In sprint.gd, so other scripts can write Sprint.find_on(enemy):
-    static func find_on(node: Variant) -> Sprint:
+    static func find_on(node: Node) -> Sprint:
         return Component.of(node, Sprint) as Sprint
 
 It works on a scene that hasn't been added to the level yet, e.g. to set a spawned enemy's :ref:`Faction.team<class_Faction_property_team>` before ``add_child()``.
@@ -374,6 +376,43 @@ Pass ``node`` to hear another host's events instead, e.g. an item listening to i
 
 ----
 
+.. _class_Component_method_hold_modifier:
+
+.. rst-class:: classref-method
+
+|void| **hold_modifier**\ (\ m\: :ref:`StatModifier<class_StatModifier>`, on\: :ref:`bool<class_bool>` = true, source\: :ref:`Object<class_Object>` = null\ ) :ref:`🔗<class_Component_method_hold_modifier>`
+
+Keeps ``m`` on this host's stats for as long as ``on`` is true, and takes it off when the component stops. An :ref:`ItemComponent<class_ItemComponent>`'s goes on its wielder.
+
+It only acts when ``on`` changes, so it can be called every frame with a condition:
+
+::
+
+    var _boost := StatModifier.new()  # Its stat and mul are set in _start().
+
+    func _process(_delta: float) -> void:
+        hold_modifier(_boost, (find(Brain) as Brain).is_action_pressed(&"sprint"))
+
+\ ``source`` is what :ref:`ComponentManager.modifiers_of()<class_ComponentManager_method_modifiers_of>` names as behind the change: this component if left out. A modifier is held once however often it is asked for, so use one object for each change. Nothing is held while the component isn't running.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Component_method_hold_status:
+
+.. rst-class:: classref-method
+
+:ref:`bool<class_bool>` **hold_status**\ (\ data\: :ref:`StatusData<class_StatusData>`, on\: :ref:`bool<class_bool>` = true, source\: :ref:`Node<class_Node>` = null\ ) :ref:`🔗<class_Component_method_hold_status>`
+
+Gives this host ``data`` for as long as ``on`` is true, and drops the hold when the component stops. An :ref:`ItemComponent<class_ItemComponent>`'s goes to its wielder. Use a status with :ref:`StatusData.duration<class_StatusData_property_duration>` 0, which stays until its last hold is dropped.
+
+Returns whether the status is held now: false if it was refused (see :ref:`StatusData.can_apply()<class_StatusData_method_can_apply>`), if there is no :ref:`Statuses<class_Statuses>` to take it, or if ``data`` is null. Like :ref:`hold_modifier()<class_Component_method_hold_modifier>`, it only acts when ``on`` changes, so a status that was refused isn't asked for again until ``on`` has been false in between. ``source`` is who is credited with applying it.
+
+.. rst-class:: classref-item-separator
+
+----
+
 .. _class_Component_method_update_stats:
 
 .. rst-class:: classref-method
@@ -441,7 +480,7 @@ Return the base values, usually your exports, never values with modifiers applie
 
 Called once the host is ready and everything this component requires is present. Connect signals with :ref:`listen()<class_Component_method_listen>` here.
 
-It runs after the host's own ``_ready()``, and again after each restart (see :ref:`_stop()<class_Component_private_method__stop>`). Anything it sets up that :ref:`listen()<class_Component_method_listen>` doesn't undo, such as a group, a stat modifier or a spawned node, should be undone in :ref:`_stop()<class_Component_private_method__stop>`.
+It runs after the host's own ``_ready()``, and again after each restart (see :ref:`_stop()<class_Component_private_method__stop>`). Anything it sets up by other means than :ref:`listen()<class_Component_method_listen>`, :ref:`on()<class_Component_method_on>`, :ref:`hold_modifier()<class_Component_method_hold_modifier>` and :ref:`hold_status()<class_Component_method_hold_status>`, such as a group or a spawned node, should be undone in :ref:`_stop()<class_Component_private_method__stop>`.
 
 .. rst-class:: classref-item-separator
 
@@ -455,7 +494,7 @@ It runs after the host's own ``_ready()``, and again after each restart (see :re
 
 Called when this component is removed, or something it requires is removed.
 
-Also called when the host is freed. Connections made with :ref:`listen()<class_Component_method_listen>` and :ref:`on()<class_Component_method_on>` are undone right after it, so only undo what :ref:`_start()<class_Component_private_method__start>` did by other means.
+Also called when the host is freed. Connections made with :ref:`listen()<class_Component_method_listen>` and :ref:`on()<class_Component_method_on>`, and holds made with :ref:`hold_modifier()<class_Component_method_hold_modifier>` and :ref:`hold_status()<class_Component_method_hold_status>`, are undone right after it, so only undo what :ref:`_start()<class_Component_private_method__start>` did by other means.
 
 .. rst-class:: classref-item-separator
 

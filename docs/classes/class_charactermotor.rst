@@ -78,7 +78,7 @@ Methods
    :widths: auto
 
    +---------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
-   | :ref:`CharacterMotor<class_CharacterMotor>` | :ref:`find_on<class_CharacterMotor_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|              |
+   | :ref:`CharacterMotor<class_CharacterMotor>` | :ref:`find_on<class_CharacterMotor_method_find_on>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static|                    |
    +---------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
    | :ref:`bool<class_bool>`                     | :ref:`is_blocked<class_CharacterMotor_method_is_blocked>`\ (\ )                                                       |
    +---------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+
@@ -248,9 +248,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`CharacterMotor<class_CharacterMotor>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_CharacterMotor_method_find_on>`
+:ref:`CharacterMotor<class_CharacterMotor>` **find_on**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_CharacterMotor_method_find_on>`
 
-The **CharacterMotor** of ``node``'s character, or null if there is none. Safe on a freed node.
+The **CharacterMotor** of ``node``'s character, or null if there is none.
 
 .. rst-class:: classref-item-separator
 

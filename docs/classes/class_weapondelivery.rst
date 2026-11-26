@@ -57,11 +57,11 @@ Methods
 .. table::
    :widths: auto
 
-   +-------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`EffectContext<class_EffectContext>` | :ref:`context_for<class_WeaponDelivery_method_context_for>`\ (\ collider\: :ref:`Object<class_Object>`, position\: :ref:`Vector3<class_Vector3>` = Vector3(inf, inf, inf), normal\: :ref:`Vector3<class_Vector3>` = Vector3(0, 0, 0)\ ) |
-   +-------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | |void|                                    | :ref:`_fire<class_WeaponDelivery_private_method__fire>`\ (\ ) |required|                                                                                                                                                                |
-   +-------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   +-------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`EffectContext<class_EffectContext>` | :ref:`context_for<class_WeaponDelivery_method_context_for>`\ (\ collider\: :ref:`Object<class_Object>`, position\: :ref:`Vector3<class_Vector3>` = Vector3(inf, inf, inf)\ ) |
+   +-------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | |void|                                    | :ref:`_fire<class_WeaponDelivery_private_method__fire>`\ (\ ) |required|                                                                                                     |
+   +-------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -105,7 +105,7 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`EffectContext<class_EffectContext>` **context_for**\ (\ collider\: :ref:`Object<class_Object>`, position\: :ref:`Vector3<class_Vector3>` = Vector3(inf, inf, inf), normal\: :ref:`Vector3<class_Vector3>` = Vector3(0, 0, 0)\ ) :ref:`🔗<class_WeaponDelivery_method_context_for>`
+:ref:`EffectContext<class_EffectContext>` **context_for**\ (\ collider\: :ref:`Object<class_Object>`, position\: :ref:`Vector3<class_Vector3>` = Vector3(inf, inf, inf)\ ) :ref:`🔗<class_WeaponDelivery_method_context_for>`
 
 The :ref:`EffectContext<class_EffectContext>` for a hit on ``collider`` by this weapon: from the wielder, with the item as its origin, and a :ref:`Hurtbox<class_Hurtbox>` resolved to its character. Pass where the hit landed if it has a point.
 

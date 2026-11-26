@@ -45,15 +45,17 @@ Methods
 .. table::
    :widths: auto
 
-   +----------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`EffectContext<class_EffectContext>`          | :ref:`hit<class_Hurtbox_method_hit>`\ (\ source\: :ref:`Variant<class_Variant>`, collider\: :ref:`Object<class_Object>`, origin\: :ref:`Resource<class_Resource>` = null, position\: :ref:`Vector3<class_Vector3>` = Vector3(inf, inf, inf), normal\: :ref:`Vector3<class_Vector3>` = Vector3(0, 0, 0)\ ) |static| |
-   +----------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Dictionary<class_Dictionary>`                | :ref:`raycast<class_Hurtbox_method_raycast>`\ (\ space\: :ref:`PhysicsDirectSpaceState3D<class_PhysicsDirectSpaceState3D>`, query\: :ref:`PhysicsRayQueryParameters3D<class_PhysicsRayQueryParameters3D>`\ ) |static|                                                                                              |
-   +----------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>`                            | :ref:`stops_shots<class_Hurtbox_method_stops_shots>`\ (\ collider\: :ref:`Object<class_Object>`\ ) |static|                                                                                                                                                                                                        |
-   +----------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Array<class_Array>`\[:ref:`RID<class_RID>`\] | :ref:`rids_of<class_Hurtbox_method_rids_of>`\ (\ character\: :ref:`Variant<class_Variant>`\ ) |static|                                                                                                                                                                                                             |
-   +----------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   +---------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`EffectContext<class_EffectContext>`                                                   | :ref:`hit<class_Hurtbox_method_hit>`\ (\ source\: :ref:`Variant<class_Variant>`, collider\: :ref:`Object<class_Object>`, origin\: :ref:`Resource<class_Resource>` = null, position\: :ref:`Vector3<class_Vector3>` = Vector3(inf, inf, inf)\ ) |static|             |
+   +---------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Dictionary<class_Dictionary>`                                                         | :ref:`raycast<class_Hurtbox_method_raycast>`\ (\ space\: :ref:`PhysicsDirectSpaceState3D<class_PhysicsDirectSpaceState3D>`, query\: :ref:`PhysicsRayQueryParameters3D<class_PhysicsRayQueryParameters3D>`\ ) |static|                                               |
+   +---------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Dictionary<class_Dictionary>`\[:ref:`Node<class_Node>`, :ref:`Object<class_Object>`\] | :ref:`overlap<class_Hurtbox_method_overlap>`\ (\ space\: :ref:`PhysicsDirectSpaceState3D<class_PhysicsDirectSpaceState3D>`, query\: :ref:`PhysicsShapeQueryParameters3D<class_PhysicsShapeQueryParameters3D>`, max_results\: :ref:`int<class_int>` = 32\ ) |static| |
+   +---------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`bool<class_bool>`                                                                     | :ref:`stops_shots<class_Hurtbox_method_stops_shots>`\ (\ collider\: :ref:`Object<class_Object>`\ ) |static|                                                                                                                                                         |
+   +---------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | :ref:`Array<class_Array>`\[:ref:`RID<class_RID>`\]                                          | :ref:`rids_of<class_Hurtbox_method_rids_of>`\ (\ character\: :ref:`Node<class_Node>`\ ) |static|                                                                                                                                                                    |
+   +---------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -126,9 +128,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`EffectContext<class_EffectContext>` **hit**\ (\ source\: :ref:`Variant<class_Variant>`, collider\: :ref:`Object<class_Object>`, origin\: :ref:`Resource<class_Resource>` = null, position\: :ref:`Vector3<class_Vector3>` = Vector3(inf, inf, inf), normal\: :ref:`Vector3<class_Vector3>` = Vector3(0, 0, 0)\ ) |static| :ref:`🔗<class_Hurtbox_method_hit>`
+:ref:`EffectContext<class_EffectContext>` **hit**\ (\ source\: :ref:`Variant<class_Variant>`, collider\: :ref:`Object<class_Object>`, origin\: :ref:`Resource<class_Resource>` = null, position\: :ref:`Vector3<class_Vector3>` = Vector3(inf, inf, inf)\ ) |static| :ref:`🔗<class_Hurtbox_method_hit>`
 
-Builds the :ref:`EffectContext<class_EffectContext>` for a hit on ``collider``, resolving a hurtbox to its character. ``origin`` is what dealt it, e.g. the weapon's :ref:`ItemData<class_ItemData>`, so a kill feed can name it. ``source`` is who dealt it; one that has been freed since, such as the shooter of a rocket still in the air, counts as null. Pass ``position`` and ``normal`` when the hit has a point, e.g. from a ray, so effects can spawn sparks there.
+Builds the :ref:`EffectContext<class_EffectContext>` for a hit on ``collider``, resolving a hurtbox to its character. ``origin`` is what dealt it, e.g. the weapon's :ref:`ItemData<class_ItemData>`, so a kill feed can name it. ``source`` is who dealt it; one that has been freed since, such as the shooter of a rocket still in the air, counts as null. Pass ``position`` when the hit has a point, e.g. from a ray, so effects can spawn sparks there.
 
 .. rst-class:: classref-item-separator
 
@@ -141,6 +143,18 @@ Builds the :ref:`EffectContext<class_EffectContext>` for a hit on ``collider``, 
 :ref:`Dictionary<class_Dictionary>` **raycast**\ (\ space\: :ref:`PhysicsDirectSpaceState3D<class_PhysicsDirectSpaceState3D>`, query\: :ref:`PhysicsRayQueryParameters3D<class_PhysicsRayQueryParameters3D>`\ ) |static| :ref:`🔗<class_Hurtbox_method_raycast>`
 
 Casts the ray of ``query`` and returns the first thing a shot stops at, in the form :ref:`PhysicsDirectSpaceState3D.intersect_ray()<class_PhysicsDirectSpaceState3D_method_intersect_ray>` uses, or an empty dictionary. The ray passes through what :ref:`stops_shots()<class_Hurtbox_method_stops_shots>` says no to: areas that aren't hurtboxes, and characters that can't be targeted, such as the dead. :ref:`Hitscan<class_Hitscan>`, :ref:`Projectile<class_Projectile>` and the :ref:`PlayerBrain<class_PlayerBrain>`'s aim all look through this.
+
+.. rst-class:: classref-item-separator
+
+----
+
+.. _class_Hurtbox_method_overlap:
+
+.. rst-class:: classref-method
+
+:ref:`Dictionary<class_Dictionary>`\[:ref:`Node<class_Node>`, :ref:`Object<class_Object>`\] **overlap**\ (\ space\: :ref:`PhysicsDirectSpaceState3D<class_PhysicsDirectSpaceState3D>`, query\: :ref:`PhysicsShapeQueryParameters3D<class_PhysicsShapeQueryParameters3D>`, max_results\: :ref:`int<class_int>` = 32\ ) |static| :ref:`🔗<class_Hurtbox_method_overlap>`
+
+Returns what the shape of ``query`` touches, one entry for each character: the character, and the part of it that was touched (a **Hurtbox**, or the body itself). When several parts of one character are inside, the one with the highest :ref:`multiplier<class_Hurtbox_property_multiplier>` stands for it. Areas that aren't hurtboxes are left out, as :ref:`raycast()<class_Hurtbox_method_raycast>` leaves them out. Characters that can't be targeted, such as the dead, are found: a swing or a blast reaches them, and what happens to them is up to the effects. :ref:`MeleeSweep<class_MeleeSweep>`, a :ref:`Projectile<class_Projectile>`'s blast and :ref:`RadiusTargeting<class_RadiusTargeting>` all look through this.
 
 .. rst-class:: classref-item-separator
 
@@ -162,7 +176,7 @@ Whether a shot stops at ``collider``. A **Hurtbox** and a body do, unless a stat
 
 .. rst-class:: classref-method
 
-:ref:`Array<class_Array>`\[:ref:`RID<class_RID>`\] **rids_of**\ (\ character\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Hurtbox_method_rids_of>`
+:ref:`Array<class_Array>`\[:ref:`RID<class_RID>`\] **rids_of**\ (\ character\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_Hurtbox_method_rids_of>`
 
 RIDs of a character's body and hurtboxes, so its own shots can ignore them. It searches the whole character, so call it once (e.g. when a weapon is equipped), not on every shot.
 

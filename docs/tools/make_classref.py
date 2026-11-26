@@ -34,7 +34,8 @@ ENGINE_DOCS = "https://docs.godotengine.org/en/stable/classes/"
 # Documented private methods that are meant to be overridden. Shown as "virtual".
 VIRTUALS = {
     "Component": {"_requires", "_stats", "_start", "_stop", "_warnings"},
-    "Condition": {"_test"},
+    "Condition": {"_passes"},
+    "SubjectCondition": {"_test"},
     "Effect": {"_execute"},
     "MotorNode": {"_stats", "_enter", "_exit", "_physics_update"},
     "MovementMode": {"_can_enter", "_get_next_mode"},

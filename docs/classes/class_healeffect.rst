@@ -8,7 +8,7 @@
 HealEffect
 ==========
 
-**Inherits:** :ref:`AmountEffect<class_AmountEffect>` **<** :ref:`Effect<class_Effect>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`AmountEffect<class_AmountEffect>` **<** :ref:`Effect<class_Effect>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Restores health: :ref:`AmountEffect.total()<class_AmountEffect_method_total>`, e.g. with a :ref:`PoolAmount<class_PoolAmount>` in its scaling for 30% of the health the target is missing, or a :ref:`HitAmount<class_HitAmount>` for life steal.
 

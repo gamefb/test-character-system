@@ -8,7 +8,7 @@
 HitCondition
 ============
 
-**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Passes when the hit is of a kind: a damage type, a tag, or both.
 
@@ -17,7 +17,7 @@ Passes when the hit is of a kind: a damage type, a tag, or both.
 Description
 -----------
 
-Use it in a :ref:`StatusTrigger<class_StatusTrigger>` on a damage event, so a ward only blocks fire or a perk only rewards headshots. It reads the hit that set the trigger off (:ref:`EffectContext.hit()<class_EffectContext_method_hit>`), so :ref:`Condition.subject<class_Condition_property_subject>` isn't used. 
+Use it in a :ref:`StatusTrigger<class_StatusTrigger>` on a damage event, so a ward only blocks fire or a perk only rewards headshots. It reads the hit that set the trigger off (:ref:`EffectContext.hit()<class_EffectContext_method_hit>`). 
 
 Tags come from the :ref:`Hurtbox<class_Hurtbox>` that was hit (:ref:`Hurtbox.tags<class_Hurtbox_property_tags>`), from the :ref:`DamageEffect<class_DamageEffect>` (:ref:`DamageEffect.tags<class_DamageEffect_property_tags>`) and from earlier :ref:`ModifyAmountEffect<class_ModifyAmountEffect>`\ s, such as &"crit".
 
@@ -34,18 +34,6 @@ Properties
    +------------------------------------------------------------------+-------------------------------------------------+--------+
    | :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] | :ref:`tags<class_HitCondition_property_tags>`   | ``[]`` |
    +------------------------------------------------------------------+-------------------------------------------------+--------+
-
-.. rst-class:: classref-reftable-group
-
-Methods
--------
-
-.. table::
-   :widths: auto
-
-   +-------------------------+------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`check<class_HitCondition_method_check>`\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) |
-   +-------------------------+------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -75,25 +63,6 @@ The damage types that pass, e.g. &"fire" and &"lightning". Empty for any type. S
 :ref:`Array<class_Array>`\[:ref:`StringName<class_StringName>`\] **tags** = ``[]`` :ref:`🔗<class_HitCondition_property_tags>`
 
 The hit must have every one of these tags, e.g. &"head". Empty for any hit.
-
-.. rst-class:: classref-section-separator
-
-----
-
-.. rst-class:: classref-descriptions-group
-
-Method Descriptions
--------------------
-
-.. _class_HitCondition_method_check:
-
-.. rst-class:: classref-method
-
-:ref:`bool<class_bool>` **check**\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) :ref:`🔗<class_HitCondition_method_check>`
-
-.. container:: contribute
-
-	No description yet.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

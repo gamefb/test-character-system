@@ -43,19 +43,19 @@ Methods
 .. table::
    :widths: auto
 
-   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
-   | :ref:`WeaponSwitch<class_WeaponSwitch>`                              | :ref:`find_on<class_WeaponSwitch_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| |
-   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
-   | :ref:`Array<class_Array>`\[:ref:`ItemInstance<class_ItemInstance>`\] | :ref:`weapons<class_WeaponSwitch_method_weapons>`\ (\ )                                                |
-   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
-   | :ref:`ItemInstance<class_ItemInstance>`                              | :ref:`current<class_WeaponSwitch_method_current>`\ (\ )                                                |
-   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
-   | |void|                                                               | :ref:`cycle<class_WeaponSwitch_method_cycle>`\ (\ step\: :ref:`int<class_int>` = 1\ )                  |
-   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
-   | |void|                                                               | :ref:`select<class_WeaponSwitch_method_select>`\ (\ index\: :ref:`int<class_int>`\ )                   |
-   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
-   | |void|                                                               | :ref:`holster<class_WeaponSwitch_method_holster>`\ (\ )                                                |
-   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
+   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------+
+   | :ref:`WeaponSwitch<class_WeaponSwitch>`                              | :ref:`find_on<class_WeaponSwitch_method_find_on>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static| |
+   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------+
+   | :ref:`Array<class_Array>`\[:ref:`ItemInstance<class_ItemInstance>`\] | :ref:`weapons<class_WeaponSwitch_method_weapons>`\ (\ )                                          |
+   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------+
+   | :ref:`ItemInstance<class_ItemInstance>`                              | :ref:`current<class_WeaponSwitch_method_current>`\ (\ )                                          |
+   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------+
+   | |void|                                                               | :ref:`cycle<class_WeaponSwitch_method_cycle>`\ (\ step\: :ref:`int<class_int>` = 1\ )            |
+   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------+
+   | |void|                                                               | :ref:`select<class_WeaponSwitch_method_select>`\ (\ index\: :ref:`int<class_int>`\ )             |
+   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------+
+   | |void|                                                               | :ref:`holster<class_WeaponSwitch_method_holster>`\ (\ )                                          |
+   +----------------------------------------------------------------------+--------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -99,9 +99,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`WeaponSwitch<class_WeaponSwitch>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_WeaponSwitch_method_find_on>`
+:ref:`WeaponSwitch<class_WeaponSwitch>` **find_on**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_WeaponSwitch_method_find_on>`
 
-The **WeaponSwitch** of ``node``'s character, or null if there is none. Safe on a freed node.
+The **WeaponSwitch** of ``node``'s character, or null if there is none.
 
 .. rst-class:: classref-item-separator
 

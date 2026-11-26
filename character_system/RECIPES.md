@@ -562,15 +562,16 @@ that scene. It flies from the user toward where they're aiming. See
 func _ready() -> void:
 	Abilities.find_on(player).failed.connect(_on_ability_failed)
 
-func _on_ability_failed(_ability: AbilityData, reason: StringName) -> void:
+func _on_ability_failed(_ability: AbilityData, reason: Abilities.Refusal) -> void:
 	match reason:
-		&"cost": show_message("Not enough mana")
-		&"cooldown": show_message("Not ready yet")
-		&"blocked": show_message("Can't do that now")
+		Abilities.Refusal.COST: show_message("Not enough mana")
+		Abilities.Refusal.COOLDOWN: show_message("Not ready yet")
+		Abilities.Refusal.BLOCKED: show_message("Can't do that now")
 ```
 
 `Abilities.can_use(ability)` answers without trying, to grey out a button. The reasons are
-`blocked`, `casting`, `cooldown`, `cost`, `condition` and `no_target`.
+the values of `Abilities.Refusal`: `BLOCKED`, `CASTING`, `COOLDOWN`, `COST`, `CONDITION` and
+`NO_TARGET`.
 
 ### Make an ability that hits everyone nearby
 
@@ -729,16 +730,18 @@ also in `starter_pack/scripts/`. In short:
 - **Effect:** extend `Effect` and override `_execute(ctx)`. The target may have none of the
   components you need, so check for null. If it has a number, extend `AmountEffect` instead:
   it brings the **Amount** and **Scaling** fields, and `total(ctx)` adds them up.
-- **Condition:** extend `Condition` and override `_test(node) -> bool`, or `check(ctx)` to
-  compare both sides, as `IsHostileCondition` does.
+- **Condition:** extend `SubjectCondition` and override `_test(node) -> bool`. To compare
+  both sides, extend `Condition` and override `_passes(ctx)`, as `IsHostileCondition` does.
 - **Amount:** extend `Amount` and override `value(ctx) -> float`. It then fits in every
   Scaling list.
 - **Component:** extend `Component`. Do your setup in `_start()` (not `_ready()`), list what
   you need in `_requires()`, and numbers statuses may change in `_stats()`. Its
-  `_process()` only runs while it's running. See `starter_pack/scripts/sprint.gd`.
+  `_process()` only runs while it's running. Give stat modifiers and statuses with
+  `hold_modifier()` and `hold_status()`, which take them back when it stops. See
+  `starter_pack/scripts/sprint.gd`.
 - **Item component:** extend `ItemComponent`. `wielder`, `item` and `brain` are ready in
-  `_start()`, and anything it changes on the wielder must be undone in `_stop()`. See
-  `starter_pack/scripts/scope.gd`.
+  `_start()`. Its `hold_modifier()` and `hold_status()` act on the wielder; anything else it
+  changes there must be undone in `_stop()`. See `starter_pack/scripts/scope.gd`.
 - **A new way for a weapon to hit** (a cone, a beam, chain lightning): extend
   `WeaponDelivery` and write `_fire()`. The trigger, the **Effects** list and
   `context_for(what_was_hit)` come with it. See `character/items/melee_sweep.gd`.

@@ -8,7 +8,7 @@
 PoolBelowCondition
 ==================
 
-**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`SubjectCondition<class_SubjectCondition>` **<** :ref:`Condition<class_Condition>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Passes while a :ref:`Pool<class_Pool>` is below a share of its maximum, e.g. health under half for an execute, or mana under a fifth. Health is the pool named ``health``.
 

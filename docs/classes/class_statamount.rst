@@ -8,7 +8,7 @@
 StatAmount
 ==========
 
-**Inherits:** :ref:`Amount<class_Amount>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Amount<class_Amount>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 A stat's value times :ref:`per_point<class_StatAmount_property_per_point>`, e.g. 2 damage per point of the user's strength.
 
@@ -29,15 +29,15 @@ Properties
 .. table::
    :widths: auto
 
-   +----------------------------------------+-------------------------------------------------------+---------+
-   | :ref:`StringName<class_StringName>`    | :ref:`stat<class_StatAmount_property_stat>`           |         |
-   +----------------------------------------+-------------------------------------------------------+---------+
-   | :ref:`Subject<enum_Condition_Subject>` | :ref:`of<class_StatAmount_property_of>`               | ``1``   |
-   +----------------------------------------+-------------------------------------------------------+---------+
-   | :ref:`float<class_float>`              | :ref:`per_point<class_StatAmount_property_per_point>` | ``1.0`` |
-   +----------------------------------------+-------------------------------------------------------+---------+
-   | :ref:`Curve<class_Curve>`              | :ref:`curve<class_StatAmount_property_curve>`         |         |
-   +----------------------------------------+-------------------------------------------------------+---------+
+   +--------------------------------------+-------------------------------------------------------+---------+
+   | :ref:`StringName<class_StringName>`  | :ref:`stat<class_StatAmount_property_stat>`           |         |
+   +--------------------------------------+-------------------------------------------------------+---------+
+   | :ref:`Role<enum_EffectContext_Role>` | :ref:`of<class_StatAmount_property_of>`               | ``1``   |
+   +--------------------------------------+-------------------------------------------------------+---------+
+   | :ref:`float<class_float>`            | :ref:`per_point<class_StatAmount_property_per_point>` | ``1.0`` |
+   +--------------------------------------+-------------------------------------------------------+---------+
+   | :ref:`Curve<class_Curve>`            | :ref:`curve<class_StatAmount_property_curve>`         |         |
+   +--------------------------------------+-------------------------------------------------------+---------+
 
 .. rst-class:: classref-reftable-group
 
@@ -76,7 +76,7 @@ The stat to read, e.g. &"strength".
 
 .. rst-class:: classref-property
 
-:ref:`Subject<enum_Condition_Subject>` **of** = ``1`` :ref:`🔗<class_StatAmount_property_of>`
+:ref:`Role<enum_EffectContext_Role>` **of** = ``1`` :ref:`🔗<class_StatAmount_property_of>`
 
 Whose stat: whoever caused the effect, or whoever receives it. A status tick's source is whoever applied the status.
 

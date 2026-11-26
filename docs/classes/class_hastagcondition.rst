@@ -8,7 +8,7 @@
 HasTagCondition
 ===============
 
-**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`SubjectCondition<class_SubjectCondition>` **<** :ref:`Condition<class_Condition>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Passes if the node has a status with :ref:`tag<class_HasTagCondition_property_tag>`, e.g. &"wet".
 

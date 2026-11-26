@@ -8,7 +8,7 @@
 AnyCondition
 ============
 
-**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Condition<class_Condition>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 Passes when at least one of :ref:`conditions<class_AnyCondition_property_conditions>` passes: "the target is wet OR below half health".
 
@@ -17,7 +17,7 @@ Passes when at least one of :ref:`conditions<class_AnyCondition_property_conditi
 Description
 -----------
 
-A list of conditions normally needs all of them to pass. Put the alternatives in here to need only one. An empty list never passes. :ref:`Condition.subject<class_Condition_property_subject>` isn't used; each condition inside picks its own.
+A list of conditions normally needs all of them to pass. Put the alternatives in here to need only one. An empty list never passes.
 
 .. rst-class:: classref-reftable-group
 
@@ -30,18 +30,6 @@ Properties
    +----------------------------------------------------------------+-----------------------------------------------------------+--------+
    | :ref:`Array<class_Array>`\[:ref:`Condition<class_Condition>`\] | :ref:`conditions<class_AnyCondition_property_conditions>` | ``[]`` |
    +----------------------------------------------------------------+-----------------------------------------------------------+--------+
-
-.. rst-class:: classref-reftable-group
-
-Methods
--------
-
-.. table::
-   :widths: auto
-
-   +-------------------------+------------------------------------------------------------------------------------------------------+
-   | :ref:`bool<class_bool>` | :ref:`check<class_AnyCondition_method_check>`\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) |
-   +-------------------------+------------------------------------------------------------------------------------------------------+
 
 .. rst-class:: classref-section-separator
 
@@ -59,25 +47,6 @@ Property Descriptions
 :ref:`Array<class_Array>`\[:ref:`Condition<class_Condition>`\] **conditions** = ``[]`` :ref:`🔗<class_AnyCondition_property_conditions>`
 
 The alternatives. One passing is enough.
-
-.. rst-class:: classref-section-separator
-
-----
-
-.. rst-class:: classref-descriptions-group
-
-Method Descriptions
--------------------
-
-.. _class_AnyCondition_method_check:
-
-.. rst-class:: classref-method
-
-:ref:`bool<class_bool>` **check**\ (\ ctx\: :ref:`EffectContext<class_EffectContext>`\ ) :ref:`🔗<class_AnyCondition_method_check>`
-
-.. container:: contribute
-
-	No description yet.
 
 .. |virtual| replace:: :abbr:`virtual (This method should typically be overridden by the user to have any effect.)`
 .. |required| replace:: :abbr:`required (This method is required to be overridden when extending its base class.)`

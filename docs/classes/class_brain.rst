@@ -69,7 +69,7 @@ Methods
    :widths: auto
 
    +---------------------------+------------------------------------------------------------------------------------------------------------------------------+
-   | :ref:`Brain<class_Brain>` | :ref:`find_on<class_Brain_method_find_on>`\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static|                              |
+   | :ref:`Brain<class_Brain>` | :ref:`find_on<class_Brain_method_find_on>`\ (\ node\: :ref:`Node<class_Node>`\ ) |static|                                    |
    +---------------------------+------------------------------------------------------------------------------------------------------------------------------+
    | |void|                    | :ref:`press<class_Brain_method_press>`\ (\ action\: :ref:`StringName<class_StringName>`\ )                                   |
    +---------------------------+------------------------------------------------------------------------------------------------------------------------------+
@@ -143,9 +143,9 @@ Method Descriptions
 
 .. rst-class:: classref-method
 
-:ref:`Brain<class_Brain>` **find_on**\ (\ node\: :ref:`Variant<class_Variant>`\ ) |static| :ref:`🔗<class_Brain_method_find_on>`
+:ref:`Brain<class_Brain>` **find_on**\ (\ node\: :ref:`Node<class_Node>`\ ) |static| :ref:`🔗<class_Brain_method_find_on>`
 
-The **Brain** of ``node``'s character, or null if there is none. Safe on a freed node.
+The **Brain** of ``node``'s character, or null if there is none.
 
 .. rst-class:: classref-item-separator
 

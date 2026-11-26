@@ -81,7 +81,7 @@ Hit detection and hurtboxes
 
 A :ref:`Hurtbox<class_Hurtbox>` is an optional ``Area3D`` on a character, such as a head. Hits on it count as hits on its character, scaled by its ``multiplier`` and labelled with its ``tags``. Characters without hurtboxes are hit through their own body collider, so nothing breaks if you skip them.
 
-The tags end up on the hit, where a :ref:`HitCondition<class_HitCondition>` tests them: a head hurtbox tagged ``head`` lets a status give a bonus for headshots, set them alight or count them, with no code. The hit also records where it landed in ``position`` and ``normal``, so a :ref:`SpawnSceneEffect<class_SpawnSceneEffect>` with ``at`` set to ``HIT_POINT`` puts sparks or a decal there.
+The tags end up on the hit, where a :ref:`HitCondition<class_HitCondition>` tests them: a head hurtbox tagged ``head`` lets a status give a bonus for headshots, set them alight or count them, with no code. The hit also records where it landed in ``position``, so a :ref:`SpawnSceneEffect<class_SpawnSceneEffect>` with ``at`` set to ``HIT_POINT`` puts sparks or a decal there.
 
 Shots are physics rays, so collision layers decide what they can hit. ``Hitscan.collision_mask`` lists the layers a weapon hits, every layer by default; untick layers in the inspector to make, for example, a rifle that ignores a turrets layer.
 
@@ -90,7 +90,7 @@ Within those layers, a shot stops at the first body or :ref:`Hurtbox<class_Hurtb
 -  **Areas that aren't hurtboxes.** Trigger volumes, door sensors, an enemy's detection range and :ref:`EffectZone<class_EffectZone>`\ s never stop a shot, whatever layer they are on.
 -  **Characters that can't be targeted.** A body or hurtbox is passed through while a status on its character blocks ``targeting``. The Dead status does, so a corpse is not cover until it is revived, and a stealth or phased status of your own can too.
 
-Projectiles in flight and the player's crosshair follow the same two rules, because all three use one ray, ``Hurtbox.raycast()``. To make corpses block shots, give the character a death status without ``targeting`` in its Blocks; to let shots through something else, ``stops_shots()`` is the one place to change. Melee swings and blasts take everything inside a shape, so nothing blocks them; a :ref:`DamageEffect<class_DamageEffect>` leaves the dead alone either way.
+Projectiles in flight and the player's crosshair follow the same two rules, because all three use one ray, ``Hurtbox.raycast()``. To make corpses block shots, give the character a death status without ``targeting`` in its Blocks; to let shots through something else, ``stops_shots()`` is the one place to change. Melee swings and blasts take everything inside a shape, so nothing blocks them; a :ref:`DamageEffect<class_DamageEffect>` leaves the dead alone either way. They share one query too, ``Hurtbox.overlap()``, which returns each character once, by the part of it that counts for most, and leaves out areas that aren't hurtboxes.
 
 A weapon's own wielder is never hit: every :ref:`WeaponDelivery<class_WeaponDelivery>` collects the wielder's body and hurtboxes once, when the weapon is equipped, and every shot passes through them.
 
@@ -136,9 +136,9 @@ Passives, stats and abilities from equipment
 
 One :ref:`Grants<class_Grants>` component gives the wielder everything an item gives while it is equipped, and takes it all back on unequip. Fill in whichever of its three lists the item needs.
 
-**Statuses.** ``drop_hold()`` drops one hold instead of removing the status outright. Two rings that grant Haste keep it until both are taken off. ``_granted`` remembers which passives were accepted, so an item whose passive was refused by an apply condition doesn't drop a hold that belongs to another item.
+**Statuses.** Each is held with ``hold_status()``, and unequipping drops that one hold instead of removing the status outright. Two rings that grant Haste keep it until both are taken off. Only a passive that was accepted is held, so an item whose passive was refused by an apply condition doesn't drop a hold that belongs to another item.
 
-**Modifiers** are the shortest way to put numbers on gear: they go straight onto the wielder's manager, with the item as their source. No status file is needed. Use a status instead when the bonus should appear on a status bar, grant an immunity or react to events.
+**Modifiers** are the shortest way to put numbers on gear: ``hold_modifier()`` puts them straight onto the wielder's manager, with the item as their source, and takes them off on unequip. No status file is needed. Use a status instead when the bonus should appear on a status bar, grant an immunity or react to events.
 
 Modifiers in the copy's ``state`` under ``modifiers`` are applied as well, which is how loot with random numbers works: the item scene is the same for every copy, and each :ref:`ItemInstance<class_ItemInstance>` carries its own rolls.
 

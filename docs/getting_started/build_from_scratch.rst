@@ -87,9 +87,9 @@ event receives one.
    * - ``tags``
      - ``Array[StringName]``
      - Labels on the hit: ``head`` from a hurtbox, ``melee`` from the effect, ``crit``.
-   * - ``position``, ``normal``
+   * - ``position``
      - ``Vector3``
-     - Where the hit landed, if a ray recorded it. ``position`` is ``Vector3.INF`` if not.
+     - Where the hit landed, if a ray recorded it. ``Vector3.INF`` if not.
    * - ``from_status``
      - ``bool = false``
      - True when a status started this. Stops statuses from setting each other off forever.
@@ -100,9 +100,17 @@ event receives one.
    * - ``depth``
      - ``int = 0``
      - How many triggers led here. A chain is cut at ``MAX_DEPTH``.
+   * - ``Role``
+     - enum
+     - ``TARGET`` or ``SOURCE``. Conditions and amounts export one to say which node they
+       read.
    * - ``_init(source, target, origin)``
      - constructor
-     - All three optional.
+     - All three optional. ``source`` and ``target`` have no type, and one that has been freed
+       is stored as null.
+   * - ``node(role)``
+     - func
+     - ``source`` or ``target``.
    * - ``hit()``
      - func
      - ``cause`` if there is one, else itself: the hit a condition should judge.
@@ -119,7 +127,10 @@ event receives one.
 StatModifier
 ~~~~~~~~~~~~
 
-**What it is:** a ``Resource`` holding one change to one stat. It has no functions.
+**What it is:** a ``Resource`` holding one change to one stat. It has no functions. (In the
+reference build this and every other data class extend ``DataResource``, a ``Resource`` that
+turns name fields into lists in the Inspector. Write plain ``Resource`` for now; see "What to
+skip the first time".)
 
 .. list-table::
    :header-rows: 1
@@ -301,9 +312,10 @@ everything else is plumbing.
    * - ``running``
      - var
      - True between ``_start()`` and ``_stop()``.
-   * - ``_connections``, ``_subscriptions``
+   * - ``_connections``, ``_holds``
      - var
-     - What ``listen()`` and ``on()`` set up, so ``_halt()`` can undo it.
+     - What ``listen()``, ``on()``, ``hold_modifier()`` and ``hold_status()`` set up, so
+       ``_halt()`` can undo it.
    * - ``_mode``
      - var
      - The ``process_mode`` to restore when the component starts.
@@ -328,6 +340,14 @@ everything else is plumbing.
    * - ``on(event, method, node = null)``
      - func
      - ``listen()`` on one event's signal, from this host's manager or from ``node``'s.
+   * - ``hold_modifier(m, on = true, source = null)``
+     - func
+     - Adds ``m`` to the manager while ``on`` is true and records it, so ``_halt()`` can take
+       it off. Does nothing when ``on`` hasn't changed.
+   * - ``hold_status(data, on = true, source = null)``
+     - func
+     - The same for a status, through ``Statuses.add()`` and ``drop_hold()``. Returns false
+       if the status was refused. Add this once stage 4 has statuses.
    * - ``update_stats()``
      - func
      - Call after changing a value ``_stats()`` reads.
@@ -349,8 +369,8 @@ everything else is plumbing.
    * - ``_begin()`` / ``_halt()``
      - func
      - Called by the manager: flip ``running``, restore or disable ``process_mode``, call the
-       virtual, and on halt undo everything from ``listen()`` and ``on()``. ``_begin()`` also
-       keeps what ``_requires()`` returned, for ``unregister``.
+       virtual, and on halt undo everything from ``listen()``, ``on()`` and the two holds.
+       ``_begin()`` also keeps what ``_requires()`` returned, for ``unregister``.
 
 WorldEvents
 ~~~~~~~~~~~
@@ -580,29 +600,44 @@ Condition
    * - Member
      - Kind
      - Purpose
-   * - ``Subject``
-     - enum
-     - ``TARGET`` or ``SOURCE``: which side to check.
-   * - ``subject``
-     - export
-     - Defaults to ``TARGET``.
    * - ``negate``
      - export
      - Flips the result ("target is NOT wet").
    * - ``check(ctx)``
      - func
-     - Picks the node ``subject`` points to and returns ``_test(node) != negate``.
-   * - ``_test(node)``
+     - Returns ``_passes(ctx) != negate``. The only place ``negate`` is read.
+   * - ``_passes(ctx)``
      - virtual
-     - Returns true if the node passes. The node may be null or have no components.
+     - Returns true if the context passes. Either side may be null or have no components.
    * - ``all_pass(list, ctx)``
      - static
      - True if every condition passes. An empty list passes.
 
+Most conditions look at one node, so they share a second base class, ``SubjectCondition``,
+which extends ``Condition``:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 12 63
+
+   * - Member
+     - Kind
+     - Purpose
+   * - ``subject``
+     - export
+     - An ``EffectContext.Role``: which side to check. Defaults to ``TARGET``.
+   * - ``_passes(ctx)``
+     - func
+     - Returns ``_test(ctx.node(subject))``.
+   * - ``_test(node)``
+     - virtual
+     - Returns true if the node passes. The node may be null or have no components.
+
 Subclasses to write: ``HasTagCondition(tag)``, ``PoolBelowCondition(fraction)``,
-``StatCondition(stat, value)`` and ``ChanceCondition(chance, bonus_stat)`` override
-``_test()``. ``HitCondition(types, tags)`` and ``AnyCondition(conditions)`` override
-``check()``; the first reads ``ctx.hit()``, so it works inside status triggers.
+``StatCondition(stat, value)`` and ``ChanceCondition(chance, bonus_stat)`` extend
+``SubjectCondition`` and override ``_test()``. ``HitCondition(types, tags)`` and
+``AnyCondition(conditions)`` extend ``Condition`` and override ``_passes()``; the first reads
+``ctx.hit()``, so it works inside status triggers.
 
 Amount
 ~~~~~~
@@ -619,7 +654,7 @@ grow with a stat.
      - Purpose
    * - ``value(ctx)``
      - virtual
-     - The number for this use. The base class returns 0.
+     - The number for this use.
    * - ``total(base, scaling, ctx)``
      - static
      - ``base`` plus the ``value()`` of everything in ``scaling``. Effects call this.
@@ -696,8 +731,8 @@ Other effects
   ``giving_healing`` and ``receiving_healing`` before and ``gave_healing`` and
   ``received_healing`` after.
 - ``ChangePoolEffect(pool, amount, scaling)``: ``Pool.named(target, pool).change(...)``.
-- ``KnockbackEffect(strength, lift)``: calls ``CharacterMotor.push`` on the target, away from
-  the source.
+- ``KnockbackEffect(amount, scaling, lift)``: calls ``CharacterMotor.push`` on the target, away
+  from the source, at ``amount`` metres per second.
 
 Hurtbox
 ~~~~~~~
@@ -721,15 +756,20 @@ character.
    * - ``tags``
      - export
      - Labels put on every hit that lands here, e.g. ``head``.
-   * - ``hit(source, collider, origin, position, normal)``
+   * - ``hit(source, collider, origin, position)``
      - static
      - Builds the ``EffectContext``: resolves a hurtbox to its character, sets ``magnitude``
-       and ``tags``, and records where the hit landed.
+       and ``tags``, and records where the hit landed. ``source`` has no type, like the
+       constructor's.
    * - ``raycast(space, query)`` / ``stops_shots(collider)``
      - static
      - The ray every shot, projectile and crosshair uses. It casts again past anything
        ``stops_shots()`` says no to: areas that aren't hurtboxes, and characters on which a
        status blocks ``targeting``, such as the dead.
+   * - ``overlap(space, query)``
+     - static
+     - The shape query every swing, blast and area ability uses. It returns each character
+       once, with the part of it that counts for most, and no area that isn't a hurtbox.
    * - ``rids_of(character)``
      - static
      - The body and hurtbox RIDs, so a character's own shots ignore them. It searches the
@@ -746,6 +786,11 @@ Watch out for
   added when it's done.
 - **Effects must survive missing components.** ``Component.of(target, Health)`` can be null;
   return quietly.
+- **Settle freed nodes in one place.** Whoever applied a status, or fired a rocket, may be
+  gone when its effects run, and GDScript refuses a freed node for a typed parameter. Leave
+  the two parameters of ``EffectContext._init()`` untyped and store null for a freed node
+  there. Everything that is handed a context can then take a typed ``Node`` and only check
+  for null.
 
 Test
 ~~~~
@@ -801,7 +846,8 @@ StatusData
    * - Group
      - Members
    * - Display
-     - ``id``, ``display_name``, ``icon``, ``description``
+     - ``id``, ``display_name``, ``icon``, ``description``. Items and abilities have the same
+       four, so the reference build keeps them in a small base class, ``DisplayData``.
    * - Rules
      - ``tags``, ``immune_to``, ``apply_conditions``, ``duration`` (0 = permanent, a passive),
        ``stacking`` (``REFRESH`` / ``STACK`` / ``IGNORE``), ``max_stacks``, ``removes_tags``,
@@ -1003,7 +1049,7 @@ Data classes
      - Extends
      - Members
    * - ``ItemData``
-     - ``Resource``
+     - ``DisplayData``
      - ``id``, ``display_name``, ``icon``, ``description``, ``max_stack``, ``slot``, ``scene``
        (the PackedScene equipped), ``use_effects``, ``consumed_on_use``
    * - ``ItemInstance``
@@ -1057,7 +1103,7 @@ Item components
 
 All extend ``ItemComponent``, which extends ``Component`` and adds ``wielder`` (the
 character), ``item`` (the ``ItemInstance``) and a ``brain`` getter that returns the wielder's
-Brain.
+Brain. Its ``hold_modifier()`` and ``hold_status()`` act on the wielder instead of the item.
 
 .. list-table::
    :header-rows: 1
@@ -1094,10 +1140,10 @@ Brain.
        build the context with ``Hurtbox.hit()``, then ``Effect.apply_all``
    * - ``Grants``
      - ``statuses``, ``modifiers``, ``abilities: Dictionary[action, AbilityData]``
-     - ``_start()``: add each status, keeping only those accepted; add each modifier, and
-       any in ``item.state[&"modifiers"]``, to the wielder's manager; put each ability in
-       the wielder's ``Abilities.slots``, remembering what was there. ``_stop()``: drop the
-       holds, remove the modifiers and put the slots back
+     - ``_start()``: hold each status and each modifier, and any modifier in
+       ``item.state[&"modifiers"]``, on the wielder; put each ability in the wielder's
+       ``Abilities.slots``, remembering what was there. ``_stop()``: put the slots back.
+       The holds are taken back without any code
 
 Projectile
 ~~~~~~~~~~
@@ -1144,6 +1190,7 @@ Watch out for
   forth.
 - **Drop only the holds you added.** If a status was refused (blocked or immune),
   ``Grants`` must not drop its hold, or it would drop a hold someone else owns.
+  ``hold_status()`` only records a status that was accepted, which takes care of it.
 - **Draw after the change, not during it.** ``WeaponSwitch`` reacts to ``inventory_changed``
   with ``call_deferred``, so it never equips in the middle of the Inventory changing.
 - **Keep what a frame overshot the fire rate by.** Setting the cooldown to ``1 / fire_rate``
@@ -1180,9 +1227,9 @@ to pick targets, and a list of effects.
      - ``Resource``
      - ``find(ctx) -> Array[Node]``. The base version returns ``[ctx.source]`` (the user).
        Subclasses return what a ray, sphere or cone finds; the reference build's
-       ``RadiusTargeting`` asks the physics engine for everything in a sphere.
+       ``RadiusTargeting`` asks ``Hurtbox.overlap()`` for everyone in a sphere.
    * - ``AbilityData``
-     - ``Resource``
+     - ``DisplayData``
      - Display: ``id``, ``display_name``, ``icon``, ``description``. Use: ``cooldown``,
        ``charges``, ``costs: Dictionary[pool, float]``, ``conditions``, ``blocked_by``.
        Casting: ``cast_time``, ``status_while_casting``, ``interrupted_by_damage``. Effects:
@@ -1206,11 +1253,11 @@ to pick targets, and a list of effects.
 
 ``use(ability)`` in order:
 
-1. Ask ``why_not(ability)``. It names the first thing against it: the Brain is blocked or a
-   status blocks one of the ability's ``blocked_by``, another cast is under way, no charge is
-   ready, a
-   Pool can't pay, a condition fails, or it needs a target and has none. If there is one, emit
-   ``failed`` with it and return false.
+1. Ask ``why_not(ability)``. It answers with the first thing against it, as a value of the
+   ``Refusal`` enum: the Brain is blocked or a status blocks one of the ability's
+   ``blocked_by``, another cast is under way, no charge is ready, a Pool can't pay, a
+   condition fails, or it needs a target and has none. If there is one, emit ``failed`` with
+   it and return false.
 2. With a ``cast_time``, remember the ability in ``casting``, give the user
    ``status_while_casting`` and return true. ``_process`` counts the cast down, interrupts it
    if the ability becomes blocked, and fires it when the time is up.
@@ -1240,7 +1287,8 @@ These were added late in the reference build and are easier once everything else
 - **Editor support:** ``@tool``, ``_get_configuration_warnings``, and the ``is_tool()`` check
   needed because non-``@tool`` scripts are placeholders in the editor.
 - **Name warnings:** :ref:`NameCheck <doc_editor_warnings_for_names>` and the Character System
-  Warnings add-on, which catch mistyped stat, event and tag names.
+  Warnings add-on, which catch mistyped stat, event and tag names, and ``DataResource``, the
+  base class that gives the data classes their name lists.
 - **Node icons** and ``##`` doc comments.
 - **"Report missing once" error messages** in ``try_start``.
 

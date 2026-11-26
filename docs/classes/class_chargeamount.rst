@@ -8,7 +8,7 @@
 ChargeAmount
 ============
 
-**Inherits:** :ref:`Amount<class_Amount>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
+**Inherits:** :ref:`Amount<class_Amount>` **<** :ref:`DataResource<class_DataResource>` **<** :ref:`Resource<class_Resource>` **<** :ref:`RefCounted<class_RefCounted>` **<** :ref:`Object<class_Object>`
 
 More the further the weapon was charged: nothing at no charge, :ref:`at_full<class_ChargeAmount_property_at_full>` at a full one. This is what makes a charge worth something.
 
