@@ -27,4 +27,4 @@ func _fire() -> void:
 		var query := PhysicsRayQueryParameters3D.create(from, to, collision_mask, _wielder_rids)
 		var hit: Dictionary = Hurtbox.raycast(muzzle.get_world_3d().direct_space_state, query)
 		if hit:
-			Effect.apply_all(effects, context_for(hit.collider, hit.position, hit.normal))
+			Effect.apply_all(effects, context_for(hit.collider, hit.position))

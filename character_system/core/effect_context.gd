@@ -80,8 +80,6 @@ var tags: Array[StringName] = []
 ## Where the hit landed, in world space. [constant Vector3.INF] when nothing recorded it, e.g.
 ## for a status tick. Use [method hit_position] to always get a point.
 var position := Vector3.INF
-## The surface direction at [member position], for decals and sparks. Zero if unknown.
-var normal := Vector3.ZERO
 ## True if a status caused this. Most status triggers ignore these, which prevents loops.
 var from_status := false
 ## For effects run by a status trigger: the context of the event that set it off, such as

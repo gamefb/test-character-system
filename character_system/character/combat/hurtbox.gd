@@ -27,17 +27,16 @@ const MAX_PASSED_THROUGH := 32
 ## [param origin] is what dealt it, e.g. the weapon's [ItemData], so a kill feed can name it.
 ## [param source] is who dealt it; one that has been freed since, such as the shooter of a
 ## rocket still in the air, counts as null.
-## Pass [param position] and [param normal] when the hit has a point, e.g. from a ray, so
-## effects can spawn sparks there.
+## Pass [param position] when the hit has a point, e.g. from a ray, so effects can spawn
+## sparks there.
 static func hit(source: Variant, collider: Object, origin: Resource = null,
-		position := Vector3.INF, normal := Vector3.ZERO) -> EffectContext:
+		position := Vector3.INF) -> EffectContext:
 	var ctx := EffectContext.new(source, collider as Node, origin)
 	if collider is Hurtbox:
 		ctx.target = collider.character
 		ctx.magnitude = collider.multiplier
 		ctx.tags = collider.tags.duplicate()
 	ctx.position = position
-	ctx.normal = normal
 	return ctx
 
 

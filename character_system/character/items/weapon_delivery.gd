@@ -45,9 +45,8 @@ func _start() -> void:
 ## The [EffectContext] for a hit on [param collider] by this weapon: from the wielder, with the
 ## item as its origin, and a [Hurtbox] resolved to its character. Pass where the hit landed if
 ## it has a point.
-func context_for(collider: Object, position := Vector3.INF,
-		normal := Vector3.ZERO) -> EffectContext:
-	var ctx := Hurtbox.hit(wielder, collider, item.data if item else null, position, normal)
+func context_for(collider: Object, position := Vector3.INF) -> EffectContext:
+	var ctx := Hurtbox.hit(wielder, collider, item.data if item else null, position)
 	ctx.charge = (find(Trigger) as Trigger).charge
 	return ctx
 

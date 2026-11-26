@@ -112,7 +112,7 @@ func _physics_process(delta: float) -> void:
 	var hit: Dictionary = Hurtbox.raycast(get_world_3d().direct_space_state, query)
 	if hit:
 		global_position = hit.position
-		var ctx: EffectContext = Hurtbox.hit(source, hit.collider, origin, hit.position, hit.normal)
+		var ctx: EffectContext = Hurtbox.hit(source, hit.collider, origin, hit.position)
 		ctx.charge = charge
 		_impact(ctx)
 		return
