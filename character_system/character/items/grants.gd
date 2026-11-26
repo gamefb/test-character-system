@@ -31,9 +31,7 @@ extends ItemComponent
 ## A wielder without an [Abilities] component gets none.
 @export var abilities: Dictionary[StringName, AbilityData] = {}
 
-# Only what was accepted or applied, so only that is taken back.
-var _statuses: Array[StatusData] = []
-var _modifiers: Array[StatModifier] = []
+# The ability each slot held before this item took it.
 var _replaced: Dictionary[StringName, AbilityData] = {}
 
 
@@ -42,15 +40,12 @@ func _warnings() -> PackedStringArray:
 
 
 func _start() -> void:
-	var holder := Statuses.find_on(wielder)
-	for s in statuses if holder else []:
-		if holder.add(s, wielder):
-			_statuses.append(s)
-	var wielder_manager := ComponentManager.of(wielder)
+	# Held, so both are taken back on unequip, and a status that was refused isn't dropped.
+	for s in statuses:
+		hold_status(s, true, wielder)
 	var rolled: Array = item.state.get(&"modifiers", []) if item else []
-	for m in (modifiers + rolled) if wielder_manager else []:
-		wielder_manager.add_modifier(m, item.data if item else null)
-		_modifiers.append(m)
+	for m: StatModifier in modifiers + rolled:
+		hold_modifier(m, true, item.data if item else null)
 	var caster := Abilities.find_on(wielder)
 	for action in abilities if caster else {}:
 		_replaced[action] = caster.slots.get(action)
@@ -58,12 +53,6 @@ func _start() -> void:
 
 
 func _stop() -> void:
-	var holder := Statuses.find_on(wielder)
-	for s in _statuses if holder else []:
-		holder.drop_hold(s)
-	var wielder_manager := ComponentManager.of(wielder)
-	for m in _modifiers if wielder_manager else []:
-		wielder_manager.remove_modifier(m)
 	var caster := Abilities.find_on(wielder)
 	for action in _replaced if caster else {}:
 		if caster.slots.get(action) != abilities.get(action):
@@ -72,6 +61,4 @@ func _stop() -> void:
 			caster.slots[action] = _replaced[action]
 		else:
 			caster.slots.erase(action)
-	_statuses.clear()
-	_modifiers.clear()
 	_replaced.clear()

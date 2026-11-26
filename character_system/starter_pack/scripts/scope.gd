@@ -6,8 +6,8 @@ extends ItemComponent
 ##
 ## It shows how an item changes the character holding it. The zoom uses the camera of the
 ## wielder's [PlayerBrain], so an AI wielder only slows down. The slowdown is a [StatModifier]
-## on the wielder's [ComponentManager], and [method Component._stop] takes it off again, so
-## unequipping while aiming leaves nothing behind.
+## held on the wielder with [method Component.hold_modifier], which takes it off again on
+## unequip. The zoom is this script's own change, so [method Component._stop] undoes it.
 
 ## Held to aim, as sent by the wielder's [Brain].
 @export var action: StringName = &"secondary"
@@ -16,7 +16,7 @@ extends ItemComponent
 ## Walking speed while aiming, as a multiplier of move_speed.
 @export var aim_speed: float = 0.5
 
-var _slow := StatModifier.new()  # Added to the wielder only while aiming.
+var _slow := StatModifier.new()  # Held on the wielder only while aiming.
 var _aiming := false
 var _camera: Camera3D
 var _normal_fov: float = 75.0
@@ -38,15 +38,11 @@ func _stop() -> void:
 
 
 func _set_aiming(on: bool) -> void:
-	var wielder_manager := ComponentManager.of(wielder)
-	if on == _aiming or not wielder_manager:
+	if on == _aiming:
 		return
 	_aiming = on
-	if on:
-		_slow.mul = aim_speed
-		wielder_manager.add_modifier(_slow)
-	else:
-		wielder_manager.remove_modifier(_slow)
+	_slow.mul = aim_speed
+	hold_modifier(_slow, on)
 	if _camera:
 		if on:
 			_normal_fov = _camera.fov

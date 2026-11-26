@@ -102,9 +102,7 @@ func use(ability: AbilityData) -> bool:
 		return _fire(ability)
 	casting = ability
 	_cast_left = ability.cast_time
-	var statuses := find(Statuses) as Statuses
-	if ability.status_while_casting and statuses:
-		statuses.add(ability.status_while_casting, host)
+	hold_status(ability.status_while_casting, true, host)
 	cast_started.emit(ability)
 	var ctx := EffectContext.new(host, host, ability)
 	ctx.duration = ability.cast_time
@@ -216,9 +214,7 @@ func _finish_cast() -> void:
 
 
 func _end_cast() -> void:
-	var statuses := find(Statuses) as Statuses
-	if casting.status_while_casting and statuses:
-		statuses.drop_hold(casting.status_while_casting)
+	hold_status(casting.status_while_casting, false)
 	casting = null
 	_cast_left = 0.0
 

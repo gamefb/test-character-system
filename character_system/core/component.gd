@@ -33,7 +33,8 @@ extends Node
 ## checks.
 ## [br]4. [method _stop] runs when it leaves the tree, when the host is freed, or when something
 ## it requires is removed. Everything connected with [method listen] or [method on] is
-## disconnected.
+## disconnected, and everything given with [method hold_modifier] or [method hold_status] is
+## taken back.
 ## [br]5. If what it required comes back, [method _start] runs again. Write [method _start] and
 ## [method _stop] so they can run more than once.
 ##
@@ -90,6 +91,8 @@ extends Node
 ## [signal ComponentManager.stat_changed]; a stored speed ignores every status.
 ## [br]- Connect with [method listen], not [code]connect()[/code], and hear events with
 ## [method on], so both are undone when the component stops.
+## [br]- Change a stat with [method hold_modifier] and give a status with [method hold_status],
+## for the same reason: a modifier left behind would change the character for good.
 ## [br]- A component that's optional for yours (used if present) doesn't go in
 ## [method _requires]. [method find] it and check for null.
 
@@ -99,15 +102,14 @@ var host: Node:
 		return get_parent()
 ## The host's [ComponentManager], or null if it has none. Set when the component enters the
 ## tree, so it's null in [code]_init()[/code] and while the component is outside the tree.
-var manager: ComponentManager:
-	get:
-		return _manager
+var manager: ComponentManager
 ## True between [method _start] and [method _stop]. Check it in methods other nodes call,
 ## because they can be called while the component is stopped.
 var running := false
 
-var _manager: ComponentManager
 var _connections: Array[Array] = []  # [Signal, Callable] pairs made with listen().
+# Each modifier and status given with hold_modifier() or hold_status(), and the node it is on.
+var _holds: Dictionary[Resource, Node] = {}
 # The process_mode to restore when the component starts.
 var _mode := PROCESS_MODE_INHERIT
 # Whether a "can't start" error was already shown.
@@ -165,13 +167,13 @@ func _notification(what: int) -> void:
 			_mode = process_mode
 			# No _process, _physics_process or input until it starts.
 			process_mode = PROCESS_MODE_DISABLED
-			if _manager:
-				_manager.try_start(self)
+			if manager:
+				manager.try_start(self)
 			else:
 				_check_manager.call_deferred()
 		NOTIFICATION_EXIT_TREE:
-			if _manager:
-				_manager.unregister(self)
+			if manager:
+				manager.unregister(self)
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -200,7 +202,7 @@ func _get_configuration_warnings() -> PackedStringArray:
 ## var brain := find(Brain) as Brain
 ## [/codeblock]
 func find(type: Script) -> Component:
-	return _manager.find(type) if _manager else null
+	return manager.find(type) if manager else null
 
 
 ## Returns every [param type] component on the same host, in scene order. Subclasses count.
@@ -208,7 +210,7 @@ func find(type: Script) -> Component:
 ## remembered, so call it in [method _start] or when something happens, not every frame.
 func find_all(type: Script) -> Array[Component]:
 	var none: Array[Component] = []
-	return _manager.find_all(type) if _manager else none
+	return manager.find_all(type) if manager else none
 
 
 ## Returns the first node of the built-in class [param type] anywhere under the host, or null.
@@ -230,7 +232,7 @@ func find_node_of_type(type: StringName) -> Node:
 ## the stat. Totals are cached, so reading it every frame is cheap.
 ## See [method ComponentManager.stat].
 func stat(stat_name: StringName) -> float:
-	return _manager.stat(stat_name) if _manager else 0.0
+	return manager.stat(stat_name) if manager else 0.0
 
 
 ## Connects [param sig] to [param method] until this component stops. Use it in [method _start].
@@ -288,9 +290,55 @@ func listen(sig: Signal, method: Callable) -> void:
 ## its wielder: [code]on(&"killed", _on_wielder_killed, wielder)[/code]. A node without a
 ## [ComponentManager] has no events, so nothing happens.
 func on(event_name: StringName, method: Callable, node: Node = null) -> void:
-	var m: ComponentManager = ComponentManager.of(node) if node else _manager
+	var m: ComponentManager = ComponentManager.of(node) if node else manager
 	if m:
 		listen(m.event(event_name), method)
+
+
+## Keeps [param m] on this host's stats for as long as [param on] is true, and takes it off when
+## the component stops. An [ItemComponent]'s goes on its wielder.
+##
+## It only acts when [param on] changes, so it can be called every frame with a condition:
+## [codeblock]
+## var _boost := StatModifier.new()  # Its stat and mul are set in _start().
+##
+## func _process(_delta: float) -> void:
+## 	hold_modifier(_boost, (find(Brain) as Brain).is_action_pressed(&"sprint"))
+## [/codeblock]
+## [param source] is what [method ComponentManager.modifiers_of] names as behind the change:
+## this component if left out. A modifier is held once however often it is asked for, so use
+## one object for each change. Nothing is held while the component isn't running.
+func hold_modifier(m: StatModifier, on := true, source: Object = null) -> void:
+	if on == _holds.has(m):
+		return
+	if not on:
+		_release_hold(m)
+		return
+	var target := ComponentManager.of(_hold_target())
+	if running and target:
+		target.add_modifier(m, source if source else self)
+		_holds[m] = target.host
+
+
+## Gives this host [param data] for as long as [param on] is true, and drops the hold when the
+## component stops. An [ItemComponent]'s goes to its wielder. Use a status with
+## [member StatusData.duration] 0, which stays until its last hold is dropped.
+##
+## Returns whether the status is held now: false if it was refused (see
+## [method StatusData.can_apply]), if there is no [Statuses] to take it, or if [param data] is
+## null. Like [method hold_modifier], it only acts when [param on] changes, so a status that
+## was refused isn't asked for again until [param on] has been false in between.
+## [param source] is who is credited with applying it.
+func hold_status(data: StatusData, on := true, source: Node = null) -> bool:
+	if not data or (on and not running):
+		return false
+	if on and not _holds.has(data):
+		var statuses := Statuses.find_on(_hold_target())
+		# One that is refused is remembered too, as held on nobody, so it is asked for once.
+		_holds[data] = statuses.host if statuses and statuses.add(data, source) else null
+	elif not on and _holds.has(data):
+		_release_hold(data)
+	return _holds.get(data) != null
 
 
 ## Call after changing a number that [method _stats] returns, so statuses and readers see it.
@@ -302,8 +350,8 @@ func on(event_name: StringName, method: Callable, node: Node = null) -> void:
 ## 		update_stats()
 ## [/codeblock]
 func update_stats() -> void:
-	if _manager:
-		_manager.refresh_stats()
+	if manager:
+		manager.refresh_stats()
 
 
 ## Components of the types in [method _requires] that are not on the host. Empty when the
@@ -343,16 +391,18 @@ func _stats() -> Dictionary[StringName, float]:
 ## Connect signals with [method listen] here.
 ##
 ## It runs after the host's own [code]_ready()[/code], and again after each restart (see
-## [method _stop]). Anything it sets up that [method listen] doesn't undo, such as a group,
-## a stat modifier or a spawned node, should be undone in [method _stop].
+## [method _stop]). Anything it sets up by other means than [method listen], [method on],
+## [method hold_modifier] and [method hold_status], such as a group or a spawned node, should
+## be undone in [method _stop].
 func _start() -> void:
 	pass
 
 
 ## Called when this component is removed, or something it requires is removed.
 ##
-## Also called when the host is freed. Connections made with [method listen] and [method on]
-## are undone right after it, so only undo what [method _start] did by other means.
+## Also called when the host is freed. Connections made with [method listen] and [method on],
+## and holds made with [method hold_modifier] and [method hold_status], are undone right after
+## it, so only undo what [method _start] did by other means.
 func _stop() -> void:
 	pass
 
@@ -381,19 +431,42 @@ func _begin() -> void:
 	_start()
 
 
-## Called by the [ComponentManager]. Stops the component and undoes every [method listen] and
-## [method on].
+## Called by the [ComponentManager]. Stops the component and undoes every [method listen],
+## [method on], [method hold_modifier] and [method hold_status].
 func _halt() -> void:
 	if not running:
 		return
 	running = false
 	process_mode = PROCESS_MODE_DISABLED
 	_stop()
+	for what: Resource in _holds.keys():
+		_release_hold(what)
 	for pair in _connections:
 		var sig: Signal = pair[0]
 		if is_instance_valid(sig.get_object()) and sig.is_connected(pair[1]):
 			sig.disconnect(pair[1])
 	_connections.clear()
+
+
+# The node hold_modifier() and hold_status() act on. An ItemComponent answers with its wielder.
+func _hold_target() -> Node:
+	return host
+
+
+# Takes back one thing hold_modifier() or hold_status() gave.
+func _release_hold(what: Resource) -> void:
+	var node: Variant = _holds[what]  # Untyped: the node may have been freed since.
+	_holds.erase(what)
+	if not is_instance_valid(node):
+		return
+	if what is StatModifier:
+		var stats := ComponentManager.of(node)
+		if stats:
+			stats.remove_modifier(what)
+	else:
+		var statuses := Statuses.find_on(node)
+		if statuses:
+			statuses.drop_hold(what)
 
 
 # Called by the ComponentManager when other leaves: true if this component required other's
@@ -406,13 +479,13 @@ func _required_type_of(other: Component) -> bool:
 
 
 func _has_sibling(type: Script) -> bool:
-	if _manager:
-		return _manager.has_registered(type)
+	if manager:
+		return manager.has_registered(type)
 	return host.get_children().any(func(child: Node) -> bool: return is_instance_of(child, type))
 
 
 func _check_manager() -> void:
-	if not _manager and is_inside_tree():
+	if not manager and is_inside_tree():
 		push_error("%s on '%s' needs a ComponentManager node beside it."
 				% [type_name(get_script()), host.name])
 

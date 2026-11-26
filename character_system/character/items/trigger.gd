@@ -160,12 +160,7 @@ func _let_go() -> void:
 
 func _set_charging(on: bool) -> void:
 	_charging = on
-	var statuses := Statuses.find_on(wielder)
-	if status_while_charging and statuses:
-		if on:
-			statuses.add(status_while_charging, wielder)
-		else:
-			statuses.drop_hold(status_while_charging)
+	hold_status(status_while_charging, on, wielder)
 
 
 func _shoot() -> void:

@@ -19,15 +19,15 @@ extends Component
 ## How much faster sprinting is: 1.5 is half as fast again.
 @export var sprint_speed: float = 1.5
 
-var _boost := StatModifier.new()  # Added to the manager only while sprinting.
-var _sprinting := false
+var _boost := StatModifier.new()  # Held on the character only while sprinting.
 
 
 func _process(delta: float) -> void:
 	var tank := Pool.named(host, pool)
 	var held: bool = (find(Brain) as Brain).is_action_pressed(action)
-	_set_sprinting(held and tank != null and tank.current > 0.0)
-	if _sprinting:
+	var sprinting: bool = held and tank != null and tank.current > 0.0
+	hold_modifier(_boost, sprinting)  # Taken off by itself if the component stops mid-sprint.
+	if sprinting:
 		tank.change(-drain * delta)
 
 
@@ -40,22 +40,8 @@ func _start() -> void:
 	_boost.mul = sprint_speed
 
 
-func _stop() -> void:
-	_set_sprinting(false)
-
-
 func _warnings() -> PackedStringArray:
 	if not get_parent().get_children().any(
 			func(node: Node) -> bool: return node is Pool and node.pool == pool):
 		return PackedStringArray(["Add a Pool named '%s' beside this." % pool])
 	return PackedStringArray()
-
-
-func _set_sprinting(on: bool) -> void:
-	if on == _sprinting:
-		return
-	_sprinting = on
-	if on:
-		manager.add_modifier(_boost, self)
-	else:
-		manager.remove_modifier(_boost)

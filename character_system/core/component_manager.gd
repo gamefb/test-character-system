@@ -407,7 +407,7 @@ func register(c: Component) -> void:
 	if c in _components:
 		return
 	_components.append(c)
-	c._manager = self
+	c.manager = self
 	_stats_changed_by(c)
 	if started or _starting:
 		for other in _components.duplicate():
@@ -421,7 +421,7 @@ func unregister(c: Component) -> void:
 		return
 	c._halt()
 	_components.erase(c)
-	c._manager = null
+	c.manager = null
 	_stats_changed_by(c)
 	for other in _components.duplicate():
 		if other.running and other._required_type_of(c) and not other.missing().is_empty():

@@ -93,8 +93,8 @@ func release(action: StringName) -> void:
 func is_blocked() -> bool:
 	# Asked many times a frame: nearly always nothing at all is blocked, which is one look.
 	return (
-			_manager != null and not _manager.blocks.is_empty()
-			and _manager.is_blocked(blocked_by)
+			manager != null and not manager.blocks.is_empty()
+			and manager.is_blocked(blocked_by)
 	)
 
 

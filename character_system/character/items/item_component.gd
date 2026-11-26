@@ -8,8 +8,9 @@ extends Component
 ## [member item] before the scene is added, so both are ready in [method Component._start].
 ##
 ## Keep per-copy state, such as rounds loaded, in [member ItemInstance.state], not on the node:
-## the node is freed when the item is unequipped. Anything you change on the wielder, such as a
-## stat modifier, must be undone in [method Component._stop], which runs on unequip.
+## the node is freed when the item is unequipped. [method Component.hold_modifier] and
+## [method Component.hold_status] act on the wielder here, and are taken back on unequip.
+## Anything else you change on the wielder must be undone in [method Component._stop].
 ##
 ## A component that acts when the item is used listens to its [Trigger], as [Hitscan] and
 ## [MeleeSweep] do:
@@ -36,3 +37,7 @@ var item: ItemInstance
 var brain: Brain:
 	get:
 		return Component.of(wielder, Brain)
+
+
+func _hold_target() -> Node:
+	return wielder
