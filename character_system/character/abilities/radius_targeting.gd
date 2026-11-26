@@ -28,13 +28,10 @@ func find(ctx: EffectContext) -> Array[Node]:
 	var query := PhysicsShapeQueryParameters3D.new()
 	query.shape = sphere
 	query.transform = Transform3D(Basis(), user.global_position)
-	query.collide_with_areas = true  # So hurtboxes count.
 	query.exclude = Hurtbox.rids_of(user)
 	var faction := Faction.find_on(user)
-	for hit in user.get_world_3d().direct_space_state.intersect_shape(query, 64):
-		# A hurtbox stands for its character.
-		var target: Node = hit.collider.character if hit.collider is Hurtbox else hit.collider
-		if target in found or ComponentManager.blocked(target, &"targeting"):
+	for target: Node in Hurtbox.overlap(user.get_world_3d().direct_space_state, query, 64):
+		if ComponentManager.blocked(target, &"targeting"):
 			continue
 		if hostile_only and faction and not faction.is_hostile(target):
 			continue

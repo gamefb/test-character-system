@@ -101,6 +101,35 @@ func test_projectiles_pass_through_plain_areas_and_the_dead() -> void:
 	assert_eq(Health.find_on(target).current, 85.0)
 
 
+## Swings, blasts and area abilities all ask Hurtbox.overlap() what a shape touches.
+func test_a_shape_finds_each_character_once_and_skips_plain_areas() -> void:
+	var soldier: CharacterBody3D = make_character(Vector3(0, 0, -2))
+	var head := Hurtbox.new()
+	head.character = soldier
+	head.multiplier = 2.0
+	head.add_child(CollisionShape3D.new())
+	(head.get_child(0) as CollisionShape3D).shape = SphereShape3D.new()
+	soldier.add_child(head)
+	head.position = Vector3(0, 1, 0)  # Inside the body, so both are touched.
+	var corpse: CharacterBody3D = make_character(Vector3(2, 0, 0))
+	Health.find_on(corpse).change(-1000.0)
+	trigger_volume(Vector3(-2, 1, 0))
+	await get_tree().physics_frame
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = SphereShape3D.new()
+	(query.shape as SphereShape3D).radius = 6.0
+	var space: PhysicsDirectSpaceState3D = soldier.get_world_3d().direct_space_state
+	var found: Dictionary[Node, Object] = Hurtbox.overlap(space, query)
+	assert_eq(found.size(), 2, "the two characters, and not the area")
+	assert_eq(found[soldier], head, "the part that counts for most stands for the character")
+	assert_eq(found[corpse], corpse, "a swing or a blast reaches the dead too")
+	var nearby := RadiusTargeting.new()
+	nearby.radius = 6.0
+	nearby.hostile_only = false
+	var targets: Array[Node] = nearby.find(EffectContext.new(make_character(Vector3(0, 0, 2))))
+	assert_eq(targets, [soldier] as Array[Node], "an area ability leaves the dead alone")
+
+
 func test_a_weapons_projectile_leaves_from_the_weapon() -> void:
 	var shooter: CharacterBody3D = make_character()
 	var slow := Projectile.new()

@@ -159,13 +159,8 @@ func _blast(where: Vector3) -> void:
 	query.shape = sphere
 	query.transform = Transform3D(Basis(), where)
 	query.collision_mask = collision_mask
-	query.collide_with_areas = true  # So hurtboxes count.
-	# Character -> its context: one blast per character, however many of its parts are inside.
-	var hits: Dictionary[Node, EffectContext] = {}
-	for hit in get_world_3d().direct_space_state.intersect_shape(query, 64):
-		var target: Node = hit.collider.character if hit.collider is Hurtbox else hit.collider
-		if hits.has(target) or not target:
-			continue
+	# One blast per character, however many of its parts are inside.
+	for target: Node in Hurtbox.overlap(get_world_3d().direct_space_state, query, 64):
 		var ctx := EffectContext.new(source, target, origin)
 		ctx.charge = charge
 		ctx.position = where
@@ -174,8 +169,6 @@ func _blast(where: Vector3) -> void:
 			var closeness: float = 1.0 - clampf(
 					node.global_position.distance_to(where) / blast_radius, 0.0, 1.0)
 			ctx.magnitude = lerpf(blast_edge_strength, 1.0, closeness)
-		hits[target] = ctx
-	for ctx: EffectContext in hits.values():
 		Effect.apply_all(blast_effects, ctx)
 
 

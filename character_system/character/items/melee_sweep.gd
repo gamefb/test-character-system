@@ -72,7 +72,6 @@ func _sweep() -> void:
 	var query := PhysicsShapeQueryParameters3D.new()
 	query.shape = shape
 	query.collision_mask = collision_mask
-	query.collide_with_areas = true  # So hurtboxes can be hit.
 	query.exclude = _wielder_rids
 	var space: PhysicsDirectSpaceState3D = (host as Node3D).get_world_3d().direct_space_state
 	var moved: float = (_last * offset).distance_to(now * offset)
@@ -81,15 +80,10 @@ func _sweep() -> void:
 		# The item's own turn is followed, so the shape goes round the arc, not across it.
 		var at: Transform3D = _last.interpolate_with(now, float(step) / steps)
 		query.transform = at.translated_local(offset)
-		# Character -> its context, keeping the strongest when several of its parts are inside.
-		var hits: Dictionary[Node, EffectContext] = {}
-		for hit in space.intersect_shape(query, 32):
-			var ctx: EffectContext = context_for(hit.collider, query.transform.origin)
-			if ctx.target in _struck:
-				continue
-			if not hits.has(ctx.target) or ctx.magnitude > hits[ctx.target].magnitude:
-				hits[ctx.target] = ctx
-		for ctx: EffectContext in hits.values():
-			_struck.append(ctx.target)
-			Effect.apply_all(effects, ctx)
+		# Each character once a swing, on the strongest of its parts inside the shape.
+		var hits: Dictionary[Node, Object] = Hurtbox.overlap(space, query)
+		for target: Node in hits:
+			if target not in _struck:
+				_struck.append(target)
+				Effect.apply_all(effects, context_for(hits[target], query.transform.origin))
 	_last = now

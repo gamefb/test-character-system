@@ -57,6 +57,27 @@ static func raycast(space: PhysicsDirectSpaceState3D,
 	return {}
 
 
+## Returns what the shape of [param query] touches, one entry for each character: the
+## character, and the part of it that was touched (a [Hurtbox], or the body itself). When
+## several parts of one character are inside, the one with the highest [member multiplier]
+## stands for it. Areas that aren't hurtboxes are left out, as [method raycast] leaves them
+## out. Characters that can't be targeted, such as the dead, are found: a swing or a blast
+## reaches them, and what happens to them is up to the effects. [MeleeSweep], a
+## [Projectile]'s blast and [RadiusTargeting] all look through this.
+static func overlap(space: PhysicsDirectSpaceState3D, query: PhysicsShapeQueryParameters3D,
+		max_results: int = 32) -> Dictionary[Node, Object]:
+	query.collide_with_areas = true  # Hurtboxes are areas.
+	var found: Dictionary[Node, Object] = {}
+	for touched in space.intersect_shape(query, max_results):
+		var part: Object = touched.collider
+		if part is Area3D and not part is Hurtbox:
+			continue  # A trigger volume or a detection range, not a part of anything.
+		var character := (part.character if part is Hurtbox else part) as Node
+		if character and _strength(part) > _strength(found.get(character)):
+			found[character] = part
+	return found
+
+
 ## Whether a shot stops at [param collider]. A [Hurtbox] and a body do, unless a status on
 ## their character blocks [code]targeting[/code], as Dead does. Any other area doesn't, so
 ## trigger volumes and detection ranges never soak up shots. A wall always does.
@@ -78,6 +99,13 @@ static func rids_of(character: Node) -> Array[RID]:
 	for node in character.find_children("*", "Hurtbox", true, false):
 		rids.append(node.get_rid())
 	return rids
+
+
+# How much a hit on this part counts for. No part at all counts for less than any part.
+static func _strength(part: Object) -> float:
+	if part is Hurtbox:
+		return part.multiplier
+	return 1.0 if part else -INF
 
 
 func _ready() -> void:
