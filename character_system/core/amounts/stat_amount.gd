@@ -13,7 +13,7 @@ extends Amount
 @export var stat: StringName
 ## Whose stat: whoever caused the effect, or whoever receives it. A status tick's source is
 ## whoever applied the status.
-@export var of := Condition.Subject.SOURCE
+@export var of := EffectContext.Role.SOURCE
 ## The amount for each point of the stat. Negative takes away.
 @export var per_point: float = 1.0
 ## Optional. The stat is looked up on this curve, and the result is multiplied by
@@ -22,8 +22,7 @@ extends Amount
 
 
 func value(ctx: EffectContext) -> float:
-	var node: Node = ctx.source if of == Condition.Subject.SOURCE else ctx.target
-	var points: float = ComponentManager.stat_of(node, stat)
+	var points: float = ComponentManager.stat_of(ctx.node(of), stat)
 	if curve:
 		points = curve.sample(points)
 	return points * per_point

@@ -15,7 +15,7 @@ enum Part {
 }
 
 ## Whose pool to read.
-@export var of := Condition.Subject.TARGET
+@export var of := EffectContext.Role.TARGET
 ## The pool's name.
 @export var pool: StringName = &"health"
 ## Which number of the pool to take a share of.
@@ -25,7 +25,7 @@ enum Part {
 
 
 func value(ctx: EffectContext) -> float:
-	var found := Pool.named(ctx.source if of == Condition.Subject.SOURCE else ctx.target, pool)
+	var found := Pool.named(ctx.node(of), pool)
 	if not found:
 		return 0.0
 	match part:

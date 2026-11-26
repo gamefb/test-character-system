@@ -34,6 +34,14 @@ extends RefCounted
 ## null source, and [method Component.of] and the [ComponentManager] helpers accept freed
 ## nodes; check [code]is_instance_valid(ctx.source)[/code] before using it directly.
 
+## The two nodes an effect involves. Conditions and amounts export one to say which they read.
+enum Role {
+	## Whoever receives the effect or status.
+	TARGET,
+	## Whoever caused it. Null for the environment.
+	SOURCE,
+}
+
 ## How many status triggers may set each other off in a row before the chain is cut. It only
 ## matters for triggers with [member StatusTrigger.react_to_statuses] on, which could otherwise
 ## loop forever.
@@ -98,10 +106,15 @@ func _init(p_source: Variant = null, p_target: Variant = null, p_origin: Resourc
 	origin = p_origin
 
 
+## The node in [param role]: [member source] or [member target].
+func node(role: Role) -> Node:
+	return source if role == Role.SOURCE else target
+
+
 ## The hit this is about: [member cause] inside a status trigger, otherwise this context.
 ## Conditions and amounts use it so the same resource works in both places:
 ## [codeblock]
-## func check(ctx: EffectContext) -> bool:
+## func _passes(ctx: EffectContext) -> bool:
 ## 	return ctx.hit().damage_type == &"fire"
 ## [/codeblock]
 func hit() -> EffectContext:

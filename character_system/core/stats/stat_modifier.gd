@@ -1,7 +1,7 @@
 @tool
 @icon("res://character_system/icons/stat_modifier.svg")
 class_name StatModifier
-extends Resource
+extends DataResource
 ## A change to one stat while it's applied.
 ##
 ## A stat's value is (base + all adds) × (1 + all percents) × all muls. The base comes from the
@@ -34,8 +34,3 @@ extends Resource
 ## stat is read. [signal ComponentManager.stat_changed] isn't emitted when one flips, so UI
 ## that shows such a stat should read it every frame.
 @export var conditions: Array[Condition] = []
-
-
-func _validate_property(property: Dictionary) -> void:
-	if Engine.is_editor_hint():
-		NameCheck.suggest(self, property)  # Name fields become lists to pick from.

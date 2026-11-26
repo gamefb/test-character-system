@@ -1,6 +1,6 @@
 @tool
 class_name PoolBelowCondition
-extends Condition
+extends SubjectCondition
 ## Passes while a [Pool] is below a share of its maximum, e.g. health under half for an
 ## execute, or mana under a fifth. Health is the pool named [code]health[/code].
 

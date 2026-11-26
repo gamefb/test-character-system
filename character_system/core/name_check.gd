@@ -72,12 +72,7 @@ static func problems_in(list: Array) -> PackedStringArray:
 
 ## True for the kinds of resource this checks, directly or inside them.
 static func handles(object: Object) -> bool:
-	return (
-			object is StatusData or object is StatusTrigger or object is StatModifier
-			or object is Condition or object is Effect or object is Amount
-			# An ability or an item, known by what it holds: core has neither class.
-			or (object is Resource and (&"costs" in object or &"use_effects" in object))
-	)
+	return object is DataResource
 
 
 ## Turns a name field into a list to pick from in the Inspector, filled with the names the

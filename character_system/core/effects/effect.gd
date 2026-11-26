@@ -2,7 +2,7 @@
 @icon("res://character_system/icons/effect.svg")
 @abstract
 class_name Effect
-extends Resource
+extends DataResource
 ## One instant change to a target: damage, healing, a status, and so on.
 ##
 ## Effects are resources, so weapons, abilities, statuses and zones all set them up in the
@@ -41,11 +41,6 @@ extends Resource
 static func apply_all(effects: Array[Effect], ctx: EffectContext) -> void:
 	for e in effects:
 		e.apply(ctx)
-
-
-func _validate_property(property: Dictionary) -> void:
-	if Engine.is_editor_hint():
-		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
 
 
 ## Runs the effect if all [member conditions] pass. Callers use this, never [method _execute].

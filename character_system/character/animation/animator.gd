@@ -58,7 +58,8 @@ func _start() -> void:
 
 
 func _play(ctx: EffectContext, event: StringName) -> void:
-	var id: StringName = ctx.origin.get(&"id") if ctx and ctx.origin else &""
+	var data := ctx.origin as DisplayData if ctx else null
+	var id: StringName = data.id if data else &""
 	var clip: StringName = _clips[event].get(id, _clips[event].get(&"", &""))
 	if not player or not player.has_animation(clip):
 		return

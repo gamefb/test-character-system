@@ -1,14 +1,16 @@
 @tool
 @icon("res://character_system/icons/status_data.svg")
 class_name StatusData
-extends Resource
+extends DisplayData
 ## A status or passive, saved as a .tres file.
 ##
 ## A passive is a status with [member duration] 0. This resource is shared by every character
-## that has the status, so it holds no runtime state; that lives in [Statuses].
+## that has the status, so it holds no runtime state; that lives in [Statuses]. Its name, icon
+## and description come from [DisplayData].
 ##
 ## Tags drive interactions: [member immune_to] keeps out statuses with those tags,
-## [member removes_tags] clears them, and [HasTagCondition] tests for them.
+## [member removes_tags] clears them, and [HasTagCondition] tests for them. Tags, not
+## [member DisplayData.id], are what conditions and other statuses look for.
 
 enum Stacking {
 	## Reapplying resets the timer.
@@ -18,17 +20,6 @@ enum Stacking {
 	## Reapplying does nothing.
 	IGNORE,
 }
-
-@export_group("Display")
-## A unique name for your code, e.g. &"burning". Tags, not this, are what
-## conditions and other statuses look for.
-@export var id: StringName
-## The name players see, e.g. in a status bar.
-@export var display_name: String
-## For your status UI. The system doesn't use it.
-@export var icon: Texture2D
-## Tooltip text for your UI.
-@export_multiline var description: String
 
 @export_group("Rules")
 ## Labels other statuses and conditions can look for, e.g. &"fire", &"wet".
@@ -78,11 +69,6 @@ enum Stacking {
 @export var on_remove: Array[Effect] = []
 ## Reactions to events such as &"taking_damage" while active. See [StatusTrigger].
 @export var triggers: Array[StatusTrigger] = []
-
-
-func _validate_property(property: Dictionary) -> void:
-	if Engine.is_editor_hint():
-		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
 
 
 ## How many stacks this status can have.

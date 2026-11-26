@@ -1,6 +1,6 @@
 @tool
 class_name StatCondition
-extends Condition
+extends SubjectCondition
 ## Passes if the node's [member stat] is at least [member value].
 ##
 ## For example, [code]resist_fire[/code] at least 1. Turn on [member Condition.negate] for

@@ -4,12 +4,9 @@ extends Condition
 ## doesn't hurt allies.
 ##
 ## Hostility comes from the source's [Faction]. A source without one, such as a trap or a zone,
-## counts as hostile to everyone. It looks at both sides, so it overrides
-## [method Condition.check] instead of [method Condition._test], and
-## [member Condition.subject] isn't used.
+## counts as hostile to everyone.
 
 
-func check(ctx: EffectContext) -> bool:
+func _passes(ctx: EffectContext) -> bool:
 	var faction := Faction.find_on(ctx.source)
-	var hostile: bool = faction == null or faction.is_hostile(ctx.target)
-	return hostile != negate
+	return faction == null or faction.is_hostile(ctx.target)

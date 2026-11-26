@@ -1,24 +1,15 @@
 @tool
 @icon("res://character_system/icons/ability_data.svg")
 class_name AbilityData
-extends Resource
+extends DisplayData
 ## An active ability: when it can be used, what it costs, who it targets and what it does.
 ##
 ## Put it in [member Abilities.slots] under an action name. Everything here is optional beyond
 ## [member effects]: an ability with only effects and a [member cooldown] fires the moment its
 ## button is pressed. Add [member costs] for mana or stamina, [member charges] to bank several
 ## uses, [member cast_time] for a wind-up that can be interrupted, and
-## a name in [member blocked_by] so a status such as Silenced can stop it.
-
-@export_group("Display")
-## A unique name for your code, e.g. &"fireball".
-@export var id: StringName
-## The name players see.
-@export var display_name: String
-## For your ability bar. The system doesn't use it.
-@export var icon: Texture2D
-## Tooltip text for your UI.
-@export_multiline var description: String
+## a name in [member blocked_by] so a status such as Silenced can stop it. Its name, icon and
+## description come from [DisplayData].
 
 @export_group("Use")
 ## Seconds before it can be used again. With [member charges], the time to regain one charge.
@@ -61,8 +52,3 @@ extends Resource
 ## Run in order on the user each time the ability fires, whoever it targets, e.g. a
 ## [LaunchProjectileEffect] for a fireball, recoil, or the heal half of a life drain.
 @export var user_effects: Array[Effect] = []
-
-
-func _validate_property(property: Dictionary) -> void:
-	if Engine.is_editor_hint():
-		NameCheck.suggest(self, property)  # Name fields become lists to pick from.

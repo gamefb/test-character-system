@@ -5,7 +5,7 @@ extends Condition
 ##
 ## Use it in a [StatusTrigger] on a damage event, so a ward only blocks fire or a perk only
 ## rewards headshots. It reads the hit that set the trigger off
-## ([method EffectContext.hit]), so [member Condition.subject] isn't used.
+## ([method EffectContext.hit]).
 ## [br][br]Tags come from the [Hurtbox] that was hit ([member Hurtbox.tags]), from the
 ## [DamageEffect] ([member DamageEffect.tags]) and from earlier [ModifyAmountEffect]s, such as
 ## &"crit".
@@ -17,7 +17,6 @@ extends Condition
 @export var tags: Array[StringName] = []
 
 
-func check(ctx: EffectContext) -> bool:
+func _passes(ctx: EffectContext) -> bool:
 	var hit: EffectContext = ctx.hit()
-	var passes: bool = (types.is_empty() or hit.damage_type in types) and tags.all(hit.has_tag)
-	return passes != negate
+	return (types.is_empty() or hit.damage_type in types) and tags.all(hit.has_tag)

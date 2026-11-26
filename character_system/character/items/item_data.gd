@@ -1,18 +1,12 @@
+@tool
 @icon("res://character_system/icons/item_data.svg")
 class_name ItemData
-extends Resource
+extends DisplayData
 ## Shared definition of an item type, saved as a .tres file.
 ##
-## It never changes while playing. Each copy a character carries is an [ItemInstance].
+## It never changes while playing. Each copy a character carries is an [ItemInstance]. Its
+## name, icon and description come from [DisplayData].
 
-## A unique name for your code and save files, e.g. &"rifle".
-@export var id: StringName
-## The name players see.
-@export var display_name: String
-## For your inventory and HUD. The system doesn't use it.
-@export var icon: Texture2D
-## Tooltip text for your UI.
-@export_multiline var description: String
 ## How many fit in one inventory stack. Use 1 for items with their own state, such as weapons.
 @export var max_stack: int = 1
 ## [Equipment] slot, e.g. &"weapon". The character's [member Equipment.sockets] needs an entry

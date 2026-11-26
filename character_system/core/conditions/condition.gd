@@ -2,39 +2,32 @@
 @icon("res://character_system/icons/condition.svg")
 @abstract
 class_name Condition
-extends Resource
-## A yes/no check on a node, used to gate effects and statuses.
+extends DataResource
+## A yes/no check, used to gate effects and statuses.
 ##
 ## [Effect] uses its [member Effect.conditions] to decide whether it runs, and [StatusData] uses
-## [member StatusData.apply_conditions] to decide whether it can be applied. To make your own,
-## extend this class and override [method _test].
+## [member StatusData.apply_conditions] to decide whether it can be applied. Turn on
+## [member negate] to flip the answer. The built-in ones are [HasTagCondition],
+## [StatCondition], [PoolBelowCondition], [ChanceCondition], [HitCondition],
+## [ChargeCondition], [IsHostileCondition] and [AnyCondition].
 ##
+## [b]Making your own.[/b] A check on one node, such as "is burning", extends
+## [SubjectCondition] and overrides [method SubjectCondition._test]; the Inspector then also
+## offers which side to check. A check that needs both sides, or the hit itself, extends this
+## class and overrides [method _passes]:
 ## [codeblock]
-## class_name IsBurningCondition
+## class_name IsCloseCondition
 ## extends Condition
 ##
-## func _test(node: Node) -> bool:
-## 	var statuses := Statuses.find_on(node)
-## 	return statuses != null and statuses.has_tag(&"fire")
+## @export var within := 3.0
+##
+## func _passes(ctx: EffectContext) -> bool:
+## 	var from := ctx.source as Node3D
+## 	var to := ctx.target as Node3D
+## 	return from and to and from.global_position.distance_to(to.global_position) <= within
 ## [/codeblock]
-##
-## Set [member subject] to check whoever caused it instead ("only rangers can apply this"),
-## and [member negate] to flip the result. The built-in ones are [HasTagCondition],
-## [StatCondition], [PoolBelowCondition] and [IsHostileCondition].
-##
-## A check that needs both sides, such as "the source is hostile to the target", overrides
-## [method check] instead and reads [member EffectContext.source] and
-## [member EffectContext.target] itself. [IsHostileCondition] is a short example.
+## Either way [member negate] is applied for you, by [method check].
 
-enum Subject {
-	## Whoever receives the effect or status.
-	TARGET,
-	## Whoever caused it. Null for the environment.
-	SOURCE,
-}
-
-## Which side to check: who receives the effect or status, or who caused it.
-@export var subject := Subject.TARGET
 ## Flip the result ("target is NOT wet").
 @export var negate := false
 
@@ -47,18 +40,12 @@ static func all_pass(conditions: Array[Condition], ctx: EffectContext) -> bool:
 	return true
 
 
-func _validate_property(property: Dictionary) -> void:
-	if Engine.is_editor_hint():
-		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
-
-
-## Tests the node [member subject] picks and applies [member negate]. Override this
-## instead of [method _test] for a check that compares both sides.
+## Whether the condition passes for [param ctx], with [member negate] applied. Callers use
+## this, never [method _passes].
 func check(ctx: EffectContext) -> bool:
-	var node: Node = ctx.target if subject == Subject.TARGET else ctx.source
-	return _test(node) != negate
+	return _passes(ctx) != negate
 
 
-## Override this: return true if the node passes. It may be null or have no components.
-func _test(_node: Node) -> bool:
-	return true
+## Override this: return true if [param ctx] passes. Either side may be null or have no
+## components. Leave [member negate] to [method check].
+@abstract func _passes(ctx: EffectContext) -> bool

@@ -1,6 +1,6 @@
 @tool
 class_name HasTagCondition
-extends Condition
+extends SubjectCondition
 ## Passes if the node has a status with [member tag], e.g. &"wet".
 
 ## The tag to look for, e.g. &"wet".

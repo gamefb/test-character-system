@@ -43,7 +43,7 @@ func test_a_stat_adds_to_the_chance() -> void:
 	roll.bonus_stat = &"crit_chance"
 	assert_true(roll.check(EffectContext.new(null, lucky)))
 	assert_false(roll.check(EffectContext.new(null, plain)), "no such stat: nothing is added")
-	roll.subject = Condition.Subject.SOURCE
+	roll.subject = EffectContext.Role.SOURCE
 	assert_true(roll.check(EffectContext.new(lucky, plain)), "the side Subject picks")
 
 

@@ -2,7 +2,7 @@
 @icon("res://character_system/icons/amount.svg")
 @abstract
 class_name Amount
-extends Resource
+extends DataResource
 ## A number worked out when an effect runs, instead of typed in: "2 per point of strength",
 ## "5% of the target's health", "a third of the hit".
 ##
@@ -36,11 +36,6 @@ static func total(base: float, scaling: Array[Amount], ctx: EffectContext) -> fl
 		if extra:
 			sum += extra.value(ctx)
 	return sum
-
-
-func _validate_property(property: Dictionary) -> void:
-	if Engine.is_editor_hint():
-		NameCheck.suggest(self, property)  # Name fields become lists to pick from.
 
 
 ## Override this: return the number for this use. [param ctx] says who is involved; either

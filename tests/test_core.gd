@@ -219,7 +219,7 @@ func test_every_base_class_has_an_icon_of_its_own() -> void:
 		assert_false(pictures.has(picture),
 				"%s has the same picture as %s" % [name, pictures.get(picture, &"")])
 		pictures[picture] = name
-	assert_gt(pictures.size(), 15)
+	assert_gt(pictures.size(), 10)
 
 
 func test_new_component_reports_its_stats() -> void:

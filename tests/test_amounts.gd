@@ -17,7 +17,7 @@ func health_of(node: Node) -> Health:
 	return Health.find_on(node)
 
 
-func per_point(stat_name: StringName, amount: float, of := Condition.Subject.SOURCE) -> StatAmount:
+func per_point(stat_name: StringName, amount: float, of := EffectContext.Role.SOURCE) -> StatAmount:
 	var a := StatAmount.new()
 	a.stat = stat_name
 	a.per_point = amount
@@ -180,7 +180,7 @@ func test_a_pool_effect_scales_too() -> void:
 	var target: Node3D = make_host([mana])
 	var draught := ChangePoolEffect.new()
 	draught.amount = 5.0
-	draught.scaling = [per_point(&"max_mana", 0.25, Condition.Subject.TARGET)]
+	draught.scaling = [per_point(&"max_mana", 0.25, EffectContext.Role.TARGET)]
 	draught.apply(EffectContext.new(null, target))
 	assert_eq(mana.current, 30.0, "5 + a quarter of the pool")
 	draught.apply(EffectContext.new(null, autofree(Node.new())))
