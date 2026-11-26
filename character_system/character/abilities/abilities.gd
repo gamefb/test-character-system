@@ -10,9 +10,9 @@ extends Component
 ##
 ## [br][br]An ability is used only if [method why_not] finds nothing against it: the character
 ## can act, isn't casting something else, has a charge and enough in its [Pool]s, and the
-## ability's conditions pass. Otherwise [signal failed] says why, e.g. for a "Not enough mana"
-## message. Costs and the charge are taken when the effects run, so an interrupted cast costs
-## nothing.
+## ability's conditions pass. Otherwise [signal failed] says why with a [enum Refusal], e.g.
+## for a "Not enough mana" message. Costs and the charge are taken when the effects run, so an
+## interrupted cast costs nothing.
 ## [br][br]The character's components and statuses hear [code]ability_cast_started[/code],
 ## [code]ability_used[/code] and [code]ability_interrupted[/code] as events, with the ability
 ## as [member EffectContext.origin].
@@ -24,7 +24,26 @@ signal cast_started(ability: AbilityData)
 ## Emitted when a cast is cut short. Nothing was spent.
 signal cast_interrupted(ability: AbilityData)
 ## Emitted when [method use] refuses. [param reason] is what [method why_not] returned.
-signal failed(ability: AbilityData, reason: StringName)
+signal failed(ability: AbilityData, reason: Refusal)
+
+## Why an ability can't be used right now. See [method why_not].
+enum Refusal {
+	## Nothing is against it.
+	NONE,
+	## A status is blocking the [Brain], as Stunned and Dead do, or one of the ability's
+	## [member AbilityData.blocked_by].
+	BLOCKED,
+	## Another ability is being cast.
+	CASTING,
+	## No charge is ready.
+	COOLDOWN,
+	## A [Pool] in [member AbilityData.costs] is missing or too low.
+	COST,
+	## One of its [member AbilityData.conditions] fails.
+	CONDITION,
+	## It needs a target and its targeting found none.
+	NO_TARGET,
+}
 
 ## Action name to ability, e.g. { &"secondary": fireball }. Change it at any time to grant
 ## abilities, or let an item do it with [Grants].
@@ -94,8 +113,8 @@ func _stop() -> void:
 ## Uses [param ability] if nothing is against it. Returns true if it was used, or if its cast
 ## started. Otherwise emits [signal failed] and returns false.
 func use(ability: AbilityData) -> bool:
-	var reason: StringName = why_not(ability)
-	if reason:
+	var reason: Refusal = why_not(ability)
+	if reason != Refusal.NONE:
 		failed.emit(ability, reason)
 		return false
 	if ability.cast_time <= 0.0:
@@ -112,31 +131,29 @@ func use(ability: AbilityData) -> bool:
 
 ## True if [method use] would use [param ability] right now, e.g. to grey out a button.
 func can_use(ability: AbilityData) -> bool:
-	return why_not(ability).is_empty()
+	return why_not(ability) == Refusal.NONE
 
 
-## Why [param ability] can't be used right now, or an empty name if it can:
-## [br]- [code]&"blocked"[/code]: a status is blocking the [Brain], as Stunned and Dead do,
-## or one of the ability's [member AbilityData.blocked_by].
-## [br]- [code]&"casting"[/code]: another ability is being cast.
-## [br]- [code]&"cooldown"[/code]: no charge is ready.
-## [br]- [code]&"cost"[/code]: a [Pool] in [member AbilityData.costs] is missing or too low.
-## [br]- [code]&"condition"[/code]: one of its [member AbilityData.conditions] fails.
-## [br]- [code]&"no_target"[/code]: it needs a target and its targeting found none.
-func why_not(ability: AbilityData) -> StringName:
-	var reason: StringName = &""
+## The first thing against using [param ability] right now, or [constant NONE]:
+## [codeblock]
+## func _on_abilities_failed(_ability: AbilityData, reason: Abilities.Refusal) -> void:
+## 	if reason == Abilities.Refusal.COST:
+## 		show_message("Not enough mana")
+## [/codeblock]
+func why_not(ability: AbilityData) -> Refusal:
+	var reason := Refusal.NONE
 	if not running or _blocked(ability):
-		reason = &"blocked"
+		reason = Refusal.BLOCKED
 	elif casting:
-		reason = &"casting"
+		reason = Refusal.CASTING
 	elif charges_left(ability) <= 0:
-		reason = &"cooldown"
+		reason = Refusal.COOLDOWN
 	elif not _can_pay(ability):
-		reason = &"cost"
+		reason = Refusal.COST
 	elif not Condition.all_pass(ability.conditions, EffectContext.new(host, host, ability)):
-		reason = &"condition"
+		reason = Refusal.CONDITION
 	elif ability.needs_target and _targets(ability).is_empty():
-		reason = &"no_target"
+		reason = Refusal.NO_TARGET
 	return reason
 
 
@@ -191,7 +208,7 @@ func _fire(ability: AbilityData) -> bool:
 	# No Targeting set: the ability affects its user.
 	var targets: Array[Node] = _targets(ability)
 	if not _can_pay(ability) or (ability.needs_target and targets.is_empty()):
-		failed.emit(ability, &"cost" if not _can_pay(ability) else &"no_target")
+		failed.emit(ability, Refusal.COST if not _can_pay(ability) else Refusal.NO_TARGET)
 		return false
 	for pool_name in ability.costs:
 		Pool.named(host, pool_name).spend(ability.costs[pool_name])

@@ -64,7 +64,7 @@ func test_stunned_stops_everything_and_silenced_stops_spells() -> void:
 	var fireball: AbilityData = ex("abilities/fireball.tres")
 	statuses(who).add(ex("statuses/silenced.tres"))
 	assert_false(brain.is_blocked())
-	assert_eq(abilities.why_not(fireball), &"blocked")
+	assert_eq(abilities.why_not(fireball), Abilities.Refusal.BLOCKED)
 	assert_true(abilities.can_use(ex("abilities/second_wind.tres")), "it only stops spells")
 	statuses(who).add(ex("statuses/stunned.tres"))
 	assert_true(brain.is_blocked())

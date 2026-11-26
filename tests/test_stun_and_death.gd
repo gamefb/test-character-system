@@ -62,7 +62,8 @@ func test_a_stunned_character_cannot_act() -> void:
 	assert_true(brain.is_blocked())
 	assert_eq(brain.move_dir, Vector3.ZERO)
 	assert_false(brain.is_action_pressed(&"primary"))
-	assert_eq(abilities.why_not(AbilityData.new()), &"blocked", "even when called from code")
+	assert_eq(abilities.why_not(AbilityData.new()), Abilities.Refusal.BLOCKED,
+			"even when called from code")
 	statuses.remove(stunned)
 	assert_eq(brain.move_dir, Vector3.FORWARD)
 	assert_true(brain.is_action_pressed(&"primary"), "a button still held counts again")
