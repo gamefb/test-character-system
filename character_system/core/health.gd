@@ -30,8 +30,8 @@ signal died(ctx: EffectContext)
 		update_stats()
 
 
-## The [Health] of [param node]'s character, or null if there is none. Safe on a freed node.
-static func find_on(node: Variant) -> Health:
+## The [Health] of [param node]'s character, or null if there is none.
+static func find_on(node: Node) -> Health:
 	return Component.of(node, Health) as Health
 
 

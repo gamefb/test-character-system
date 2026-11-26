@@ -33,8 +33,8 @@ var equipped: Dictionary[StringName, ItemInstance] = {}
 var _nodes: Dictionary[StringName, Node] = {}
 
 
-## The [Equipment] of [param node]'s character, or null if there is none. Safe on a freed node.
-static func find_on(node: Variant) -> Equipment:
+## The [Equipment] of [param node]'s character, or null if there is none.
+static func find_on(node: Node) -> Equipment:
 	return Component.of(node, Equipment) as Equipment
 
 

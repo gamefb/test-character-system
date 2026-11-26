@@ -26,7 +26,7 @@ enum Where {
 
 func _execute(ctx: EffectContext) -> void:
 	var anchor := (ctx.source if at == Where.SOURCE else ctx.target) as Node3D
-	if not scene or not is_instance_valid(anchor) or not anchor.is_inside_tree():
+	if not scene or not anchor or not anchor.is_inside_tree():
 		return
 	var where: Vector3 = anchor.global_position
 	if at == Where.HIT_POINT and ctx.hit().position.is_finite():

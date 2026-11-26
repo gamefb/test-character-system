@@ -24,7 +24,7 @@ extends Effect
 
 func _execute(ctx: EffectContext) -> void:
 	var user := ctx.source as Node3D
-	if not is_instance_valid(user) or not user.is_inside_tree():
+	if not user or not user.is_inside_tree():
 		return
 	# From the weapon that fired, if the context says where it is; otherwise from the chest.
 	var from_weapon: bool = ctx.position.is_finite()

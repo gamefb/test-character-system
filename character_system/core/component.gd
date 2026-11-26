@@ -43,8 +43,8 @@ extends Node
 ##
 ## [b]Using components from other code.[/b] Get one with its type's [code]find_on()[/code],
 ## such as [method Health.find_on], read stats with [method ComponentManager.stat_of] and send
-## events with [method ComponentManager.notify]. All three are safe on null or freed nodes and
-## on nodes without components, such as walls.
+## events with [method ComponentManager.notify]. All three are safe on null and on nodes
+## without components, such as walls.
 ## [codeblock]
 ## var health := Health.find_on(body)  # null if body has no Health.
 ## if health:
@@ -118,7 +118,7 @@ var _reported := false
 var _required: Array[Script] = []
 
 
-## Returns the [param type] component on [param node], or null. Safe on null or freed nodes.
+## Returns the [param type] component on [param node], or null. Safe on a null node.
 ##
 ## Use it from any script: effects, level scripts, UI. Subclasses count, so asking for
 ## [Brain] finds a [PlayerBrain] or [AIBrain]. The components a game looks up most have a
@@ -129,12 +129,12 @@ var _required: Array[Script] = []
 ## var sprint := Component.of(enemy, Sprint) as Sprint
 ##
 ## # In sprint.gd, so other scripts can write Sprint.find_on(enemy):
-## static func find_on(node: Variant) -> Sprint:
+## static func find_on(node: Node) -> Sprint:
 ## 	return Component.of(node, Sprint) as Sprint
 ## [/codeblock]
 ## It works on a scene that hasn't been added to the level yet, e.g. to set a spawned
 ## enemy's [member Faction.team] before [code]add_child()[/code].
-static func of(node: Variant, type: Script) -> Component:
+static func of(node: Node, type: Script) -> Component:
 	var m := ComponentManager.of(node)
 	return m.find(type) if m else null
 

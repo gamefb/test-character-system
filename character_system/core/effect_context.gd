@@ -30,9 +30,10 @@ extends RefCounted
 ## The hit then lands for (amount + add) × (1 + percent) × mul, the same formula stats use, so
 ## the result doesn't depend on which status was applied first. See [method resolve].
 ##
-## [member source] may have been freed by the time a status ticks. A context built then has a
-## null source, and [method Component.of] and the [ComponentManager] helpers accept freed
-## nodes; check [code]is_instance_valid(ctx.source)[/code] before using it directly.
+## [b]Sources can die.[/b] A status may outlive whoever applied it, and a rocket whoever fired
+## it. Building a context is where that is settled: a node that has been freed becomes null
+## here, so effects, conditions and listeners get a [member source] and a [member target]
+## that are each a live node or null, and only need the null check.
 
 ## The two nodes an effect involves. Conditions and amounts export one to say which they read.
 enum Role {
@@ -99,7 +100,8 @@ var charge: float = 0.0
 
 ## [param p_source] caused it, [param p_target] receives it, and [param p_origin] is the
 ## ability, status or item behind it. A node that has already been freed counts as null, so a
-## status whose applier is gone can still build its context.
+## status whose applier is gone can still build its context. The two have no type because
+## GDScript refuses a freed node for a typed parameter.
 func _init(p_source: Variant = null, p_target: Variant = null, p_origin: Resource = null) -> void:
 	source = p_source if is_instance_valid(p_source) else null
 	target = p_target if is_instance_valid(p_target) else null
@@ -139,7 +141,7 @@ func hit_position() -> Vector3:
 	if position.is_finite():
 		return position
 	var node := target as Node3D
-	return node.global_position if is_instance_valid(node) and node.is_inside_tree() else Vector3.ZERO
+	return node.global_position if node and node.is_inside_tree() else Vector3.ZERO
 
 
 ## Clears the running totals before a new number is worked out. Effects call this.

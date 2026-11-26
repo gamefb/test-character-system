@@ -21,8 +21,8 @@ extends Component
 var _holstered := false
 
 
-## The [WeaponSwitch] of [param node]'s character, or null if there is none. Safe on a freed node.
-static func find_on(node: Variant) -> WeaponSwitch:
+## The [WeaponSwitch] of [param node]'s character, or null if there is none.
+static func find_on(node: Node) -> WeaponSwitch:
 	return Component.of(node, WeaponSwitch) as WeaponSwitch
 
 

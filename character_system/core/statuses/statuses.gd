@@ -32,8 +32,8 @@ signal refused(data: StatusData, source: Node)
 var active: Dictionary[StatusData, ActiveStatus] = {}
 
 
-## The [Statuses] of [param node]'s character, or null if there is none. Safe on a freed node.
-static func find_on(node: Variant) -> Statuses:
+## The [Statuses] of [param node]'s character, or null if there is none.
+static func find_on(node: Node) -> Statuses:
 	return Component.of(node, Statuses) as Statuses
 
 

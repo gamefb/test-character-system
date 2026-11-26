@@ -65,7 +65,7 @@ var _excluded: Array[RID] = []
 static func launch(scene: PackedScene, p_source: Node, from: Vector3, toward: Vector3,
 		extra_effects: Array[Effect] = [], p_origin: Resource = null, p_charge: float = 0.0,
 		extra_speed: float = 0.0) -> Projectile:
-	var tree: SceneTree = p_source.get_tree() if is_instance_valid(p_source) else null
+	var tree: SceneTree = p_source.get_tree() if p_source else null
 	if not scene or not tree:
 		return null
 	var shot := scene.instantiate() as Projectile
@@ -164,7 +164,7 @@ func _blast(where: Vector3) -> void:
 	var hits: Dictionary[Node, EffectContext] = {}
 	for hit in get_world_3d().direct_space_state.intersect_shape(query, 64):
 		var target: Node = hit.collider.character if hit.collider is Hurtbox else hit.collider
-		if hits.has(target) or not is_instance_valid(target):
+		if hits.has(target) or not target:
 			continue
 		var ctx := EffectContext.new(source, target, origin)
 		ctx.charge = charge

@@ -92,8 +92,8 @@ var _blocked := false
 var _push := Vector3.ZERO
 
 
-## The [CharacterMotor] of [param node]'s character, or null if there is none. Safe on a freed node.
-static func find_on(node: Variant) -> CharacterMotor:
+## The [CharacterMotor] of [param node]'s character, or null if there is none.
+static func find_on(node: Node) -> CharacterMotor:
 	return Component.of(node, CharacterMotor) as CharacterMotor
 
 

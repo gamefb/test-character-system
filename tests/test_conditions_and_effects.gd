@@ -130,28 +130,24 @@ func test_a_scene_can_spawn_at_the_hit_point_or_the_source() -> void:
 	assert_eq(places, expected, "the target, the hit point, the source, then the target again")
 
 
-## Everything the docs call safe on a freed node, tried on one. A script error in here would
-## end the function early, and the caller would get null instead of the list.
-func lookups_on(node: Variant) -> Array:
-	var out: Array = [
-		Component.of(node, Health),
-		ComponentManager.of(node),
-		ComponentManager.stat_of(node, &"max_health"),
-		Pool.named(node, &"mana"),
-		Hurtbox.rids_of(node).size(),
-		EffectContext.new(node, node).source,
-		Hurtbox.hit(node, null).source,
-	]
-	ComponentManager.notify(node, &"ping")
-	return out
-
-
-func test_lookups_accept_a_node_that_was_just_freed() -> void:
+## A freed node becomes null in the two places that build a context, so whatever is handed
+## the context meets a live node or null, and every lookup takes null.
+func test_a_freed_node_becomes_null_where_a_context_is_built() -> void:
 	var gone: Node3D = make_host()
 	var faction := Faction.new()
 	faction.hostile_to = [&"enemy"]
 	make_host([faction])
 	gone.free()
-	assert_eq(lookups_on(gone), [null, null, 0.0, null, 0, null, null])
-	assert_eq(lookups_on(null), [null, null, 0.0, null, 0, null, null])
-	assert_false(faction.is_hostile(gone))
+	var ctx := EffectContext.new(gone, gone)
+	assert_null(ctx.source)
+	assert_null(ctx.target)
+	assert_null(Hurtbox.hit(gone, null).source, "the shooter of a rocket still in the air")
+	assert_eq(ctx.hit_position(), Vector3.ZERO)
+	assert_null(Component.of(ctx.source, Health))
+	assert_null(ComponentManager.of(ctx.source))
+	assert_eq(ComponentManager.stat_of(ctx.source, &"max_health"), 0.0)
+	assert_false(ComponentManager.blocked(ctx.target, &"damage"))
+	assert_null(Pool.named(ctx.target, &"mana"))
+	assert_eq(Hurtbox.rids_of(ctx.source).size(), 0)
+	assert_false(faction.is_hostile(ctx.target))
+	ComponentManager.notify(ctx.source, &"ping")

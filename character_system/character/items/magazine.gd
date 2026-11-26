@@ -35,8 +35,8 @@ var rounds: int:
 var _reload_left: float = 0.0
 
 
-## The [Magazine] on the item scene [param node], or null if there is none. Safe on a freed node.
-static func find_on(node: Variant) -> Magazine:
+## The [Magazine] on the item scene [param node], or null if there is none.
+static func find_on(node: Node) -> Magazine:
 	return Component.of(node, Magazine) as Magazine
 
 

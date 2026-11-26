@@ -14,7 +14,7 @@ extends Effect
 func _execute(ctx: EffectContext) -> void:
 	var target := ctx.target as Node3D
 	var from := ctx.source as Node3D
-	if not target or not is_instance_valid(from):
+	if not target or not from:
 		return
 	var away: Vector3 = from.global_position.direction_to(target.global_position)
 	away = away.slide(Vector3.UP).normalized()

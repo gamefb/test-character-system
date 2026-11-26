@@ -71,8 +71,8 @@ var _max_stat: StringName = &"max_mana"
 var _regen_stat: StringName = &"mana_regen"
 
 
-## The pool called [param pool_name] on [param node]'s character, or null. Safe on a freed node.
-static func named(node: Variant, pool_name: StringName) -> Pool:
+## The pool called [param pool_name] on [param node]'s character, or null.
+static func named(node: Node, pool_name: StringName) -> Pool:
 	var m := ComponentManager.of(node)
 	if m:
 		for found: Pool in m.find_all(Pool):
@@ -203,7 +203,7 @@ func _hold(ctx: EffectContext) -> void:
 	var data: StatusData = _empty_status()
 	var statuses := find(Statuses) as Statuses
 	if data and statuses and not _held:
-		var source: Node = ctx.source if ctx and is_instance_valid(ctx.source) else null
+		var source: Node = ctx.source if ctx else null
 		if statuses.add(data, source):
 			_held = data
 

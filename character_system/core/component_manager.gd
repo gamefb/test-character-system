@@ -21,8 +21,8 @@ extends Node
 ## every host at once.
 ##
 ## From other code, use the static helpers [method of], [method notify] and [method stat_of].
-## They take any node and do nothing (or return 0) if it has no manager, so they're safe on
-## walls, props and freed nodes.
+## They take any node, or null, and do nothing (or return 0) if it has no manager, so they're
+## safe on walls and props.
 ## [codeblock]
 ## var speed := ComponentManager.stat_of(player, &"move_speed")
 ## ComponentManager.notify(player, &"level_up")
@@ -74,19 +74,17 @@ var _found: Dictionary[Script, Component] = {}  # find() answers, cleared when c
 var _events: Dictionary[StringName, Signal] = {}  # The signals event() has handed out.
 
 
-## Returns [param node]'s [ComponentManager] child, or null. Safe on null or freed nodes:
-## [param node] has no type so that a node freed a moment ago can be passed straight in.
-static func of(node: Variant) -> ComponentManager:
-	if not is_instance_valid(node):
-		return null
-	var valid := node as Node  # Typed from here on, which is quicker to call.
-	if not valid:
+## Returns [param node]'s [ComponentManager] child, or null if it has none or [param node] is
+## null. A node you kept in a variable may have been freed since: check it with
+## [code]is_instance_valid()[/code] first, as for any call that takes a node.
+static func of(node: Node) -> ComponentManager:
+	if not node:
 		return null
 	# The usual name is a quick lookup; searching the children is the fallback.
-	var named := valid.get_node_or_null(^"ComponentManager") as ComponentManager
+	var named := node.get_node_or_null(^"ComponentManager") as ComponentManager
 	if named:
 		return named
-	for child in valid.get_children():
+	for child in node.get_children():
 		if child is ComponentManager:
 			return child
 	return null
@@ -98,21 +96,21 @@ static func of(node: Variant) -> ComponentManager:
 ## listener connected with [method event] or [method Component.on] hears it, and status
 ## triggers with that [member StatusTrigger.event] fire. Leave out [param ctx] and a context
 ## with [param node] as the target is made for you; pass your own to say who caused it.
-static func notify(node: Variant, event: StringName, ctx: EffectContext = null) -> void:
+static func notify(node: Node, event: StringName, ctx: EffectContext = null) -> void:
 	var m: ComponentManager = of(node)
 	if m:
 		m.send(event, ctx if ctx else EffectContext.new(null, node))
 
 
 ## Reads [param stat_name] from [param node], or 0 if it has no [ComponentManager].
-static func stat_of(node: Variant, stat_name: StringName) -> float:
+static func stat_of(node: Node, stat_name: StringName) -> float:
 	var m: ComponentManager = of(node)
 	return m.stat(stat_name) if m else 0.0
 
 
 ## Whether [param node]'s host is blocking [param what], e.g. [code]&"damage"[/code]. False
-## for a node without a manager, and safe on a freed one.
-static func blocked(node: Variant, what: StringName) -> bool:
+## for a node without a manager.
+static func blocked(node: Node, what: StringName) -> bool:
 	var m := of(node)
 	return m != null and m.blocks.has(what)
 

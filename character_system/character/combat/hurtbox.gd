@@ -63,15 +63,15 @@ static func raycast(space: PhysicsDirectSpaceState3D,
 static func stops_shots(collider: Object) -> bool:
 	if collider is Area3D and not collider is Hurtbox:
 		return false
-	return not ComponentManager.blocked(
-			collider.character if collider is Hurtbox else collider, &"targeting")
+	var character := (collider.character if collider is Hurtbox else collider) as Node
+	return not ComponentManager.blocked(character, &"targeting")
 
 
 ## RIDs of a character's body and hurtboxes, so its own shots can ignore them. It searches the
 ## whole character, so call it once (e.g. when a weapon is equipped), not on every shot.
-static func rids_of(character: Variant) -> Array[RID]:
+static func rids_of(character: Node) -> Array[RID]:
 	var rids: Array[RID] = []
-	if not is_instance_valid(character) or not character is Node:
+	if not character:
 		return rids
 	if character is CollisionObject3D:
 		rids.append(character.get_rid())

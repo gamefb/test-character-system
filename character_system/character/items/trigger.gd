@@ -71,8 +71,8 @@ var _winding: float = 0.0
 var _charging := false
 
 
-## The [Trigger] on the item scene [param node], or null if there is none. Safe on a freed node.
-static func find_on(node: Variant) -> Trigger:
+## The [Trigger] on the item scene [param node], or null if there is none.
+static func find_on(node: Node) -> Trigger:
 	return Component.of(node, Trigger) as Trigger
 
 

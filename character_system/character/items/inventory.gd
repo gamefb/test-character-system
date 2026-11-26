@@ -16,8 +16,8 @@ signal changed
 @export var items: Array[ItemInstance] = []
 
 
-## The [Inventory] of [param node]'s character, or null if there is none. Safe on a freed node.
-static func find_on(node: Variant) -> Inventory:
+## The [Inventory] of [param node]'s character, or null if there is none.
+static func find_on(node: Node) -> Inventory:
 	return Component.of(node, Inventory) as Inventory
 
 

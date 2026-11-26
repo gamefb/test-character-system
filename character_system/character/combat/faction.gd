@@ -21,8 +21,8 @@ extends Component
 @export var hostile_to: Array[StringName] = []
 
 
-## The [Faction] of [param node]'s character, or null if there is none. Safe on a freed node.
-static func find_on(node: Variant) -> Faction:
+## The [Faction] of [param node]'s character, or null if there is none.
+static func find_on(node: Node) -> Faction:
 	return Component.of(node, Faction) as Faction
 
 
@@ -36,5 +36,5 @@ func _stop() -> void:
 
 
 ## True if [param other] is in the group of a team this character fights.
-func is_hostile(other: Variant) -> bool:
-	return is_instance_valid(other) and other is Node and hostile_to.any(other.is_in_group)
+func is_hostile(other: Node) -> bool:
+	return other != null and hostile_to.any(other.is_in_group)
